@@ -3,289 +3,31 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>頭城烏石港賞鯨行程智能指南｜給家人看的決策版</title>
-  <meta name="description" content="頭城烏石港出發、龜山島賞鯨行程比較與決策指南。適合給家人快速判斷要不要報名、選哪個方案、怎麼準備。" />
+  <title>OmiNote｜入口</title>
+  <meta name="description" content="OmiNote 一頁式網站入口。" />
   <style>
-    :root{
-      --bg:#eef8ff;
-      --paper:#ffffff;
-      --ink:#11314b;
-      --muted:#5c7890;
-      --blue:#0499d8;
-      --blue2:#0d79bd;
-      --deep:#0d4160;
-      --cyan:#c9f3ff;
-      --mint:#d9ffe9;
-      --green:#17a85b;
-      --yellow:#fff4cb;
-      --orange:#ffad3b;
-      --red:#e95757;
-      --pink:#ffe8ec;
-      --line:#d7eaf4;
-      --shadow: 0 18px 40px rgba(31,88,126,.14);
-      --radius:26px;
-    }
-    *{box-sizing:border-box}
-    html{scroll-behavior:smooth}
-    body{
-      margin:0;
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC","PingFang TC","Microsoft JhengHei",Arial,sans-serif;
-      color:var(--ink);
-      background:
-        radial-gradient(circle at 8% 8%, rgba(1,168,220,.16), transparent 28%),
-        radial-gradient(circle at 98% 16%, rgba(255,190,73,.16), transparent 24%),
-        linear-gradient(180deg, #eaf8ff 0%, #fffaf1 100%);
-      line-height:1.72;
-    }
-    a{color:var(--blue2);text-decoration:none}
-    a:hover{text-decoration:underline}
-    .wrap{width:min(1080px, calc(100% - 32px));margin:0 auto;padding:32px 0 72px}
-    .hero{
-      position:relative;
-      overflow:hidden;
-      color:white;
-      background:
-        linear-gradient(135deg, rgba(8,68,101,.98), rgba(8,45,71,.98)),
-        radial-gradient(circle at 20% 12%, rgba(16,202,243,.4), transparent 32%);
-      border-radius:34px;
-      padding:42px clamp(24px, 5vw, 56px);
-      box-shadow:var(--shadow);
-      min-height:330px;
-    }
-    .hero:before{
-      content:"";
-      position:absolute;
-      right:-80px;bottom:-130px;
-      width:420px;height:420px;
-      border:18px solid rgba(0,165,220,.16);
-      transform:rotate(32deg);
-      border-radius:38px;
-    }
-    .hero:after{
-      content:"🐳";
-      position:absolute;
-      right:44px;top:26px;
-      font-size:58px;
-      filter:drop-shadow(0 9px 0 rgba(0,0,0,.22));
-      transform:rotate(-6deg);
-    }
-    .tag{display:inline-flex;gap:8px;align-items:center;background:rgba(41,187,232,.2);border:1px solid rgba(185,243,255,.22);border-radius:999px;padding:7px 13px;font-weight:800;color:#aeefff;font-size:14px}
-    .tag span{width:8px;height:8px;border-radius:999px;background:#2ee2ff;display:inline-block}
-    h1{font-size:clamp(34px, 6vw, 62px);line-height:1.04;margin:22px 0 16px;letter-spacing:-.04em;max-width:780px}
-    h1 mark{background:transparent;color:#d9f985}
-    .lead{font-size:clamp(17px, 2.2vw, 23px);font-weight:800;color:#bde8ff;max-width:760px;margin:0 0 22px}
-    .hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}
-    .btn{appearance:none;border:0;border-radius:14px;padding:12px 18px;font-weight:900;cursor:pointer;background:var(--blue);color:white;box-shadow:0 8px 16px rgba(2,105,161,.22);font-size:16px;display:inline-flex;align-items:center;gap:8px}
-    .btn.secondary{background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.25)}
-    .btn.light{background:#effaff;color:var(--deep);border:1px solid var(--line);box-shadow:none}
-    .grid{display:grid;grid-template-columns:1.15fr .85fr;gap:26px;margin-top:30px}
-    .card{background:rgba(255,255,255,.92);border:1px solid rgba(216,235,244,.9);border-radius:var(--radius);box-shadow:var(--shadow);padding:28px;position:relative;overflow:hidden}
-    .card h2{font-size:25px;line-height:1.25;margin:0 0 10px;color:var(--deep);letter-spacing:-.02em}
-    .card h3{font-size:20px;margin:22px 0 8px;color:var(--deep)}
-    .sub{color:var(--muted);margin:0 0 18px;font-weight:650}
-    .big-call{font-size:30px;line-height:1.25;font-weight:950;color:#006eab;margin:12px 0 14px;letter-spacing:-.03em}
-    .chips{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 18px}.chip{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;background:#effbff;border:1px solid #bde9fa;color:#0878ad;font-weight:850;font-size:13px}.chip.good{background:#effff4;border-color:#a9efc4;color:#0c8b4a}.chip.warn{background:#fff8dc;border-color:#ffe09a;color:#9a6400}
-    .notice{border-radius:18px;padding:16px 18px;background:#e8fbff;border:1px solid #c6eef8;color:#08618f;font-weight:750}.notice.pink{background:#fff0f2;border-color:#ffd1da;color:#b63c4f}.notice.yellow{background:#fff8df;border-color:#ffe2a0;color:#845400}.notice.green{background:#edfff4;border-color:#bff0d0;color:#0d7544}
-    .divider{height:1px;background:var(--line);margin:24px 0}
-    .mini{font-size:14px;color:var(--muted);font-weight:700}.price-table{width:100%;border-collapse:separate;border-spacing:0 10px;margin-top:14px}.price-table th{text-align:left;font-size:13px;color:var(--muted);padding:0 12px}.price-table td{background:#f6fbff;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:14px 12px;font-weight:800}.price-table td:first-child{border-left:1px solid var(--line);border-radius:16px 0 0 16px}.price-table td:last-child{border-right:1px solid var(--line);border-radius:0 16px 16px 0}.best td{background:#effff4;border-color:#aeeac4}.best .badge{background:#18a95c;color:#fff}.badge{display:inline-flex;border-radius:999px;padding:3px 9px;background:#dfeef7;color:#2a6386;font-size:12px;font-weight:950;white-space:nowrap}.timeline{display:grid;gap:12px;margin-top:16px}.step{display:grid;grid-template-columns:42px 1fr;gap:12px;align-items:start}.num{width:42px;height:42px;border-radius:14px;background:#eaf8ff;border:1px solid #cbeef9;display:flex;align-items:center;justify-content:center;font-weight:950;color:#0479af}.step strong{display:block;font-size:17px;color:var(--deep)}
-    .sim-tabs{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0 18px}.tab{border:1px solid var(--line);background:#fff;border-radius:14px;padding:10px 13px;font-weight:900;color:#2c698a;cursor:pointer}.tab.active{background:#078fd1;color:#fff;border-color:#078fd1}.result{background:#e7fbff;border:1px solid #c6eef8;border-radius:18px;padding:18px;margin-top:14px}.metric{display:grid;grid-template-columns:1fr auto;gap:10px;padding:8px 0;border-bottom:1px dashed rgba(14,110,150,.22);font-weight:800}.metric:last-child{border-bottom:0}.score{font-size:24px;color:#0a9c52;font-weight:950}
-    .plans{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.plan{border:1px solid var(--line);border-radius:22px;background:#fff;padding:18px;display:flex;flex-direction:column;gap:8px}.plan.reco{border-color:#84ddad;background:linear-gradient(180deg,#effff5,#fff)}.plan .price{font-size:28px;font-weight:950;color:#0078b6}.plan .name{font-weight:950;color:var(--deep)}.plan .small{font-size:13px;color:var(--muted);font-weight:700}.plan ul{padding-left:18px;margin:8px 0 0}.plan li{margin:4px 0}.checklist{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.check{background:#f7fcff;border:1px solid var(--line);border-radius:18px;padding:14px 16px;font-weight:800}.check input{transform:scale(1.2);margin-right:8px}.decision{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.decision .box{border-radius:22px;padding:20px;border:1px solid var(--line);background:#fff}.decision .box strong{display:block;font-size:20px;color:var(--deep);margin-bottom:6px}.box.go{background:#effff4;border-color:#a8e8c1}.box.maybe{background:#fff9e8;border-color:#ffe0a0}.box.no{background:#fff0f2;border-color:#ffcbd4}.footer{margin-top:32px;color:var(--muted);font-size:14px;text-align:center}.source-list{font-size:14px;color:var(--muted)}
-    .topnav{position:sticky;top:0;z-index:20;background:rgba(241,250,255,.78);backdrop-filter:blur(14px);border-bottom:1px solid rgba(191,225,240,.75)}.topnav-inner{width:min(1080px, calc(100% - 32px));margin:0 auto;display:flex;gap:10px;overflow:auto;padding:10px 0}.topnav a{white-space:nowrap;border-radius:999px;background:#fff;border:1px solid var(--line);padding:8px 12px;font-weight:850;color:#285f7d;font-size:14px}.topnav a:hover{background:#eaf8ff;text-decoration:none}
-    @media(max-width:860px){.wrap{width:min(100% - 22px,1080px);padding-top:18px}.hero{border-radius:25px;padding:30px 22px;min-height:auto}.hero:after{font-size:42px;right:22px;top:18px}.grid,.plans,.decision{grid-template-columns:1fr}.checklist{grid-template-columns:1fr}.card{padding:22px;border-radius:22px}.price-table{font-size:14px}.price-table th:nth-child(3),.price-table td:nth-child(3){display:none}.big-call{font-size:25px}}
-    @media print{body{background:#fff}.topnav,.hero-actions,.btn,.sim-tabs{display:none}.wrap{width:100%;padding:0}.hero,.card{box-shadow:none;border:1px solid #ddd;break-inside:avoid}.hero{color:#111;background:#fff}.hero .lead,.tag{color:#111}.grid,.plans,.decision,.checklist{grid-template-columns:1fr 1fr}a{color:#111;text-decoration:none}}
+    :root{--bg:#eef8ff;--paper:#fff;--ink:#11314b;--muted:#5d7890;--blue:#0795d0;--deep:#0b405f;--line:#d8edf7;--shadow:0 18px 42px rgba(24,83,116,.14)}*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC","PingFang TC","Microsoft JhengHei",Arial,sans-serif;color:var(--ink);background:radial-gradient(circle at 0 0,rgba(0,169,220,.18),transparent 32%),radial-gradient(circle at 100% 18%,rgba(255,184,77,.2),transparent 26%),linear-gradient(180deg,#eaf8ff,#fffaf1);min-height:100vh}.wrap{width:min(960px,calc(100% - 32px));margin:auto;padding:48px 0}.hero{color:#fff;border-radius:34px;padding:42px clamp(24px,5vw,58px);background:linear-gradient(135deg,#0b4b6e,#092e48);box-shadow:var(--shadow);position:relative;overflow:hidden}.hero:after{content:"🗒️";position:absolute;right:38px;top:26px;font-size:58px;filter:drop-shadow(0 8px 0 rgba(0,0,0,.22));transform:rotate(-6deg)}.tag{display:inline-flex;border-radius:999px;padding:7px 13px;background:rgba(42,202,242,.2);color:#b7f2ff;font-weight:900}h1{font-size:clamp(36px,6vw,62px);line-height:1.04;margin:22px 0 14px;letter-spacing:-.04em}.lead{max-width:700px;color:#c4ecff;font-size:clamp(17px,2.2vw,22px);font-weight:850}.section-title{margin:34px 0 14px;color:var(--deep)}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}.card{display:block;background:rgba(255,255,255,.94);border:1px solid var(--line);border-radius:26px;box-shadow:var(--shadow);padding:24px;text-decoration:none;color:inherit;transition:.18s transform,.18s box-shadow}.card:hover{transform:translateY(-3px);box-shadow:0 22px 48px rgba(24,83,116,.18);text-decoration:none}.card .emoji{font-size:36px}.card h2{margin:10px 0 8px;color:var(--deep)}.card p{margin:0;color:var(--muted);line-height:1.7}.badge{display:inline-flex;margin-top:18px;border-radius:999px;background:#effbff;border:1px solid #bde9fa;color:#0878ad;padding:5px 10px;font-weight:850;font-size:13px}.footer{text-align:center;color:var(--muted);font-size:14px;margin-top:34px}@media(max-width:760px){.wrap{width:min(100% - 22px,960px);padding:24px 0}.hero{border-radius:25px;padding:30px 22px}.hero:after{font-size:42px;right:20px;top:16px}}
   </style>
 </head>
 <body>
-  <nav class="topnav" aria-label="頁面導覽">
-    <div class="topnav-inner">
-      <a href="#summary">結論</a>
-      <a href="#sea">海況模擬</a>
-      <a href="#plans">方案比較</a>
-      <a href="#judge">適不適合</a>
-      <a href="#pack">行前準備</a>
-      <a href="#sources">資料提醒</a>
-    </div>
-  </nav>
-
   <main class="wrap">
     <section class="hero">
-      <div class="tag"><span></span>頭城烏石港出發｜龜山島賞鯨指南</div>
-      <h1>值得去！但建議報 <mark>「環島＋賞鯨」</mark> 就好</h1>
-      <p class="lead">最推薦：1000 元、約 2.5 小時。時間體力剛剛好，能看龜山島，也保留看到鯨豚的驚喜。</p>
-      <div class="hero-actions">
-        <a class="btn" href="#judge">🧭 先看適不適合</a>
-        <button class="btn secondary" onclick="window.print()">🖨️ 列印給家人</button>
-      </div>
+      <div class="tag">OmiNote｜入口</div>
+      <h1>這裡放一頁式網站</h1>
+      <p class="lead">這個首頁只當入口，不放完整內容。之後每個主題都會放到自己的資料夾，網址乾淨、好分享，也不會全部擠成海鮮粥。</p>
     </section>
 
-    <section class="grid" id="summary">
-      <article class="card">
-        <h2>💡 一秒重點</h2>
-        <p class="big-call">別猶豫太久，直接報 1000 元的組合！</p>
-        <div class="chips">
-          <span class="chip good">CP 值最高</span>
-          <span class="chip">時間最剛好</span>
-          <span class="chip warn">暈船風險較可控</span>
-        </div>
-        <p>我們要把期待放在「看牛奶海、繞龜山島、看飛旋海豚游水」。如果一路看到牠們跳得像海上爆米花，那就是額外中獎；如果沒看到，也還有龜山島景觀，不會整趟變成只在海上等動物打卡。</p>
-        <div class="divider"></div>
-        <p class="mini">📅 建議出發時間：上午 8:00－10:00。下午通常比較容易累，也比較怕海況變化。</p>
-      </article>
+    <h2 class="section-title">目前頁面</h2>
+    <div class="grid">
+      <a class="card" href="pages/toucheng-whale-watching/">
+        <div class="emoji">🐳</div>
+        <h2>頭城烏石港賞鯨行程指南</h2>
+        <p>給家人看的決策版：方案比較、海況模擬、適不適合報名、行前準備。</p>
+        <span class="badge">開啟頁面</span>
+      </a>
+    </div>
 
-      <aside class="card" id="sea">
-        <h2>🌊 海況與鯨豚模擬</h2>
-        <p class="sub">點不同海況，看當天體感與期待值：</p>
-        <div class="sim-tabs">
-          <button class="tab active" data-mode="sun">☀️ 晴天微風</button>
-          <button class="tab" data-mode="cloud">⛅ 多雲中浪</button>
-          <button class="tab" data-mode="rain">🌧️ 陰雨大浪</button>
-        </div>
-        <div class="result" id="seaResult" aria-live="polite"></div>
-        <p class="notice pink" style="margin-top:12px">⚠️ 注意：海上天候變化快，實際出發仍以船公司通知為準。</p>
-      </aside>
-    </section>
-
-    <section class="card" id="plans" style="margin-top:30px">
-      <h2>🗺️ 烏石港四大行程方案，怎麼選？</h2>
-      <p class="sub">以下價格依目前收到的報價整理，實際仍以業者當日公告與訂位確認為準。</p>
-      <div class="plans">
-        <div class="plan">
-          <span class="badge">最省</span>
-          <div class="name">純環島</div>
-          <div class="price">600</div>
-          <div class="small">約 1.5 小時</div>
-          <ul><li>適合只想看龜山島</li><li>不追求鯨豚</li><li>體力負擔最低</li></ul>
-        </div>
-        <div class="plan reco">
-          <span class="badge" style="background:#18a95c;color:#fff">最推薦</span>
-          <div class="name">環島＋賞鯨</div>
-          <div class="price">1000</div>
-          <div class="small">約 2.5 小時</div>
-          <ul><li>景觀＋鯨豚機會都有</li><li>不用登島曬太久</li><li>長輩與一般旅客最平衡</li></ul>
-        </div>
-        <div class="plan">
-          <span class="badge">想上島</span>
-          <div class="name">環島＋登島</div>
-          <div class="price">1200</div>
-          <div class="small">約 3 小時</div>
-          <ul><li>適合想慢慢看島</li><li>但比較曬、要走路</li><li>沒有賞鯨重點</li></ul>
-        </div>
-        <div class="plan">
-          <span class="badge">全包</span>
-          <div class="name">環島＋登島＋賞鯨</div>
-          <div class="price">1500</div>
-          <div class="small">約 4 小時</div>
-          <ul><li>內容最滿</li><li>體力消耗最大</li><li>怕暈船者不建議</li></ul>
-        </div>
-      </div>
-    </section>
-
-    <section class="grid" style="margin-top:30px">
-      <article class="card">
-        <h2>🐬 看到鯨豚的機率高嗎？</h2>
-        <p>以頭城烏石港到龜山島周邊來說，賞鯨豚本來就是熱門行程，夏季通常比冷門季節更值得期待。不過牠們是野生動物，不是排班打卡的工讀生，所以沒有「保證一定看到」。</p>
-        <div class="notice green">比較務實的期待：把它當成「高機會看到海豚，但不保證」。看到就是賺到，沒看到也還有龜山島與牛奶海景觀。</div>
-        <h3>比較容易加分的條件</h3>
-        <div class="timeline">
-          <div class="step"><div class="num">1</div><div><strong>天氣穩、浪小</strong>船比較能順利找鯨豚，也比較不會暈到變鹹魚。</div></div>
-          <div class="step"><div class="num">2</div><div><strong>早上出發</strong>體力和精神狀態比較好，長輩也比較不容易累。</div></div>
-          <div class="step"><div class="num">3</div><div><strong>選賞鯨不是只環島</strong>船程會把找鯨豚納入重點，不只是繞島看風景。</div></div>
-        </div>
-      </article>
-
-      <article class="card" id="judge">
-        <h2>🧭 智能行程評估器</h2>
-        <p class="sub">勾一勾，幫家人快速判斷適不適合報名。</p>
-        <div class="checklist">
-          <label class="check"><input type="checkbox" class="q" value="2" checked> 想看龜山島與牛奶海</label>
-          <label class="check"><input type="checkbox" class="q" value="2" checked> 對海豚有興趣</label>
-          <label class="check"><input type="checkbox" class="q" value="1"> 不太會暈船</label>
-          <label class="check"><input type="checkbox" class="q" value="1"> 能接受 2.5 小時船程</label>
-          <label class="check"><input type="checkbox" class="q danger" value="-2"> 容易暈船或怕浪</label>
-          <label class="check"><input type="checkbox" class="q danger" value="-1"> 不喜歡曬太陽</label>
-        </div>
-        <div class="result" id="fitResult"></div>
-      </article>
-    </section>
-
-    <section class="card" style="margin-top:30px">
-      <h2>✅ 最終決策：什麼情況報哪個？</h2>
-      <div class="decision">
-        <div class="box go"><strong>推薦報名</strong>想看龜山島、牛奶海、海豚，且沒有嚴重暈船。選 1000 元「環島＋賞鯨」。</div>
-        <div class="box maybe"><strong>可以考慮</strong>很想登島、體力好、能接受曬太陽和走路，再選 1200 或 1500。</div>
-        <div class="box no"><strong>先不要</strong>很容易暈船、怕浪、怕曬、最近身體很累，就不要硬上。海上不是健身房，但會把你練成海帶。</div>
-      </div>
-    </section>
-
-    <section class="card" id="pack" style="margin-top:30px">
-      <h2>🎒 行前準備清單</h2>
-      <p class="sub">這段可以直接截圖傳家人。</p>
-      <div class="checklist">
-        <label class="check"><input type="checkbox"> 暈船藥：容易暈船者先問藥師，提前吃</label>
-        <label class="check"><input type="checkbox"> 防曬：帽子、薄外套、太陽眼鏡</label>
-        <label class="check"><input type="checkbox"> 水：不要喝太少，但也不要上船前狂灌</label>
-        <label class="check"><input type="checkbox"> 鞋子：穿好走、防滑的鞋</label>
-        <label class="check"><input type="checkbox"> 手機防水袋：海風會鹹，浪花會偷襲</label>
-        <label class="check"><input type="checkbox"> 出發前一天確認：船班、集合時間、天氣、是否延期</label>
-      </div>
-      <div class="notice yellow" style="margin-top:18px">長輩版提醒：前一晚睡飽、早餐吃清淡，不要空腹上船，也不要吃太油。暈船不是意志力問題，是內耳在敲鑼。</div>
-    </section>
-
-    <section class="card" id="sources" style="margin-top:30px">
-      <h2>📌 資料與確認提醒</h2>
-      <p>本頁是依目前討論到的「頭城烏石港出發、北極星壹號、四種報價」整理成家人決策版。票價、船班、登島名額、天候停航與實際行程安排，請以下訂前確認為準：</p>
-      <ul class="source-list">
-        <li>船公司或報名頁面的當日票價、集合地點、退改規則。</li>
-        <li>中央氣象署海象與宜蘭沿海天氣。</li>
-        <li>龜山島登島與管制資訊，以官方公告為準。</li>
-      </ul>
-      <table class="price-table" aria-label="報價整理">
-        <thead><tr><th>方案</th><th>價格</th><th>時間</th><th>一句話判斷</th></tr></thead>
-        <tbody>
-          <tr><td>純環島</td><td>600</td><td>1.5 小時</td><td>最省，但少了賞鯨期待</td></tr>
-          <tr class="best"><td>環島＋賞鯨</td><td>1000</td><td>2.5 小時</td><td><span class="badge">最推薦</span> 平衡又划算</td></tr>
-          <tr><td>環島＋登島</td><td>1200</td><td>3 小時</td><td>想上島才選</td></tr>
-          <tr><td>環島＋登島＋賞鯨</td><td>1500</td><td>4 小時</td><td>內容最多，但最累</td></tr>
-        </tbody>
-      </table>
-    </section>
-
-    <p class="footer">給媽媽看的版本｜重點不是把每個方案背起來，是選到不累、好玩、又不後悔的那個。</p>
+    <p class="footer">OmiNote｜GitHub Pages</p>
   </main>
-
-  <script>
-    const seaData = {
-      sun: {
-        html: `<div class="metric"><span>鯨豚期待值</span><span class="score">高</span></div><div class="metric"><span>暈船風險</span><span>低到中</span></div><div class="metric"><span>推薦程度</span><span>很適合出發</span></div><p>最美狀態：天空亮、海面穩、牛奶海顏色清楚。這種天氣最適合報 1000 元環島＋賞鯨。</p>`
-      },
-      cloud: {
-        html: `<div class="metric"><span>鯨豚期待值</span><span class="score">中高</span></div><div class="metric"><span>暈船風險</span><span>中</span></div><div class="metric"><span>推薦程度</span><span>可出發，但要備暈船藥</span></div><p>多雲不一定差，拍照不會太刺眼；但如果風浪變明顯，就要把長輩體感放第一。</p>`
-      },
-      rain: {
-        html: `<div class="metric"><span>鯨豚期待值</span><span class="score" style="color:#e95757">不穩</span></div><div class="metric"><span>暈船風險</span><span>偏高</span></div><div class="metric"><span>推薦程度</span><span>不建議硬衝</span></div><p>陰雨大浪就不要硬拚。船上看海會變成海看你，長輩不舒服就整趟扣分。</p>`
-      }
-    };
-    const seaResult = document.getElementById('seaResult');
-    function setSea(mode){
-      seaResult.innerHTML = seaData[mode].html;
-      document.querySelectorAll('.tab').forEach(btn=>btn.classList.toggle('active', btn.dataset.mode===mode));
-    }
-    document.querySelectorAll('.tab').forEach(btn=>btn.addEventListener('click',()=>setSea(btn.dataset.mode)));
-    setSea('sun');
-
-    const qs = document.querySelectorAll('.q');
-    const fitResult = document.getElementById('fitResult');
-    function calcFit(){
-      let score = 0;
-      qs.forEach(q=>{ if(q.checked) score += Number(q.value); });
-      let title, text, color;
-      if(score >= 5){ title='很適合報名'; text='建議直接選 1000 元「環島＋賞鯨」。內容完整，時間也不會太硬。'; color='#0a9c52'; }
-      else if(score >= 2){ title='可以去，但要保守安排'; text='可以報 1000 元方案，但出發前一天要確認浪況，容易暈船的人要準備。'; color='#b17400'; }
-      else { title='先不要硬上'; text='目前條件比較容易玩得累或暈船。除非天氣很好、身體狀態也好，不然可改純環島或改天。'; color='#d84848'; }
-      fitResult.innerHTML = `<div class="metric"><span>評估分數</span><span class="score" style="color:${color}">${score}</span></div><h3 style="margin:10px 0 4px;color:${color}">${title}</h3><p style="margin:0">${text}</p>`;
-    }
-    qs.forEach(q=>q.addEventListener('change',calcFit));
-    calcFit();
-  </script>
 </body>
 </html>
