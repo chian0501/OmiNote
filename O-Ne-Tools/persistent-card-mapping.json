@@ -1,5 +1,5 @@
 {
-  "generator_version": "V1.0_20260807",
+  "generator_version": "V1.0.1_20260807",
   "component_id": "PERSISTENT-MISSION",
   "family": "常駐卡",
   "formal_source_folder": "https://drive.google.com/drive/folders/1p8U9F7OwLlKkUZNFdwsXS1jFN8ue-fub",
@@ -27,45 +27,18 @@
       "result_icon_psd_id": "1tu7b0MTq6LpXu2XvA-sVEPQ1JjNaLNBb"
     }
   },
-  "canvas": {
-    "width": 634,
-    "height": 62
-  },
-  "locked": [
-    "panel_geometry",
-    "corner_cut",
-    "panel_opacity",
-    "outline",
-    "state_label_style",
-    "result_icon_style",
-    "formal_colors",
-    "transparent_background"
-  ],
+  "canvas": {"width": 634, "height": 62},
+  "locked": ["panel_geometry","corner_cut","panel_opacity","outline","state_label_style","result_icon_style","formal_colors","transparent_background"],
   "editable": {
-    "task_text": {
-      "x": 163,
-      "baseline_y": 42,
-      "max_width": 319,
-      "font_start": 21,
-      "font_min": 14,
-      "weight": 800
-    },
-    "progress": {
-      "x": 498,
-      "baseline_y": 42,
-      "max_width": 40,
-      "font_start": 20,
-      "font_min": 14,
-      "weight": 800,
-      "color": "#FDF3E7"
-    }
+    "task_text": {"x": 163,"baseline_y": 42,"max_width": 319,"font_start": 21,"font_min": 14,"weight": 800},
+    "progress": {"x": 498,"baseline_y": 42,"max_width": 40,"font_start": 20,"font_min": 14,"weight": 800,"color": "#FDF3E7"}
   },
   "fixed_positions": {
     "mission_label": [8,13,141,33],
     "result_label": [11,13,141,33],
     "result_icon": [543,8,46,46]
   },
-  "export": {
-    "png_transparent": true
-  }
+  "export": {"png_transparent": true},
+  "runtime_render_mode": "self_contained_canvas",
+  "runtime_asset_dependency": false
 }
