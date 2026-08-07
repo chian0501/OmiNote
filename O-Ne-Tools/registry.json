@@ -1,15 +1,73 @@
 {
-  "version": "V1.3_20260807",
+  "version": "V1.4_20260807",
   "principle": "one_function_one_entry",
   "total": 14,
-  "ready": 4,
+  "ready": 5,
   "candidate": 0,
   "tools": [
-    {"id":"general","name":"一般卡","family":"一般卡","group":"任務／事件","desc":"HERE｜目前位置、場景定位、畫面主題","status":"ready","href":"./general-card.html","features":["title","subtitle","auto_shrink","transparent_png"],"formal_source_folder":"https://drive.google.com/drive/folders/1P-05OvWiq9gcc75btZJYOEyL5FYZWSro","formal_psd_id":"1K-Xc7oNcWEoLrHviGhVmeygYISa4j6Q4","reference_png_id":"15qjO8JR5-cFBPU089HmGR_7Z6RDB0fzD"},
-    {"id":"trigger","name":"觸發卡","family":"觸發卡","group":"任務／事件","desc":"EVENT／DONE!／FAIL｜同一工具切換事件觸發、成功、失敗；可改大標、副標與進度","status":"ready","href":"./trigger-card.html","features":["state_switch","event","done","fail","title","subtitle","progress","transparent_png","self_contained_canvas"],"formal_source_folder":"https://drive.google.com/drive/folders/1EEoUn-U_zkxNgYtfsJynvw8dbvp_LV7c","formal_psd_id":"10sd-QP_W3YqYksm1cVGYhaAqLbppjBJY","reference_png_ids":{"EVENT":"1TDlMx2pXtXfDXsRvtfTvaBdjXdBdAOVo","DONE":"1rFme_zzzZHNA1msk3RuDEJB3JGE9TZXv","FAIL":"1hbKMhJaSeDa7fcmx5i5PDzPErZ8kWGqe"}},
-    {"id":"persistent","name":"常駐卡","family":"常駐卡","group":"任務／事件","desc":"MISSION／DONE!／FAIL｜同一工具切換任務中、成功、失敗；可改任務文字與進度","status":"ready","href":"./persistent-card.html","features":["state_switch","mission","done","fail","task_text","progress","transparent_png","self_contained_canvas"],"formal_source_folder":"https://drive.google.com/drive/folders/1p8U9F7OwLlKkUZNFdwsXS1jFN8ue-fub","formal_psd_id":"1VMBCecO8QLuwtSMxy-BplfUa2Ybr3YDU","reference_png_ids":{"MISSION":"1DVJhC0KBwEMfyfUnn5wGMpObQGOv32kH","DONE":"16IvXs5BSgP2MP9bqbCi2SuujKGo18TF3","FAIL":"1tFdU_tztw5d6YoxFm2DIPXjjOJ27aCip"}},
-    {"id":"move","name":"移動卡","family":"移動卡","group":"路線／導航","desc":"MOVE｜動態增減站點、每段實線／虛線、白色／橘色版；跨國移動也在這裡處理","status":"ready","href":"./move-card.html","features":["dynamic_stations","solid_or_dashed_per_segment","white_or_orange_export","cross_border_same_tool"]},
-    {"id":"choice","name":"選項卡","family":"選項卡","group":"選擇／確認","desc":"SELECT｜同一工具內增減選項、切換焦點／選中狀態，不另拆 2 項版","status":"planned","href":"","features":["dynamic_options","focus_state","selected_state"]},
+    {
+      "id": "general",
+      "name": "一般卡",
+      "family": "一般卡",
+      "group": "任務／事件",
+      "desc": "HERE｜目前位置、場景定位、畫面主題",
+      "status": "ready",
+      "href": "./general-card.html",
+      "features": ["title","subtitle","auto_shrink","transparent_png"],
+      "formal_source_folder": "https://drive.google.com/drive/folders/1P-05OvWiq9gcc75btZJYOEyL5FYZWSro",
+      "formal_psd_id": "1K-Xc7oNcWEoLrHviGhVmeygYISa4j6Q4",
+      "reference_png_id": "15qjO8JR5-cFBPU089HmGR_7Z6RDB0fzD"
+    },
+    {
+      "id": "trigger",
+      "name": "觸發卡",
+      "family": "觸發卡",
+      "group": "任務／事件",
+      "desc": "EVENT／DONE!／FAIL｜同一工具切換事件觸發、成功、失敗；可改大標、副標與進度",
+      "status": "ready",
+      "href": "./trigger-card.html",
+      "features": ["state_switch","event","done","fail","title","subtitle","progress","transparent_png","self_contained_canvas"],
+      "formal_source_folder": "https://drive.google.com/drive/folders/1EEoUn-U_zkxNgYtfsJynvw8dbvp_LV7c",
+      "formal_psd_id": "10sd-QP_W3YqYksm1cVGYhaAqLbppjBJY",
+      "reference_png_ids": {"EVENT":"1TDlMx2pXtXfDXsRvtfTvaBdjXdBdAOVo","DONE":"1rFme_zzzZHNA1msk3RuDEJB3JGE9TZXv","FAIL":"1hbKMhJaSeDa7fcmx5i5PDzPErZ8kWGqe"}
+    },
+    {
+      "id": "persistent",
+      "name": "常駐卡",
+      "family": "常駐卡",
+      "group": "任務／事件",
+      "desc": "MISSION／DONE!／FAIL｜同一工具切換任務中、成功、失敗；可改任務文字與進度",
+      "status": "ready",
+      "href": "./persistent-card.html",
+      "features": ["state_switch","mission","done","fail","task_text","progress","transparent_png","self_contained_canvas"],
+      "formal_source_folder": "https://drive.google.com/drive/folders/1p8U9F7OwLlKkUZNFdwsXS1jFN8ue-fub",
+      "formal_psd_id": "1VMBCecO8QLuwtSMxy-BplfUa2Ybr3YDU",
+      "reference_png_ids": {"MISSION":"1DVJhC0KBwEMfyfUnn5wGMpObQGOv32kH","DONE":"16IvXs5BSgP2MP9bqbCi2SuujKGo18TF3","FAIL":"1tFdU_tztw5d6YoxFm2DIPXjjOJ27aCip"}
+    },
+    {
+      "id": "move",
+      "name": "移動卡",
+      "family": "移動卡",
+      "group": "路線／導航",
+      "desc": "MOVE｜動態增減站點、每段實線／虛線、白色／橘色版；跨國移動也在這裡處理",
+      "status": "ready",
+      "href": "./move-card.html",
+      "features": ["dynamic_stations","solid_or_dashed_per_segment","white_or_orange_export","cross_border_same_tool"]
+    },
+    {
+      "id": "choice",
+      "name": "選項卡",
+      "family": "選項卡",
+      "group": "選擇／確認",
+      "desc": "SELECT｜自由增減選項；每項可獨立切亮／暗，可同時亮多項",
+      "status": "ready",
+      "href": "./choice-card.html",
+      "features": ["dynamic_options","independent_bright_dim","multiple_bright_allowed","auto_renumber","dynamic_height","transparent_png","self_contained_canvas"],
+      "formal_source_folder": "https://drive.google.com/drive/folders/1NLJaPk0AlZk0lt1U9crqbD_GyePyGbvc",
+      "formal_psd_id": "1wYnhZVvoQMl4hn1W7msw_oh3k-RqbHca",
+      "reference_png_ids": {"ALL_DIM":"1hhVUvfxbhzAA-ZLlWjECOjfG0UUzDz4X","OPTION_1_BRIGHT":"1jgZgULbR73XmEJ-D5G-KGeMOvEl_liqG","OPTION_2_BRIGHT":"1EFxHT9BNlsIaiEmVn0A2i-8BCkHZpZr1","OPTION_3_BRIGHT":"1U1OEgaJ4FqEBAN5pvjuxAGHPM1i0ek88","OPTION_4_BRIGHT":"1kZ6vsjydYjDvsBSPKUEj8NQHqVtbP8Po","OPTION_5_BRIGHT":"1iaVjw4COWun_qGbNKpY49jPSM0bOqHFq"},
+      "panel_fill_opacity": 0.8
+    },
     {"id":"challenge","name":"挑戰任務","family":"選項卡","group":"選擇／確認","desc":"同一工具內切換「接受／放棄」與確認／取消，不拆成兩個入口","status":"planned","href":"","features":["accept_or_abandon","confirm_or_cancel"]},
     {"id":"dialogue","name":"對話卡","family":"對話卡","group":"對話／角色","desc":"正式對話卡｜Omi／涅特／Kuma／Nomi／NPC／雙人；表情與角色在同一工具內選擇","status":"planned","href":"","features":["speaker_select","expression_select","npc","dual_dialogue"],"formal_source_folder":"https://drive.google.com/drive/folders/18ddBMdVUEW6WvNyYF1gmuPSJ_eqYG8ad","formal_psd_id":"16AzfHUXuznSj8adbA9lKDcEYbUZ5iL6U"},
     {"id":"reading","name":"說明字卡","family":"說明／評分","group":"資訊／閱讀","desc":"COL-02 reading_card｜左圖右文大型閱讀卡","status":"planned","href":""},
@@ -19,5 +77,12 @@
     {"id":"player2","name":"玩家 2","family":"固定支援","group":"玩家／支援","desc":"2P｜紅色玩家識別","status":"planned","href":"","color_semantics":"red"},
     {"id":"saving","name":"Saving","family":"固定支援","group":"玩家／支援","desc":"Saving...｜章節／存檔轉場","status":"planned","href":""},
     {"id":"mini_show","name":"小劇場","family":"固定支援","group":"玩家／支援","desc":"MINI_SHOW_BADGE｜小劇場識別層","status":"planned","href":""}
-  ]
+  ],
+  "visual_rules": {
+    "panel_fill_opacity": 0.8,
+    "scope": "main_card_panel_fill_only",
+    "not_global_card_opacity": true,
+    "excluded_elements": ["outline","labels","accent_bars","icons","text","option_rows"],
+    "note": "Only the main card/panel background fill is 80% opacity. Do not fade the whole card."
+  }
 }
