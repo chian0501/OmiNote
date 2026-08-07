@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>O-Ne 常駐卡生成器 V1.0.1</title>
+<title>O-Ne 常駐卡生成器 V1.0.2</title>
 <style>
 *{box-sizing:border-box}
 body{margin:0;min-height:100vh;background:#0e1117;color:#f3efe8;font-family:"Noto Sans TC","Noto Sans CJK TC","Microsoft JhengHei",sans-serif}
@@ -11,13 +11,11 @@ body{margin:0;min-height:100vh;background:#0e1117;color:#f3efe8;font-family:"Not
 h1{margin:0 0 8px;font-size:24px}.sub{color:#9ea7b3;font-size:13px;line-height:1.7;margin-bottom:22px}
 .grid{display:grid;grid-template-columns:430px 1fr;gap:22px;align-items:start}
 .panel{background:#151a23;border:1px solid #2a3240;border-radius:16px;padding:18px;box-shadow:0 12px 30px rgba(0,0,0,.25)}
-.section-title{font-size:14px;font-weight:800;margin:0 0 12px;color:#f0a8cf}
-.note{font-size:12px;color:#c4cad3;background:#101620;border:1px solid #273244;border-radius:10px;padding:10px 12px;line-height:1.7;margin-bottom:12px}
+.section-title{font-size:14px;font-weight:800;margin:0 0 12px;color:#f0a8cf}.note{font-size:12px;color:#c4cad3;background:#101620;border:1px solid #273244;border-radius:10px;padding:10px 12px;line-height:1.7;margin-bottom:12px}
 label{display:block;font-size:12px;font-weight:700;color:#b9c0ca;margin:12px 0 6px}
 input,select{width:100%;border:1px solid #394355;border-radius:9px;background:#101620;color:white;padding:10px 11px;font-size:14px;outline:none}
 input:focus,select:focus{border-color:#29A6A7}input.bad{border-color:#FD4537;background:#241415}
-.preview-wrap{min-height:420px;display:flex;justify-content:center;align-items:center;background:
-linear-gradient(45deg,#222832 25%,transparent 25%),linear-gradient(-45deg,#222832 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#222832 75%),linear-gradient(-45deg,transparent 75%,#222832 75%);background-size:24px 24px;background-position:0 0,0 12px,12px -12px,-12px 0;border-radius:14px;overflow:hidden;padding:34px 20px}
+.preview-wrap{min-height:420px;display:flex;justify-content:center;align-items:center;background:linear-gradient(45deg,#222832 25%,transparent 25%),linear-gradient(-45deg,#222832 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#222832 75%),linear-gradient(-45deg,transparent 75%,#222832 75%);background-size:24px 24px;background-position:0 0,0 12px,12px -12px,-12px 0;border-radius:14px;overflow:hidden;padding:34px 20px}
 canvas{width:min(100%,900px);height:auto;filter:drop-shadow(0 8px 18px rgba(0,0,0,.26))}
 .buttons{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}button{border:0;border-radius:9px;padding:11px 15px;font-weight:800;cursor:pointer;background:#29A6A7;color:white}button.secondary{background:#30394a}
 .status{min-height:22px;margin-top:12px;font-size:12px;color:#8fd4c8;line-height:1.6}.status.error{color:#ff7770}
@@ -27,8 +25,8 @@ canvas{width:min(100%,900px);height:auto;filter:drop-shadow(0 8px 18px rgba(0,0,
 </head>
 <body>
 <div class="app">
-<h1>O-Ne 常駐卡生成器 <span style="font-size:12px;color:#8c96a5">V1.0.1</span></h1>
-<div class="sub">同一工具切換 MISSION／DONE!／FAIL。V1.0.1 改為自包含 Canvas，不再依賴外部或內嵌圖片載入。</div>
+<h1>O-Ne 常駐卡生成器 <span style="font-size:12px;color:#8c96a5">V1.0.2</span></h1>
+<div class="sub">同一工具切換 MISSION／DONE!／FAIL。主底板固定 #1F1713、80% 透明；外框、標籤、圖示、文字維持實色。</div>
 <div class="grid">
 <div class="panel">
   <div class="section-title">01｜內容輸入</div>
@@ -39,7 +37,7 @@ canvas{width:min(100%,900px);height:auto;filter:drop-shadow(0 8px 18px rgba(0,0,
   <label>進度</label><input id="progress" value="0/1">
   <div id="status" class="status">READY｜可輸出透明 PNG</div>
   <div class="buttons"><button id="download">輸出透明 PNG</button><button id="jsonBtn" class="secondary">輸出欄位 JSON</button><button id="reset" class="secondary">回復示例</button></div>
-  <div class="mini"><b class="lock">🔒 固定不改：</b>634×62、卡體、右上切角、MISSION／DONE!／FAIL 標籤、成功／失敗圖示、正式色彩、透明背景。<br><b>可改：</b>狀態、任務文字、進度。</div>
+  <div class="mini"><b class="lock">🔒 固定不改：</b>634×62、主底板 80%、白框、MISSION／DONE!／FAIL 標籤、成功／失敗圖示、正式色彩、透明背景。<br><b>可改：</b>狀態、任務文字、進度。</div>
 </div>
 <div class="panel"><div class="section-title">02｜正式母版即時預覽</div><div class="preview-wrap"><canvas id="c" width="634" height="62"></canvas></div></div>
 </div>
@@ -48,19 +46,19 @@ canvas{width:min(100%,900px);height:auto;filter:drop-shadow(0 8px 18px rgba(0,0,
 const canvas=document.getElementById('c');
 const ctx=canvas.getContext('2d');
 const $=id=>document.getElementById(id);
-const COLORS={dark:'#1F1713',cream:'#FDF3E7',white:'#FFFFFF',yellow:'#FFBE37',fail:'#333333',green:'#21A74D'};
+const COLORS={dark:'rgba(31,23,19,.80)',cream:'#FDF3E7',white:'#FFFFFF',yellow:'#FFBE37',fail:'#333333',green:'#21A74D'};
 const defaults={state:'MISSION',task:'Osaka Castle｜大阪城任務中任務中',progress:'0/1'};
 function font(weight,px){return `${weight} ${px}px "Noto Sans TC","Noto Sans CJK TC","Microsoft JhengHei",sans-serif`;}
 function fitText(text,maxWidth,startSize,minSize,weight=800){let size=startSize;while(size>=minSize){ctx.font=font(weight,size);const width=ctx.measureText(text).width;if(width<=maxWidth)return{size,width,ok:true};size--;}ctx.font=font(weight,minSize);return{size:minSize,width:ctx.measureText(text).width,ok:false};}
 function roundedRect(x,y,w,h,r,fill){ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fillStyle=fill;ctx.fill();}
-function drawPanel(){ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(614,0);ctx.lineTo(634,20);ctx.lineTo(634,61);ctx.lineTo(0,61);ctx.closePath();ctx.fillStyle=COLORS.white;ctx.fill();ctx.beginPath();ctx.moveTo(0,3);ctx.lineTo(613,3);ctx.lineTo(631,21);ctx.lineTo(631,58);ctx.lineTo(0,58);ctx.closePath();ctx.fillStyle=COLORS.dark;ctx.fill();}
+function drawPanel(){ctx.save();ctx.beginPath();ctx.moveTo(0,2);ctx.lineTo(613,2);ctx.lineTo(632,21);ctx.lineTo(632,60);ctx.lineTo(0,60);ctx.closePath();ctx.fillStyle=COLORS.dark;ctx.fill();ctx.strokeStyle=COLORS.white;ctx.lineWidth=3;ctx.stroke();ctx.restore();}
 function drawBadge(state){const x=state==='MISSION'?8:11,y=13,w=141,h=33;const fill=state==='FAIL'?COLORS.fail:COLORS.yellow;const textColor=state==='FAIL'?COLORS.cream:'#3B170C';roundedRect(x,y,w,h,10,fill);ctx.font=font(800,20);ctx.fillStyle=textColor;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(state==='DONE'?'DONE!':state,x+w/2,y+h/2+0.5);}
 function drawSuccessIcon(){roundedRect(543,8,46,46,4,COLORS.cream);roundedRect(547,12,38,38,2,COLORS.green);ctx.strokeStyle=COLORS.cream;ctx.lineWidth=7;ctx.lineCap='square';ctx.lineJoin='miter';ctx.beginPath();ctx.moveTo(552,31);ctx.lineTo(560,39);ctx.lineTo(580,18);ctx.stroke();}
 function drawFailIcon(){roundedRect(543,8,46,46,4,COLORS.cream);roundedRect(547,12,38,38,2,COLORS.fail);ctx.strokeStyle=COLORS.cream;ctx.lineWidth=7;ctx.lineCap='square';ctx.beginPath();ctx.moveTo(554,20);ctx.lineTo(578,43);ctx.moveTo(578,20);ctx.lineTo(554,43);ctx.stroke();}
 function render(){const state=$('state').value;ctx.clearRect(0,0,634,62);drawPanel();drawBadge(state);if(state==='DONE')drawSuccessIcon();if(state==='FAIL')drawFailIcon();let blocked=false;const task=$('task').value;const taskFit=fitText(task,319,21,14,800);$('task').classList.toggle('bad',!taskFit.ok);ctx.font=font(800,taskFit.size);ctx.fillStyle=state==='DONE'?COLORS.yellow:COLORS.cream;ctx.textAlign='left';ctx.textBaseline='alphabetic';ctx.fillText(task,163,42);blocked ||= !taskFit.ok;const prog=$('progress').value;const progFit=fitText(prog,40,20,14,800);$('progress').classList.toggle('bad',!progFit.ok);ctx.font=font(800,progFit.size);ctx.fillStyle=COLORS.cream;ctx.fillText(prog,498,42);blocked ||= !progFit.ok;const status=$('status');$('download').disabled=blocked;if(blocked){status.textContent='BLOCKED｜任務文字或進度超出正式安全範圍，請縮短內容';status.className='status error';}else{status.textContent='READY｜可輸出透明 PNG';status.className='status';}return blocked;}
 $('state').addEventListener('change',render);$('task').addEventListener('input',render);$('progress').addEventListener('input',render);
 $('download').onclick=()=>{if(render())return;canvas.toBlob(blob=>{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`O-Ne_常駐卡_${$('state').value}.png`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);},'image/png');};
-$('jsonBtn').onclick=()=>{const payload={component_id:'PERSISTENT-MISSION',master_psd_id:'1VMBCecO8QLuwtSMxy-BplfUa2Ybr3YDU',generator_version:'V1.0.1_20260807',state:$('state').value,task_text:$('task').value,progress:$('progress').value};const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='O-Ne_常駐卡_data_v101.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);};
+$('jsonBtn').onclick=()=>{const payload={component_id:'PERSISTENT-MISSION',master_psd_id:'1VMBCecO8QLuwtSMxy-BplfUa2Ybr3YDU',generator_version:'V1.0.2_20260807',panel_fill_opacity:.8,state:$('state').value,task_text:$('task').value,progress:$('progress').value};const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='O-Ne_常駐卡_data_v102.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);};
 $('reset').onclick=()=>{$('state').value=defaults.state;$('task').value=defaults.task;$('progress').value=defaults.progress;render();};
 render();
 </script>
