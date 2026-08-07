@@ -1,0 +1,71 @@
+{
+  "generator_version": "V1.0_20260807",
+  "component_id": "PERSISTENT-MISSION",
+  "family": "常駐卡",
+  "formal_source_folder": "https://drive.google.com/drive/folders/1p8U9F7OwLlKkUZNFdwsXS1jFN8ue-fub",
+  "master_psd": {
+    "name": "00_常駐卡.psd",
+    "drive_id": "1VMBCecO8QLuwtSMxy-BplfUa2Ybr3YDU"
+  },
+  "states": {
+    "MISSION": {
+      "reference_png_id": "1DVJhC0KBwEMfyfUnn5wGMpObQGOv32kH",
+      "label_psd_id": "1AP7OfuoZJQvWHRgVbxbMWopsqzdTvtzM",
+      "title_color": "#FDF3E7",
+      "result_icon": null
+    },
+    "DONE": {
+      "reference_png_id": "16IvXs5BSgP2MP9bqbCi2SuujKGo18TF3",
+      "label_psd_id": "1qJ2RKpW75vhL-dNY6hg1aJKP8MyC3R98",
+      "title_color": "#FFBE37",
+      "result_icon_psd_id": "1Z5lHCqO0BeyoPJ93vfhYPoRnB6lS8N4l"
+    },
+    "FAIL": {
+      "reference_png_id": "1tFdU_tztw5d6YoxFm2DIPXjjOJ27aCip",
+      "label_psd_id": "1ich_-2QjUsFEAewzh_9kZKR_s9PLFNU-",
+      "title_color": "#FDF3E7",
+      "result_icon_psd_id": "1tu7b0MTq6LpXu2XvA-sVEPQ1JjNaLNBb"
+    }
+  },
+  "canvas": {
+    "width": 634,
+    "height": 62
+  },
+  "locked": [
+    "panel_geometry",
+    "corner_cut",
+    "panel_opacity",
+    "outline",
+    "state_label_style",
+    "result_icon_style",
+    "formal_colors",
+    "transparent_background"
+  ],
+  "editable": {
+    "task_text": {
+      "x": 163,
+      "baseline_y": 42,
+      "max_width": 319,
+      "font_start": 21,
+      "font_min": 14,
+      "weight": 800
+    },
+    "progress": {
+      "x": 498,
+      "baseline_y": 42,
+      "max_width": 40,
+      "font_start": 20,
+      "font_min": 14,
+      "weight": 800,
+      "color": "#FDF3E7"
+    }
+  },
+  "fixed_positions": {
+    "mission_label": [8,13,141,33],
+    "result_label": [11,13,141,33],
+    "result_icon": [543,8,46,46]
+  },
+  "export": {
+    "png_transparent": true
+  }
+}
