@@ -1,11 +1,11 @@
 {
-  "version": "V1.0_20260807",
+  "version": "V1.1_20260807",
   "principle": "one_function_one_entry",
   "total": 14,
-  "ready": 1,
+  "ready": 2,
   "candidate": 0,
   "tools": [
-    {"id":"general","name":"一般卡","family":"一般卡","group":"任務／事件","desc":"HERE｜目前位置、場景定位、畫面主題","status":"planned","href":""},
+    {"id":"general","name":"一般卡","family":"一般卡","group":"任務／事件","desc":"HERE｜目前位置、場景定位、畫面主題","status":"ready","href":"./general-card.html","features":["title","subtitle","auto_shrink","transparent_png"],"formal_source_folder":"https://drive.google.com/drive/folders/1P-05OvWiq9gcc75btZJYOEyL5FYZWSro","formal_psd_id":"1K-Xc7oNcWEoLrHviGhVmeygYISa4j6Q4","reference_png_id":"15qjO8JR5-cFBPU089HmGR_7Z6RDB0fzD"},
     {"id":"trigger","name":"觸發卡","family":"觸發卡","group":"任務／事件","desc":"EVENT／DONE!／FAIL｜新事件、任務更新與結果","status":"planned","href":""},
     {"id":"persistent","name":"常駐卡","family":"常駐卡","group":"任務／事件","desc":"MISSION／DONE!／FAIL｜持續顯示目前任務","status":"planned","href":""},
     {"id":"move","name":"移動卡","family":"移動卡","group":"路線／導航","desc":"MOVE｜動態增減站點、每段實線／虛線、白色／橘色版；跨國移動也在這裡處理","status":"ready","href":"./move-card.html","features":["dynamic_stations","solid_or_dashed_per_segment","white_or_orange_export","cross_border_same_tool"]},
