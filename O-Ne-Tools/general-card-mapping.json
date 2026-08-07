@@ -1,0 +1,46 @@
+{
+  "generator_version": "V1.0_20260807",
+  "component_id": "HERE-01",
+  "template": {
+    "name": "00_一般卡.psd",
+    "drive_id": "1K-Xc7oNcWEoLrHviGhVmeygYISa4j6Q4",
+    "reference_png_id": "15qjO8JR5-cFBPU089HmGR_7Z6RDB0fzD",
+    "frame_psd_id": "1uKffp2XXIanewlo01ZtDokZan-iyaeGg",
+    "label_psd_id": "11x3td3hV7fBO8t0WSlpYeOHWCogcP216",
+    "canvas": {
+      "width": 653,
+      "height": 127
+    }
+  },
+  "locked": [
+    "frame",
+    "corner_cut",
+    "left_blue_bar",
+    "HERE_label",
+    "colors",
+    "transparent_background"
+  ],
+  "editable": {
+    "title": {
+      "color": "#FFBE37",
+      "x": 186,
+      "baseline_y": 49,
+      "max_width": 430,
+      "font_start": 34,
+      "font_min": 18,
+      "weight": 800
+    },
+    "subtitle": {
+      "color": "#FDF3E7",
+      "x": 36,
+      "baseline_y": 91,
+      "max_width": 585,
+      "font_start": 22,
+      "font_min": 14,
+      "weight": 700
+    }
+  },
+  "export": {
+    "png_transparent": true
+  }
+}
