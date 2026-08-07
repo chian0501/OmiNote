@@ -1,0 +1,19 @@
+{
+  "generator_version": "V1.0_20260807",
+  "template": {
+    "name": "00_移動卡.psd",
+    "drive_id": "1KpEX-97ObOHxLxbnLmK-3lxlVlBsvCPA",
+    "component_id": "NAV-01",
+    "label": "MOVE",
+    "states": ["WHITE", "ORANGE"],
+    "station_count": {"min": 2, "max": 8, "dynamic": true},
+    "segment_count_rule": "station_count - 1"
+  },
+  "editable_fields": {
+    "title": {"layer": "標題", "fit_mode": "auto_shrink", "position": "safe_clamped"},
+    "stations": {"dynamic": true, "fit_mode": "auto_shrink", "position": "smart_clamped"},
+    "segments": {"dynamic": true, "fit_mode": "auto_shrink", "line_style": "solid|dashed"}
+  },
+  "locked": ["卡體輪廓", "切角", "MOVE標籤", "藍色標籤底", "正式色彩語意", "透明背景", "整體版型"],
+  "export": {"supported": ["WHITE", "ORANGE", "BOTH"], "png_transparent": true}
+}
