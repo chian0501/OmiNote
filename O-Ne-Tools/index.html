@@ -10,7 +10,7 @@
 </head>
 <body>
 <div class="app">
-  <div class="hero"><div><h1>O-Ne 字卡工具入口</h1><div class="sub">一個功能只留一個入口。不同狀態、數量或變體，都在編輯器裡切換。</div></div><div class="stat"><b id="count">2 / 14</b><span>目前可使用</span></div></div>
+  <div class="hero"><div><h1>O-Ne 字卡工具入口</h1><div class="sub">一個功能只留一個入口。不同狀態、數量或變體，都在編輯器裡切換。</div></div><div class="stat"><b id="count">3 / 14</b><span>目前可使用</span></div></div>
   <div class="toolbar">
     <input id="search" class="search" placeholder="搜尋：移動、選項、對話、評分…">
     <button class="filter active" data-group="全部">全部</button><button class="filter" data-group="任務／事件">任務／事件</button><button class="filter" data-group="路線／導航">路線／導航</button><button class="filter" data-group="選擇／確認">選擇／確認</button><button class="filter" data-group="對話／角色">對話／角色</button><button class="filter" data-group="資訊／閱讀">資訊／閱讀</button><button class="filter" data-group="結算／結果">結算／結果</button><button class="filter" data-group="玩家／支援">玩家／支援</button>
@@ -22,7 +22,7 @@
 const tools=[
 {id:'general',name:'一般卡',family:'一般卡',group:'任務／事件',desc:'HERE｜目前位置、場景定位、畫面主題',status:'ready',href:'./general-card.html?v=100'},
 {id:'trigger',name:'觸發卡',family:'觸發卡',group:'任務／事件',desc:'EVENT／DONE!／FAIL｜新事件、任務更新與結果',status:'planned',href:''},
-{id:'persistent',name:'常駐卡',family:'常駐卡',group:'任務／事件',desc:'MISSION／DONE!／FAIL｜持續顯示目前任務',status:'planned',href:''},
+{id:'persistent',name:'常駐卡',family:'常駐卡',group:'任務／事件',desc:'MISSION／DONE!／FAIL｜同一工具切換任務中、成功、失敗；可改任務文字與進度',status:'ready',href:'./persistent-card.html?v=100'},
 {id:'move',name:'移動卡',family:'移動卡',group:'路線／導航',desc:'MOVE｜動態增減站點、每段實線／虛線、白色／橘色版；跨國也在同一工具處理',status:'ready',href:'./move-card.html?v=104'},
 {id:'choice',name:'選項卡',family:'選項卡',group:'選擇／確認',desc:'SELECT｜同一工具內增減選項、切換焦點／選中狀態',status:'planned',href:''},
 {id:'challenge',name:'挑戰任務',family:'選項卡',group:'選擇／確認',desc:'同一工具內切換接受／放棄與確認／取消',status:'planned',href:''},
