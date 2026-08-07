@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>O-Ne 一般卡生成器 V1.0</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:#0e1117;color:#f3efe8;font-family:"Noto Sans TC","Noto Sans CJK TC","Microsoft JhengHei",sans-serif}
+.app{max-width:1320px;margin:auto;padding:26px}
+h1{margin:0 0 8px;font-size:24px}
+.sub{color:#9ea7b3;font-size:13px;line-height:1.7;margin-bottom:22px}
+.grid{display:grid;grid-template-columns:430px 1fr;gap:22px;align-items:start}
+.panel{background:#151a23;border:1px solid #2a3240;border-radius:16px;padding:18px;box-shadow:0 12px 30px rgba(0,0,0,.25)}
+.section-title{font-size:14px;font-weight:800;margin:0 0 12px;color:#f0a8cf}
+.note{font-size:12px;color:#c4cad3;background:#101620;border:1px solid #273244;border-radius:10px;padding:10px 12px;line-height:1.7;margin-bottom:12px}
+label{display:block;font-size:12px;font-weight:700;color:#b9c0ca;margin:12px 0 6px}
+input{width:100%;border:1px solid #394355;border-radius:9px;background:#101620;color:white;padding:10px 11px;font-size:14px;outline:none}
+input:focus{border-color:#29A6A7}
+input.bad{border-color:#FD4537;background:#241415}
+.preview-wrap{min-height:420px;display:flex;justify-content:center;align-items:center;background:
+linear-gradient(45deg,#222832 25%,transparent 25%),
+linear-gradient(-45deg,#222832 25%,transparent 25%),
+linear-gradient(45deg,transparent 75%,#222832 75%),
+linear-gradient(-45deg,transparent 75%,#222832 75%);
+background-size:24px 24px;background-position:0 0,0 12px,12px -12px,-12px 0;border-radius:14px;overflow:hidden;padding:34px 20px}
+canvas{width:min(100%,900px);height:auto;filter:drop-shadow(0 8px 18px rgba(0,0,0,.26))}
+.buttons{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+button{border:0;border-radius:9px;padding:11px 15px;font-weight:800;cursor:pointer;background:#29A6A7;color:white}
+button.secondary{background:#30394a}
+.status{min-height:22px;margin-top:12px;font-size:12px;color:#8fd4c8;line-height:1.6}
+.status.error{color:#ff7770}
+.mini{margin-top:14px;padding:12px;border-radius:10px;background:#101620;color:#aeb7c3;font-size:12px;line-height:1.7}
+.lock{color:#ffcf6d}
+@media(max-width:950px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+<h1>O-Ne 一般卡生成器 <span style="font-size:12px;color:#8c96a5">V1.0</span></h1>
+<div class="sub">直接套用正式一般卡母版。HERE、框體、左側藍條固定；只替換主標與副標。</div>
+<div class="grid">
+  <div class="panel">
+    <div class="section-title">01｜內容輸入</div>
+    <div class="note">
+      <b>主標</b>固定使用橘色；<b>副標</b>固定使用白色。<br>
+      文字過長會先自動縮字，超過最低字級才會 BLOCKED，避免跑出版型。
+    </div>
+
+    <label>主標｜橘色</label>
+    <input id="title" value="A2 三重站">
+
+    <label>副標｜白色</label>
+    <input id="subtitle" value="下一站｜桃園機場第二航廈">
+
+    <div id="status" class="status">READY｜可輸出 PNG</div>
+
+    <div class="buttons">
+      <button id="download">輸出透明 PNG</button>
+      <button id="jsonBtn" class="secondary">輸出欄位 JSON</button>
+      <button id="reset" class="secondary">回復示例</button>
+    </div>
+
+    <div class="mini">
+      <b class="lock">🔒 固定不改：</b>653×127、HERE、小標籤尺寸、卡體、切角、左藍條、正式色彩、透明背景。<br>
+      <b>可改：</b>主標、副標。
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="section-title">02｜正式母版即時預覽</div>
+    <div class="preview-wrap">
+      <canvas id="c" width="653" height="127"></canvas>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+const frameSrc = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAowAAAB+CAYAAACu9kDtAAAEKUlEQVR4nO3dPW4kRQCG4W8s8EXISMl8E1sa+xIOOcKSkBIg70hrcjIkUkfshSykJmHQeG1/89ONtmfmeaLp0qhU4atqddViGIZM5NskPyW5mmpCAAAO8pTkPsnzFJNdTDFJxCIAwJxcJfmQ5HKKyaYIRrEIADA/k0XjYuQr6Vex+Gn1MY+rh7HrAgDgANfLu9wsbzeHRr+eHrPDKBYBAGbmcfWQT6uPm0OjdxoPDUaxCAAwU1NH4yHBKBYBAGZuymjcNxjFIgDAkZgqGvcJRrEIAHBkpojGXYNRLAIAHKmx0bhLMF5GLAIAHLUx0bgtGC//nUgsAgAcuUOjsQWjWAQAODGHRON7wSgWAQBO1L7R+FYwikUAgBO3TzR+GYxiEQDgTOwajZvBKBYBAM7MLtG4DkaxCABwprZF42IYBodyAwCQ6+Vdbpa3m0NPSe4XwzD8HLEIAEDejsbFMAx/rZ/EIgAAX0bji2D8/vG3H7ZN8N2vv3z+n9YGAMBM/P7Hn//93uUuaQAAzphgBACgEowAAFSCEQCASjACAFAJRgAAKsEIAEAlGAEAqAQjAACVYAQAoBKMAABUghEAgEowAgBQCUYAACrBCABAJRgBAKgEIwAAlWAEAKASjAAAVIIRAIBKMAIAUAlGAAAqwQgAQCUYAQCoBCMAAJVgBACgEowAAFSCEQCASjACAFAJRgAAKsEIAEAlGAEAqAQjAACVYAQAoBKMAABUghEAgEowAgBQCUYAACrBCABAJRgBAKgEIwAAlWAEAKASjAAAVIIRAIBKMAIAUAlGAAAqwQgAQCUYAQCoBCMAAJVgBACgEowAAFSCEQCASjACAFAJRgAAKsEIAEAlGAEAqAQjAACVYAQAoBKMAABUghEAgEowAgBQCUYAACrBCABAJRgBAKgEIwAAlWAEAKASjAAAVIIRAIBKMAIAUAlGAAAqwQgAQCUYAQCoBCMAAJVgBACgEowAAFSCEQCASjACAFAJRgAAKsEIAEAlGAEAqAQjAACVYAQAoBKMAABU32w+/Pj38+fH1cPXWgsAADNwvbx78XyR5Gn9cLO8ffUHAADOx/XyLjfL282hp4sk9xGNAABn761YTHJ/keQ5ohEA4Ky9F4tJntcfvYhGAIAz1WIxefmVtGgEADgz22IxeX2sjmgEADgTu8Ri8vY5jKIRAODE7RqLyfsHd4tGAIATtU8sJv2mF9EIAHBi9o3FZPvVgKIRAOBEHBKLyW53SYtGAIAjd2gsJrsFYyIaAQCO1phYTHYPxkQ0AgAcnbGxmOwXjIloBAA4GlPEYrJ/MCaiEQBg9qaKxeSwYExEIwDAbE0Zi8nhwZiIRgCA2Zk6FpNkMQzD2HVdJvmQ5GrsRAAATGp0LCbjdhjXXu00AgDw1U0Si8k0wZiIRgCAOZksFpPkH94YZcYUOaa0AAAAAElFTkSuQmCC";
+const labelSrc = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAI0AAAAhCAYAAADkgCgwAAAEi0lEQVR4nO2cb0wbZRzHvz2uzJYR1jrSrb0WQvizjsW6oYu+MDGODXWZYWHzxczebC/cC1/INGzgi7k3i/sTsxdo1ATjK1+IuhkgcQQSks3EKDpgxUtdRdZeh+XPYSntAS3FF6S3Sq+lgPbpsefzqve733P3Te7b5/n97i6nWVpawkoisVh+ryDU9wq++oHJyefHJckcicXykxIpmwo9y87u0OsFu8Fwt5bjbrzEWb7TMszCyjzNStP0CMLRawMDVzzB2fKsqaXkJLbCre53HE+fO2jlvk2My6ZZXFrKuz44dKmN55uIKKTkLKft9itvO55qydNoFgGAie+ghqGkoo3nm64PDl2KbzMA0O31HqOGoaSjjeebur3eYwCgWVhczD/U0fmHPxzmSAuj5DYmnc7X/dqRMuaWx3ucGoaSCX5Jsnzv8bzO9ghCPWkxa+FwsQH7txsAAGPhOXzy4KFi3kV7mfz7K88YhkNSUjwdF/gRAMCZEjN26p9ImffT5DS6JqaT4quNU9KmBnoFXz3rFMVnSQtZC/u3G9BQbgMAuMRAStPEc4DlCxu/MInxdMRNc5AzocpYlDKvodyGJmken/7mxpcPJ+T4auOUtKkBpyg+w0xK0g7SQtTOk7otaKmpxuFiA2kp/zsTkrSTXYjFtpAWQoov+BHwgWDG+d+4PfIMZNKyOFBswMnKUlgLCwAAb1WXo6vv56Rxt31+dHr/Ujxm/9+Znz8XiMRi+SxpESThA0HFeiQT/JGovBy11FQDgGyelYxL8+s+Ty7CrJ5CSUcgEiUtIetQ02wQq15HWkLWUfXyVGUsgvPIi+sef/k5By4rxPd09GU0/kyJGad3P2rhfx2fUsxrKLcpdm3nfhxU5bKlatNkm1QXHwCkaBSfuUazK4gQqjaNFI3CMxNS3JfJPRJvMITwf1CTTEnzeK/fiTspOqEpaR6T0lxSXK31kKpN45kJoeGHu4r7Mlm2Wofda1oeXGIATjGAAjYPL5da5Hg6wwBAn88vt+qbAVoIrwGnGMAFfgTv3rsPlxiQ443Vj9f7atQ06+Tz30fl31XGIpwwF5MTk2WoadZJ18Q0bvv88vabux+f2UbVNc1GSdVyA5m1w62uUbxgMQFYfv500V6mWLuk67oSH02oBTrTbIDhkPSv2ebVUjNM2s3/P2QLtGwwFIkWkhaSKWPhObkI/XNmNmVeYqGa2NomxtMRH5N4jrFwctv8/r37+Fj36L2ZkyVmXHN70mpLROmYuYyWYRY0r3R0ukaDwUrSYijqwFxQ8ICp3LZtiLQQinrYYzT2M7Ucd5O0EIp6OMBZbjJ1Nmu7Sa8XSIuh5D4mnc5XZ7O1M1qGWTi/d+9Z0oIouc/5ffsa8xlmngGAOpu1/ZR911XSoii5yyn7rqt1Nms7kHCfptHhaH6jsqKVnCxKrnKiouKjRoejOb6d9NWIbq+34cPBwQ/oVyMotsKt7rMOR/Mhq/XrxHiSaYDlN85vebzHewTh6LAo1vglyRKNxbRZU0shAsswEZNO56s2Gn+p5bgbdTZru9L3af4BXavJEnn94WgAAAAASUVORK5CYII=";
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const frame = new Image();
+const label = new Image();
+frame.src = frameSrc;
+label.src = labelSrc;
+const $ = id => document.getElementById(id);
+
+const defaults = {
+  title: 'A2 三重站',
+  subtitle: '下一站｜桃園機場第二航廈'
+};
+
+function font(weight, px) {
+  return `${weight} ${px}px "Noto Sans TC","Noto Sans CJK TC","Microsoft JhengHei",sans-serif`;
+}
+
+function fitText(text, maxWidth, startSize, minSize, weight) {
+  let size = startSize;
+  while (size >= minSize) {
+    ctx.font = font(weight, size);
+    const w = ctx.measureText(text).width;
+    if (w <= maxWidth) return {size, width:w, ok:true};
+    size--;
+  }
+  ctx.font = font(weight, minSize);
+  return {size:minSize, width:ctx.measureText(text).width, ok:false};
+}
+
+function render() {
+  if (!frame.complete || !label.complete) return false;
+  ctx.clearRect(0,0,653,127);
+  ctx.drawImage(frame, 1, 1, 652, 126);
+  ctx.drawImage(label, 30, 19, 141, 33);
+
+  let blocked = false;
+
+  const titleText = $('title').value;
+  const titleFit = fitText(titleText, 430, 34, 18, 800);
+  $('title').classList.toggle('bad', !titleFit.ok);
+  ctx.font = font(800, titleFit.size);
+  ctx.fillStyle = '#FFBE37';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillText(titleText, 186, 49);
+  blocked = blocked || !titleFit.ok;
+
+  const subText = $('subtitle').value;
+  const subFit = fitText(subText, 585, 22, 14, 700);
+  $('subtitle').classList.toggle('bad', !subFit.ok);
+  ctx.font = font(700, subFit.size);
+  ctx.fillStyle = '#FDF3E7';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillText(subText, 36, 91);
+  blocked = blocked || !subFit.ok;
+
+  const st = $('status');
+  $('download').disabled = blocked;
+  if (blocked) {
+    st.textContent = 'BLOCKED｜文字超出一般卡安全範圍，請縮短內容';
+    st.className = 'status error';
+  } else {
+    st.textContent = 'READY｜可輸出透明 PNG';
+    st.className = 'status';
+  }
+  return blocked;
+}
+
+$('title').addEventListener('input', render);
+$('subtitle').addEventListener('input', render);
+
+$('download').onclick = () => {
+  if (render()) return;
+  canvas.toBlob(blob => {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'O-Ne_HERE_一般卡.png';
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  }, 'image/png');
+};
+
+$('jsonBtn').onclick = () => {
+  const payload = {
+    template_id: '1K-Xc7oNcWEoLrHviGhVmeygYISa4j6Q4',
+    template_name: '00_一般卡.psd',
+    component_id: 'HERE-01',
+    title: $('title').value,
+    subtitle: $('subtitle').value
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'O-Ne_一般卡_data.json';
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+};
+
+$('reset').onclick = () => {
+  $('title').value = defaults.title;
+  $('subtitle').value = defaults.subtitle;
+  render();
+};
+
+function init() {
+  if (frame.complete && label.complete) render();
+}
+frame.onload = init;
+label.onload = init;
+</script>
+</body>
+</html>
