@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>O-Ne 對話卡生成器 V1.0</title>
+<title>O-Ne 對話卡生成器 V1.1</title>
 <style>
 *{box-sizing:border-box}
 body{margin:0;min-height:100vh;background:#0e1117;color:#f3efe8;font-family:"Noto Sans TC","Noto Sans CJK TC","Microsoft JhengHei",sans-serif}
@@ -27,36 +27,301 @@ button{border:0;border-radius:9px;padding:10px 13px;font-weight:800;cursor:point
 button.secondary{background:#30394a}
 button.orange{background:#c8791a}
 button.small{padding:8px 10px;font-size:12px}
-.preview-wrap{min-height:480px;display:flex;justify-content:center;align-items:center;background:linear-gradient(45deg,#222832 25%,transparent 25%),linear-gradient(-45deg,#222832 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#222832 75%),linear-gradient(-45deg,transparent 75%,#222832 75%);background-size:24px 24px;background-position:0 0,0 12px,12px -12px,-12px 0;border-radius:14px;padding:34px 20px}
+.preview-wrap{min-height:480px;display:flex;justify-content:center;align-items:center;background:
+linear-gradient(45deg,#222832 25%,transparent 25%),
+linear-gradient(-45deg,#222832 25%,transparent 25%),
+linear-gradient(45deg,transparent 75%,#222832 75%),
+linear-gradient(-45deg,transparent 75%,#222832 75%);
+background-size:24px 24px;background-position:0 0,0 12px,12px -12px,-12px 0;border-radius:14px;padding:34px 20px}
 canvas{width:min(100%,1050px);height:auto;filter:drop-shadow(0 8px 18px rgba(0,0,0,.28))}
-.status{min-height:22px;margin-top:12px;font-size:12px;color:#8fd4c8;line-height:1.6}.status.error{color:#ff7770}
-.mini{margin-top:14px;padding:12px;border-radius:10px;background:#101620;color:#aeb7c3;font-size:12px;line-height:1.7}.lock{color:#ffcf6d}.charhint{font-size:11px;color:#788493;margin-top:6px;line-height:1.5}
-@media(max-width:1080px){.grid{grid-template-columns:1fr}}@media(max-width:620px){.slots{grid-template-columns:1fr}.swap{margin-top:0}}
-</style></head>
-<body><div class="app">
-<h1>O-Ne 對話卡生成器 <span style="font-size:12px;color:#8c96a5">V1.0</span></h1>
+.status{min-height:22px;margin-top:12px;font-size:12px;color:#8fd4c8;line-height:1.6}
+.status.error{color:#ff7770}
+.mini{margin-top:14px;padding:12px;border-radius:10px;background:#101620;color:#aeb7c3;font-size:12px;line-height:1.7}
+.lock{color:#ffcf6d}
+.charhint{font-size:11px;color:#788493;margin-top:6px;line-height:1.5}
+@media(max-width:1080px){.grid{grid-template-columns:1fr}}
+@media(max-width:620px){.slots{grid-template-columns:1fr}.swap{margin-top:0}}
+</style>
+</head>
+<body>
+<div class="app">
+<h1>O-Ne 對話卡生成器 <span style="font-size:12px;color:#8c96a5">V1.1</span></h1>
 <div class="sub">左右角色槽位完全獨立。角色標籤不壓頭像；NPC 使用正式貼邊位置；任一側關閉就自動變單人卡。</div>
-<div class="grid"><div class="panel"><div class="section-title">01｜左右角色設定</div>
-<div class="note">正式來源：對話卡 PSD、Omi／涅特／Kuma／Nomi／NPC 單人卡、雙人對話卡與四組 6 表情素材。<br><b>表情：</b>一般／大笑／驚訝／生氣／委屈哭／疑惑／無奈。</div>
-<div class="slots"><div class="slot"><h3>⬅ 左側角色</h3><label>角色</label><select id="leftCharacter"></select><label>表情</label><select id="leftExpression"></select><label>顯示名稱</label><input id="leftName"><div class="charhint">NPC 沒有角色圖，表情會自動停用；標籤使用正式貼邊位置。</div></div><button id="swap" class="secondary small swap" title="交換左右">⇄</button><div class="slot"><h3>右側角色 ➡</h3><label>角色</label><select id="rightCharacter"></select><label>表情</label><select id="rightExpression"></select><label>顯示名稱</label><input id="rightName"><div class="charhint">左右可選同一角色，也可以任一側不顯示。</div></div></div>
-<label>對話文字</label><textarea id="dialogue">你不是說走這條比較快嗎？</textarea><div id="status" class="status">LOADING｜正在準備角色素材…</div>
-<div class="buttons"><button id="download">輸出透明 PNG</button><button id="jsonBtn" class="secondary">輸出欄位 JSON</button><button id="reset" class="secondary">回復示例</button></div>
-<div class="mini"><b class="lock">🔒 固定不改：</b>617×120、正式切角框、#1F1713 主底板 80%、角色識別色、透明背景。<br><b>可改：</b>左右角色、左右表情、左右名稱、台詞。<br><b>角色色：</b>Omi 紅／涅特藍／Kuma・Nomi 黃／NPC 青綠。</div></div>
-<div class="panel"><div class="section-title">02｜正式版即時預覽</div><div class="preview-wrap"><canvas id="c" width="617" height="120"></canvas></div></div></div></div>
-<script src="./dialogue-assets-omi-a.js?v=100"></script><script src="./dialogue-assets-omi-b.js?v=100"></script><script src="./dialogue-assets-niete-a.js?v=100"></script><script src="./dialogue-assets-niete-b.js?v=100"></script><script src="./dialogue-assets-kuma-a.js?v=100"></script><script src="./dialogue-assets-kuma-b.js?v=100"></script><script src="./dialogue-assets-nomi-a.js?v=100"></script><script src="./dialogue-assets-nomi-b.js?v=100"></script>
+
+<div class="grid">
+<div class="panel">
+  <div class="section-title">01｜左右角色設定</div>
+  <div class="note">
+    正式來源：對話卡 PSD、Omi／涅特／Kuma／Nomi／NPC 單人卡、雙人對話卡與四組 6 表情素材。<br>
+    <b>表情：</b>一般／大笑／驚訝／生氣／委屈哭／疑惑／無奈。
+  </div>
+
+  <div class="slots">
+    <div class="slot">
+      <h3>⬅ 左側角色</h3>
+      <label>角色</label>
+      <select id="leftCharacter"></select>
+      <label>表情</label>
+      <select id="leftExpression"></select>
+      <label>角色名稱（可自訂）</label>
+      <input id="leftName" placeholder="例如：工作人員、店員阿姨">
+      <button type="button" id="leftNameReset" class="secondary small" style="margin-top:7px">使用預設名稱</button>
+      <div class="charhint">NPC 沒有角色圖，表情會自動停用；名稱可改成「工作人員／站務員」等自訂文字。</div>
+    </div>
+
+    <button id="swap" class="secondary small swap" title="交換左右">⇄</button>
+
+    <div class="slot">
+      <h3>右側角色 ➡</h3>
+      <label>角色</label>
+      <select id="rightCharacter"></select>
+      <label>表情</label>
+      <select id="rightExpression"></select>
+      <label>角色名稱（可自訂）</label>
+      <input id="rightName" placeholder="例如：站務員、路人">
+      <button type="button" id="rightNameReset" class="secondary small" style="margin-top:7px">使用預設名稱</button>
+      <div class="charhint">左右可選同一角色，也可以任一側不顯示；角色名稱可另外自訂。</div>
+    </div>
+  </div>
+
+  <label>對話文字</label>
+  <textarea id="dialogue">你不是說走這條比較快嗎？</textarea>
+
+  <div id="status" class="status">LOADING｜正在準備角色素材…</div>
+
+  <div class="buttons">
+    <button id="download">輸出透明 PNG</button>
+    <button id="jsonBtn" class="secondary">輸出欄位 JSON</button>
+    <button id="reset" class="secondary">回復示例</button>
+  </div>
+
+  <div class="mini">
+    <b class="lock">🔒 固定不改：</b>617×120、正式切角框、#1F1713 主底板 80%、角色識別色、透明背景。<br>
+    <b>可改：</b>左右角色、左右表情、左右角色名稱（可輸入任意文字）、台詞。<br>
+    <b>角色色：</b>Omi 紅／涅特藍／Kuma・Nomi 黃／NPC 青綠。
+  </div>
+</div>
+
+<div class="panel">
+  <div class="section-title">02｜正式版即時預覽</div>
+  <div class="preview-wrap">
+    <canvas id="c" width="617" height="120"></canvas>
+  </div>
+</div>
+</div>
+</div>
+
+<script src="./dialogue-assets-omi-a.js?v=110"></script>
+<script src="./dialogue-assets-omi-b.js?v=110"></script>
+<script src="./dialogue-assets-niete-a.js?v=110"></script>
+<script src="./dialogue-assets-niete-b.js?v=110"></script>
+<script src="./dialogue-assets-kuma-a.js?v=110"></script>
+<script src="./dialogue-assets-kuma-b.js?v=110"></script>
+<script src="./dialogue-assets-nomi-a.js?v=110"></script>
+<script src="./dialogue-assets-nomi-b.js?v=110"></script>
 <script>
-const ASSETS=window.DIALOGUE_ASSETS||{};const EXPRESSIONS=['一般','大笑','驚訝','生氣','委屈哭','疑惑','無奈'];
-const CHARACTERS=[{id:'NONE',label:'不顯示',name:'',color:null,text:'#FDF3E7',portrait:false},{id:'Omi',label:'Omi',name:'Omi',color:'#FD4537',text:'#FDF3E7',portrait:true},{id:'NieTe',label:'涅特',name:'Nie Te',color:'#3F8FB7',text:'#FDF3E7',portrait:true},{id:'Kuma',label:'Kuma',name:'Kuma',color:'#FFBE37',text:'#1F1713',portrait:true},{id:'Nomi',label:'Nomi',name:'Nomi',color:'#FFBE37',text:'#1F1713',portrait:true},{id:'NPC',label:'NPC',name:'NPC',color:'#29A6A7',text:'#FDF3E7',portrait:false}];
-const canvas=document.getElementById('c'),ctx=canvas.getContext('2d'),$=id=>document.getElementById(id),images={};let assetsReady=false;
-function font(w,p){return `${w} ${p}px "Noto Sans TC","Noto Sans CJK TC","Microsoft JhengHei",sans-serif`}function charDef(id){return CHARACTERS.find(x=>x.id===id)||CHARACTERS[0]}function fillCharacterSelect(el){CHARACTERS.forEach(c=>{let o=document.createElement('option');o.value=c.id;o.textContent=c.label;el.appendChild(o)})}function fillExpressionSelect(el){EXPRESSIONS.forEach(e=>{let o=document.createElement('option');o.value=e;o.textContent=e;el.appendChild(o)})}
-async function loadAssets(){const jobs=[];for(const [c,map] of Object.entries(ASSETS)){images[c]={};for(const [e,src] of Object.entries(map)){jobs.push(new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>{images[c][e]=im;resolve()};im.onerror=reject;im.src=src}))}}try{await Promise.all(jobs);assetsReady=true;updateUI();render()}catch(e){$('status').textContent='ERROR｜角色素材載入失敗';$('status').className='status error'}}
-function fitName(name,max=110,start=21,min=13){let s=start;while(s>=min){ctx.font=font(800,s);if(ctx.measureText(name).width<=max)return s;s--}return min}
-function badge(side,character,name){if(character==='NONE')return;const d=charDef(character),nm=(name||d.name||'').trim()||d.name;ctx.font=font(800,20);const measured=ctx.measureText(nm).width,w=Math.min(118,Math.max(74,measured+26));let x;if(character==='NPC')x=side==='left'?0:617-w;else x=side==='left'?122:617-122-w;const y=0,h=31,r=10;ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fillStyle=d.color;ctx.fill();const fs=fitName(nm,w-20,20,12);ctx.font=font(800,fs);ctx.fillStyle=d.text;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(nm,x+w/2,y+h/2+1)}
-function drawFrame(){ctx.save();ctx.beginPath();ctx.moveTo(16,1);ctx.lineTo(600,1);ctx.lineTo(616,17);ctx.lineTo(616,103);ctx.lineTo(600,119);ctx.lineTo(16,119);ctx.lineTo(1,104);ctx.lineTo(1,16);ctx.closePath();ctx.fillStyle='rgba(31,23,19,.80)';ctx.fill();ctx.strokeStyle='#FDF3E7';ctx.lineWidth=2;ctx.lineJoin='miter';ctx.stroke();ctx.restore()}
-function drawPortrait(side,character,expression){const d=charDef(character);if(!d.portrait||!images[character]||!images[character][expression])return;const im=images[character][expression],maxW=119,maxH=119,scale=Math.min(maxW/im.width,maxH/im.height),w=im.width*scale,h=im.height*scale,x=side==='left'?0:617-w,y=(120-h)/2;ctx.drawImage(im,x,y,w,h)}
-function wrapAtSize(text,maxWidth,size,weight=800){ctx.font=font(weight,size);const explicit=String(text).split(/\n/),lines=[];for(const para of explicit){let line='';for(const ch of para){const test=line+ch;if(ctx.measureText(test).width<=maxWidth||!line)line=test;else{lines.push(line);line=ch}}lines.push(line)}return lines}
-function drawDialogue(text,leftChar,rightChar){const leftPortrait=charDef(leftChar).portrait,rightPortrait=charDef(rightChar).portrait,x1=leftPortrait?122:18,x2=rightPortrait?495:599,maxW=x2-x1;let size=27,lines=[];while(size>=15){lines=wrapAtSize(text,maxW,size,800);if(lines.length<=2)break;size--}const ok=lines.length<=2;lines=lines.slice(0,2);const lh=size+7,total=lines.length*lh;let y=63-total/2+size*.82;ctx.font=font(800,size);ctx.fillStyle='#FDF3E7';ctx.textAlign='left';ctx.textBaseline='alphabetic';for(const line of lines){ctx.fillText(line,x1,y);y+=lh}return ok}
-function render(){if(!assetsReady)return;ctx.clearRect(0,0,617,120);const lc=$('leftCharacter').value,rc=$('rightCharacter').value,le=$('leftExpression').value,re=$('rightExpression').value;if(lc==='NONE'&&rc==='NONE'){$('status').textContent='BLOCKED｜左右至少要保留一個角色或 NPC';$('status').className='status error';$('download').disabled=true;return}drawFrame();badge('left',lc,$('leftName').value);badge('right',rc,$('rightName').value);const textOk=drawDialogue($('dialogue').value,lc,rc);drawPortrait('left',lc,le);drawPortrait('right',rc,re);$('download').disabled=!textOk;if(textOk){$('status').textContent='READY｜可輸出透明 PNG';$('status').className='status'}else{$('status').textContent='BLOCKED｜台詞太長，請縮短到兩行內';$('status').className='status error'}}
-function updateSlot(side,resetName=false){const ch=$(side+'Character').value,d=charDef(ch),exp=$(side+'Expression');exp.disabled=!d.portrait;if(resetName)$(side+'Name').value=d.name;$(side+'Name').disabled=ch==='NONE';render()}function snapshot(side){return{character:$(side+'Character').value,expression:$(side+'Expression').value,name:$(side+'Name').value}}function applySnapshot(side,s){$(side+'Character').value=s.character;$(side+'Expression').value=s.expression;$(side+'Name').value=s.name;updateSlot(side,false)}
-fillCharacterSelect($('leftCharacter'));fillCharacterSelect($('rightCharacter'));fillExpressionSelect($('leftExpression'));fillExpressionSelect($('rightExpression'));$('leftCharacter').value='NieTe';$('leftExpression').value='一般';$('leftName').value='Nie Te';$('rightCharacter').value='Omi';$('rightExpression').value='一般';$('rightName').value='Omi';['left','right'].forEach(side=>{$(side+'Character').addEventListener('change',()=>updateSlot(side,true));$(side+'Expression').addEventListener('change',render);$(side+'Name').addEventListener('input',render)});$('dialogue').addEventListener('input',render);$('swap').onclick=()=>{const a=snapshot('left'),b=snapshot('right');applySnapshot('left',b);applySnapshot('right',a);render()};$('reset').onclick=()=>{$('leftCharacter').value='NieTe';$('leftExpression').value='一般';$('leftName').value='Nie Te';$('rightCharacter').value='Omi';$('rightExpression').value='一般';$('rightName').value='Omi';$('dialogue').value='你不是說走這條比較快嗎？';updateUI();render()};$('download').onclick=()=>{render();if($('download').disabled)return;canvas.toBlob(blob=>{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='O-Ne_對話卡.png';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)},'image/png')};$('jsonBtn').onclick=()=>{const payload={component_id:'DIALOGUE-CARD',generator_version:'V1.0_20260808',panel_fill_opacity:.8,left:snapshot('left'),right:snapshot('right'),dialogue:$('dialogue').value};const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}));a.download='O-Ne_對話卡_data.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};function updateUI(){updateSlot('left',false);updateSlot('right',false)}loadAssets();
-</script></body></html>
+const ASSETS=window.DIALOGUE_ASSETS||{};
+const EXPRESSIONS=["一般", "大笑", "驚訝", "生氣", "委屈哭", "疑惑", "無奈"];
+const CHARACTERS=[
+  {id:'NONE',label:'不顯示',name:'',color:null,text:'#FDF3E7',portrait:false},
+  {id:'Omi',label:'Omi',name:'Omi',color:'#FD4537',text:'#FDF3E7',portrait:true},
+  {id:'NieTe',label:'涅特',name:'Nie Te',color:'#3F8FB7',text:'#FDF3E7',portrait:true},
+  {id:'Kuma',label:'Kuma',name:'Kuma',color:'#FFBE37',text:'#1F1713',portrait:true},
+  {id:'Nomi',label:'Nomi',name:'Nomi',color:'#FFBE37',text:'#1F1713',portrait:true},
+  {id:'NPC',label:'NPC',name:'NPC',color:'#29A6A7',text:'#FDF3E7',portrait:false}
+];
+const canvas=document.getElementById('c'),ctx=canvas.getContext('2d'),$=id=>document.getElementById(id);
+const images={};
+let assetsReady=false;
+
+function font(weight,px){return `${weight} ${px}px "Noto Sans TC","Noto Sans CJK TC","Microsoft JhengHei",sans-serif`}
+function charDef(id){return CHARACTERS.find(x=>x.id===id)||CHARACTERS[0]}
+function fillCharacterSelect(el){CHARACTERS.forEach(c=>{let o=document.createElement('option');o.value=c.id;o.textContent=c.label;el.appendChild(o)})}
+function fillExpressionSelect(el){EXPRESSIONS.forEach(e=>{let o=document.createElement('option');o.value=e;o.textContent=e;el.appendChild(o)})}
+
+async function loadAssets(){
+  const jobs=[];
+  for(const [c,map] of Object.entries(ASSETS)){
+    images[c]={};
+    for(const [e,src] of Object.entries(map)){
+      jobs.push(new Promise(resolve=>{
+        const im=new Image();
+        im.onload=()=>{images[c][e]=im;resolve(true)};
+        im.onerror=()=>resolve(false);
+        im.src=src;
+      }));
+    }
+  }
+  const result=await Promise.all(jobs);
+  assetsReady=true;
+  updateUI();
+  render();
+  if(result.some(x=>!x)){
+    $('status').textContent='READY｜部分表情素材異常時會自動退回一般表情';
+    $('status').className='status';
+  }
+}
+
+function fitName(name,max=110,start=21,min=13){
+  let s=start; while(s>=min){ctx.font=font(800,s);if(ctx.measureText(name).width<=max)return s;s--}
+  return min;
+}
+function badge(side,character,name){
+  if(character==='NONE')return;
+  const d=charDef(character);
+  const nm=(name||d.name||'').trim()||d.name;
+  ctx.font=font(800,20);
+  const measured=ctx.measureText(nm).width;
+  const w=Math.min(118,Math.max(74,measured+26));
+  let x;
+  if(character==='NPC') x=side==='left'?0:617-w;
+  else x=side==='left'?122:617-122-w;
+  const y=0,h=31,r=10;
+  ctx.beginPath();ctx.roundRect(x,y,w,h,r);
+  ctx.fillStyle=d.color;ctx.fill();
+  const fs=fitName(nm,w-20,20,12);
+  ctx.font=font(800,fs);ctx.fillStyle=d.text;ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText(nm,x+w/2,y+h/2+1);
+}
+
+function drawFrame(){
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(16,1);ctx.lineTo(600,1);ctx.lineTo(616,17);ctx.lineTo(616,103);
+  ctx.lineTo(600,119);ctx.lineTo(16,119);ctx.lineTo(1,104);ctx.lineTo(1,16);ctx.closePath();
+  ctx.fillStyle='rgba(31,23,19,.80)';ctx.fill();
+  ctx.strokeStyle='#FDF3E7';ctx.lineWidth=2;ctx.lineJoin='miter';ctx.stroke();
+  ctx.restore();
+}
+
+function drawPortrait(side,character,expression){
+  const d=charDef(character);
+  if(!d.portrait||!images[character])return;
+  const im=images[character][expression]||images[character]['一般'];
+  if(!im)return;
+  const maxW=119,maxH=119;
+  const scale=Math.min(maxW/im.width,maxH/im.height);
+  const w=im.width*scale,h=im.height*scale;
+  const x=side==='left'?0:617-w;
+  const y=(120-h)/2;
+  ctx.drawImage(im,x,y,w,h);
+}
+
+function wrapAtSize(text,maxWidth,size,weight=800){
+  ctx.font=font(weight,size);
+  const explicit=String(text).split(/\n/);
+  const lines=[];
+  for(const para of explicit){
+    let line='';
+    for(const ch of para){
+      const test=line+ch;
+      if(ctx.measureText(test).width<=maxWidth||!line)line=test;
+      else{lines.push(line);line=ch}
+    }
+    lines.push(line);
+  }
+  return lines;
+}
+function drawDialogue(text,leftChar,rightChar){
+  const leftPortrait=charDef(leftChar).portrait;
+  const rightPortrait=charDef(rightChar).portrait;
+  const x1=leftPortrait?122:18;
+  const x2=rightPortrait?495:599;
+  const maxW=x2-x1;
+  let size=27,lines=[];
+  while(size>=15){
+    lines=wrapAtSize(text,maxW,size,800);
+    if(lines.length<=2)break;
+    size--;
+  }
+  const ok=lines.length<=2;
+  lines=lines.slice(0,2);
+  const lh=size+7,total=lines.length*lh;
+  let y=63-total/2+size*0.82;
+  ctx.font=font(800,size);ctx.fillStyle='#FDF3E7';ctx.textAlign='left';ctx.textBaseline='alphabetic';
+  for(const line of lines){ctx.fillText(line,x1,y);y+=lh}
+  return ok;
+}
+
+function render(){
+  if(!assetsReady)return;
+  ctx.clearRect(0,0,617,120);
+  const lc=$('leftCharacter').value,rc=$('rightCharacter').value;
+  const le=$('leftExpression').value,re=$('rightExpression').value;
+  if(lc==='NONE'&&rc==='NONE'){
+    $('status').textContent='BLOCKED｜左右至少要保留一個角色或 NPC';
+    $('status').className='status error';$('download').disabled=true;return;
+  }
+  drawFrame();
+  badge('left',lc,$('leftName').value);
+  badge('right',rc,$('rightName').value);
+  const textOk=drawDialogue($('dialogue').value,lc,rc);
+  drawPortrait('left',lc,le);
+  drawPortrait('right',rc,re);
+  $('download').disabled=!textOk;
+  if(textOk){$('status').textContent='READY｜可輸出透明 PNG';$('status').className='status'}
+  else{$('status').textContent='BLOCKED｜台詞太長，請縮短到兩行內';$('status').className='status error'}
+}
+
+function updateSlot(side,resetName=false){
+  const ch=$(side+'Character').value,d=charDef(ch),exp=$(side+'Expression');
+  exp.disabled=!d.portrait;
+  if(resetName)$(side+'Name').value=d.name;
+  $(side+'Name').disabled=ch==='NONE';
+  render();
+}
+function snapshot(side){
+  return {
+    character:$(side+'Character').value,
+    expression:$(side+'Expression').value,
+    name:$(side+'Name').value
+  };
+}
+function applySnapshot(side,s){
+  $(side+'Character').value=s.character;
+  $(side+'Expression').value=s.expression;
+  $(side+'Name').value=s.name;
+  updateSlot(side,false);
+}
+
+fillCharacterSelect($('leftCharacter'));fillCharacterSelect($('rightCharacter'));
+fillExpressionSelect($('leftExpression'));fillExpressionSelect($('rightExpression'));
+
+$('leftCharacter').value='NieTe';$('leftExpression').value='一般';$('leftName').value='Nie Te';
+$('rightCharacter').value='Omi';$('rightExpression').value='一般';$('rightName').value='Omi';
+
+['left','right'].forEach(side=>{
+  $(side+'Character').addEventListener('change',()=>updateSlot(side,true));
+  $(side+'Expression').addEventListener('change',render);
+  $(side+'Name').addEventListener('input',render);
+});
+$('leftNameReset').onclick=()=>{$('leftName').value=charDef($('leftCharacter').value).name;render()};
+$('rightNameReset').onclick=()=>{$('rightName').value=charDef($('rightCharacter').value).name;render()};
+$('dialogue').addEventListener('input',render);
+$('swap').onclick=()=>{const a=snapshot('left'),b=snapshot('right');applySnapshot('left',b);applySnapshot('right',a);render()};
+$('reset').onclick=()=>{
+  $('leftCharacter').value='NieTe';$('leftExpression').value='一般';$('leftName').value='Nie Te';
+  $('rightCharacter').value='Omi';$('rightExpression').value='一般';$('rightName').value='Omi';
+  $('dialogue').value='你不是說走這條比較快嗎？';updateUI();render();
+};
+$('download').onclick=()=>{
+  render();if($('download').disabled)return;
+  canvas.toBlob(blob=>{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='O-Ne_對話卡.png';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)},'image/png')
+};
+$('jsonBtn').onclick=()=>{
+  const payload={
+    component_id:'DIALOGUE-CARD',
+    generator_version:'V1.1_20260808',
+    panel_fill_opacity:.8,
+    left:snapshot('left'),
+    right:snapshot('right'),
+    dialogue:$('dialogue').value
+  };
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}));
+  a.download='O-Ne_對話卡_data.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)
+};
+function updateUI(){updateSlot('left',false);updateSlot('right',false)}
+loadAssets();
+</script>
+</body>
+</html>
