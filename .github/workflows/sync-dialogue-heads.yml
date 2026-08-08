@@ -16,12 +16,15 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - name: Install reliable Drive downloader
+        run: python3 -m pip install --quiet gdown
       - name: Download standalone transparent head PNGs from Drive
         shell: bash
         run: |
           set -euo pipefail
+          rm -rf O-Ne-Tools/dialogue-heads
           mkdir -p O-Ne-Tools/dialogue-heads
-          get() { id="$1"; out="$2"; echo "Downloading $out"; curl -L --fail --retry 3 --retry-delay 2 -o "O-Ne-Tools/dialogue-heads/$out" "https://drive.usercontent.google.com/download?id=${id}&export=download&confirm=t"; }
+          get() { id="$1"; out="$2"; echo "Downloading $out"; gdown --quiet --id "$id" -O "O-Ne-Tools/dialogue-heads/$out"; }
           get 13BSwK3GrRhsE0zYNvi74-osTs1zEctOV omi-laugh.png
           get 1_wcRLv0JekRqApC1E_s4iUlS-j7guWz0 omi-surprise.png
           get 1lpEBGD_tAZ2Sc-BTkfIuc0bAiS3vVoKf omi-angry.png
