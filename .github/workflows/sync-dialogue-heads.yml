@@ -1,0 +1,76 @@
+name: Sync dialogue standalone heads
+
+on:
+  push:
+    paths:
+      - '.github/workflows/sync-dialogue-heads.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Download standalone transparent head PNGs from Drive
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p O-Ne-Tools/dialogue-heads
+          get() { id="$1"; out="$2"; echo "Downloading $out"; curl -L --fail --retry 3 --retry-delay 2 -o "O-Ne-Tools/dialogue-heads/$out" "https://drive.usercontent.google.com/download?id=${id}&export=download&confirm=t"; }
+          get 13BSwK3GrRhsE0zYNvi74-osTs1zEctOV omi-laugh.png
+          get 1_wcRLv0JekRqApC1E_s4iUlS-j7guWz0 omi-surprise.png
+          get 1lpEBGD_tAZ2Sc-BTkfIuc0bAiS3vVoKf omi-angry.png
+          get 10xoo4e7Hkq7dzpHP2T8ED10DVT9PbyUm omi-cry.png
+          get 1kEdecTpwBhGIu6938NbjbV7Wn8ER1oZS omi-confused.png
+          get 1KJy3fjbD4F9Fe_UHg6hhm7vQ-TN462rT omi-helpless.png
+          get 1D66PUu2KUwlQNsWOJrCYPe8XwJzoBc9z niete-laugh.png
+          get 1NAQOIG8jA2_fdzecNsvZzIyUfky9Xlkc niete-surprise.png
+          get 19nkVoSJCF8JcjoFEWFFoJH6AyeVkQSF9 niete-angry.png
+          get 10xhyRkhETGT8wYdqXhYK4BXCgcsppuJZ niete-cry.png
+          get 1x0X1gh4KKgUsW2tCg4K8B8BFNgOwNOzP niete-confused.png
+          get 1ZFypywLmrObprYnmUN-gMIGscRgPPAo- niete-helpless.png
+          get 1OoqkXzkKd2wRsA365sJCCdSgIPFxrBMK kuma-laugh.png
+          get 1MGe1lc1SqOp5T96NOyJeH4FM8O-BrvDc kuma-surprise.png
+          get 1LlxawAihsidyye1xGWDTFC9xcQ78DGfh kuma-angry.png
+          get 1a47kETk5tgrC9OiP9UvPIt0C2tTsxIUw kuma-cry.png
+          get 1WeqkNBZxzlRg2HpsMh1BkD4PVHX5Y-LR kuma-confused.png
+          get 1WC_0E4FnKWitQspt15HfAwio5WtWxVUr kuma-helpless.png
+          get 1QpGlVzsNEe8QeHoC9e7UvYmuVleqsdmS nomi-laugh.png
+          get 1I8kdTUrSdGrfMIX35LtdyJJCF-_dLsW0 nomi-surprise.png
+          get 1-bzqd7irSqJrYGmzmi4LLYqI9AsYp2LD nomi-angry.png
+          get 1sImzzvPsqX045c8JwK2JF7RkSfJdZ5j1 nomi-cry.png
+          get 1mf8JT9f12D8HgbJ5ghrJeMgGVK9zRGp2 nomi-confused.png
+          get 1-TMIQ6sh7Y1-gKigidP9jS-zcGpODCtI nomi-helpless.png
+      - name: Validate PNG signatures and original dimensions
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import struct
+          root=Path('O-Ne-Tools/dialogue-heads')
+          files=sorted(root.glob('*.png'))
+          assert len(files)==24, f'expected 24 PNGs, got {len(files)}'
+          for p in files:
+              b=p.read_bytes()
+              assert b[:8]==b'\x89PNG\r\n\x1a\n', f'{p} is not PNG'
+              w,h=struct.unpack('>II', b[16:24])
+              assert w>=1000 and h>=1000, f'{p} unexpectedly small: {w}x{h}'
+              print(p.name, w, h, len(b))
+          PY
+      - name: Commit synced heads
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add O-Ne-Tools/dialogue-heads
+          if git diff --cached --quiet; then
+            echo "No changes"
+          else
+            git commit -m "Sync standalone dialogue head PNG assets"
+            git push
+          fi
