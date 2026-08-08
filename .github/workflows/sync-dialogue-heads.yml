@@ -24,7 +24,7 @@ jobs:
           set -euo pipefail
           rm -rf O-Ne-Tools/dialogue-heads
           mkdir -p O-Ne-Tools/dialogue-heads
-          get() { id="$1"; out="$2"; echo "Downloading $out"; gdown --quiet --id "$id" -O "O-Ne-Tools/dialogue-heads/$out"; }
+          get() { id="$1"; out="$2"; echo "Downloading $out"; gdown --quiet "$id" -O "O-Ne-Tools/dialogue-heads/$out"; }
           get 13BSwK3GrRhsE0zYNvi74-osTs1zEctOV omi-laugh.png
           get 1_wcRLv0JekRqApC1E_s4iUlS-j7guWz0 omi-surprise.png
           get 1lpEBGD_tAZ2Sc-BTkfIuc0bAiS3vVoKf omi-angry.png
