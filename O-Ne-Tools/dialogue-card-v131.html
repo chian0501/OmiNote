@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>O-Ne 對話卡生成器 V1.3.1</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:#0e1117;color:#f3efe8;font-family:"Noto Sans TC","Noto Sans CJK TC","Microsoft JhengHei",sans-serif}
+.app{max-width:1420px;margin:auto;padding:26px}
+h1{margin:0 0 8px;font-size:24px}
+.sub{color:#aeb8c6;font-size:13px;line-height:1.7;margin-bottom:22px}
+.grid{display:grid;grid-template-columns:520px 1fr;gap:22px;align-items:start}
+.panel{background:#151a23;border:1px solid #2a3240;border-radius:16px;padding:18px;box-shadow:0 12px 30px rgba(0,0,0,.24)}
+.section-title{font-size:14px;font-weight:900;margin:0 0 12px;color:#f0a8cf}
+.note{font-size:12px;color:#c4cad3;background:#101620;border:1px solid #273244;border-radius:10px;padding:10px 12px;line-height:1.7;margin-bottom:12px}
+.slots{display:grid;grid-template-columns:1fr 52px 1fr;gap:10px;align-items:start}
+.slot{border:1px solid #2d3747;background:#111823;border-radius:12px;padding:12px}
+.slot h3{font-size:13px;margin:0 0 8px;color:#dce4ee}
+label{display:block;font-size:12px;font-weight:800;color:#b9c0ca;margin:10px 0 6px}
+input,select,textarea{width:100%;border:1px solid #394355;border-radius:9px;background:#101620;color:#fff;padding:10px 11px;font-size:14px;outline:none}
+input:focus,select:focus,textarea:focus{border-color:#29A6A7}
+textarea{resize:vertical;min-height:86px;line-height:1.55}
+.swap{align-self:center;margin-top:78px;border:0;border-radius:9px;padding:10px;font-weight:900;background:#30394a;color:#fff;cursor:pointer}
+.buttons{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+button{border:0;border-radius:9px;padding:10px 13px;font-weight:900;cursor:pointer;background:#29A6A7;color:#fff}
+button.secondary{background:#30394a}
+button.small{padding:7px 9px;font-size:12px;margin-top:8px}
+.hint{font-size:11px;color:#8290a0;margin-top:7px;line-height:1.55}
+.status{min-height:22px;margin-top:12px;font-size:12px;color:#8fd4c8;line-height:1.6}
+.status.error{color:#ff7770}
+.preview-wrap{min-height:500px;display:flex;justify-content:center;align-items:center;background:
+linear-gradient(45deg,#222832 25%,transparent 25%),
+linear-gradient(-45deg,#222832 25%,transparent 25%),
+linear-gradient(45deg,transparent 75%,#222832 75%),
+linear-gradient(-45deg,transparent 75%,#222832 75%);
+background-size:24px 24px;background-position:0 0,0 12px,12px -12px,-12px 0;border-radius:14px;padding:28px 18px;overflow:auto}
+canvas{width:617px;max-width:100%;height:auto;image-rendering:auto;filter:drop-shadow(0 8px 18px rgba(0,0,0,.28))}
+.mini{margin-top:14px;padding:12px;border-radius:10px;background:#101620;color:#aeb7c3;font-size:12px;line-height:1.7}
+.lock{color:#ffcf6d}
+@media(max-width:1080px){.grid{grid-template-columns:1fr}}
+@media(max-width:620px){.slots{grid-template-columns:1fr}.swap{margin-top:0}}
+</style>
+</head>
+<body>
+<div class="app">
+<h1>O-Ne 對話卡生成器 <span style="font-size:12px;color:#8c96a5">V1.3.1</span></h1>
+<div class="sub">正確版：正式框與角色頭像完全分離。角色只使用獨立透明表情頭像；預覽原生 617×120，不放大。</div>
+
+<div class="grid">
+<div class="panel">
+  <div class="section-title">01｜左右角色設定</div>
+  <div class="note">
+    <b>角色來源：</b>Omi／涅特／Kuma／Nomi 的獨立透明頭像表情包。<br>
+    <b>表情：</b>大笑／驚訝／生氣／委屈哭／疑惑／無奈。沒有獨立來源的「一般」不提供。<br>
+    NPC 無頭像，名稱可以自行改成「站務員／店員阿姨／工作人員」等。
+  </div>
+
+  <div class="slots">
+    <div class="slot">
+      <h3>⬅ 左側角色</h3>
+      <label>角色</label><select id="leftCharacter"></select>
+      <label>表情</label><select id="leftExpression"></select>
+      <label>角色名稱（可自訂）</label><input id="leftName">
+      <button type="button" id="leftDefault" class="secondary small">使用預設名稱</button>
+      <div class="hint">NPC 沒有角色圖頑，表情最粨甩用；名字程「工作／竘只政呲位置不顯。
+      </div>
+    </div>
+    <button id="swap" class="secondary small swap" title="交換左右">⇄</button>
+    <div class="slot">
+      <h3>右側角色 ➡</h3>
+      <label>角色</label><select id="rightCharacter"></select>
+      <label>表情</label><select id="rightExpression"></select>
+      <label>角色名稱（可自訂）</label><input id="rightName">
+      <button type="button" id="rightDefault" class="secondary small">使用預設名稱</button>
+      <div class="hint">左右可選相同角色；任一側關閉即自動變單人卡。</div>
+    </div>
+  </div>
+
+  <label>對話文字</label>
+  <textarea id="dialogue">你不是說走這條比較快嗎？</textarea>
+
+  <div id="status" class="status">READY｜正在載入獨立頭像素材…</div>
+  <div class="buttons">
+    <button id="download">輸出透明 PNG</button>
+    <button id="jsonBtn" class="secondary">輸出欄位 JSON</button>
+    <button id="reset" class="secondary">回復示例</button>
+  </div>
+
+  <div class="mini">
+    <b class="lock">🔒 固定不改：</b>617×120、正式切角白框、#1F1713 主底板 80%、角色識別色、透明背景。<br>
+    <b>人物規則：</b>獨立頭像先裁透明空白，再從 240px 素材縮到正式大小；瀏覽器不放大人物。<br>
+    <b>可改：</b>左右角色、左右表情、左右角色名稱、台詞。
+  </div>
+</div>
+
+<div class="panel">
+  <div class="section-title">02｜正式版即時預覽</div>
+  <div class="preview-wrap">
+    <canvas id="c" width="617" height="120"></canvas>
+  </div>
+</div>
+</div>
+</div>
+
+<script src="./dialogue-heads-v130/omi-laugh.js?v=131"></script>
+<script src="./dialogue-heads-v130/omi-surprise.js?v=131"></script>
+<script src="./dialogue-heads-v130/omi-angry.js?v=131"></script>
+<script src="./dialogue-heads-v130/omi-cry.js?v=131"></script>
+<script src="./dialogue-heads-v130/omi-confused.js?v=131"></script>
+<script src="./dialogue-heads-v130/omi-helpless.js?v=131"></script>
+<script src="./dialogue-heads-v130/niete-laugh.js?v=131"></script>
+<script src="./dialogue-heads-v130/niete-surprise.js?v=131"></script>
+<script src="./dialogue-heads-v130/niete-angry.js?v=131"></script>
+<script src="./dialogue-heads-v130/niete-cry.js?v=131"></script>
+<script src="./dialogue-heads-v130/niete-confused.js?v=131"></script>
+<script src="./dialogue-heads-v130/niete-helpless.js?v=131"></script>
+<script src="./dialogue-heads-v130/kuma-laugh.js?v=131"></script>
+<script src="./dialogue-heads-v130/kuma-surprise.js?v=131"></script>
+<script src="./dialogue-heads-v130/kuma-angry.js?v=131"></script>
+<script src="./dialogue-heads-v130/kuma-cry.js?v=131"></script>
+<script src="./dialogue-heads-v130/kuma-confused.js?v=131"></script>
+<script src="./dialogue-heads-v131/kuma-helpless.js?v=131"></script>
+<script src="./dialogue-heads-v131/nomi-laugh.js?v=131"></script>
+<script src="./dialogue-heads-v131/nomi-surprise.js?v=131"></script>
+<script src="./dialogue-heads-v131/nomi-angry.js?v=131"></script>
+<script src="./dialogue-heads-v131/nomi-confused.js?v=131"></script>
+<script>window.DIALOGUE_HEADS=window.DIALOGUE_HEADS||{};window.DIALOGUE_HEADS["Nomi"]=window.DIALOGUE_HEADS["Nomi"]||{};window.DIALOGUE_HEADS["Nomi"]["委屈哭"]={"src":"data:image/webp;base64,UklGRrAaAABXRUJQVlA4WAoAAAAQAAAAgQAAWwAAQUxQSLMGAAAB8IZtnyFJ/v/dr1dE9di2bduz9m7PvG3btm1zbdu2bdtWT0fE635QVZlZNZnPI2ICkFEADBo/e+6sGeOH9UBD71VQ
