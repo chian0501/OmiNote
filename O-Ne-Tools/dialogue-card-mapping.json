@@ -1,46 +1,92 @@
 {
-  "generator_version": "V1.3_20260809",
+  "generator_version": "V1.3.5_20260811",
   "component_id": "DIALOGUE-CARD",
   "family": "對話卡",
   "formal_source_folder": "https://drive.google.com/drive/folders/18ddBMdVUEW6WvNyYF1gmuPSJ_eqYG8ad",
-  "master_psd": {"name":"對話卡.psd","drive_id":"16AzfHUXuznSj8adbA9lKDcEYbUZ5iL6U"},
+  "master_psd": {
+    "name": "對話卡.psd",
+    "drive_id": "16AzfHUXuznSj8adbA9lKDcEYbUZ5iL6U"
+  },
   "formal_references": {
-    "Omi_card":"1iE6LgXNEPirKNFg9BvOvcaX6imd845ye",
-    "NieTe_card":"1DSUa8SmbPIdjENkUp8US6I1VWfHqSnnZ",
-    "Kuma_card":"1Cf6vuvGr9Qqjr03J6n4Ak3lliHnOyljr",
-    "Nomi_card":"1H20ePHU7UzKHhMyj7uTWwNIw3-eyV0Bv",
-    "NPC_card":"1zvjesZhoa1BPgzRcYtBi9dJZyWa5Jmc5",
-    "dual_card":"1H-sOGVjvkXSEAcNIR9j6oB7M3Hr8cWKu"
+    "Omi_card": "1iE6LgXNEPirKNFg9BvOvcaX6imd845ye",
+    "NieTe_card": "1DSUa8SmbPIdjENkUp8US6I1VWfHqSnnZ",
+    "Kuma_card": "1Cf6vuvGr9Qqjr03J6n4Ak3lliHnOyljr",
+    "Nomi_card": "1H20ePHU7UzKHhMyj7uTWwNIw3-eyV0Bv",
+    "NPC_card": "1zvjesZhoa1BPgzRcYtBi9dJZyWa5Jmc5",
+    "dual_card": "1H-sOGVjvkXSEAcNIR9j6oB7M3Hr8cWKu"
   },
   "portrait_source_rule": {
-    "mode":"standalone_expression_heads_only",
-    "repo_folder":"O-Ne-Tools/dialogue-heads/",
-    "finished_dialogue_cards_are_reference_only":true,
-    "forbid_portrait_extraction_from_finished_cards":true,
-    "original_source_size":"1254x1254 transparent PNG",
-    "transparent_margin_crop_at_render":true,
-    "upscale_forbidden":true
+    "mode": "four_complete_standalone_expression_bundles",
+    "repo_files": [
+      "O-Ne-Tools/dialogue-assets-omi.js",
+      "O-Ne-Tools/dialogue-assets-niete.js",
+      "O-Ne-Tools/dialogue-assets-kuma.js",
+      "O-Ne-Tools/dialogue-assets-nomi.js"
+    ],
+    "finished_dialogue_cards_are_reference_only": true,
+    "forbid_portrait_extraction_from_finished_cards": true,
+    "transparent_margin_crop_at_render": true,
+    "upscale_forbidden": true,
+    "required_asset_count": 24
   },
   "characters": {
-    "Omi":{"prefix":"omi","label_color":"#FD4537","expressions":{"大笑":"13BSwK3GrRhsE0zYNvi74-osTs1zEctOV","驚訝":"1_wcRLv0JekRqApC1E_s4iUlS-j7guWz0","生氣":"1lpEBGD_tAZ2Sc-BTkfIuc0bAiS3vVoKf","委屈哭":"10xoo4e7Hkq7dzpHP2T8ED10DVT9PbyUm","疑惑":"1kEdecTpwBhGIu6938NbjbV7Wn8ER1oZS","無奈":"1KJy3fjbD4F9Fe_UHg6hhm7vQ-TN462rT"}},
-    "NieTe":{"prefix":"niete","label_color":"#3F8FB7","expressions":{"大笑":"1D66PUu2KUwlQNsWOJrCYPe8XwJzoBc9z","驚訝":"1NAQOIG8jA2_fdzecNsvZzIyUfky9Xlkc","生氣":"19nkVoSJCF8JcjoFEWFFoJH6AyeVkQSF9","委屈哭":"10xhyRkhETGT8wYdqXhYK4BXCgcsppuJZ","疑惑":"1x0X1gh4KKgUsW2tCg4K8B8BFNgOwNOzP","無奈":"1ZFypywLmrObprYnmUN-gMIGscRgPPAo-"}},
-    "Kuma":{"prefix":"kuma","label_color":"#FFBE37","expressions":{"大笑":"1OoqkXzkKd2wRsA365sJCCdSgIPFxrBMK","驚訝":"1MGe1lc1SqOp5T96NOyJeH4FM8O-BrvDc","生氣":"1LlxawAihsidyye1xGWDTFC9xcQ78DGfh","委屈哭":"1a47kETk5tgrC9OiP9UvPIt0C2tTsxIUw","疑惑":"1WeqkNBZxzlRg2HpsMh1BkD4PVHX5Y-LR","無奈":"1WC_0E4FnKWitQspt15HfAwio5WtWxVUr"}},
-    "Nomi":{"prefix":"nomi","label_color":"#FFBE37","expressions":{"大笑":"1QpGlVzsNEe8QeHoC9e7UvYmuVleqsdmS","驚訝":"1I8kdTUrSdGrfMIX35LtdyJJCF-_dLsW0","生氣":"1-bzqd7irSqJrYGmzmi4LLYqI9AsYp2LD","委屈哭":"1sImzzvPsqX045c8JwK2JF7RkSfJdZ5j1","疑惑":"1mf8JT9f12D8HgbJ5ghrJeMgGVK9zRGp2","無奈":"1-TMIQ6sh7Y1-gKigidP9jS-zcGpODCtI"}},
-    "NPC":{"label_color":"#29A6A7","portrait":false,"expressions":{}}
+    "Omi": {
+      "label_color": "#FD4537",
+      "expressions": ["大笑", "驚訝", "生氣", "委屈哭", "疑惑", "無奈"]
+    },
+    "NieTe": {
+      "label_color": "#57B5E8",
+      "expressions": ["大笑", "驚訝", "生氣", "委屈哭", "疑惑", "無奈"]
+    },
+    "Kuma": {
+      "label_color": "#FFBE37",
+      "expressions": ["大笑", "驚訝", "生氣", "委屈哭", "疑惑", "無奈"]
+    },
+    "Nomi": {
+      "label_color": "#FFBE37",
+      "expressions": ["大笑", "驚訝", "生氣", "委屈哭", "疑惑", "無奈"]
+    },
+    "NPC": {
+      "label_color": "#29A6A7",
+      "portrait": false,
+      "expressions": []
+    }
   },
   "behavior": {
-    "left_right_independent":true,
-    "single_or_dual_same_editor":true,
-    "character_options":["NONE","Omi","NieTe","Kuma","Nomi","NPC"],
-    "expression_options":["大笑","驚訝","生氣","委屈哭","疑惑","無奈"],
-    "neutral_expression_removed_because_no_standalone_source":true,
-    "custom_display_name":true,
-    "npc_custom_name":true,
-    "swap_sides":true,
-    "dialogue_auto_shrink":true,
-    "max_dialogue_lines":2
+    "left_right_independent": true,
+    "single_or_dual_same_editor": true,
+    "character_options": ["NONE", "Omi", "NieTe", "Kuma", "Nomi", "NPC"],
+    "expression_options": ["大笑", "驚訝", "生氣", "委屈哭", "疑惑", "無奈"],
+    "neutral_expression_removed_because_no_standalone_source": true,
+    "custom_display_name": true,
+    "npc_custom_name": true,
+    "swap_sides": true,
+    "dialogue_auto_shrink": true,
+    "max_dialogue_lines": 2
   },
-  "canvas":{"width":617,"height":120,"css_upscale":false},
-  "visual_rules":{"panel_fill":"#1F1713","panel_fill_opacity":0.80,"scope":"panel_fill_only","outline_opaque":true,"portraits_opaque":true,"labels_opaque":true},
-  "export":{"transparent_png":true,"canvas_safe_same_origin_assets":true}
+  "canvas": {
+    "width": 617,
+    "height": 120,
+    "css_upscale": false
+  },
+  "visual_rules": {
+    "panel_fill": "#1F1713",
+    "panel_fill_opacity": 0.8,
+    "scope": "panel_fill_only",
+    "outline_opaque": true,
+    "portraits_opaque": true,
+    "labels_opaque": true
+  },
+  "export": {
+    "transparent_png": true,
+    "canvas_safe_same_origin_assets": true
+  },
+  "qa": {
+    "asset_decode": "24_of_24_pass",
+    "alpha_bbox_validation": "24_of_24_pass",
+    "expression_uniqueness": "6_of_6_per_character_pass",
+    "single_npc_case": "pass",
+    "dual_character_case": "pass",
+    "headless_browser_dom": "pass"
+  }
 }
