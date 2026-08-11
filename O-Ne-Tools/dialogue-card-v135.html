@@ -91,13 +91,14 @@ function render(){frame();const lc=$('leftCharacter').value,rc=$('rightCharacter
 function snap(side){return{character:$(side+'Character').value,expression:$(side+'Expression').value,name:$(side+'Name').value}}
 function put(side,s){$(side+'Character').value=s.character;$(side+'Expression').value=s.expression;$(side+'Name').value=s.name;sync(side)}
 function reset(redraw=true){for(const [k,v] of Object.entries(defaults))$(k).value=v;syncAll();if(redraw)render()}
+function saveBlob(blob,name){if(!blob){$('status').className='status error';$('status').textContent='ERROR｜輸出失敗，請重新整理後再試';return}const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;a.style.display='none';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500)}
 init();
 ['left','right'].forEach(side=>{$(`${side}Character`).addEventListener('change',()=>sync(side,true));$(`${side}Expression`).addEventListener('change',render);$(`${side}Name`).addEventListener('input',render);$(`${side}Default`).onclick=()=>{$(`${side}Name`).value=def($(`${side}Character`).value).name;render()}});
 $('dialogue').addEventListener('input',render);
 $('swap').onclick=()=>{const a=snap('left'),b=snap('right');put('left',b);put('right',a);render()};
 $('reset').onclick=()=>reset(true);
-$('download').onclick=()=>{render();if($('download').disabled)return;canvas.toBlob(blob=>{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='O-Ne_對話卡.png';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1200)},'image/png')};
-$('jsonBtn').onclick=()=>{const data={component_id:'DIALOGUE-CARD',generator_version:'V1.3.6_20260811',left:snap('left'),right:snap('right'),dialogue:$('dialogue').value},a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));a.download='O-Ne_對話卡_data.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1200)};
+$('download').onclick=()=>{render();if($('download').disabled)return;canvas.toBlob(blob=>saveBlob(blob,'O-Ne_對話卡.png'),'image/png')};
+$('jsonBtn').onclick=()=>{const data={component_id:'DIALOGUE-CARD',generator_version:'V1.3.6_20260811',left:snap('left'),right:snap('right'),dialogue:$('dialogue').value};saveBlob(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),'O-Ne_對話卡_data.json')};
 render();loadAssets();
 </script>
 </body>
