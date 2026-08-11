@@ -1,0 +1,176 @@
+name: Build dialogue master atlas V1.3.5
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/build-dialogue-master-v135.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install Pillow
+        run: python3 -m pip install --quiet pillow
+      - name: Collect all repository dialogue candidates
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > /tmp/collect.js <<'NODE'
+          const fs=require('fs');
+          const vm=require('vm');
+          const path=require('path');
+          const fixed=[
+            'O-Ne-Tools/dialogue-assets-omi.js','O-Ne-Tools/dialogue-assets-omi-a.js','O-Ne-Tools/dialogue-assets-omi-b.js',
+            'O-Ne-Tools/dialogue-assets-niete.js','O-Ne-Tools/dialogue-assets-niete-a.js','O-Ne-Tools/dialogue-assets-niete-b.js',
+            'O-Ne-Tools/dialogue-assets-kuma.js','O-Ne-Tools/dialogue-assets-kuma-a.js','O-Ne-Tools/dialogue-assets-kuma-b.js',
+            'O-Ne-Tools/dialogue-assets-nomi.js','O-Ne-Tools/dialogue-assets-nomi-a.js','O-Ne-Tools/dialogue-assets-nomi-b.js'
+          ];
+          const walk=(dir)=>{if(!fs.existsSync(dir))return[];return fs.readdirSync(dir,{withFileTypes:true}).flatMap(e=>e.isDirectory()?walk(path.join(dir,e.name)):[path.join(dir,e.name)]);};
+          const files=[...fixed,...walk('O-Ne-Tools/dialogue-heads-v130'),...walk('O-Ne-Tools/dialogue-heads-v131'),...walk('O-Ne-Tools/dialogue-heads-v132')].filter((x,i,a)=>x.endsWith('.js')&&a.indexOf(x)===i&&fs.existsSync(x));
+          const out={};
+          function add(role,expr,value,file){
+            const src=typeof value==='string'?value:(value&&typeof value.src==='string'?value.src:'');
+            if(!src.startsWith('data:image/'))return;
+            out[role]??={};out[role][expr]??=[];out[role][expr].push({file,src});
+          }
+          for(const file of files){
+            const sandbox={window:{DIALOGUE_ASSETS:{},DIALOGUE_HEADS:{}}};
+            try{vm.runInNewContext(fs.readFileSync(file,'utf8'),sandbox,{filename:file,timeout:3000});}
+            catch(e){console.log('JS_ERROR',file,e.message);continue;}
+            for(const [role,map] of Object.entries(sandbox.window.DIALOGUE_ASSETS||{}))for(const [expr,val] of Object.entries(map||{}))add(role,expr,val,file);
+            for(const [role,map] of Object.entries(sandbox.window.DIALOGUE_HEADS||{}))for(const [expr,val] of Object.entries(map||{}))add(role,expr,val,file);
+          }
+          fs.writeFileSync('/tmp/candidates.json',JSON.stringify(out));
+          console.log('candidate files scanned:',files.length);
+          NODE
+          node /tmp/collect.js
+      - name: Select verified candidates and build 4x6 atlas
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import base64, hashlib, io, json, re
+          from collections import Counter, defaultdict
+          from pathlib import Path
+          from PIL import Image, ImageOps
+
+          roles=['Omi','NieTe','Kuma','Nomi']
+          role_keys={'Omi':'omi','NieTe':'niete','Kuma':'kuma','Nomi':'nomi'}
+          exprs=['大笑','驚訝','生氣','委屈哭','疑惑','無奈']
+          data=json.loads(Path('/tmp/candidates.json').read_text())
+          CELL=240
+          atlas=Image.new('RGBA',(CELL*4,CELL*6),(0,0,0,0))
+          manifest={'version':'V1.3.5','layout':{'width':960,'height':1440,'cell':240,'columns':roles,'rows':exprs},'selected':{},'rejected':{}}
+
+          def priority(file, role):
+              key=role_keys[role]
+              if file==f'O-Ne-Tools/dialogue-assets-{key}.js': return 0
+              if file.startswith(f'O-Ne-Tools/dialogue-assets-{key}-'): return 1
+              if 'dialogue-heads-v132' in file: return 2
+              if 'dialogue-heads-v131' in file: return 3
+              if 'dialogue-heads-v130' in file: return 4
+              return 9
+
+          def decode(item):
+              raw=base64.b64decode(item['src'].split(',',1)[1],validate=True)
+              im=Image.open(io.BytesIO(raw)).convert('RGBA'); im.load()
+              bbox=im.getchannel('A').getbbox()
+              if not bbox: raise ValueError('empty alpha')
+              crop=im.crop(bbox)
+              # Stable visual fingerprint after alpha-aware normalisation.
+              bg=Image.new('RGBA',crop.size,(0,0,0,0)); bg.alpha_composite(crop)
+              thumb=ImageOps.contain(bg,(96,96),Image.Resampling.LANCZOS)
+              frame=Image.new('RGBA',(96,96),(0,0,0,0)); frame.alpha_composite(thumb,((96-thumb.width)//2,96-thumb.height))
+              ph=hashlib.sha256(frame.tobytes()).hexdigest()
+              return raw,im,crop,bbox,ph
+
+          missing=[]
+          for col,role in enumerate(roles):
+              manifest['selected'][role]={}; manifest['rejected'][role]={}
+              for row,expr in enumerate(exprs):
+                  candidates=[]
+                  for item in data.get(role,{}).get(expr,[]):
+                      try:
+                          raw,im,crop,bbox,ph=decode(item)
+                          candidates.append({'item':item,'raw':raw,'im':im,'crop':crop,'bbox':bbox,'ph':ph,'priority':priority(item['file'],role)})
+                      except Exception as exc:
+                          manifest['rejected'][role].setdefault(expr,[]).append({'file':item['file'],'reason':f'{type(exc).__name__}: {str(exc)[:120]}'})
+                  if not candidates:
+                      missing.append(f'{role}/{expr}')
+                      continue
+                  counts=Counter(c['ph'] for c in candidates)
+                  candidates.sort(key=lambda c:(-counts[c['ph']],c['priority'],-c['crop'].width*c['crop'].height,c['item']['file']))
+                  best=candidates[0]
+                  crop=best['crop']
+                  pad=max(6,round(max(crop.size)*0.015))
+                  padded=Image.new('RGBA',(crop.width+pad*2,crop.height+pad*2),(0,0,0,0)); padded.alpha_composite(crop,(pad,pad))
+                  scale=min(228/padded.width,228/padded.height,1.0)
+                  size=(max(1,round(padded.width*scale)),max(1,round(padded.height*scale)))
+                  if size!=padded.size: padded=padded.resize(size,Image.Resampling.LANCZOS)
+                  cell=Image.new('RGBA',(CELL,CELL),(0,0,0,0)); dx=(CELL-padded.width)//2; dy=CELL-padded.height; cell.alpha_composite(padded,(dx,dy))
+                  atlas.alpha_composite(cell,(col*CELL,row*CELL))
+                  manifest['selected'][role][expr]={
+                    'file':best['item']['file'],'source_size':list(best['im'].size),'source_bbox':list(best['bbox']),
+                    'normalised_bbox':[dx,dy,dx+padded.width,dy+padded.height],
+                    'pixel_fingerprint':best['ph'],'matching_candidates':counts[best['ph']],
+                    'candidate_count':len(candidates),'raw_bytes':len(best['raw'])
+                  }
+                  print('SELECT',role,expr,best['item']['file'],'matches',counts[best['ph']],'candidates',len(candidates),'size',best['im'].size,'crop',crop.size)
+
+          if missing:
+              manifest['missing']=missing
+              Path('/tmp/dialogue-v135-failure.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2))
+              raise SystemExit('Missing expressions: '+', '.join(missing))
+
+          out=Path('O-Ne-Tools/dialogue-master-v135')
+          out.mkdir(parents=True,exist_ok=True)
+          webp=out/'dialogue-master-v135.webp'
+          png=out/'dialogue-master-v135.png'
+          atlas.save(webp,'WEBP',lossless=True,method=6,exact=True)
+          atlas.save(png,'PNG',optimize=True)
+          manifest['outputs']={
+            'webp':{'path':str(webp),'bytes':webp.stat().st_size,'sha256':hashlib.sha256(webp.read_bytes()).hexdigest()},
+            'png':{'path':str(png),'bytes':png.stat().st_size,'sha256':hashlib.sha256(png.read_bytes()).hexdigest()}
+          }
+          (out/'manifest.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2))
+          # Strict 24-cell validation after round trip.
+          check=Image.open(webp).convert('RGBA')
+          assert check.size==(960,1440)
+          for col,role in enumerate(roles):
+              for row,expr in enumerate(exprs):
+                  cell=check.crop((col*CELL,row*CELL,(col+1)*CELL,(row+1)*CELL))
+                  assert cell.getchannel('A').getbbox(),(role,expr)
+          print('ATLAS_OK',webp.stat().st_size,manifest['outputs']['webp']['sha256'])
+          PY
+      - name: Commit verified atlas and manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'Omi'
+          git config user.email 'chian0501@gmail.com'
+          git add O-Ne-Tools/dialogue-master-v135/dialogue-master-v135.webp \
+                  O-Ne-Tools/dialogue-master-v135/dialogue-master-v135.png \
+                  O-Ne-Tools/dialogue-master-v135/manifest.json
+          if git diff --cached --quiet; then
+            echo 'No atlas changes'
+          else
+            git commit -m 'Build verified 24-cell dialogue master atlas V1.3.5'
+            git push origin main
+          fi
+      - name: Upload atlas diagnostic
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dialogue-master-v135-diagnostic
+          path: |
+            O-Ne-Tools/dialogue-master-v135/manifest.json
+            O-Ne-Tools/dialogue-master-v135/dialogue-master-v135.png
+            /tmp/dialogue-v135-failure.json
+          if-no-files-found: ignore
