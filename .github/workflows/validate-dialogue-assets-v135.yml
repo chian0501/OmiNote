@@ -1,0 +1,101 @@
+name: Validate dialogue assets V1.3.5
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/validate-dialogue-assets-v135.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Pillow
+        run: python3 -m pip install --quiet pillow
+      - name: Collect candidates from repository JS assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > /tmp/collect.js <<'NODE'
+          const fs=require('fs');
+          const vm=require('vm');
+          const path=require('path');
+          const roots=[
+            'O-Ne-Tools/dialogue-assets-omi.js','O-Ne-Tools/dialogue-assets-omi-a.js','O-Ne-Tools/dialogue-assets-omi-b.js',
+            'O-Ne-Tools/dialogue-assets-niete.js','O-Ne-Tools/dialogue-assets-niete-a.js','O-Ne-Tools/dialogue-assets-niete-b.js',
+            'O-Ne-Tools/dialogue-assets-kuma.js','O-Ne-Tools/dialogue-assets-kuma-a.js','O-Ne-Tools/dialogue-assets-kuma-b.js',
+            'O-Ne-Tools/dialogue-assets-nomi.js','O-Ne-Tools/dialogue-assets-nomi-a.js','O-Ne-Tools/dialogue-assets-nomi-b.js'
+          ];
+          const walk=(dir)=>{if(!fs.existsSync(dir))return[];return fs.readdirSync(dir,{withFileTypes:true}).flatMap(e=>e.isDirectory()?walk(path.join(dir,e.name)):[path.join(dir,e.name)]);};
+          const files=[...roots,...walk('O-Ne-Tools/dialogue-heads-v130'),...walk('O-Ne-Tools/dialogue-heads-v131'),...walk('O-Ne-Tools/dialogue-heads-v132')].filter((x,i,a)=>x.endsWith('.js')&&a.indexOf(x)===i&&fs.existsSync(x));
+          const out={};
+          function add(role,expr,value,file){
+            const src=typeof value==='string'?value:(value&&typeof value.src==='string'?value.src:'');
+            if(!src.startsWith('data:image/'))return;
+            out[role]??={};out[role][expr]??=[];out[role][expr].push({file,src});
+          }
+          for(const file of files){
+            const sandbox={window:{DIALOGUE_ASSETS:{},DIALOGUE_HEADS:{}}};
+            try{vm.runInNewContext(fs.readFileSync(file,'utf8'),sandbox,{filename:file,timeout:3000});}
+            catch(e){console.log('JS_ERROR',file,e.message);continue;}
+            for(const [role,map] of Object.entries(sandbox.window.DIALOGUE_ASSETS||{}))for(const [expr,val] of Object.entries(map||{}))add(role,expr,val,file);
+            for(const [role,map] of Object.entries(sandbox.window.DIALOGUE_HEADS||{}))for(const [expr,val] of Object.entries(map||{}))add(role,expr,val,file);
+          }
+          fs.writeFileSync('/tmp/candidates.json',JSON.stringify(out));
+          console.log('FILES_SCANNED',files.length);
+          NODE
+          node /tmp/collect.js
+      - name: Decode, validate and report all 24 cells
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import base64, io, json, math, statistics
+          from pathlib import Path
+          from PIL import Image, ImageStat
+          roles=['Omi','NieTe','Kuma','Nomi']
+          exprs=['大笑','驚訝','生氣','委屈哭','疑惑','無奈']
+          data=json.loads(Path('/tmp/candidates.json').read_text())
+          valid={}
+          for role in roles:
+              valid[role]={}
+              for expr in exprs:
+                  cand=data.get(role,{}).get(expr,[])
+                  good=[]
+                  for index,item in enumerate(cand):
+                      try:
+                          raw=base64.b64decode(item['src'].split(',',1)[1],validate=True)
+                          im=Image.open(io.BytesIO(raw)).convert('RGBA')
+                          im.load()
+                          bbox=im.getchannel('A').getbbox()
+                          if not bbox: raise ValueError('empty alpha')
+                          crop=im.crop(bbox)
+                          stat=ImageStat.Stat(crop.convert('RGB'))
+                          means=stat.mean
+                          extrema=crop.convert('RGB').getextrema()
+                          score=crop.width*crop.height
+                          good.append({'file':item['file'],'index':index,'size':im.size,'crop':crop.size,'score':score,'mean':[round(x,1) for x in means],'raw':len(raw)})
+                      except Exception as e:
+                          print('BAD',role,expr,item['file'],type(e).__name__,str(e)[:120])
+                  good.sort(key=lambda x:(x['file'].count('dialogue-heads'),-x['score'],x['file']))
+                  valid[role][expr]=good
+                  if good:
+                      best=good[0]
+                      print('OK ',role,expr,'candidates=',len(good),'BEST=',best['file'],'SIZE=',best['size'],'CROP=',best['crop'],'RAW=',best['raw'])
+                  else:
+                      print('MISSING',role,expr,'candidates=',len(cand))
+          Path('/tmp/valid-report.json').write_text(json.dumps(valid,ensure_ascii=False,indent=2))
+          missing=[f'{r}/{e}' for r in roles for e in exprs if not valid[r][e]]
+          print('SUMMARY valid=',24-len(missing),'missing=',len(missing),missing)
+          if missing: raise SystemExit(2)
+          PY
+      - name: Upload diagnostic report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dialogue-assets-v135-report
+          path: /tmp/valid-report.json
