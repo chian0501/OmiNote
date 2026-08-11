@@ -1,0 +1,123 @@
+name: Build dialogue sprite sheets V1.3.4
+
+on:
+  push:
+    paths:
+      - '.github/workflows/build-dialogue-sprites-v134.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Pillow
+        run: python3 -m pip install --quiet pillow
+
+      - name: Download 24 standalone expression sources
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/dialogue-source
+          mkdir -p /tmp/dialogue-source
+          get() {
+            id="$1"; out="$2"
+            echo "Downloading $out"
+            curl --fail --location --retry 3 --silent --show-error \
+              "https://lh3.googleusercontent.com/d/$id" \
+              -o "/tmp/dialogue-source/$out"
+          }
+
+          get 13BSwK3GrRhsE0zYNvi74-osTs1zEctOV omi-01
+          get 1_wcRLv0JekRqApC1E_s4iUlS-j7guWz0 omi-02
+          get 1lpEBGD_tAZ2Sc-BTkfIuc0bAiS3vVoKf omi-03
+          get 10xoo4e7Hkq7dzpHP2T8ED10DVT9PbyUm omi-04
+          get 1kEdecTpwBhGIu6938NbjbV7Wn8ER1oZS omi-05
+          get 1KJy3fjbD4F9Fe_UHg6hhm7vQ-TN462rT omi-06
+
+          get 1D66PUu2KUwlQNsWOJrCYPe8XwJzoBc9z niete-01
+          get 1NAQOIG8jA2_fdzecNsvZzIyUfky9Xlkc niete-02
+          get 19nkVoSJCF8JcjoFEWFFoJH6AyeVkQSF9 niete-03
+          get 10xhyRkhETGT8wYdqXhYK4BXCgcsppuJZ niete-04
+          get 1x0X1gh4KKgUsW2tCg4K8B8BFNgOwNOzP niete-05
+          get 1ZFypywLmrObprYnmUN-gMIGscRgPPAo- niete-06
+
+          get 1OoqkXzkKd2wRsA365sJCCdSgIPFxrBMK kuma-01
+          get 1MGe1lc1SqOp5T96NOyJeH4FM8O-BrvDc kuma-02
+          get 1LlxawAihsidyye1xGWDTFC9xcQ78DGfh kuma-03
+          get 1a47kETk5tgrC9OiP9UvPIt0C2tTsxIUw kuma-04
+          get 1WeqkNBZxzlRg2HpsMh1BkD4PVHX5Y-LR kuma-05
+          get 1WC_0E4FnKWitQspt15HfAwio5WtWxVUr kuma-06
+
+          get 1QpGlVzsNEe8QeHoC9e7UvYmuVleqsdmS nomi-01
+          get 1I8kdTUrSdGrfMIX35LtdyJJCF-_dLsW0 nomi-02
+          get 1-bzqd7irSqJrYGmzmi4LLYqI9AsYp2LD nomi-03
+          get 1sImzzvPsqX045c8JwK2JF7RkSfJdZ5j1 nomi-04
+          get 1mf8JT9f12D8HgbJ5ghrJeMgGVK9zRGp2 nomi-05
+          get 1-TMIQ6sh7Y1-gKigidP9jS-zcGpODCtI nomi-06
+
+      - name: Build four transparent sprite sheets
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+
+          src = Path('/tmp/dialogue-source')
+          out = Path('O-Ne-Tools/dialogue-sprites-v134')
+          out.mkdir(parents=True, exist_ok=True)
+
+          CELL = 240
+          roles = ['omi', 'niete', 'kuma', 'nomi']
+
+          for role in roles:
+              sheet = Image.new('RGBA', (CELL, CELL * 6), (0, 0, 0, 0))
+              for i in range(1, 7):
+                  p = src / f'{role}-{i:02d}'
+                  im = Image.open(p).convert('RGBA')
+                  alpha = im.getchannel('A')
+                  bbox = alpha.getbbox()
+                  if not bbox:
+                      raise RuntimeError(f'empty alpha: {p}')
+                  x0, y0, x1, y1 = bbox
+                  pad = max(8, round(max(im.size) * 0.012))
+                  x0 = max(0, x0 - pad); y0 = max(0, y0 - pad)
+                  x1 = min(im.width, x1 + pad); y1 = min(im.height, y1 + pad)
+                  im = im.crop((x0, y0, x1, y1))
+
+                  scale = min(CELL / im.width, CELL / im.height, 1.0)
+                  size = (max(1, round(im.width * scale)), max(1, round(im.height * scale)))
+                  im = im.resize(size, Image.Resampling.LANCZOS)
+
+                  cell = Image.new('RGBA', (CELL, CELL), (0, 0, 0, 0))
+                  x = (CELL - im.width) // 2
+                  y = CELL - im.height
+                  cell.alpha_composite(im, (x, y))
+                  sheet.alpha_composite(cell, (0, (i - 1) * CELL))
+
+              target = out / f'{role}.png'
+              sheet.save(target, 'PNG', optimize=True)
+              check = Image.open(target)
+              assert check.size == (240, 1440), (target, check.size)
+              assert check.getchannel('A').getbbox(), f'empty sprite: {target}'
+              print(target, target.stat().st_size)
+          PY
+
+      - name: Commit generated sprite sheets
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add O-Ne-Tools/dialogue-sprites-v134
+          if git diff --cached --quiet; then
+            echo "No sprite changes"
+          else
+            git commit -m "Build stable dialogue sprite sheets V1.3.4"
+            git push
+          fi
