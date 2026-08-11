@@ -17,8 +17,8 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install Pillow
-        run: python3 -m pip install --quiet pillow
+      - name: Install image downloader and Pillow
+        run: python3 -m pip install --quiet gdown pillow
 
       - name: Download 24 standalone expression sources
         shell: bash
@@ -29,9 +29,7 @@ jobs:
           get() {
             id="$1"; out="$2"
             echo "Downloading $out"
-            curl --fail --location --retry 3 --silent --show-error \
-              "https://lh3.googleusercontent.com/d/$id" \
-              -o "/tmp/dialogue-source/$out"
+            gdown --quiet "$id" -O "/tmp/dialogue-source/$out"
           }
 
           get 13BSwK3GrRhsE0zYNvi74-osTs1zEctOV omi-01
@@ -72,17 +70,14 @@ jobs:
           src = Path('/tmp/dialogue-source')
           out = Path('O-Ne-Tools/dialogue-sprites-v134')
           out.mkdir(parents=True, exist_ok=True)
-
           CELL = 240
-          roles = ['omi', 'niete', 'kuma', 'nomi']
 
-          for role in roles:
+          for role in ['omi', 'niete', 'kuma', 'nomi']:
               sheet = Image.new('RGBA', (CELL, CELL * 6), (0, 0, 0, 0))
               for i in range(1, 7):
                   p = src / f'{role}-{i:02d}'
                   im = Image.open(p).convert('RGBA')
-                  alpha = im.getchannel('A')
-                  bbox = alpha.getbbox()
+                  bbox = im.getchannel('A').getbbox()
                   if not bbox:
                       raise RuntimeError(f'empty alpha: {p}')
                   x0, y0, x1, y1 = bbox
@@ -90,22 +85,17 @@ jobs:
                   x0 = max(0, x0 - pad); y0 = max(0, y0 - pad)
                   x1 = min(im.width, x1 + pad); y1 = min(im.height, y1 + pad)
                   im = im.crop((x0, y0, x1, y1))
-
                   scale = min(CELL / im.width, CELL / im.height, 1.0)
-                  size = (max(1, round(im.width * scale)), max(1, round(im.height * scale)))
-                  im = im.resize(size, Image.Resampling.LANCZOS)
-
+                  im = im.resize((max(1, round(im.width * scale)), max(1, round(im.height * scale))), Image.Resampling.LANCZOS)
                   cell = Image.new('RGBA', (CELL, CELL), (0, 0, 0, 0))
-                  x = (CELL - im.width) // 2
-                  y = CELL - im.height
-                  cell.alpha_composite(im, (x, y))
+                  cell.alpha_composite(im, ((CELL - im.width) // 2, CELL - im.height))
                   sheet.alpha_composite(cell, (0, (i - 1) * CELL))
 
               target = out / f'{role}.png'
               sheet.save(target, 'PNG', optimize=True)
               check = Image.open(target)
-              assert check.size == (240, 1440), (target, check.size)
-              assert check.getchannel('A').getbbox(), f'empty sprite: {target}'
+              assert check.size == (240, 1440)
+              assert check.getchannel('A').getbbox()
               print(target, target.stat().st_size)
           PY
 
