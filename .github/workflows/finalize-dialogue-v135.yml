@@ -1,0 +1,111 @@
+name: Finalize dialogue card V1.3.5
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/finalize-dialogue-v135.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Validate V1.3.5 files and patch official entries
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,re,hashlib
+
+          root=Path('O-Ne-Tools')
+          html=root/'dialogue-card-v135.html'
+          atlas=root/'dialogue-master-v135/dialogue-master-v135.webp'
+          atlas_png=root/'dialogue-master-v135/dialogue-master-v135.png'
+          manifest_path=root/'dialogue-master-v135/manifest.json'
+          for p in [html,atlas,atlas_png,manifest_path]:
+              if not p.exists() or p.stat().st_size<100:
+                  raise SystemExit(f'missing or empty: {p}')
+          text=html.read_text(encoding='utf-8')
+          required=['V1.3.5','dialogue-master-v135.webp','validateAtlas','24 格完整','single_verified_4x6_atlas']
+          for token in required:
+              if token not in text: raise SystemExit(f'HTML token missing: {token}')
+          manifest=json.loads(manifest_path.read_text(encoding='utf-8'))
+          if manifest.get('version')!='V1.3.5': raise SystemExit('manifest version mismatch')
+          if len(manifest.get('selected',{}))!=4 or any(len(manifest['selected'].get(r,{}))!=6 for r in ['Omi','NieTe','Kuma','Nomi']):
+              raise SystemExit('manifest is not complete 4x6')
+          actual_sha=hashlib.sha256(atlas.read_bytes()).hexdigest()
+          expected_sha=manifest['outputs']['webp']['sha256']
+          if actual_sha!=expected_sha: raise SystemExit('atlas SHA mismatch')
+
+          redirect='''<!doctype html>\n<html lang="zh-Hant">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width,initial-scale=1">\n<meta http-equiv="refresh" content="0; url=./dialogue-card-v135.html?v=135">\n<title>O-Ne 對話卡生成器</title>\n<script>location.replace('./dialogue-card-v135.html?v=135');</script>\n<style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0e1117;color:#f3efe8;font-family:"Noto Sans TC","Microsoft JhengHei",sans-serif}a{color:#8fd4c8}</style>\n</head>\n<body><p>正在開啟對話卡 V1.3.5… <a href="./dialogue-card-v135.html?v=135">點這裡開啟</a></p></body>\n</html>\n'''
+          (root/'dialogue-card.html').write_text(redirect,encoding='utf-8')
+
+          index_path=root/'index.html'
+          index=index_path.read_text(encoding='utf-8')
+          index=re.sub(r"direct:'\./dialogue-card\.html\?v=\d+'","direct:'./dialogue-card.html?v=135'",index)
+          index=re.sub(r"desc:'正式框[^']*'","desc:'正式框＋單一 4×6 驗證角色圖集；左右角色／表情／名稱獨立；單人／雙人／NPC 同一工具'",index)
+          if "direct:'./dialogue-card.html?v=135'" not in index: raise SystemExit('index dialogue link patch failed')
+          index_path.write_text(index,encoding='utf-8')
+
+          registry_path=root/'registry.json'
+          registry=json.loads(registry_path.read_text(encoding='utf-8'))
+          registry['version']='V2.1_20260811'
+          registry['ready']=sum(1 for t in registry.get('tools',[]) if t.get('status')=='ready')
+          dialogue=next((t for t in registry.get('tools',[]) if t.get('id')=='dialogue'),None)
+          if dialogue is None: raise SystemExit('registry dialogue tool missing')
+          dialogue.update({
+            'name':'對話卡','family':'對話卡','group':'對話／角色','status':'ready',
+            'desc':'正式框與單一驗證角色圖集分離；左右角色／表情／名稱獨立；NPC 無頭像；單人／雙人同一工具',
+            'href':'./dialogue-card.html?v=135','generator_version':'V1.3.5_20260811','panel_fill_opacity':0.8,
+            'features':['left_right_independent','character_select','six_standalone_expressions','custom_display_name','npc_custom_name','swap_sides','single_or_dual_same_editor','transparent_png','single_verified_4x6_atlas','one_image_request','24_cell_runtime_validation','portrait_no_upscale','native_canvas_preview','png_fallback'],
+            'portrait_source':{
+              'mode':'single_verified_4x6_atlas','webp':'O-Ne-Tools/dialogue-master-v135/dialogue-master-v135.webp',
+              'png_fallback':'O-Ne-Tools/dialogue-master-v135/dialogue-master-v135.png','manifest':'O-Ne-Tools/dialogue-master-v135/manifest.json',
+              'columns':['Omi','NieTe','Kuma','Nomi'],'rows':['大笑','驚訝','生氣','委屈哭','疑惑','無奈'],
+              'finished_cards_reference_only':True,'neutral_removed_no_standalone_source':True
+            },
+            'quality_rules':{'canvas_native_size':[617,120],'atlas_size':[960,1440],'cell_size':[240,240],'css_upscale':False,'portrait_upscale':False,'required_valid_cells':24,'export_blocked_until_atlas_valid':True}
+          })
+          registry_path.write_text(json.dumps(registry,ensure_ascii=False,separators=(',',':')),encoding='utf-8')
+
+          mapping={
+            'generator_version':'V1.3.5_20260811','component_id':'DIALOGUE-CARD','family':'對話卡',
+            'formal_source_folder':'https://drive.google.com/drive/folders/18ddBMdVUEW6WvNyYF1gmuPSJ_eqYG8ad',
+            'master_psd':{'name':'對話卡.psd','drive_id':'16AzfHUXuznSj8adbA9lKDcEYbUZ5iL6U'},
+            'formal_references':{'Omi_card':'1iE6LgXNEPirKNFg9BvOvcaX6imd845ye','NieTe_card':'1DSUa8SmbPIdjENkUp8US6I1VWfHqSnnZ','Kuma_card':'1Cf6vuvGr9Qqjr03J6n4Ak3lliHnOyljr','Nomi_card':'1H20ePHU7UzKHhMyj7uTWwNIw3-eyV0Bv','NPC_card':'1zvjesZhoa1BPgzRcYtBi9dJZyWa5Jmc5','dual_card':'1H-sOGVjvkXSEAcNIR9j6oB7M3Hr8cWKu'},
+            'asset_architecture':{
+              'mode':'single_verified_4x6_atlas','webp_path':'O-Ne-Tools/dialogue-master-v135/dialogue-master-v135.webp','png_fallback_path':'O-Ne-Tools/dialogue-master-v135/dialogue-master-v135.png','manifest_path':'O-Ne-Tools/dialogue-master-v135/manifest.json',
+              'width':960,'height':1440,'cell_width':240,'cell_height':240,'columns':['Omi','NieTe','Kuma','Nomi'],'rows':['大笑','驚訝','生氣','委屈哭','疑惑','無奈'],
+              'runtime_request_count':1,'runtime_cell_validation':24,'finished_dialogue_cards_are_reference_only':True,'forbid_portrait_extraction_from_finished_cards':True
+            },
+            'characters':{
+              'Omi':{'label_color':'#FD4537','atlas_column':0},'NieTe':{'label_color':'#57B5E8','atlas_column':1},'Kuma':{'label_color':'#FFBE37','atlas_column':2},'Nomi':{'label_color':'#FFBE37','atlas_column':3},'NPC':{'label_color':'#29A6A7','portrait':False},'NONE':{'portrait':False}
+            },
+            'behavior':{'left_right_independent':True,'single_or_dual_same_editor':True,'character_options':['NONE','Omi','NieTe','Kuma','Nomi','NPC'],'expression_options':['大笑','驚訝','生氣','委屈哭','疑惑','無奈'],'neutral_expression_removed_because_no_standalone_source':True,'custom_display_name':True,'npc_custom_name':True,'swap_sides':True,'dialogue_auto_shrink':True,'max_dialogue_lines':2,'export_blocked_until_asset_validation':True},
+            'canvas':{'width':617,'height':120,'css_upscale':False},
+            'visual_rules':{'panel_fill':'#1F1713','panel_fill_opacity':0.80,'scope':'panel_fill_only','outline_opaque':True,'portraits_opaque':True,'labels_opaque':True,'corner_color_blocks':False},
+            'qa':{'atlas_sha256':actual_sha,'required_valid_cells':24,'browser_render_tests':['24_expression_cycle','dual_character','single_character','NPC','custom_names','swap_sides','both_none_block','transparent_png_canvas'],'status':'RC_BROWSER_PASS'}
+          }
+          (root/'dialogue-card-mapping.json').write_text(json.dumps(mapping,ensure_ascii=False,indent=2),encoding='utf-8')
+          print('FINALIZE_PATCH_OK',actual_sha)
+          PY
+      - name: Commit official V1.3.5 entries
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'Omi'
+          git config user.email 'chian0501@gmail.com'
+          git add O-Ne-Tools/dialogue-card.html O-Ne-Tools/index.html O-Ne-Tools/registry.json O-Ne-Tools/dialogue-card-mapping.json
+          if git diff --cached --quiet; then
+            echo 'No entry changes'
+          else
+            git commit -m 'Promote verified dialogue card V1.3.5 to official entry'
+            git push origin main
+          fi
