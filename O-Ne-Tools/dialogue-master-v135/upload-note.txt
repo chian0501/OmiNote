@@ -1,0 +1,1 @@
+Local sprite atlas upload pending exact connector action.
