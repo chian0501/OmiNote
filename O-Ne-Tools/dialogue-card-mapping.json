@@ -1,7 +1,9 @@
 {
-  "generator_version": "V1.3.5_20260811",
+  "generator_version": "V1.3.6_20260811",
   "component_id": "DIALOGUE-CARD",
   "family": "對話卡",
+  "stable_entry": "O-Ne-Tools/dialogue-card.html?v=140",
+  "implementation_entry": "O-Ne-Tools/dialogue-card-v135.html?v=140",
   "formal_source_folder": "https://drive.google.com/drive/folders/18ddBMdVUEW6WvNyYF1gmuPSJ_eqYG8ad",
   "master_psd": {
     "name": "對話卡.psd",
@@ -23,28 +25,62 @@
       "O-Ne-Tools/dialogue-assets-kuma.js",
       "O-Ne-Tools/dialogue-assets-nomi.js"
     ],
+    "global_namespace": "window.DIALOGUE_ASSETS",
+    "compatibility_alias": "window.ONE_DIALOGUE_ASSETS",
+    "source_image_size_px": 1254,
+    "embedded_high_density_size_px": 224,
+    "render_max_size_px": 120,
     "finished_dialogue_cards_are_reference_only": true,
     "forbid_portrait_extraction_from_finished_cards": true,
     "transparent_margin_crop_at_render": true,
     "upscale_forbidden": true,
-    "required_asset_count": 24
+    "required_asset_count": 24,
+    "verified_asset_count": 24
   },
   "characters": {
     "Omi": {
       "label_color": "#FD4537",
-      "expressions": ["大笑", "驚訝", "生氣", "委屈哭", "疑惑", "無奈"]
+      "expressions": [
+        "大笑",
+        "驚訝",
+        "生氣",
+        "委屈哭",
+        "疑惑",
+        "無奈"
+      ]
     },
     "NieTe": {
       "label_color": "#57B5E8",
-      "expressions": ["大笑", "驚訝", "生氣", "委屈哭", "疑惑", "無奈"]
+      "expressions": [
+        "大笑",
+        "驚訝",
+        "生氣",
+        "委屈哭",
+        "疑惑",
+        "無奈"
+      ]
     },
     "Kuma": {
       "label_color": "#FFBE37",
-      "expressions": ["大笑", "驚訝", "生氣", "委屈哭", "疑惑", "無奈"]
+      "expressions": [
+        "大笑",
+        "驚訝",
+        "生氣",
+        "委屈哭",
+        "疑惑",
+        "無奈"
+      ]
     },
     "Nomi": {
       "label_color": "#FFBE37",
-      "expressions": ["大笑", "驚訝", "生氣", "委屈哭", "疑惑", "無奈"]
+      "expressions": [
+        "大笑",
+        "驚訝",
+        "生氣",
+        "委屈哭",
+        "疑惑",
+        "無奈"
+      ]
     },
     "NPC": {
       "label_color": "#29A6A7",
@@ -55,14 +91,31 @@
   "behavior": {
     "left_right_independent": true,
     "single_or_dual_same_editor": true,
-    "character_options": ["NONE", "Omi", "NieTe", "Kuma", "Nomi", "NPC"],
-    "expression_options": ["大笑", "驚訝", "生氣", "委屈哭", "疑惑", "無奈"],
+    "character_options": [
+      "NONE",
+      "Omi",
+      "NieTe",
+      "Kuma",
+      "Nomi",
+      "NPC"
+    ],
+    "expression_options": [
+      "大笑",
+      "驚訝",
+      "生氣",
+      "委屈哭",
+      "疑惑",
+      "無奈"
+    ],
     "neutral_expression_removed_because_no_standalone_source": true,
     "custom_display_name": true,
     "npc_custom_name": true,
+    "npc_label_flush_to_card_edge": true,
+    "labels_render_behind_portraits": true,
     "swap_sides": true,
     "dialogue_auto_shrink": true,
-    "max_dialogue_lines": 2
+    "max_dialogue_lines": 2,
+    "both_sides_none_blocks_export": true
   },
   "canvas": {
     "width": 617,
@@ -73,20 +126,29 @@
     "panel_fill": "#1F1713",
     "panel_fill_opacity": 0.8,
     "scope": "panel_fill_only",
-    "outline_opaque": true,
+    "outline_opacity": 0.8,
     "portraits_opaque": true,
     "labels_opaque": true
   },
   "export": {
     "transparent_png": true,
+    "direct_download_anchor": true,
+    "filename": "O-Ne_對話卡.png",
     "canvas_safe_same_origin_assets": true
   },
   "qa": {
-    "asset_decode": "24_of_24_pass",
+    "repository_asset_inventory": "24_of_24_pass",
+    "browser_asset_decode": "24_of_24_pass",
     "alpha_bbox_validation": "24_of_24_pass",
     "expression_uniqueness": "6_of_6_per_character_pass",
-    "single_npc_case": "pass",
+    "expression_cycle": "24_of_24_pass",
+    "single_npc_left_case": "pass",
+    "single_npc_right_case": "pass",
     "dual_character_case": "pass",
-    "headless_browser_dom": "pass"
+    "custom_display_names": "pass",
+    "both_sides_none_guard": "pass",
+    "download_link_data_uri": "pass",
+    "download_filename": "pass",
+    "browser_dom_and_console": "pass"
   }
 }
