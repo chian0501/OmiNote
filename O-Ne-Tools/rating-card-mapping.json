@@ -1,0 +1,64 @@
+{
+  "schema_version": "V1.0_20260814",
+  "component_id": "COL-02",
+  "semantic_id": "food_rating_card_16x9",
+  "usage": "RESULT",
+  "status": "ready",
+  "generator": "./rating-card.html?v=100",
+  "canvas": {"width": 1920, "height": 1080, "color_mode": "RGB_8bit"},
+  "formal_source": {
+    "folder": "https://drive.google.com/drive/folders/1AGPXawwx3lBzAyZZl7X56BlAUUHM5ZBg",
+    "psd_id": "1RVtZOmq4pMNViGBRnj-qHPtd3NwsuhJU",
+    "preview_id": "11m7iZnxgOMuqfBvVNL80PD_koN9E8gCG",
+    "record_id": "1R6FIOKn1iWiXrFUuNICbxbFBJctzTu3Ky2pysaElFMc",
+    "sha256": "70b0a621e0593d037fe99bc9cf492f70a3ee0342cc60ffbf80dd8103878ef9a7",
+    "priority": ["評分卡.psd", "O-NE_評分卡_正式母檔紀錄_V1.0", "評分卡.jpg"],
+    "rejected_sources": ["評分卡.md", "評分卡.json", "評分卡.txt"]
+  },
+  "fixed_visuals": {
+    "panel_fill": "#1F1713",
+    "panel_fill_opacity": 0.8,
+    "panel_bbox": [58, 80, 1123, 879],
+    "panel_outline": "#FFFFFF",
+    "accent": "#FFBE37",
+    "secondary_accent": "#29A6A7",
+    "text_primary": "#FDF3E7",
+    "header_label": "補給品鑑定",
+    "store_info_bbox": [1272, 83, 1681, 930]
+  },
+  "variants": {
+    "results": {
+      "default": true,
+      "visible_psd_groups": ["RATING_01_味道", "RATING_02_CP值", "RATING_03_排隊值", "06_RESULT_PANEL"],
+      "hidden_psd_groups": ["RATING_04_補血值"]
+    },
+    "rating4": {
+      "default": false,
+      "visible_psd_groups": ["RATING_01_味道", "RATING_02_CP值", "RATING_03_排隊值", "RATING_04_補血值"],
+      "hidden_psd_groups": ["06_RESULT_PANEL"],
+      "note": "第四列與雙結果區共用同一垂直區段，不可同時顯示。"
+    }
+  },
+  "editable_fields": [
+    {"key": "store_name", "psd_layer": "TXT_STORE_燒肉力丸道頓堀店", "bbox": [105, 211, 555, 264], "font": "NotoSansTC-Bold", "font_size": 55, "min_size": 36},
+    {"key": "address", "psd_layer": "TXT_SUBTITLE_食物圖鑑收錄晚餐支線", "bbox": [106, 278, 920, 304], "font": "NotoSansTC-Medium", "font_size": 25, "min_size": 18},
+    {"key": "rating_1_label", "psd_group": "RATING_01_味道", "psd_layer": "TXT_LABEL", "baseline": [132, 391.5], "font_size": 28},
+    {"key": "rating_1_score", "psd_group": "RATING_01_味道", "psd_layer": "TXT_SCORE", "range": [0, 5], "step": 0.1},
+    {"key": "rating_2_label", "psd_group": "RATING_02_CP值", "psd_layer": "TXT_LABEL", "baseline": [132, 480.5], "font_size": 28},
+    {"key": "rating_2_score", "psd_group": "RATING_02_CP值", "psd_layer": "TXT_SCORE", "range": [0, 5], "step": 0.1},
+    {"key": "rating_3_label", "psd_group": "RATING_03_排隊值", "psd_layer": "TXT_LABEL", "baseline": [132, 569.5], "font_size": 28},
+    {"key": "rating_3_result", "psd_group": "RATING_03_排隊值", "psd_layer": "TXT_SCORE", "baseline": [419, 576.5], "font_size": 34, "min_size": 22},
+    {"key": "rating_4_label", "psd_group": "RATING_04_補血值", "psd_layer": "TXT_LABEL", "baseline": [132, 658.5], "font_size": 28},
+    {"key": "rating_4_score", "psd_group": "RATING_04_補血值", "psd_layer": "TXT_SCORE", "range": [0, 5], "step": 0.1},
+    {"key": "price", "psd_layer": "TXT_RESULT_LINE_01 拷貝", "bbox": [188, 668, 382, 753], "max_lines": 2},
+    {"key": "review", "psd_layer": "TXT_RESULT_LINE_01", "bbox": [548, 695, 962, 784], "max_lines": 2},
+    {"key": "background_image", "psd_layer": "BG_CLEAN_SMART_OBJECT", "bbox": [0, 0, 1920, 1080], "controls": ["upload", "scale", "x", "y"]},
+    {"key": "store_info_image", "psd_layer": "圖層 1", "bbox": [1272, 83, 1681, 930], "controls": ["upload", "scale", "x", "y"]}
+  ],
+  "validation": {
+    "block_export_on_overflow": true,
+    "allow_global_opacity_change": false,
+    "image_max_bytes": 26214400,
+    "output": ["png_1920x1080", "field_json"]
+  }
+}
