@@ -1,10 +1,10 @@
 {
-  "schema_version": "V1.0_20260814",
+  "schema_version": "V1.0.1_20260814",
   "component_id": "COL-02",
   "semantic_id": "food_rating_card_16x9",
   "usage": "RESULT",
   "status": "ready",
-  "generator": "./rating-card.html?v=100",
+  "generator": "./rating-card.html?v=101",
   "canvas": {"width": 1920, "height": 1080, "color_mode": "RGB_8bit"},
   "formal_source": {
     "folder": "https://drive.google.com/drive/folders/1AGPXawwx3lBzAyZZl7X56BlAUUHM5ZBg",

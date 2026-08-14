@@ -219,7 +219,7 @@
       "group": "資訊／閱讀",
       "desc": "COL-02｜正式 1920×1080 品鑑卡；分數列、文字結果、價格／心得、背景與店家資訊影像",
       "status": "ready",
-      "href": "./rating-card.html?v=100",
+      "href": "./rating-card.html?v=101",
       "features": [
         "formal_1920x1080_canvas",
         "two_numeric_segmented_ratings",
@@ -239,7 +239,7 @@
       "formal_record_id": "1R6FIOKn1iWiXrFUuNICbxbFBJctzTu3Ky2pysaElFMc",
       "formal_sha256": "70b0a621e0593d037fe99bc9cf492f70a3ee0342cc60ffbf80dd8103878ef9a7",
       "panel_fill_opacity": 0.8,
-      "generator_version": "V1.0.0_20260814",
+      "generator_version": "V1.0.1_20260814",
       "layout_modes": [
         "results",
         "rating4"
