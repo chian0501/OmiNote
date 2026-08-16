@@ -1,9 +1,9 @@
 {
-  "version": "V2.2_20260814",
+  "version": "V2.3_20260817",
   "principle": "one_function_one_entry",
-  "total": 14,
+  "total": 15,
   "ready": 7,
-  "candidate": 0,
+  "candidate": 1,
   "ai_bridge": {
     "version": "V1.2_20260807",
     "mode": "chatgpt_pro_manual_json_bridge",
@@ -247,6 +247,38 @@
       "mapping": "./rating-card-mapping.json"
     },
     {
+      "id": "focus",
+      "name": "焦點內容卡",
+      "family": "CANDIDATE｜自訂內容卡",
+      "group": "資訊／閱讀",
+      "desc": "一般內文／項目／步驟；每列獨立底框與文字重點，可插入左右商品圖",
+      "status": "candidate",
+      "href": "./focus-card.html?v=051",
+      "features": [
+        "body_list_steps_modes",
+        "up_to_8_rows",
+        "independent_none_idle_focus_frames",
+        "stable_marker_and_text_colors",
+        "whole_row_or_inline_emphasis",
+        "optional_cta_and_source",
+        "optional_custom_label",
+        "left_right_or_both_product_images",
+        "small_medium_large_card_sizes",
+        "85_to_115_percent_text_scale",
+        "transparent_png_and_json_export"
+      ],
+      "generator_version": "V0.5.1_20260817",
+      "visual_status": "CANDIDATE",
+      "formal_replacement": false,
+      "panel_fill_opacity": 0.8,
+      "qa": {
+        "vite_build": "pass",
+        "sites_worker": "4_of_4_pass",
+        "browser_main_and_portable": "pass",
+        "console_errors": 0
+      }
+    },
+    {
       "id": "settlement",
       "name": "片尾結算",
       "family": "片尾結算",
@@ -304,3 +336,4 @@
     ]
   }
 }
+
