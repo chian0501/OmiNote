@@ -2,41 +2,54 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>O-Ne 一般卡生成器 V1.0.1</title>
+<title>O-Ne 一般卡生成器 V1.1.0</title>
 <style>
 *{box-sizing:border-box}body{margin:0;min-height:100vh;background:#0e1117;color:#f3efe8;font-family:"Noto Sans TC","Noto Sans CJK TC","Microsoft JhengHei",sans-serif}
 .app{max-width:1320px;margin:auto;padding:26px}h1{margin:0 0 8px;font-size:24px}.sub{color:#9ea7b3;font-size:13px;line-height:1.7;margin-bottom:22px}
 .grid{display:grid;grid-template-columns:430px 1fr;gap:22px;align-items:start}.panel{background:#151a23;border:1px solid #2a3240;border-radius:16px;padding:18px;box-shadow:0 12px 30px rgba(0,0,0,.25)}
 .section-title{font-size:14px;font-weight:800;margin:0 0 12px;color:#f0a8cf}.note{font-size:12px;color:#c4cad3;background:#101620;border:1px solid #273244;border-radius:10px;padding:10px 12px;line-height:1.7;margin-bottom:12px}
-label{display:block;font-size:12px;font-weight:700;color:#b9c0ca;margin:12px 0 6px}input{width:100%;border:1px solid #394355;border-radius:9px;background:#101620;color:white;padding:10px 11px;font-size:14px;outline:none}
-input:focus{border-color:#29A6A7}input.bad{border-color:#FD4537;background:#241415}
+label{display:block;font-size:12px;font-weight:700;color:#b9c0ca;margin:12px 0 6px}input,select{width:100%;border:1px solid #394355;border-radius:9px;background:#101620;color:white;padding:10px 11px;font-size:14px;outline:none}
+input:focus,select:focus{border-color:#29A6A7}input.bad{border-color:#FD4537;background:#241415}
 .preview-wrap{min-height:420px;display:flex;justify-content:center;align-items:center;background:linear-gradient(45deg,#222832 25%,transparent 25%),linear-gradient(-45deg,#222832 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#222832 75%),linear-gradient(-45deg,transparent 75%,#222832 75%);background-size:24px 24px;background-position:0 0,0 12px,12px -12px,-12px 0;border-radius:14px;overflow:hidden;padding:34px 20px}
-canvas{width:min(100%,900px);height:auto;filter:drop-shadow(0 8px 18px rgba(0,0,0,.26))}.buttons{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}button{border:0;border-radius:9px;padding:11px 15px;font-weight:800;cursor:pointer;background:#29A6A7;color:white}button.secondary{background:#30394a}
+canvas{width:min(100%,900px);height:auto;filter:drop-shadow(0 8px 18px rgba(0,0,0,.26))}.buttons{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}button{border:0;border-radius:9px;padding:11px 15px;font-weight:800;cursor:pointer;background:#29A6A7;color:white}button.secondary{background:#30394a}button:disabled{opacity:.45;cursor:not-allowed}
 .status{min-height:22px;margin-top:12px;font-size:12px;color:#8fd4c8;line-height:1.6}.status.error{color:#ff7770}.mini{margin-top:14px;padding:12px;border-radius:10px;background:#101620;color:#aeb7c3;font-size:12px;line-height:1.7}.lock{color:#ffcf6d}
 @media(max-width:950px){.grid{grid-template-columns:1fr}}
 </style></head>
 <body><div class="app">
-<h1>O-Ne 一般卡生成器 <span style="font-size:12px;color:#8c96a5">V1.0.1</span></h1>
-<div class="sub">正式深咖啡底板固定 80% 透明；HERE、外框、左側識別條、文字維持正式實色。</div>
+<h1>O-Ne 一般卡生成器 <span style="font-size:12px;color:#8c96a5">V1.1.0</span></h1>
+<div class="sub">同一工具切換 HERE／GET!。主底板固定 80% 透明；標籤、外框、左側識別條與文字維持正式實色。</div>
 <div class="grid">
 <div class="panel"><div class="section-title">01｜內容輸入</div>
-<div class="note"><b>主標</b>固定橘色；<b>副標</b>固定白色。只有主底板為 80% 透明，不是整張卡片一起變淡。</div>
-<label>主標｜橘色</label><input id="title" value="A2 三重站">
-<label>副標｜白色</label><input id="subtitle" value="下一站｜桃園機場第二航廈">
+<div id="note" class="note"><b>HERE</b> 用於位置、場景或畫面主題；主標固定橘色，副標固定白色。</div>
+<label>卡片形式</label><select id="mode"><option value="HERE">HERE｜位置／場景</option><option value="GET">GET!｜商品／道具解鎖</option></select>
+<label id="titleLabel">主標｜橘色</label><input id="title" value="A2 三重站">
+<label id="subtitleLabel">副標｜白色</label><input id="subtitle" value="下一站｜桃園機場第二航廈">
 <div id="status" class="status">READY｜可輸出透明 PNG</div>
 <div class="buttons"><button id="download">輸出透明 PNG</button><button id="jsonBtn" class="secondary">輸出欄位 JSON</button><button id="reset" class="secondary">回復示例</button></div>
-<div class="mini"><b class="lock">🔒 固定：</b>653×127、#1F1713 主底板 80%、白色外框、HERE、左側青綠條、正式色彩。<br><b>可改：</b>主標、副標。</div>
+<div id="rules" class="mini"><b class="lock">🔒 固定：</b>653×127、#1F1713 主底板 80%、白色外框、HERE、左側青綠條、正式色彩。<br><b>可改：</b>主標、副標。</div>
 </div>
 <div class="panel"><div class="section-title">02｜正式母版即時預覽</div><div class="preview-wrap"><canvas id="c" width="653" height="127"></canvas></div></div>
 </div></div>
 <script>
 const canvas=document.getElementById('c'),ctx=canvas.getContext('2d'),$=id=>document.getElementById(id);
-const C={panel:'rgba(31,23,19,.80)',cream:'#FDF3E7',white:'#FFFFFF',orange:'#FFBE37',teal:'#29A6A7',dark:'#3B170C'};
-const defaults={title:'A2 三重站',subtitle:'下一站｜桃園機場第二航廈'};
+const C={panel:'rgba(31,23,19,.80)',cream:'#FDF3E7',white:'#FFFFFF',orange:'#FFBE37',teal:'#29A6A7',darkText:'#3B170C'};
+const config={
+  HERE:{label:'HERE',accent:C.teal,labelText:C.white,titleLabel:'主標｜橘色',subtitleLabel:'副標｜白色',note:'<b>HERE</b> 用於位置、場景或畫面主題；主標固定橘色，副標固定白色。',rules:'<b class="lock">🔒 固定：</b>653×127、#1F1713 主底板 80%、白色外框、HERE、左側青綠條、正式色彩。<br><b>可改：</b>主標、副標。',componentId:'HERE-01',variant:'HERE',file:'O-Ne_HERE_一般卡',defaults:{title:'A2 三重站',subtitle:'下一站｜桃園機場第二航廈'}},
+  GET:{label:'GET!',accent:C.orange,labelText:C.darkText,titleLabel:'品項名稱｜橘色',subtitleLabel:'資訊列｜白色',note:'<b>GET!</b> 用於商品、道具或圖鑑解鎖；資訊列建議依序放「價格 | 數量 | 解鎖進度」。',rules:'<b class="lock">🔒 固定：</b>653×127、#1F1713 主底板 80%、白色外框、GET!、左側橘色條、正式色彩。<br><b>可改：</b>品項名稱、價格／數量／解鎖資訊。',componentId:'COL-02',variant:'GET',file:'O-Ne_GET_解鎖卡',defaults:{title:'中祥 O’ day 雪花餅',subtitle:'NT$70 | 9 小包 | 解鎖 6/7'}}
+};
+let currentMode='HERE';
+const drafts={HERE:{...config.HERE.defaults},GET:{...config.GET.defaults}};
 function font(weight,px){return `${weight} ${px}px "Noto Sans TC","Noto Sans CJK TC","Microsoft JhengHei",sans-serif`}
 function fitText(text,maxWidth,startSize,minSize,weight){let s=startSize;while(s>=minSize){ctx.font=font(weight,s);const w=ctx.measureText(text).width;if(w<=maxWidth)return{size:s,width:w,ok:true};s--}ctx.font=font(weight,minSize);return{size:minSize,width:ctx.measureText(text).width,ok:false}}
-function roundedRect(x,y,w,h,r){ctx.beginPath();ctx.roundRect(x,y,w,h,r)}
-function drawBase(){ctx.save();ctx.beginPath();ctx.moveTo(20,2);ctx.lineTo(632,2);ctx.lineTo(651,21);ctx.lineTo(651,106);ctx.lineTo(632,125);ctx.lineTo(20,125);ctx.lineTo(2,107);ctx.lineTo(2,20);ctx.closePath();ctx.fillStyle=C.panel;ctx.fill();ctx.strokeStyle=C.white;ctx.lineWidth=3;ctx.stroke();ctx.fillStyle=C.teal;ctx.fillRect(3,21,9,85);roundedRect(30,19,141,33,7);ctx.fillStyle=C.teal;ctx.fill();ctx.fillStyle=C.white;ctx.font=font(800,22);ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('HERE',100.5,35.5);ctx.restore()}
-function render(){ctx.clearRect(0,0,653,127);drawBase();let blocked=false;const t=$('title').value,tf=fitText(t,430,34,18,800);$('title').classList.toggle('bad',!tf.ok);ctx.font=font(800,tf.size);ctx.fillStyle=C.orange;ctx.textAlign='left';ctx.textBaseline='alphabetic';ctx.fillText(t,186,49);blocked||=!tf.ok;const s=$('subtitle').value,sf=fitText(s,585,22,14,700);$('subtitle').classList.toggle('bad',!sf.ok);ctx.font=font(700,sf.size);ctx.fillStyle=C.cream;ctx.fillText(s,36,91);blocked||=!sf.ok;$('download').disabled=blocked;$('status').className=blocked?'status error':'status';$('status').textContent=blocked?'BLOCKED｜文字超出安全範圍，請縮短內容':'READY｜可輸出透明 PNG';return blocked}
-$('title').oninput=render;$('subtitle').oninput=render;$('download').onclick=()=>{if(render())return;canvas.toBlob(b=>{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='O-Ne_HERE_一般卡.png';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)},'image/png')};$('jsonBtn').onclick=()=>{const p={component_id:'HERE-01',generator_version:'V1.0.1_20260807',panel_fill_opacity:.8,title:$('title').value,subtitle:$('subtitle').value};const u=URL.createObjectURL(new Blob([JSON.stringify(p,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=u;a.download='O-Ne_一般卡_data_v101.json';a.click();URL.revokeObjectURL(u)};$('reset').onclick=()=>{$('title').value=defaults.title;$('subtitle').value=defaults.subtitle;render()};render();
+function roundedRect(x,y,w,h,r){ctx.beginPath();if(ctx.roundRect){ctx.roundRect(x,y,w,h,r);return}ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()}
+function drawHereBase(){ctx.save();ctx.beginPath();ctx.moveTo(20,2);ctx.lineTo(632,2);ctx.lineTo(651,21);ctx.lineTo(651,106);ctx.lineTo(632,125);ctx.lineTo(20,125);ctx.lineTo(2,107);ctx.lineTo(2,20);ctx.closePath();ctx.fillStyle=C.panel;ctx.fill();ctx.strokeStyle=C.white;ctx.lineWidth=3;ctx.stroke();ctx.fillStyle=C.teal;ctx.fillRect(3,21,9,85);roundedRect(30,19,141,33,7);ctx.fillStyle=C.teal;ctx.fill();ctx.fillStyle=C.white;ctx.font=font(800,22);ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('HERE',100.5,35.5);ctx.restore()}
+function drawGetBase(){ctx.save();ctx.fillStyle=C.panel;ctx.strokeStyle=C.white;ctx.lineWidth=4;ctx.lineJoin='miter';ctx.beginPath();ctx.moveTo(21,4);ctx.lineTo(632,4);ctx.lineTo(650,21);ctx.lineTo(650,106);ctx.lineTo(632,123);ctx.lineTo(21,123);ctx.lineTo(4,106);ctx.lineTo(4,21);ctx.closePath();ctx.fill();ctx.stroke();ctx.fillStyle=C.orange;ctx.fillRect(4,20,9,87);roundedRect(30,20,141,33,10);ctx.fillStyle=C.orange;ctx.fill();ctx.fillStyle=C.darkText;ctx.font=font(800,20);ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('GET!',100.5,37.5);ctx.restore()}
+function saveDraft(){drafts[currentMode]={title:$('title').value,subtitle:$('subtitle').value}}
+function loadMode(mode){const c=config[mode],d=drafts[mode];$('title').value=d.title;$('subtitle').value=d.subtitle;$('titleLabel').textContent=c.titleLabel;$('subtitleLabel').textContent=c.subtitleLabel;$('note').innerHTML=c.note;$('rules').innerHTML=c.rules}
+function render(){const mode=$('mode').value,c=config[mode];ctx.clearRect(0,0,653,127);if(mode==='GET')drawGetBase();else drawHereBase();let blocked=false;const t=$('title').value,tf=fitText(t,430,34,18,800);$('title').classList.toggle('bad',!tf.ok);ctx.font=font(800,tf.size);ctx.fillStyle=C.orange;ctx.textAlign='left';ctx.textBaseline='alphabetic';ctx.fillText(t,mode==='GET'?183:186,49);blocked||=!tf.ok;const s=$('subtitle').value,sf=fitText(s,585,22,14,700);$('subtitle').classList.toggle('bad',!sf.ok);ctx.font=font(700,sf.size);ctx.fillStyle=C.cream;ctx.fillText(s,mode==='GET'?34:36,mode==='GET'?92:91);blocked||=!sf.ok;$('download').disabled=blocked;$('status').className=blocked?'status error':'status';$('status').textContent=blocked?'BLOCKED｜文字超出安全範圍，請縮短內容':`READY｜${c.label} 可輸出透明 PNG`;return blocked}
+$('mode').onchange=()=>{saveDraft();currentMode=$('mode').value;loadMode(currentMode);render()};
+$('title').oninput=()=>{drafts[currentMode].title=$('title').value;render()};$('subtitle').oninput=()=>{drafts[currentMode].subtitle=$('subtitle').value;render()};
+$('download').onclick=()=>{if(render())return;const c=config[$('mode').value];canvas.toBlob(b=>{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=c.file+'.png';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)},'image/png')};
+$('jsonBtn').onclick=()=>{const mode=$('mode').value,c=config[mode],p={component_id:c.componentId,generator_version:'V1.1.0_20260818',panel_fill_opacity:.8,mode,variant:c.variant,title:$('title').value,subtitle:$('subtitle').value};const u=URL.createObjectURL(new Blob([JSON.stringify(p,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=u;a.download=`O-Ne_一般卡_${mode}_data_v110.json`;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000)};
+$('reset').onclick=()=>{drafts[currentMode]={...config[currentMode].defaults};loadMode(currentMode);render()};loadMode(currentMode);render();
 </script></body></html>
