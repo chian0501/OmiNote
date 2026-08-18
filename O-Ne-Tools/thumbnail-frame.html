@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>O-Ne 縮圖品牌框工具 V1.1.0</title>
+  <title>O-Ne 縮圖品牌框工具 V1.2.0</title>
   <style>
     :root{
       --bg:#0e1117;
@@ -20,6 +20,7 @@
       --danger:#ff7770;
     }
     *{box-sizing:border-box}
+    [hidden]{display:none!important}
     html,body{min-height:100%}
     body{
       margin:0;
@@ -173,6 +174,46 @@
     }
     .segmented button+button{border-left:1px solid var(--line-strong)}
     .segmented button.is-active{color:#fff;background:var(--teal)}
+    .segmented.four{grid-template-columns:repeat(4,1fr)}
+    .segmented.four button{padding:0 7px}
+    .corner-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:8px;
+    }
+    .corner-grid button{
+      min-height:40px;
+      border:1px solid var(--line-strong);
+      border-radius:8px;
+      color:#b8c0ca;
+      background:var(--panel-2);
+      font-size:12px;
+      font-weight:800;
+    }
+    .corner-grid button.is-active{border-color:var(--teal);color:#fff;background:var(--teal)}
+    .field{
+      width:100%;
+      min-height:42px;
+      padding:0 12px;
+      border:1px solid var(--line-strong);
+      border-radius:8px;
+      color:var(--text);
+      background:var(--field);
+      outline:none;
+    }
+    .field:focus{border-color:var(--teal-bright)}
+    .inline-upload{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-height:48px;
+      padding:8px 10px;
+      border:1px solid var(--line-strong);
+      border-radius:8px;
+      background:var(--field);
+    }
+    .inline-upload .upload-button{flex:0 0 auto}
+    .inline-upload .file-name{min-width:0}
     .range-row{
       display:grid;
       grid-template-columns:1fr 54px;
@@ -310,8 +351,8 @@
       <a class="tool-home-link" href="./">回工具入口</a>
       <span class="header-divider" aria-hidden="true"></span>
       <div class="title-block">
-        <h1>O-Ne 縮圖品牌框工具 <span>V1.1.0</span></h1>
-        <div class="sub">上傳縮圖後可縮小、放大、裁切與調整位置，最後自動疊上品牌框，輸出 1920×1080 PNG。</div>
+        <h1>O-Ne 縮圖品牌框工具 <span>V1.2.0</span></h1>
+        <div class="sub">上傳縮圖後可調整畫面，再選擇角標位置與內容，最後輸出 1920×1080 PNG。</div>
       </div>
       <div class="ready">READY</div>
     </header>
@@ -320,7 +361,7 @@
       <aside class="panel controls">
         <div class="section">
           <div class="section-title"><strong>01｜上傳縮圖</strong><span>JPG／PNG／WEBP</span></div>
-          <div class="note">框線、Logo 與腳印會固定放在最上層，不會被縮圖蓋住。建議先完成縮圖文字與人物，再進來套框。</div>
+          <div class="note">框線、角標與腳印會固定放在最上層，不會被縮圖蓋住。建議先完成縮圖文字與人物，再進來套框。</div>
           <div id="dropZone" class="drop-zone">
             <strong>把縮圖拖到這裡</strong>
             <label class="upload-button">選擇縮圖<input id="fileInput" type="file" accept="image/png,image/jpeg,image/webp"></label>
@@ -358,7 +399,56 @@
           <div class="source-meta">
             正式可編輯母版：字卡.psb<br>
             正式疊圖來源：首頁框.png｜1920×1080｜透明 PNG<br>
-            網頁衍生框：僅修除右下角細線，正式原檔不覆蓋
+            網頁衍生框：修除右下細線並拆出可移動角標；正式原檔不覆蓋
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title"><strong>03｜角標設定</strong><span>位置與內容可替換</span></div>
+          <div class="note">可保留 O-Ne Logo、改成文字、換成自己的透明圖片，或完全不顯示角標。</div>
+
+          <label>角標內容</label>
+          <div class="segmented four" role="group" aria-label="角標內容">
+            <button class="is-active" type="button" data-corner-content="logo">O-Ne Logo</button>
+            <button type="button" data-corner-content="text">文字</button>
+            <button type="button" data-corner-content="image">自訂圖片</button>
+            <button type="button" data-corner-content="none">不顯示</button>
+          </div>
+
+          <div id="cornerPositionControls">
+            <label>角標位置</label>
+            <div class="corner-grid" role="group" aria-label="角標位置">
+              <button type="button" data-corner-position="top-left">左上</button>
+              <button class="is-active" type="button" data-corner-position="top-right">右上</button>
+              <button type="button" data-corner-position="bottom-left">左下</button>
+              <button type="button" data-corner-position="bottom-right">右下</button>
+            </div>
+          </div>
+
+          <div id="cornerTextControls" hidden>
+            <label for="cornerTextPreset">常用文字</label>
+            <select id="cornerTextPreset" class="field">
+              <option value="下集預告">下集預告</option>
+              <option value="本集重點">本集重點</option>
+              <option value="精彩預告">精彩預告</option>
+              <option value="未完待續">未完待續</option>
+              <option value="">自訂輸入</option>
+            </select>
+
+            <label for="cornerText">角標文字</label>
+            <input id="cornerText" class="field" type="text" maxlength="10" value="下集預告" placeholder="輸入角標文字">
+
+            <label for="cornerTextColor">文字顏色</label>
+            <div class="color-row"><input id="cornerTextColor" type="color" value="#FDF3E7"><code id="cornerTextColorValue">#FDF3E7</code></div>
+          </div>
+
+          <div id="cornerImageControls" hidden>
+            <label>替換圖片</label>
+            <div class="inline-upload">
+              <label class="upload-button">選擇圖片<input id="cornerImageInput" type="file" accept="image/png,image/jpeg,image/webp"></label>
+              <div id="cornerImageName" class="file-name">尚未選擇圖片</div>
+            </div>
+            <div class="note">建議使用透明 PNG／WEBP；圖片會依角標空間等比例縮放。</div>
           </div>
         </div>
       </aside>
@@ -366,11 +456,11 @@
       <section class="panel preview-panel">
         <div class="preview-toolbar">
           <strong>縮圖合成預覽</strong>
-          <span>框線永遠固定在最上層</span>
+          <span>框線與角標永遠固定在最上層</span>
         </div>
         <div id="stage" class="stage">
           <canvas id="canvas" width="1920" height="1080" aria-label="縮圖品牌框預覽"></canvas>
-          <div id="emptyHint" class="empty-hint">目前只顯示品牌框；上傳縮圖後會自動放到框線下方。</div>
+          <div id="emptyHint" class="empty-hint">目前只顯示品牌框；可先試角標位置與內容，再上傳縮圖。</div>
         </div>
         <div class="export-bar">
           <button id="download" class="export-button" type="button" disabled>輸出含框 PNG</button>
@@ -385,13 +475,28 @@
       "use strict";
       var WIDTH=1920;
       var HEIGHT=1080;
-      var FRAME_SOURCE="./assets/thumbnail-home-frame-clean-v110.png";
+      var CORNER_WIDTH=450;
+      var CORNER_HEIGHT=210;
+      var FRAME_BASE_SOURCE="./assets/thumbnail-frame-base-v120.png";
+      var CORNER_PANEL_SOURCE="./assets/thumbnail-corner-panel-v120.png";
+      var CORNER_LOGO_SOURCE="./assets/thumbnail-corner-logo-v120.png";
       var canvas=document.getElementById("canvas");
       var ctx=canvas.getContext("2d");
-      var frameImage=new Image();
+      var frameCanvas=document.createElement("canvas");
+      frameCanvas.width=WIDTH;
+      frameCanvas.height=HEIGHT;
+      var frameCtx=frameCanvas.getContext("2d");
+      var frameBaseImage=new Image();
+      var cornerPanelImage=new Image();
+      var cornerLogoImage=new Image();
       var sourceImage=null;
       var sourceObjectUrl="";
+      var cornerCustomImage=null;
+      var cornerImageObjectUrl="";
       var mode="cover";
+      var cornerContent="logo";
+      var cornerPosition="top-right";
+      var assetState={base:false,panel:false,logo:false,error:false};
 
       function $(id){return document.getElementById(id)}
       function setStatus(message,isError){
@@ -408,6 +513,97 @@
         $("positionXValue").textContent=formatPosition($("positionX").value);
         $("positionYValue").textContent=formatPosition($("positionY").value);
         $("backgroundColorValue").textContent=$("backgroundColor").value.toUpperCase();
+        $("cornerTextColorValue").textContent=$("cornerTextColor").value.toUpperCase();
+      }
+      function frameAssetsReady(){
+        return assetState.base&&assetState.panel&&assetState.logo&&!assetState.error;
+      }
+      function syncDownloadState(){
+        $("download").disabled=!(sourceImage&&frameAssetsReady());
+      }
+      function getCornerRegion(){
+        return {
+          x:cornerPosition.indexOf("right")>-1?WIDTH-CORNER_WIDTH:0,
+          y:cornerPosition.indexOf("bottom")>-1?HEIGHT-CORNER_HEIGHT:0
+        };
+      }
+      function getCornerContentBox(){
+        return {
+          x:cornerPosition.indexOf("right")>-1?1615:15,
+          y:cornerPosition.indexOf("bottom")>-1?HEIGHT-108:8,
+          width:290,
+          height:100
+        };
+      }
+      function drawCornerPanel(){
+        var region=getCornerRegion();
+        frameCtx.clearRect(region.x,region.y,CORNER_WIDTH,CORNER_HEIGHT);
+        frameCtx.save();
+        if(cornerPosition==="top-left"){
+          frameCtx.translate(CORNER_WIDTH,0);
+          frameCtx.scale(-1,1);
+        }else if(cornerPosition==="top-right"){
+          frameCtx.translate(WIDTH-CORNER_WIDTH,0);
+        }else if(cornerPosition==="bottom-left"){
+          frameCtx.translate(CORNER_WIDTH,HEIGHT);
+          frameCtx.scale(-1,-1);
+        }else{
+          frameCtx.translate(WIDTH-CORNER_WIDTH,HEIGHT);
+          frameCtx.scale(1,-1);
+        }
+        frameCtx.drawImage(cornerPanelImage,0,0,CORNER_WIDTH,CORNER_HEIGHT);
+        frameCtx.restore();
+      }
+      function drawTextContent(box){
+        var textValue=$("cornerText").value.trim()||"下集預告";
+        var fontSize=58;
+        var maxWidth=box.width-18;
+        frameCtx.save();
+        frameCtx.textAlign="center";
+        frameCtx.textBaseline="middle";
+        frameCtx.lineJoin="round";
+        do{
+          frameCtx.font="900 "+fontSize+"px 'Noto Sans TC','Noto Sans CJK TC','Microsoft JhengHei',sans-serif";
+          if(frameCtx.measureText(textValue).width<=maxWidth||fontSize<=28)break;
+          fontSize-=2;
+        }while(fontSize>28);
+        frameCtx.strokeStyle="rgba(0,0,0,.48)";
+        frameCtx.lineWidth=Math.max(4,Math.round(fontSize*.09));
+        frameCtx.fillStyle=$("cornerTextColor").value;
+        frameCtx.strokeText(textValue,box.x+box.width/2,box.y+box.height/2+2);
+        frameCtx.fillText(textValue,box.x+box.width/2,box.y+box.height/2+2);
+        frameCtx.restore();
+      }
+      function drawCustomImage(box){
+        if(!cornerCustomImage)return;
+        var padding=8;
+        var maxWidth=box.width-padding*2;
+        var maxHeight=box.height-padding*2;
+        var scale=Math.min(maxWidth/cornerCustomImage.width,maxHeight/cornerCustomImage.height);
+        var drawWidth=cornerCustomImage.width*scale;
+        var drawHeight=cornerCustomImage.height*scale;
+        frameCtx.drawImage(
+          cornerCustomImage,
+          box.x+(box.width-drawWidth)/2,
+          box.y+(box.height-drawHeight)/2,
+          drawWidth,
+          drawHeight
+        );
+      }
+      function drawFrameLayer(){
+        frameCtx.clearRect(0,0,WIDTH,HEIGHT);
+        if(!assetState.base)return;
+        frameCtx.drawImage(frameBaseImage,0,0,WIDTH,HEIGHT);
+        if(cornerContent==="none"||!assetState.panel)return;
+        drawCornerPanel();
+        var box=getCornerContentBox();
+        if(cornerContent==="logo"&&assetState.logo){
+          frameCtx.drawImage(cornerLogoImage,box.x,box.y,box.width,box.height);
+        }else if(cornerContent==="text"){
+          drawTextContent(box);
+        }else if(cornerContent==="image"){
+          drawCustomImage(box);
+        }
       }
       function draw(){
         ctx.clearRect(0,0,WIDTH,HEIGHT);
@@ -426,8 +622,9 @@
           var y=(HEIGHT-drawHeight)/2-(Number($("positionY").value)/100)*(deltaY/2);
           ctx.drawImage(sourceImage,x,y,drawWidth,drawHeight);
         }
-        if(frameImage.complete&&frameImage.naturalWidth){
-          ctx.drawImage(frameImage,0,0,WIDTH,HEIGHT);
+        if(assetState.base){
+          drawFrameLayer();
+          ctx.drawImage(frameCanvas,0,0,WIDTH,HEIGHT);
         }
         $("emptyHint").hidden=Boolean(sourceImage);
       }
@@ -445,10 +642,36 @@
         });
         resetAdjustments();
       }
+      function updateCornerControls(){
+        $("cornerPositionControls").hidden=cornerContent==="none";
+        $("cornerTextControls").hidden=cornerContent!=="text";
+        $("cornerImageControls").hidden=cornerContent!=="image";
+      }
+      function activateCornerContent(nextContent){
+        cornerContent=nextContent;
+        document.querySelectorAll("[data-corner-content]").forEach(function(button){
+          button.classList.toggle("is-active",button.dataset.cornerContent===cornerContent);
+        });
+        updateCornerControls();
+        draw();
+      }
+      function activateCornerPosition(nextPosition){
+        cornerPosition=nextPosition;
+        document.querySelectorAll("[data-corner-position]").forEach(function(button){
+          button.classList.toggle("is-active",button.dataset.cornerPosition===cornerPosition);
+        });
+        draw();
+      }
       function releaseSource(){
         if(sourceObjectUrl){
           URL.revokeObjectURL(sourceObjectUrl);
           sourceObjectUrl="";
+        }
+      }
+      function releaseCornerImage(){
+        if(cornerImageObjectUrl){
+          URL.revokeObjectURL(cornerImageObjectUrl);
+          cornerImageObjectUrl="";
         }
       }
       function removeImage(){
@@ -456,7 +679,7 @@
         sourceImage=null;
         $("fileInput").value="";
         $("fileName").textContent="尚未選擇縮圖";
-        $("download").disabled=true;
+        syncDownloadState();
         resetAdjustments();
         setStatus("品牌框已就緒；請上傳縮圖。",false);
       }
@@ -471,7 +694,7 @@
         image.onload=function(){
           sourceImage=image;
           $("fileName").textContent=file.name+"｜"+image.naturalWidth+"×"+image.naturalHeight;
-          $("download").disabled=false;
+          syncDownloadState();
           resetAdjustments();
           setStatus("縮圖已載入；可調整畫面後輸出。",false);
         };
@@ -481,8 +704,29 @@
         };
         image.src=sourceObjectUrl;
       }
+      function loadCornerImage(file){
+        if(!file||!/^image\/(png|jpeg|webp)$/.test(file.type)){
+          setStatus("角標圖片請選擇 JPG、PNG 或 WEBP。",true);
+          return;
+        }
+        releaseCornerImage();
+        cornerImageObjectUrl=URL.createObjectURL(file);
+        var image=new Image();
+        image.onload=function(){
+          cornerCustomImage=image;
+          $("cornerImageName").textContent=file.name+"｜"+image.naturalWidth+"×"+image.naturalHeight;
+          draw();
+          setStatus("角標圖片已載入；會依角標空間等比例縮放。",false);
+        };
+        image.onerror=function(){
+          releaseCornerImage();
+          cornerCustomImage=null;
+          setStatus("角標圖片讀取失敗，請換一個檔案再試。",true);
+        };
+        image.src=cornerImageObjectUrl;
+      }
       function download(){
-        if(!sourceImage)return;
+        if(!sourceImage||!frameAssetsReady())return;
         draw();
         canvas.toBlob(function(blob){
           if(!blob){
@@ -499,21 +743,47 @@
         },"image/png");
       }
 
-      frameImage.onload=function(){
-        draw();
-        setStatus("品牌框已就緒；請上傳縮圖。",false);
-      };
-      frameImage.onerror=function(){
-        $("download").disabled=true;
-        setStatus("品牌框載入失敗，請重新整理頁面。",true);
-      };
-      frameImage.src=FRAME_SOURCE;
+      function bindAsset(image,key,source){
+        image.onload=function(){
+          assetState[key]=true;
+          draw();
+          syncDownloadState();
+          if(frameAssetsReady()){
+            setStatus(sourceImage?"縮圖與品牌框已就緒，可輸出。":"品牌框已就緒；請上傳縮圖。",false);
+          }
+        };
+        image.onerror=function(){
+          assetState.error=true;
+          syncDownloadState();
+          setStatus("品牌框元件載入失敗，請重新整理頁面。",true);
+        };
+        image.src=source;
+      }
+
+      bindAsset(frameBaseImage,"base",FRAME_BASE_SOURCE);
+      bindAsset(cornerPanelImage,"panel",CORNER_PANEL_SOURCE);
+      bindAsset(cornerLogoImage,"logo",CORNER_LOGO_SOURCE);
 
       $("fileInput").addEventListener("change",function(event){loadFile(event.target.files[0])});
+      $("cornerImageInput").addEventListener("change",function(event){loadCornerImage(event.target.files[0])});
       $("coverMode").addEventListener("click",function(){activateMode("cover")});
       $("containMode").addEventListener("click",function(){activateMode("contain")});
-      ["zoom","positionX","positionY","backgroundColor"].forEach(function(id){
+      ["zoom","positionX","positionY","backgroundColor","cornerTextColor"].forEach(function(id){
         $(id).addEventListener("input",function(){updateLabels();draw()});
+      });
+      document.querySelectorAll("[data-corner-content]").forEach(function(button){
+        button.addEventListener("click",function(){activateCornerContent(button.dataset.cornerContent)});
+      });
+      document.querySelectorAll("[data-corner-position]").forEach(function(button){
+        button.addEventListener("click",function(){activateCornerPosition(button.dataset.cornerPosition)});
+      });
+      $("cornerTextPreset").addEventListener("change",function(){
+        if(this.value)$("cornerText").value=this.value;
+        draw();
+      });
+      $("cornerText").addEventListener("input",function(){
+        $("cornerTextPreset").value="";
+        draw();
       });
       $("resetPosition").addEventListener("click",resetAdjustments);
       $("removeImage").addEventListener("click",removeImage);
@@ -534,8 +804,9 @@
       $("dropZone").addEventListener("drop",function(event){
         loadFile(event.dataTransfer.files[0]);
       });
-      window.addEventListener("beforeunload",releaseSource);
+      window.addEventListener("beforeunload",function(){releaseSource();releaseCornerImage()});
       updateLabels();
+      updateCornerControls();
       draw();
     })();
   </script>
