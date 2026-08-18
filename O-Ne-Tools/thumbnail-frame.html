@@ -1,0 +1,542 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>O-Ne 縮圖品牌框工具 V1.0.0</title>
+  <style>
+    :root{
+      --bg:#0e1117;
+      --panel:#151a23;
+      --panel-2:#101620;
+      --field:#0f1721;
+      --line:#2a3240;
+      --line-strong:#394355;
+      --text:#f3efe8;
+      --muted:#98a3b2;
+      --teal:#29a6a7;
+      --teal-bright:#53ced0;
+      --yellow:#ffbe37;
+      --danger:#ff7770;
+    }
+    *{box-sizing:border-box}
+    html,body{min-height:100%}
+    body{
+      margin:0;
+      color:var(--text);
+      background:var(--bg);
+      font-family:"Noto Sans TC","Noto Sans CJK TC","Microsoft JhengHei",sans-serif;
+    }
+    button,input,select{font:inherit}
+    button{cursor:pointer}
+    .app{max-width:1760px;margin:auto;padding:24px}
+    .app-header{
+      display:flex;
+      align-items:center;
+      gap:20px;
+      min-height:74px;
+      margin-bottom:18px;
+    }
+    .tool-home-link{
+      min-width:118px;
+      height:48px;
+      display:inline-flex;
+      align-items:center;
+      color:var(--teal-bright);
+      font-size:15px;
+      font-weight:800;
+      text-decoration:none;
+    }
+    .tool-home-link:hover{text-decoration:underline}
+    .tool-home-link:focus-visible{
+      outline:2px solid var(--teal-bright);
+      outline-offset:4px;
+      border-radius:4px;
+    }
+    .header-divider{width:1px;height:48px;background:var(--line)}
+    .title-block{min-width:0}
+    h1{margin:0 0 5px;font-size:25px;line-height:1.25}
+    h1 span{color:var(--muted);font-size:12px;font-weight:700}
+    .sub{color:var(--muted);font-size:12px;line-height:1.65}
+    .ready{
+      margin-left:auto;
+      padding:7px 11px;
+      border:1px solid #246d68;
+      border-radius:8px;
+      color:#8fd4c8;
+      background:#14312e;
+      font-size:11px;
+      font-weight:900;
+      letter-spacing:.08em;
+    }
+    .workspace{
+      display:grid;
+      grid-template-columns:430px minmax(0,1fr);
+      gap:18px;
+      align-items:stretch;
+    }
+    .panel{
+      overflow:hidden;
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:var(--panel);
+      box-shadow:0 14px 34px rgba(0,0,0,.22);
+    }
+    .controls{padding:18px}
+    .section+.section{
+      margin-top:18px;
+      padding-top:18px;
+      border-top:1px solid var(--line);
+    }
+    .section-title{
+      display:flex;
+      align-items:baseline;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:10px;
+    }
+    .section-title strong{font-size:14px}
+    .section-title span{color:var(--muted);font-size:11px}
+    .note{
+      margin-bottom:12px;
+      padding:10px 12px;
+      border:1px solid #273244;
+      border-radius:9px;
+      color:#c4cad3;
+      background:var(--panel-2);
+      font-size:12px;
+      line-height:1.65;
+    }
+    .drop-zone{
+      min-height:132px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      padding:20px;
+      border:1px dashed #47717a;
+      border-radius:10px;
+      background:#101923;
+      text-align:center;
+      transition:border-color .15s ease,background .15s ease;
+    }
+    .drop-zone.is-dragging{border-color:var(--teal-bright);background:#123036}
+    .drop-zone strong{font-size:14px}
+    .drop-zone small{color:var(--muted);font-size:11px;line-height:1.5}
+    .upload-button{
+      position:relative;
+      min-height:38px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:0 14px;
+      border:1px solid var(--teal);
+      border-radius:8px;
+      color:var(--teal-bright);
+      background:transparent;
+      font-size:12px;
+      font-weight:800;
+    }
+    .upload-button:hover{background:#2cb7bc14}
+    .upload-button input{
+      position:absolute;
+      width:1px;
+      height:1px;
+      overflow:hidden;
+      clip:rect(0 0 0 0);
+      clip-path:inset(50%);
+    }
+    .file-name{
+      max-width:100%;
+      overflow:hidden;
+      color:#cbd2dc;
+      font-size:11px;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+    label{display:block;margin:11px 0 6px;color:#bcc4cf;font-size:12px;font-weight:800}
+    .segmented{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      overflow:hidden;
+      border:1px solid var(--line-strong);
+      border-radius:8px;
+    }
+    .segmented button{
+      height:40px;
+      border:0;
+      color:#b8c0ca;
+      background:var(--panel-2);
+      font-size:12px;
+      font-weight:800;
+    }
+    .segmented button+button{border-left:1px solid var(--line-strong)}
+    .segmented button.is-active{color:#fff;background:var(--teal)}
+    .range-row{
+      display:grid;
+      grid-template-columns:1fr 54px;
+      align-items:center;
+      gap:10px;
+      min-height:38px;
+      padding:0 10px;
+      border:1px solid var(--line-strong);
+      border-radius:8px;
+      background:var(--field);
+    }
+    .range-row input{width:100%;accent-color:var(--teal-bright)}
+    .range-row output{color:var(--teal-bright);font-size:11px;text-align:right}
+    .color-row{
+      display:grid;
+      grid-template-columns:36px 1fr;
+      align-items:center;
+      gap:10px;
+      min-height:42px;
+      padding:0 10px;
+      border:1px solid var(--line-strong);
+      border-radius:8px;
+      background:var(--field);
+    }
+    .color-row input{width:28px;height:28px;padding:0;border:0;background:transparent}
+    .color-row code{color:var(--muted);font-size:11px}
+    .button-row{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:14px}
+    .button{
+      min-height:40px;
+      border:0;
+      border-radius:8px;
+      color:#fff;
+      background:var(--teal);
+      font-size:12px;
+      font-weight:900;
+    }
+    .button.secondary{color:#c5ccd5;background:#30394a}
+    .source-meta{
+      margin-top:12px;
+      color:#7f8b9a;
+      font-size:10px;
+      line-height:1.6;
+    }
+    .preview-panel{display:grid;grid-template-rows:auto minmax(430px,1fr) auto}
+    .preview-toolbar{
+      min-height:58px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      padding:0 18px;
+      border-bottom:1px solid var(--line);
+    }
+    .preview-toolbar strong{font-size:13px}
+    .preview-toolbar span{color:var(--muted);font-size:11px}
+    .stage{
+      position:relative;
+      min-height:540px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      padding:24px;
+      background-color:#252b32;
+      background-image:
+        linear-gradient(45deg,#30363d 25%,transparent 25%),
+        linear-gradient(-45deg,#30363d 25%,transparent 25%),
+        linear-gradient(45deg,transparent 75%,#30363d 75%),
+        linear-gradient(-45deg,transparent 75%,#30363d 75%);
+      background-size:30px 30px;
+      background-position:0 0,0 15px,15px -15px,-15px 0;
+    }
+    canvas{
+      display:block;
+      width:min(100%,1120px);
+      height:auto;
+      border-radius:2px;
+      filter:drop-shadow(0 12px 26px rgba(0,0,0,.36));
+    }
+    .empty-hint{
+      position:absolute;
+      left:50%;
+      bottom:38px;
+      transform:translateX(-50%);
+      max-width:calc(100% - 48px);
+      padding:8px 12px;
+      border:1px solid #435063;
+      border-radius:7px;
+      color:#d6dce4;
+      background:#101620e8;
+      font-size:11px;
+      text-align:center;
+      pointer-events:none;
+    }
+    .export-bar{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      padding:14px 18px;
+      border-top:1px solid var(--line);
+      background:#111923;
+    }
+    .export-button{
+      min-height:52px;
+      min-width:220px;
+      border:1px solid var(--teal-bright);
+      border-radius:9px;
+      color:#fff;
+      background:var(--teal);
+      font-size:14px;
+      font-weight:900;
+    }
+    .export-button:disabled{cursor:not-allowed;opacity:.42}
+    .status{min-width:0;color:#8fd4c8;font-size:11px;line-height:1.55}
+    .status.error{color:var(--danger)}
+    @media(max-width:1120px){
+      .workspace{grid-template-columns:1fr}
+      .stage{min-height:440px}
+    }
+    @media(max-width:680px){
+      .app{padding:15px}
+      .app-header{flex-wrap:wrap;gap:10px}
+      .header-divider{display:none}
+      .title-block{width:100%}
+      .ready{margin-left:0}
+      .stage{min-height:300px;padding:10px}
+      .export-bar{align-items:stretch;flex-direction:column}
+      .export-button{width:100%;min-width:0}
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="app-header">
+      <a class="tool-home-link" href="./">回工具入口</a>
+      <span class="header-divider" aria-hidden="true"></span>
+      <div class="title-block">
+        <h1>O-Ne 縮圖品牌框工具 <span>V1.0.0</span></h1>
+        <div class="sub">上傳縮圖後調整裁切與位置，最後自動疊上正式「首頁框.png」，輸出 1920×1080 PNG。</div>
+      </div>
+      <div class="ready">READY</div>
+    </header>
+
+    <section class="workspace">
+      <aside class="panel controls">
+        <div class="section">
+          <div class="section-title"><strong>01｜上傳縮圖</strong><span>JPG／PNG／WEBP</span></div>
+          <div class="note">框線、Logo 與腳印會固定放在最上層，不會被縮圖蓋住。建議先完成縮圖文字與人物，再進來套框。</div>
+          <div id="dropZone" class="drop-zone">
+            <strong>把縮圖拖到這裡</strong>
+            <label class="upload-button">選擇縮圖<input id="fileInput" type="file" accept="image/png,image/jpeg,image/webp"></label>
+            <small>輸入比例不限；輸出固定為 16:9、1920×1080。</small>
+            <div id="fileName" class="file-name">尚未選擇縮圖</div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title"><strong>02｜畫面調整</strong><span>不改變品牌框</span></div>
+          <label>縮圖填滿方式</label>
+          <div class="segmented" role="group" aria-label="縮圖填滿方式">
+            <button id="coverMode" class="is-active" type="button" data-mode="cover">裁切填滿</button>
+            <button id="containMode" type="button" data-mode="contain">完整顯示</button>
+          </div>
+
+          <label for="zoom">縮放</label>
+          <div class="range-row"><input id="zoom" type="range" min="100" max="220" value="100"><output id="zoomValue">100%</output></div>
+
+          <label for="positionX">左右位置</label>
+          <div class="range-row"><input id="positionX" type="range" min="-100" max="100" value="0"><output id="positionXValue">置中</output></div>
+
+          <label for="positionY">上下位置</label>
+          <div class="range-row"><input id="positionY" type="range" min="-100" max="100" value="0"><output id="positionYValue">置中</output></div>
+
+          <label for="backgroundColor">完整顯示時的補色</label>
+          <div class="color-row"><input id="backgroundColor" type="color" value="#151a23"><code id="backgroundColorValue">#151A23</code></div>
+
+          <div class="button-row">
+            <button id="resetPosition" class="button secondary" type="button">重設位置</button>
+            <button id="removeImage" class="button secondary" type="button">移除縮圖</button>
+          </div>
+
+          <div class="source-meta">
+            正式可編輯母版：字卡.psb<br>
+            正式疊圖：首頁框.png｜1920×1080｜透明 PNG<br>
+            疊圖 SHA-256：cd394f87…cc62
+          </div>
+        </div>
+      </aside>
+
+      <section class="panel preview-panel">
+        <div class="preview-toolbar">
+          <strong>縮圖合成預覽</strong>
+          <span>框線永遠固定在最上層</span>
+        </div>
+        <div id="stage" class="stage">
+          <canvas id="canvas" width="1920" height="1080" aria-label="縮圖品牌框預覽"></canvas>
+          <div id="emptyHint" class="empty-hint">目前只顯示品牌框；上傳縮圖後會自動放到框線下方。</div>
+        </div>
+        <div class="export-bar">
+          <button id="download" class="export-button" type="button" disabled>輸出含框 PNG</button>
+          <div id="status" class="status" aria-live="polite">品牌框載入中…</div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    (function(){
+      "use strict";
+      var WIDTH=1920;
+      var HEIGHT=1080;
+      var FRAME_SOURCE="./assets/thumbnail-home-frame.png";
+      var canvas=document.getElementById("canvas");
+      var ctx=canvas.getContext("2d");
+      var frameImage=new Image();
+      var sourceImage=null;
+      var sourceObjectUrl="";
+      var mode="cover";
+
+      function $(id){return document.getElementById(id)}
+      function setStatus(message,isError){
+        $("status").textContent=message;
+        $("status").classList.toggle("error",Boolean(isError));
+      }
+      function formatPosition(value){
+        var number=Number(value);
+        if(number===0)return "置中";
+        return (number>0?"+":"")+number;
+      }
+      function updateLabels(){
+        $("zoomValue").textContent=$("zoom").value+"%";
+        $("positionXValue").textContent=formatPosition($("positionX").value);
+        $("positionYValue").textContent=formatPosition($("positionY").value);
+        $("backgroundColorValue").textContent=$("backgroundColor").value.toUpperCase();
+      }
+      function draw(){
+        ctx.clearRect(0,0,WIDTH,HEIGHT);
+        if(sourceImage){
+          ctx.fillStyle=$("backgroundColor").value;
+          ctx.fillRect(0,0,WIDTH,HEIGHT);
+          var baseScale=mode==="cover"
+            ? Math.max(WIDTH/sourceImage.width,HEIGHT/sourceImage.height)
+            : Math.min(WIDTH/sourceImage.width,HEIGHT/sourceImage.height);
+          var scale=baseScale*(Number($("zoom").value)/100);
+          var drawWidth=sourceImage.width*scale;
+          var drawHeight=sourceImage.height*scale;
+          var overflowX=Math.max(0,drawWidth-WIDTH);
+          var overflowY=Math.max(0,drawHeight-HEIGHT);
+          var x=(WIDTH-drawWidth)/2-(Number($("positionX").value)/100)*(overflowX/2);
+          var y=(HEIGHT-drawHeight)/2-(Number($("positionY").value)/100)*(overflowY/2);
+          ctx.drawImage(sourceImage,x,y,drawWidth,drawHeight);
+        }
+        if(frameImage.complete&&frameImage.naturalWidth){
+          ctx.drawImage(frameImage,0,0,WIDTH,HEIGHT);
+        }
+        $("emptyHint").hidden=Boolean(sourceImage);
+      }
+      function resetAdjustments(){
+        $("zoom").value="100";
+        $("positionX").value="0";
+        $("positionY").value="0";
+        updateLabels();
+        draw();
+      }
+      function activateMode(nextMode){
+        mode=nextMode;
+        document.querySelectorAll("[data-mode]").forEach(function(button){
+          button.classList.toggle("is-active",button.dataset.mode===mode);
+        });
+        resetAdjustments();
+      }
+      function releaseSource(){
+        if(sourceObjectUrl){
+          URL.revokeObjectURL(sourceObjectUrl);
+          sourceObjectUrl="";
+        }
+      }
+      function removeImage(){
+        releaseSource();
+        sourceImage=null;
+        $("fileInput").value="";
+        $("fileName").textContent="尚未選擇縮圖";
+        $("download").disabled=true;
+        resetAdjustments();
+        setStatus("品牌框已就緒；請上傳縮圖。",false);
+      }
+      function loadFile(file){
+        if(!file||!/^image\/(png|jpeg|webp)$/.test(file.type)){
+          setStatus("請選擇 JPG、PNG 或 WEBP 圖片。",true);
+          return;
+        }
+        releaseSource();
+        sourceObjectUrl=URL.createObjectURL(file);
+        var image=new Image();
+        image.onload=function(){
+          sourceImage=image;
+          $("fileName").textContent=file.name+"｜"+image.naturalWidth+"×"+image.naturalHeight;
+          $("download").disabled=false;
+          resetAdjustments();
+          setStatus("縮圖已載入；可調整畫面後輸出。",false);
+        };
+        image.onerror=function(){
+          releaseSource();
+          setStatus("圖片讀取失敗，請換一個檔案再試。",true);
+        };
+        image.src=sourceObjectUrl;
+      }
+      function download(){
+        if(!sourceImage)return;
+        draw();
+        canvas.toBlob(function(blob){
+          if(!blob){
+            setStatus("PNG 產生失敗，請重新整理後再試。",true);
+            return;
+          }
+          var url=URL.createObjectURL(blob);
+          var link=document.createElement("a");
+          link.href=url;
+          link.download="O-Ne_縮圖品牌框_1920x1080.png";
+          link.click();
+          setTimeout(function(){URL.revokeObjectURL(url)},1200);
+          setStatus("已輸出 1920×1080 含框 PNG。",false);
+        },"image/png");
+      }
+
+      frameImage.onload=function(){
+        draw();
+        setStatus("品牌框已就緒；請上傳縮圖。",false);
+      };
+      frameImage.onerror=function(){
+        $("download").disabled=true;
+        setStatus("品牌框載入失敗，請重新整理頁面。",true);
+      };
+      frameImage.src=FRAME_SOURCE;
+
+      $("fileInput").addEventListener("change",function(event){loadFile(event.target.files[0])});
+      $("coverMode").addEventListener("click",function(){activateMode("cover")});
+      $("containMode").addEventListener("click",function(){activateMode("contain")});
+      ["zoom","positionX","positionY","backgroundColor"].forEach(function(id){
+        $(id).addEventListener("input",function(){updateLabels();draw()});
+      });
+      $("resetPosition").addEventListener("click",resetAdjustments);
+      $("removeImage").addEventListener("click",removeImage);
+      $("download").addEventListener("click",download);
+
+      ["dragenter","dragover"].forEach(function(type){
+        $("dropZone").addEventListener(type,function(event){
+          event.preventDefault();
+          $("dropZone").classList.add("is-dragging");
+        });
+      });
+      ["dragleave","drop"].forEach(function(type){
+        $("dropZone").addEventListener(type,function(event){
+          event.preventDefault();
+          $("dropZone").classList.remove("is-dragging");
+        });
+      });
+      $("dropZone").addEventListener("drop",function(event){
+        loadFile(event.dataTransfer.files[0]);
+      });
+      window.addEventListener("beforeunload",releaseSource);
+      updateLabels();
+      draw();
+    })();
+  </script>
+</body>
+</html>
