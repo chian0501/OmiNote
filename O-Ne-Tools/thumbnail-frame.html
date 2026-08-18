@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>O-Ne 縮圖品牌框工具 V1.0.0</title>
+  <title>O-Ne 縮圖品牌框工具 V1.1.0</title>
   <style>
     :root{
       --bg:#0e1117;
@@ -310,8 +310,8 @@
       <a class="tool-home-link" href="./">回工具入口</a>
       <span class="header-divider" aria-hidden="true"></span>
       <div class="title-block">
-        <h1>O-Ne 縮圖品牌框工具 <span>V1.0.0</span></h1>
-        <div class="sub">上傳縮圖後調整裁切與位置，最後自動疊上正式「首頁框.png」，輸出 1920×1080 PNG。</div>
+        <h1>O-Ne 縮圖品牌框工具 <span>V1.1.0</span></h1>
+        <div class="sub">上傳縮圖後可縮小、放大、裁切與調整位置，最後自動疊上品牌框，輸出 1920×1080 PNG。</div>
       </div>
       <div class="ready">READY</div>
     </header>
@@ -337,8 +337,9 @@
             <button id="containMode" type="button" data-mode="contain">完整顯示</button>
           </div>
 
-          <label for="zoom">縮放</label>
-          <div class="range-row"><input id="zoom" type="range" min="100" max="220" value="100"><output id="zoomValue">100%</output></div>
+          <label for="zoom">縮放（可縮小）</label>
+          <div class="range-row"><input id="zoom" type="range" min="20" max="220" step="1" value="100"><output id="zoomValue">100%</output></div>
+          <div class="note">20–99% 為縮小；100% 為依目前模式自動適配；最高可放大至 220%。</div>
 
           <label for="positionX">左右位置</label>
           <div class="range-row"><input id="positionX" type="range" min="-100" max="100" value="0"><output id="positionXValue">置中</output></div>
@@ -356,8 +357,8 @@
 
           <div class="source-meta">
             正式可編輯母版：字卡.psb<br>
-            正式疊圖：首頁框.png｜1920×1080｜透明 PNG<br>
-            疊圖 SHA-256：cd394f87…cc62
+            正式疊圖來源：首頁框.png｜1920×1080｜透明 PNG<br>
+            網頁衍生框：僅修除右下角細線，正式原檔不覆蓋
           </div>
         </div>
       </aside>
@@ -384,7 +385,7 @@
       "use strict";
       var WIDTH=1920;
       var HEIGHT=1080;
-      var FRAME_SOURCE="./assets/thumbnail-home-frame.png";
+      var FRAME_SOURCE="./assets/thumbnail-home-frame-clean-v110.png";
       var canvas=document.getElementById("canvas");
       var ctx=canvas.getContext("2d");
       var frameImage=new Image();
@@ -419,10 +420,10 @@
           var scale=baseScale*(Number($("zoom").value)/100);
           var drawWidth=sourceImage.width*scale;
           var drawHeight=sourceImage.height*scale;
-          var overflowX=Math.max(0,drawWidth-WIDTH);
-          var overflowY=Math.max(0,drawHeight-HEIGHT);
-          var x=(WIDTH-drawWidth)/2-(Number($("positionX").value)/100)*(overflowX/2);
-          var y=(HEIGHT-drawHeight)/2-(Number($("positionY").value)/100)*(overflowY/2);
+          var deltaX=drawWidth-WIDTH;
+          var deltaY=drawHeight-HEIGHT;
+          var x=(WIDTH-drawWidth)/2-(Number($("positionX").value)/100)*(deltaX/2);
+          var y=(HEIGHT-drawHeight)/2-(Number($("positionY").value)/100)*(deltaY/2);
           ctx.drawImage(sourceImage,x,y,drawWidth,drawHeight);
         }
         if(frameImage.complete&&frameImage.naturalWidth){
