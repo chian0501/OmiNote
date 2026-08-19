@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>O-Ne 縮圖品牌框工具 V1.2.0</title>
+  <title>O-Ne 縮圖品牌框工具 V1.2.4</title>
   <style>
     :root{
       --bg:#0e1117;
@@ -66,6 +66,17 @@
       border-radius:8px;
       color:#8fd4c8;
       background:#14312e;
+      font-size:11px;
+      font-weight:900;
+      letter-spacing:.08em;
+    }
+    .candidate-status{
+      margin-left:auto;
+      padding:7px 11px;
+      border:1px solid #8b6b24;
+      border-radius:8px;
+      color:#ffd978;
+      background:#3b2d12;
       font-size:11px;
       font-weight:900;
       letter-spacing:.08em;
@@ -351,17 +362,17 @@
       <a class="tool-home-link" href="./">回工具入口</a>
       <span class="header-divider" aria-hidden="true"></span>
       <div class="title-block">
-        <h1>O-Ne 縮圖品牌框工具 <span>V1.2.0</span></h1>
+        <h1>O-Ne 縮圖品牌框工具 <span>V1.2.4</span></h1>
         <div class="sub">上傳縮圖後可調整畫面，再選擇角標位置與內容，最後輸出 1920×1080 PNG。</div>
       </div>
-      <div class="ready">READY</div>
+      <div class="candidate-status">CANDIDATE</div>
     </header>
 
     <section class="workspace">
       <aside class="panel controls">
         <div class="section">
           <div class="section-title"><strong>01｜上傳縮圖</strong><span>JPG／PNG／WEBP</span></div>
-          <div class="note">框線、角標與腳印會固定放在最上層，不會被縮圖蓋住。建議先完成縮圖文字與人物，再進來套框。</div>
+          <div class="note">框線與角標會固定放在最上層，不會被縮圖蓋住。選右下角時會先移除原本的腳印與短線，再換成角標。建議先完成縮圖文字與人物，再進來套框。</div>
           <div id="dropZone" class="drop-zone">
             <strong>把縮圖拖到這裡</strong>
             <label class="upload-button">選擇縮圖<input id="fileInput" type="file" accept="image/png,image/jpeg,image/webp"></label>
@@ -397,15 +408,15 @@
           </div>
 
           <div class="source-meta">
-            正式可編輯母版：字卡.psb<br>
-            正式疊圖來源：首頁框.png｜1920×1080｜透明 PNG<br>
-            網頁衍生框：修除右下細線並拆出可移動角標；正式原檔不覆蓋
+            正式可編輯母版：首頁框.psd<br>
+            正式疊圖來源：首頁框.png｜1920×1080｜2026-08-19 更新版<br>
+            網頁使用：直接載入最新版正式 PNG，再只替換所選角落；正式原檔不覆蓋
           </div>
         </div>
 
         <div class="section">
           <div class="section-title"><strong>03｜角標設定</strong><span>位置與內容可替換</span></div>
-          <div class="note">可保留 O-Ne Logo、改成文字、換成自己的透明圖片，或完全不顯示角標。</div>
+          <div class="note">可保留 O-Ne Logo、改成文字、換成自己的透明圖片，或完全不顯示角標。角標內容會維持原比例並保留呼吸空間。</div>
 
           <label>角標內容</label>
           <div class="segmented four" role="group" aria-label="角標內容">
@@ -424,6 +435,8 @@
               <button type="button" data-corner-position="bottom-right">右下</button>
             </div>
           </div>
+
+          <div class="note">四個角落都使用這次新版的短矩形角標接法；角標底片會翻面接邊，Logo、文字與自訂圖片保持正向。右下角會先清掉原本的腳印與短線，不會直接壓在上面。</div>
 
           <div id="cornerTextControls" hidden>
             <label for="cornerTextPreset">常用文字</label>
@@ -475,18 +488,24 @@
       "use strict";
       var WIDTH=1920;
       var HEIGHT=1080;
-      var CORNER_WIDTH=450;
-      var CORNER_HEIGHT=210;
-      var FRAME_BASE_SOURCE="./assets/thumbnail-frame-base-v120.png";
-      var CORNER_PANEL_SOURCE="./assets/thumbnail-corner-panel-v120.png";
-      var CORNER_LOGO_SOURCE="./assets/thumbnail-corner-logo-v120.png";
+      var CORNER_WIDTH=420;
+      var CORNER_HEIGHT=220;
+      var CORNER_CONTENT_X=122;
+      var CORNER_CONTENT_Y=13;
+      var CORNER_CONTENT_WIDTH=274;
+      var CORNER_CONTENT_HEIGHT=83;
+      var FORMAL_FRAME_SOURCE="./assets/thumbnail-home-frame-v124.png";
+      var REGULAR_TOP_RIGHT_SOURCE="./assets/thumbnail-regular-top-right-v124.png";
+      var CORNER_PANEL_SOURCE="./assets/thumbnail-corner-panel-v124.png";
+      var CORNER_LOGO_SOURCE="./assets/thumbnail-corner-logo-patch-v124.png";
       var canvas=document.getElementById("canvas");
       var ctx=canvas.getContext("2d");
       var frameCanvas=document.createElement("canvas");
       frameCanvas.width=WIDTH;
       frameCanvas.height=HEIGHT;
       var frameCtx=frameCanvas.getContext("2d");
-      var frameBaseImage=new Image();
+      var formalFrameImage=new Image();
+      var regularTopRightImage=new Image();
       var cornerPanelImage=new Image();
       var cornerLogoImage=new Image();
       var sourceImage=null;
@@ -496,7 +515,7 @@
       var mode="cover";
       var cornerContent="logo";
       var cornerPosition="top-right";
-      var assetState={base:false,panel:false,logo:false,error:false};
+      var assetState={formal:false,regular:false,panel:false,logo:false,error:false};
 
       function $(id){return document.getElementById(id)}
       function setStatus(message,isError){
@@ -516,7 +535,7 @@
         $("cornerTextColorValue").textContent=$("cornerTextColor").value.toUpperCase();
       }
       function frameAssetsReady(){
-        return assetState.base&&assetState.panel&&assetState.logo&&!assetState.error;
+        return assetState.formal&&assetState.regular&&assetState.panel&&assetState.logo&&!assetState.error;
       }
       function syncDownloadState(){
         $("download").disabled=!(sourceImage&&frameAssetsReady());
@@ -528,11 +547,14 @@
         };
       }
       function getCornerContentBox(){
+        var region=getCornerRegion();
+        var isLeft=cornerPosition.indexOf("left")>-1;
+        var isBottom=cornerPosition.indexOf("bottom")>-1;
         return {
-          x:cornerPosition.indexOf("right")>-1?1615:15,
-          y:cornerPosition.indexOf("bottom")>-1?HEIGHT-108:8,
-          width:290,
-          height:100
+          x:region.x+(isLeft?CORNER_WIDTH-CORNER_CONTENT_X-CORNER_CONTENT_WIDTH:CORNER_CONTENT_X),
+          y:region.y+(isBottom?CORNER_HEIGHT-CORNER_CONTENT_Y-CORNER_CONTENT_HEIGHT:CORNER_CONTENT_Y),
+          width:CORNER_CONTENT_WIDTH,
+          height:CORNER_CONTENT_HEIGHT
         };
       }
       function drawCornerPanel(){
@@ -554,19 +576,25 @@
         frameCtx.drawImage(cornerPanelImage,0,0,CORNER_WIDTH,CORNER_HEIGHT);
         frameCtx.restore();
       }
+      function restoreTopRightRegularCorner(){
+        if(!assetState.regular)return;
+        var x=WIDTH-CORNER_WIDTH;
+        frameCtx.clearRect(x,0,CORNER_WIDTH,CORNER_HEIGHT);
+        frameCtx.drawImage(regularTopRightImage,x,0,CORNER_WIDTH,CORNER_HEIGHT);
+      }
       function drawTextContent(box){
         var textValue=$("cornerText").value.trim()||"下集預告";
-        var fontSize=58;
-        var maxWidth=box.width-18;
+        var fontSize=46;
+        var maxWidth=box.width-24;
         frameCtx.save();
         frameCtx.textAlign="center";
         frameCtx.textBaseline="middle";
         frameCtx.lineJoin="round";
         do{
           frameCtx.font="900 "+fontSize+"px 'Noto Sans TC','Noto Sans CJK TC','Microsoft JhengHei',sans-serif";
-          if(frameCtx.measureText(textValue).width<=maxWidth||fontSize<=28)break;
+          if(frameCtx.measureText(textValue).width<=maxWidth||fontSize<=22)break;
           fontSize-=2;
-        }while(fontSize>28);
+        }while(fontSize>22);
         frameCtx.strokeStyle="rgba(0,0,0,.48)";
         frameCtx.lineWidth=Math.max(4,Math.round(fontSize*.09));
         frameCtx.fillStyle=$("cornerTextColor").value;
@@ -574,16 +602,15 @@
         frameCtx.fillText(textValue,box.x+box.width/2,box.y+box.height/2+2);
         frameCtx.restore();
       }
-      function drawCustomImage(box){
-        if(!cornerCustomImage)return;
-        var padding=8;
+      function drawContainedImage(image,box,padding){
+        if(!image)return;
         var maxWidth=box.width-padding*2;
         var maxHeight=box.height-padding*2;
-        var scale=Math.min(maxWidth/cornerCustomImage.width,maxHeight/cornerCustomImage.height);
-        var drawWidth=cornerCustomImage.width*scale;
-        var drawHeight=cornerCustomImage.height*scale;
+        var scale=Math.min(maxWidth/image.width,maxHeight/image.height);
+        var drawWidth=image.width*scale;
+        var drawHeight=image.height*scale;
         frameCtx.drawImage(
-          cornerCustomImage,
+          image,
           box.x+(box.width-drawWidth)/2,
           box.y+(box.height-drawHeight)/2,
           drawWidth,
@@ -592,9 +619,14 @@
       }
       function drawFrameLayer(){
         frameCtx.clearRect(0,0,WIDTH,HEIGHT);
-        if(!assetState.base)return;
-        frameCtx.drawImage(frameBaseImage,0,0,WIDTH,HEIGHT);
-        if(cornerContent==="none"||!assetState.panel)return;
+        if(!assetState.formal)return;
+        frameCtx.drawImage(formalFrameImage,0,0,WIDTH,HEIGHT);
+        if(cornerContent==="none"){
+          restoreTopRightRegularCorner();
+          return;
+        }
+        if(!assetState.panel)return;
+        if(cornerPosition!=="top-right")restoreTopRightRegularCorner();
         drawCornerPanel();
         var box=getCornerContentBox();
         if(cornerContent==="logo"&&assetState.logo){
@@ -602,7 +634,7 @@
         }else if(cornerContent==="text"){
           drawTextContent(box);
         }else if(cornerContent==="image"){
-          drawCustomImage(box);
+          drawContainedImage(cornerCustomImage,box,8);
         }
       }
       function draw(){
@@ -622,7 +654,7 @@
           var y=(HEIGHT-drawHeight)/2-(Number($("positionY").value)/100)*(deltaY/2);
           ctx.drawImage(sourceImage,x,y,drawWidth,drawHeight);
         }
-        if(assetState.base){
+        if(assetState.formal){
           drawFrameLayer();
           ctx.drawImage(frameCanvas,0,0,WIDTH,HEIGHT);
         }
@@ -760,7 +792,8 @@
         image.src=source;
       }
 
-      bindAsset(frameBaseImage,"base",FRAME_BASE_SOURCE);
+      bindAsset(formalFrameImage,"formal",FORMAL_FRAME_SOURCE);
+      bindAsset(regularTopRightImage,"regular",REGULAR_TOP_RIGHT_SOURCE);
       bindAsset(cornerPanelImage,"panel",CORNER_PANEL_SOURCE);
       bindAsset(cornerLogoImage,"logo",CORNER_LOGO_SOURCE);
 
