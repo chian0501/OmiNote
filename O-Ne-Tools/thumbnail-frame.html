@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>O-Ne 縮圖品牌框工具 V1.2.4</title>
+  <title>O-Ne 縮圖品牌框工具 V1.2.5</title>
   <style>
     :root{
       --bg:#0e1117;
@@ -362,8 +362,8 @@
       <a class="tool-home-link" href="./">回工具入口</a>
       <span class="header-divider" aria-hidden="true"></span>
       <div class="title-block">
-        <h1>O-Ne 縮圖品牌框工具 <span>V1.2.4</span></h1>
-        <div class="sub">上傳縮圖後可調整畫面，再選擇角標位置與內容，最後輸出 1920×1080 PNG。</div>
+        <h1>O-Ne 縮圖品牌框工具 <span>V1.2.5</span></h1>
+        <div class="sub">底圖可選填；可輸出「底圖＋品牌框」，也可直接輸出透明背景的品牌框 PNG。</div>
       </div>
       <div class="candidate-status">CANDIDATE</div>
     </header>
@@ -371,20 +371,20 @@
     <section class="workspace">
       <aside class="panel controls">
         <div class="section">
-          <div class="section-title"><strong>01｜上傳縮圖</strong><span>JPG／PNG／WEBP</span></div>
-          <div class="note">框線與角標會固定放在最上層，不會被縮圖蓋住。選右下角時會先移除原本的腳印與短線，再換成角標。建議先完成縮圖文字與人物，再進來套框。</div>
+          <div class="section-title"><strong>01｜底圖（選填）</strong><span>JPG／PNG／WEBP</span></div>
+          <div class="note">不放底圖時會輸出透明背景的品牌框；放入底圖時則輸出完整合成圖。框線與角標固定在最上層，不會被底圖蓋住。</div>
           <div id="dropZone" class="drop-zone">
-            <strong>把縮圖拖到這裡</strong>
-            <label class="upload-button">選擇縮圖<input id="fileInput" type="file" accept="image/png,image/jpeg,image/webp"></label>
-            <small>輸入比例不限；輸出固定為 16:9、1920×1080。</small>
-            <div id="fileName" class="file-name">尚未選擇縮圖</div>
+            <strong>把底圖拖到這裡</strong>
+            <label class="upload-button">選擇底圖<input id="fileInput" type="file" accept="image/png,image/jpeg,image/webp"></label>
+            <small>底圖可不選；輸出固定為 16:9、1920×1080 PNG。</small>
+            <div id="fileName" class="file-name">未選擇底圖｜將輸出透明背景</div>
           </div>
         </div>
 
         <div class="section">
-          <div class="section-title"><strong>02｜畫面調整</strong><span>不改變品牌框</span></div>
-          <label>縮圖填滿方式</label>
-          <div class="segmented" role="group" aria-label="縮圖填滿方式">
+          <div class="section-title"><strong>02｜底圖畫面調整</strong><span>不改變品牌框</span></div>
+          <label>底圖填滿方式</label>
+          <div class="segmented" role="group" aria-label="底圖填滿方式">
             <button id="coverMode" class="is-active" type="button" data-mode="cover">裁切填滿</button>
             <button id="containMode" type="button" data-mode="contain">完整顯示</button>
           </div>
@@ -404,7 +404,7 @@
 
           <div class="button-row">
             <button id="resetPosition" class="button secondary" type="button">重設位置</button>
-            <button id="removeImage" class="button secondary" type="button">移除縮圖</button>
+            <button id="removeImage" class="button secondary" type="button">移除底圖</button>
           </div>
 
           <div class="source-meta">
@@ -468,15 +468,15 @@
 
       <section class="panel preview-panel">
         <div class="preview-toolbar">
-          <strong>縮圖合成預覽</strong>
+          <strong>品牌框輸出預覽</strong>
           <span>框線與角標永遠固定在最上層</span>
         </div>
         <div id="stage" class="stage">
           <canvas id="canvas" width="1920" height="1080" aria-label="縮圖品牌框預覽"></canvas>
-          <div id="emptyHint" class="empty-hint">目前只顯示品牌框；可先試角標位置與內容，再上傳縮圖。</div>
+          <div id="emptyHint" class="empty-hint">目前為透明背景；可直接輸出品牌框，也可再加入底圖。</div>
         </div>
         <div class="export-bar">
-          <button id="download" class="export-button" type="button" disabled>輸出含框 PNG</button>
+          <button id="download" class="export-button" type="button" disabled>輸出透明底框 PNG</button>
           <div id="status" class="status" aria-live="polite">品牌框載入中…</div>
         </div>
       </section>
@@ -538,7 +538,8 @@
         return assetState.formal&&assetState.regular&&assetState.panel&&assetState.logo&&!assetState.error;
       }
       function syncDownloadState(){
-        $("download").disabled=!(sourceImage&&frameAssetsReady());
+        $("download").disabled=!frameAssetsReady();
+        $("download").textContent=sourceImage?"輸出含底圖 PNG":"輸出透明底框 PNG";
       }
       function getCornerRegion(){
         return {
@@ -710,10 +711,10 @@
         releaseSource();
         sourceImage=null;
         $("fileInput").value="";
-        $("fileName").textContent="尚未選擇縮圖";
+        $("fileName").textContent="未選擇底圖｜將輸出透明背景";
         syncDownloadState();
         resetAdjustments();
-        setStatus("品牌框已就緒；請上傳縮圖。",false);
+        setStatus("已移除底圖；可直接輸出透明背景品牌框。",false);
       }
       function loadFile(file){
         if(!file||!/^image\/(png|jpeg|webp)$/.test(file.type)){
@@ -728,7 +729,7 @@
           $("fileName").textContent=file.name+"｜"+image.naturalWidth+"×"+image.naturalHeight;
           syncDownloadState();
           resetAdjustments();
-          setStatus("縮圖已載入；可調整畫面後輸出。",false);
+          setStatus("底圖已載入；可調整畫面後輸出完整合成圖。",false);
         };
         image.onerror=function(){
           releaseSource();
@@ -758,7 +759,7 @@
         image.src=cornerImageObjectUrl;
       }
       function download(){
-        if(!sourceImage||!frameAssetsReady())return;
+        if(!frameAssetsReady())return;
         draw();
         canvas.toBlob(function(blob){
           if(!blob){
@@ -768,10 +769,14 @@
           var url=URL.createObjectURL(blob);
           var link=document.createElement("a");
           link.href=url;
-          link.download="O-Ne_縮圖品牌框_1920x1080.png";
+          link.download=sourceImage
+            ?"O-Ne_縮圖品牌框_含底圖_1920x1080.png"
+            :"O-Ne_縮圖品牌框_透明底_1920x1080.png";
           link.click();
           setTimeout(function(){URL.revokeObjectURL(url)},1200);
-          setStatus("已輸出 1920×1080 含框 PNG。",false);
+          setStatus(sourceImage
+            ?"已輸出 1920×1080 底圖＋品牌框 PNG。"
+            :"已輸出 1920×1080 透明背景品牌框 PNG。",false);
         },"image/png");
       }
 
@@ -781,7 +786,9 @@
           draw();
           syncDownloadState();
           if(frameAssetsReady()){
-            setStatus(sourceImage?"縮圖與品牌框已就緒，可輸出。":"品牌框已就緒；請上傳縮圖。",false);
+            setStatus(sourceImage
+              ?"底圖與品牌框已就緒，可輸出完整合成圖。"
+              :"品牌框已就緒；可直接輸出透明背景 PNG，或再加入底圖。",false);
           }
         };
         image.onerror=function(){
