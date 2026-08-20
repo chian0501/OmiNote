@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>O-Ne 效果卡生成器 V0.1.8</title>
+<title>O-Ne 效果卡生成器 V0.1.9</title>
 <style>
 :root{--bg:#0e1117;--panel:#151a23;--panel2:#101620;--line:#2a3240;--line2:#394355;--text:#f5efe7;--muted:#9ea7b3;--teal:#29a6a7;--teal2:#53ced0;--gold:#ffbe37;--red:#fd4537;--purple:#8d67aa}
 *{box-sizing:border-box}
@@ -38,6 +38,10 @@ input:focus,select:focus{border-color:var(--teal)}
 .color-control{height:42px;display:flex;align-items:center;gap:8px;padding:0 10px;border:1px solid var(--line2);border-radius:9px;background:var(--panel2)}
 .color-control input{width:25px;height:25px;padding:0;border:0;border-radius:5px;background:transparent;cursor:pointer}
 .color-control code{color:#8d98a6;font-size:10px}
+.size-grid{margin-top:4px}
+.size-label{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.size-label output{min-width:48px;color:#ffd978;font-size:11px;font-weight:900;text-align:right}
+input[type="range"]{height:32px;padding:0;border:0;background:transparent;accent-color:var(--gold);cursor:pointer}
 input:disabled,select:disabled{opacity:.48;cursor:not-allowed}
 .switch-row{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:12px;padding:10px 11px;border:1px solid #273244;border-radius:10px;background:var(--panel2)}
 .switch-copy strong{display:block;font-size:12px}.switch-copy small{display:block;margin-top:3px;color:var(--muted);font-size:10px;line-height:1.5}
@@ -67,8 +71,8 @@ canvas{display:block;width:min(100%,1120px);height:auto;filter:drop-shadow(0 10p
 <body>
 <main class="app">
   <a class="home" href="./">← 回工具入口</a>
-  <div class="title-row"><h1>O-Ne 效果卡生成器</h1><span class="version">V0.1.8</span><span class="badge">CANDIDATE</span></div>
-  <p class="sub">STA-02｜Buff／Debuff。依 2026-08-20 新施工圖重新分層：外框、三條色塊、狀態膠囊、標題、內容與角落裝飾皆獨立控制；中央影片區維持真透明。</p>
+  <div class="title-row"><h1>O-Ne 效果卡生成器</h1><span class="version">V0.1.9</span><span class="badge">CANDIDATE</span></div>
+  <p class="sub">STA-02｜Buff／Debuff。標題與內容字級可各自調整；色票.psd 的 5 組主色已加入系統色；角落效果裝飾可自由替換，中央影片區維持真透明。</p>
   <div class="workspace">
     <section class="panel">
       <div class="section">
@@ -84,13 +88,17 @@ canvas{display:block;width:min(100%,1120px);height:auto;filter:drop-shadow(0 10p
         <label for="titleText">效果標題（最多 10 字）</label>
         <input id="titleText" maxlength="10" value="美味爆擊！！">
         <div id="subtitleWrap"><label for="subtitleText">效果內容（選填，最多 16 字）</label><input id="subtitleText" maxlength="16" value="味覺傷害 +999"></div>
+        <div class="two size-grid">
+          <div><label class="size-label" for="titleSize"><span>標題字級</span><output id="titleSizeValue" for="titleSize">42 px</output></label><input id="titleSize" type="range" min="22" max="54" step="1" value="42"></div>
+          <div><label class="size-label" for="contentSize"><span>內容字級</span><output id="contentSizeValue" for="contentSize">22 px</output></label><input id="contentSize" type="range" min="14" max="30" step="1" value="22"></div>
+        </div>
         <div class="switch-row"><div class="switch-copy"><strong>顯示效果內容</strong><small>關閉後只保留狀態與效果標題，輸入文字不會被清除。</small></div><button id="contentToggle" class="switch on" type="button" aria-pressed="true"></button></div>
       </div>
       <div class="section">
         <div class="section-title"><span>03｜顏色與裝飾</span><small>正式色票＋語意圖示</small></div>
         <div class="color-row">
-          <div><label for="colorPreset">正式語意色</label><select id="colorPreset"><option value="#29A6A7">O-NE 青綠｜系統／進行</option><option value="#FFBE37">獎勵黃｜幸運／獎勵</option><option value="#3F8FB7">導航藍｜速度／資訊／天氣</option><option value="#FD4537">危險紅｜扣血／警告</option><option value="#21A74D">成功綠｜回復／完成</option><option value="#333333">失敗灰｜疲勞／失效</option><option value="custom">自訂顏色</option></select></div>
-          <div><label for="accentColor">自訂顏色</label><div class="color-control"><input id="accentColor" type="color" value="#29a6a7"><code id="accentHex">#29A6A7</code></div></div>
+          <div><label for="colorPreset">正式系統色</label><select id="colorPreset"><optgroup label="色票.psd｜5 組主色"><option value="#FDF3E7">亮色和框線｜#FDF3E7</option><option value="#3F8FB7">移動卡藍｜#3F8FB7</option><option value="#29A6A7">一般卡青綠｜#29A6A7</option><option value="#FD4537">挑戰卡紅｜#FD4537</option><option value="#FFBE37" selected>高亮黃｜#FFBE37</option></optgroup><optgroup label="補充效果語意色"><option value="#21A74D">成功綠｜回復／完成</option><option value="#333333">失敗灰｜疲勞／失效</option></optgroup><option value="custom">自訂顏色</option></select></div>
+          <div><label for="accentColor">自訂顏色</label><div class="color-control"><input id="accentColor" type="color" value="#ffbe37"><code id="accentHex">#FFBE37</code></div></div>
         </div>
         <div class="two">
           <div><label for="textStyle">主字顏色</label><select id="textStyle"><option value="white">奶油白</option><option value="accent">跟隨效果色</option><option value="gold">金黃色</option></select></div>
@@ -100,7 +108,7 @@ canvas{display:block;width:min(100%,1120px);height:auto;filter:drop-shadow(0 10p
       </div>
       <div class="section">
         <div class="section-title"><span>04｜版本邊界</span><small>FORMAL SOURCE</small></div>
-        <div class="note">正式母版：<b>效果卡.psd</b>（Drive ID：1ZZdipJX…）。V0.1.8 直接使用本輪提供的外框.png、閃光1.png、閃光2.png，並從同一 PSD 讀取三條色塊與左上標籤圖層；沒有重畫、鏡像補角或覆蓋 Drive 原檔。</div>
+        <div class="note">正式母版：<b>效果卡.psd</b>（Drive ID：1ZZdipJX…）。V0.1.9 沿用正式分層與本輪提供的外框／閃光 PNG；色票.psd 只作精確取色，兩份 PSD 都沒有被覆蓋。</div>
       </div>
     </section>
     <section class="panel preview-panel">
@@ -109,14 +117,14 @@ canvas{display:block;width:min(100%,1120px);height:auto;filter:drop-shadow(0 10p
       <div class="export">
         <div id="status" class="status">正在載入正式母版…</div>
         <div class="buttons"><button id="downloadPng" class="action" type="button">下載透明 PNG</button><button id="downloadJson" class="action secondary" type="button">下載設定 JSON</button><button id="reset" class="action ghost" type="button">重設</button></div>
-        <div class="formal-note">schema=o-ne.effect-card.candidate.v0.1.8｜原檔分層合成｜色塊同步換色｜內容可隱藏｜裝飾可替換｜中央影片區留空</div>
+        <div class="formal-note">schema=o-ne.effect-card.candidate.v0.1.9｜原檔分層合成｜標題／內容字級可調｜5 組系統主色｜新增 4 組裝飾｜中央影片區留空</div>
       </div>
     </section>
   </div>
 </main>
 <script>
-const VERSION='0.1.8';
-const SCHEMA='o-ne.effect-card.candidate.v0.1.8';
+const VERSION='0.1.9';
+const SCHEMA='o-ne.effect-card.candidate.v0.1.9';
 const FRAME_SRC='./assets/effect-card-frame-v018.png';
 const ACCENT_BOTTOM_SRC='./assets/effect-card-accent-bottom-v018.png';
 const ACCENT_RIGHT_SRC='./assets/effect-card-accent-right-v018.png';
@@ -131,9 +139,13 @@ const ICON_NODES={"UtensilsCrossed":[["path",{"d":"m16 2-2.3 2.3a3 3 0 0 0 0 4.2
 ICON_NODES.ChefHat=[["path",{"d":"M17 21a1 1 0 0 0 1-1v-5.35c0-.457.316-.844.727-1.041a4 4 0 0 0-2.134-7.589 5 5 0 0 0-9.186 0 4 4 0 0 0-2.134 7.588c.411.198.727.585.727 1.041V20a1 1 0 0 0 1 1Z"}],["path",{"d":"M6 17h12"}]];
 ICON_NODES.Heart=[["path",{"d":"M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78Z"}]];
 ICON_NODES.Moon=[["path",{"d":"M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"}]];
+ICON_NODES.Frown=[["circle",{"cx":"12","cy":"12","r":"10"}],["path",{"d":"M16 16s-1.5-2-4-2-4 2-4 2"}],["path",{"d":"M9 9h.01"}],["path",{"d":"M15 9h.01"}]];
+ICON_NODES.ThumbsDown=[["path",{"d":"M17 14V2"}],["path",{"d":"M9 18.12 10 14H5.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 7.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22a3.13 3.13 0 0 1-3-3.88Z"}]];
+ICON_NODES.Smile=[["circle",{"cx":"12","cy":"12","r":"10"}],["path",{"d":"M8 14s1.5 2 4 2 4-2 4-2"}],["path",{"d":"M9 9h.01"}],["path",{"d":"M15 9h.01"}]];
+ICON_NODES.Target=[["circle",{"cx":"12","cy":"12","r":"10"}],["circle",{"cx":"12","cy":"12","r":"6"}],["circle",{"cx":"12","cy":"12","r":"2"}]];
 delete ICON_NODES.UtensilsCrossed;
 const PRESETS=[
-  {id:'delicious',name:'美味爆擊',primary:'ChefHat',secondary:'Heart',bottomPrimary:'Heart',state:'BUFF',title:'美味爆擊！！',subtitle:'味覺傷害 +999',color:'#29A6A7',decor:'formalSpark',sparkles:false},
+  {id:'delicious',name:'美味爆擊',primary:'ChefHat',secondary:'Sparkles',bottomPrimary:'Sparkles',state:'BUFF',title:'美味爆擊！！',subtitle:'味覺傷害 +999',color:'#FFBE37',decor:'spark',sparkles:true},
   {id:'heal',name:'體力回復',primary:'HeartPulse',secondary:'CirclePlus',state:'BUFF',title:'體力恢復！',subtitle:'HP +30',color:'#21A74D',decor:'heart'},
   {id:'lucky',name:'幸運提升',primary:'Clover',secondary:'Sparkles',state:'BUFF',title:'幸運值提升！',subtitle:'稀有掉落率 UP',color:'#FFBE37',decor:'clover',sparkles:true},
   {id:'speed',name:'速度提升',primary:'Gauge',secondary:'Zap',state:'BUFF',title:'移動速度 UP！',subtitle:'探索效率提升',color:'#3F8FB7',decor:'speed'},
@@ -143,18 +155,22 @@ const PRESETS=[
   {id:'rain',name:'淋雨狀態',primary:'CloudRain',secondary:'Droplets',state:'DEBUFF',title:'淋雨狀態',subtitle:'心情 -10',color:'#3F8FB7',decor:'rain'}
 ];
 const DECORS=[
-  {id:'formalSpark',name:'原檔閃光｜上右＋下左'},
-  {id:'spark',name:'主廚帽＋愛心｜美味爆擊'},
-  {id:'heart',name:'心電愛心＋加號｜體力回復'},
-  {id:'clover',name:'四葉草＋星芒｜幸運提升'},
-  {id:'speed',name:'速度錶＋閃電｜速度提升'},
-  {id:'down',name:'破裂愛心＋下降線｜體力下降'},
-  {id:'sleep',name:'低電量＋月亮｜疲勞累積'},
-  {id:'question',name:'定位關閉＋導航關閉｜迷路'},
-  {id:'rain',name:'雨雲＋水滴｜淋雨狀態'},
+  {id:'formalSpark',name:'原檔閃光｜上右＋下左',formal:true},
+  {id:'spark',name:'主廚帽＋閃光｜美味爆擊',primary:'ChefHat',secondary:'Sparkles',bottomPrimary:'Sparkles',special:'food'},
+  {id:'badTaste',name:'難吃｜皺眉＋倒讚',primary:'Frown',secondary:'ThumbsDown'},
+  {id:'love',name:'愛心 LOVE｜愛心＋閃光',primary:'Heart',secondary:'Sparkles',special:'love'},
+  {id:'cute',name:'萌萌的｜笑臉＋愛心',primary:'Smile',secondary:'Heart'},
+  {id:'hit',name:'打擊｜靶心＋閃電',primary:'Target',secondary:'Zap'},
+  {id:'heart',name:'心電愛心＋加號｜體力回復',primary:'HeartPulse',secondary:'CirclePlus'},
+  {id:'clover',name:'四葉草＋星芒｜幸運提升',primary:'Clover',secondary:'Sparkles',special:'lucky'},
+  {id:'speed',name:'速度錶＋閃電｜速度提升',primary:'Gauge',secondary:'Zap'},
+  {id:'down',name:'破裂愛心＋下降線｜體力下降',primary:'HeartCrack',secondary:'TrendingDown'},
+  {id:'sleep',name:'低電量＋月亮｜疲勞累積',primary:'BatteryLow',secondary:'Moon'},
+  {id:'question',name:'定位關閉＋導航關閉｜迷路',primary:'MapPinOff',secondary:'NavigationOff'},
+  {id:'rain',name:'雨雲＋水滴｜淋雨狀態',primary:'CloudRain',secondary:'Droplets'},
   {id:'none',name:'不加裝飾'}
 ];
-const els={presets:document.getElementById('presets'),stateText:document.getElementById('stateText'),titleText:document.getElementById('titleText'),subtitleText:document.getElementById('subtitleText'),subtitleWrap:document.getElementById('subtitleWrap'),contentToggle:document.getElementById('contentToggle'),decorSelect:document.getElementById('decorSelect'),colorPreset:document.getElementById('colorPreset'),accentColor:document.getElementById('accentColor'),accentHex:document.getElementById('accentHex'),textStyle:document.getElementById('textStyle'),decorDensity:document.getElementById('decorDensity'),decorToggle:document.getElementById('decorToggle'),canvas:document.getElementById('canvas'),stage:document.getElementById('stage'),status:document.getElementById('status')};
+const els={presets:document.getElementById('presets'),stateText:document.getElementById('stateText'),titleText:document.getElementById('titleText'),subtitleText:document.getElementById('subtitleText'),subtitleWrap:document.getElementById('subtitleWrap'),titleSize:document.getElementById('titleSize'),titleSizeValue:document.getElementById('titleSizeValue'),contentSize:document.getElementById('contentSize'),contentSizeValue:document.getElementById('contentSizeValue'),contentToggle:document.getElementById('contentToggle'),decorSelect:document.getElementById('decorSelect'),colorPreset:document.getElementById('colorPreset'),accentColor:document.getElementById('accentColor'),accentHex:document.getElementById('accentHex'),textStyle:document.getElementById('textStyle'),decorDensity:document.getElementById('decorDensity'),decorToggle:document.getElementById('decorToggle'),canvas:document.getElementById('canvas'),stage:document.getElementById('stage'),status:document.getElementById('status')};
 const ctx=els.canvas.getContext('2d');
 const frame=new Image();
 const accentBottom=new Image();
@@ -232,8 +248,8 @@ function drawReplacementLabel(accent){
   const state=(els.stateText.value.trim()||'BUFF').toUpperCase();
   const stateSize=fitFont(state,29,19,112,900);ctx.font='900 '+stateSize+'px "Noto Sans TC","Microsoft JhengHei",sans-serif';ctx.fillStyle=contrastText(accent);ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(state,164.5,92.5);
   const title=els.titleText.value.trim()||'效果發動！';const subtitle=els.contentToggle.classList.contains('on')?els.subtitleText.value.trim():'';
-  const titleY=subtitle?76:94;const titleSize=fitFont(title,38,22,305,900);ctx.font='900 '+titleSize+'px "Noto Sans TC","Microsoft JhengHei",sans-serif';ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillStyle=els.textStyle.value==='accent'?accent:els.textStyle.value==='gold'?'#FFBE37':'#FDF3E7';ctx.fillText(title,260,titleY);
-  if(subtitle){const subSize=fitFont(subtitle,19,14,305,800);ctx.font='800 '+subSize+'px "Noto Sans TC","Microsoft JhengHei",sans-serif';ctx.fillStyle='rgba(253,243,231,.86)';ctx.fillText(subtitle,260,116);}
+  const titleY=subtitle?72:94;const titleSize=fitFont(title,Number(els.titleSize.value),22,318,900);ctx.font='900 '+titleSize+'px "Noto Sans TC","Microsoft JhengHei",sans-serif';ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillStyle=els.textStyle.value==='accent'?accent:els.textStyle.value==='gold'?'#FFBE37':'#FDF3E7';ctx.fillText(title,260,titleY);
+  if(subtitle){const subSize=fitFont(subtitle,Number(els.contentSize.value),14,318,800);ctx.font='800 '+subSize+'px "Noto Sans TC","Microsoft JhengHei",sans-serif';ctx.fillStyle='rgba(253,243,231,.86)';ctx.fillText(subtitle,260,119);}
 }
 function drawFormalSparkles(density){
   ctx.drawImage(formalSparkTop,1740,29,150,134);
@@ -247,14 +263,14 @@ function drawAccentLayers(accent){
 function drawDecoration(type,color,density){
   if(type==='none')return;
   if(type==='formalSpark'){drawFormalSparkles(density);return;}
-  const preset=PRESETS.find(function(p){return p.decor===type;})||PRESETS[0];const more=density==='standard';const primary=color==='#333333'?'#FDF3E7':color;const secondary=color==='#333333'?'#333333':'#FDF3E7';
+  const decor=DECORS.find(function(d){return d.id===type;})||DECORS[1];const more=density==='standard';const primary=color==='#333333'?'#FDF3E7':color;const secondary=color==='#333333'?'#333333':'#FDF3E7';
   ctx.save();ctx.globalAlpha=.98;ctx.beginPath();ctx.rect(0,0,1920,190);ctx.rect(0,890,1920,190);ctx.rect(0,0,190,1080);ctx.rect(1730,0,190,1080);ctx.clip();
-  const topPrimary=preset.primary;const bottomPrimary=preset.bottomPrimary||preset.primary;const topSecondary=preset.secondary;const bottomSecondary=preset.bottomSecondary||preset.secondary;
-  const food=preset.id==='delicious';const lucky=preset.id==='lucky';
+  const topPrimary=decor.primary;const bottomPrimary=decor.bottomPrimary||decor.primary;const topSecondary=decor.secondary;const bottomSecondary=decor.bottomSecondary||decor.secondary;
+  const food=decor.special==='food';const lucky=decor.special==='lucky';const love=decor.special==='love';
   if(food){
     drawIcon(topPrimary,1688,126,more?72:64,primary,0);
-    drawIcon(bottomPrimary,168,951,more?44:38,'#FFBE37',-.04);
-    if(more&&topSecondary)drawIcon(topSecondary,1628,92,28,'#FFBE37',-.08);
+    drawIcon(bottomPrimary,168,951,more?46:40,primary,-.04);
+    if(more&&topSecondary)drawIcon(topSecondary,1628,92,30,secondary,-.08);
   }else if(lucky){
     drawIcon(topPrimary,1688,126,more?70:62,primary,-.04);
     drawIcon(bottomPrimary,154,952,more?50:44,primary,.06);
@@ -263,6 +279,7 @@ function drawDecoration(type,color,density){
     drawIcon(bottomPrimary,118,970,more?60:54,primary,.06);
     if(more){drawIcon(topSecondary,1718,103,36,secondary,.06);drawIcon(bottomSecondary,168,938,30,secondary,-.08);}
   }
+  if(love){ctx.font='900 34px "Noto Sans TC","Microsoft JhengHei",sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.lineWidth=8;ctx.strokeStyle='rgba(31,23,19,.94)';ctx.fillStyle=primary;ctx.strokeText('LOVE',1685,163);ctx.fillText('LOVE',1685,163);}
   ctx.restore();
   if(lucky)drawFormalSparkles(density);
 }
@@ -277,30 +294,30 @@ function render(){
   drawReplacementLabel(accent);
 }
 function getConfig(){
-  const preset=PRESETS.find(function(p){return p.id===current;})||PRESETS[0];
-  const decorPreset=PRESETS.find(function(p){return p.decor===els.decorSelect.value;})||(els.decorSelect.value==='spark'?PRESETS[0]:null);
-  const decorIcons=els.decorSelect.value==='formalSpark'?['閃光2.png','閃光1.png']:decorPreset?[decorPreset.primary,decorPreset.secondary,decorPreset.bottomPrimary,decorPreset.bottomSecondary].filter(Boolean):[];
-  return {schema:SCHEMA,version:VERSION,status:'CANDIDATE',formal_source:{master_psd:'效果卡.psd',drive_id:'1ZZdipJXr7Ujt_u1KUK2WxkRkJn8xjOoY',mapping:'STA-02',state_family:'Buff/Debuff',source_date:'2026-08-20'},render_strategy:'native_psd_layer_composite_v018',frame_repair:'none',frame_source:'外框.png',frame_bounds:{x:15,y:19,width:1886,height:1037},accent_layers:['left','right','bottom','label_bar','state_pill'],label_source:'PSD separated panel/bar/pill',icon_source:'Lucide official vectors',formal_sparkle_source:['閃光1.png','閃光2.png'],preset:current,state:els.stateText.value,title:els.titleText.value.trim(),subtitle:els.subtitleText.value.trim(),content_visible:els.contentToggle.classList.contains('on'),accent:getAccent(),palette_mode:els.colorPreset.value==='custom'?'CUSTOM':'O-NE_FORMAL_TOKENS',content_zone:'top_left_label_only',decoration_zone:'top_right_and_bottom_left',text_style:els.textStyle.value,decoration:els.decorSelect.value,decoration_icons:decorIcons,decoration_density:els.decorDensity.value,decoration_visible:els.decorToggle.classList.contains('on'),canvas:{width:1920,height:1080,transparent:true},generated_at:new Date().toISOString()};
+  const decor=DECORS.find(function(d){return d.id===els.decorSelect.value;});
+  const decorIcons=els.decorSelect.value==='formalSpark'?['閃光2.png','閃光1.png']:decor?[decor.primary,decor.secondary,decor.bottomPrimary,decor.bottomSecondary].filter(Boolean):[];
+  return {schema:SCHEMA,version:VERSION,status:'CANDIDATE',formal_source:{master_psd:'效果卡.psd',drive_id:'1ZZdipJXr7Ujt_u1KUK2WxkRkJn8xjOoY',mapping:'STA-02',state_family:'Buff/Debuff',source_date:'2026-08-20'},render_strategy:'native_psd_layer_composite_v019',frame_repair:'none',frame_source:'外框.png',frame_bounds:{x:15,y:19,width:1886,height:1037},accent_layers:['left','right','bottom','label_bar','state_pill'],label_source:'PSD separated panel/bar/pill',icon_source:'Lucide official vectors',formal_sparkle_source:['閃光1.png','閃光2.png'],palette_source:{file:'色票.psd',effect_colors:['#FDF3E7','#3F8FB7','#29A6A7','#FD4537','#FFBE37']},preset:current,state:els.stateText.value,title:els.titleText.value.trim(),subtitle:els.subtitleText.value.trim(),title_font_size:Number(els.titleSize.value),content_font_size:Number(els.contentSize.value),content_visible:els.contentToggle.classList.contains('on'),accent:getAccent(),palette_mode:els.colorPreset.value==='custom'?'CUSTOM':'O-NE_FORMAL_TOKENS',content_zone:'top_left_label_only',decoration_zone:'top_right_and_bottom_left',text_style:els.textStyle.value,decoration:els.decorSelect.value,decoration_icons:decorIcons,decoration_density:els.decorDensity.value,decoration_visible:els.decorToggle.classList.contains('on'),canvas:{width:1920,height:1080,transparent:true},generated_at:new Date().toISOString()};
 }
 function downloadBlob(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(a.href);},1200);}
 function safeName(){return (els.titleText.value.trim()||'EFFECT').replace(/[\\/:*?"<>|\s]+/g,'_').slice(0,30);}
 function exportPng(){
   if(!assetsReady()){setStatus('正式母版與替換素材尚未載入，請稍後再試。',true);return;}
-  render();els.canvas.toBlob(function(blob){if(!blob){setStatus('PNG 產生失敗，請重新整理。',true);return;}downloadBlob(blob,'O-NE_EFFECT_'+safeName()+'_V0.1.8.png');setStatus('已輸出 1920×1080 透明 PNG；分層色塊、內容顯示與裝飾設定已套用。');},'image/png');
+  render();els.canvas.toBlob(function(blob){if(!blob){setStatus('PNG 產生失敗，請重新整理。',true);return;}downloadBlob(blob,'O-NE_EFFECT_'+safeName()+'_V0.1.9.png');setStatus('已輸出 1920×1080 透明 PNG；分層色塊、字級、內容顯示與裝飾設定已套用。');},'image/png');
 }
-function exportJson(){const blob=new Blob([JSON.stringify(getConfig(),null,2)],{type:'application/json;charset=utf-8'});downloadBlob(blob,'O-NE_EFFECT_'+safeName()+'_V0.1.8.json');setStatus('已輸出設定 JSON。');}
+function exportJson(){const blob=new Blob([JSON.stringify(getConfig(),null,2)],{type:'application/json;charset=utf-8'});downloadBlob(blob,'O-NE_EFFECT_'+safeName()+'_V0.1.9.json');setStatus('已輸出設定 JSON。');}
 function bind(){
   [els.stateText,els.titleText,els.subtitleText,els.decorSelect,els.textStyle,els.decorDensity].forEach(function(el){el.addEventListener('input',render);el.addEventListener('change',render);});
+  [[els.titleSize,els.titleSizeValue],[els.contentSize,els.contentSizeValue]].forEach(function(pair){pair[0].addEventListener('input',function(){pair[1].textContent=this.value+' px';render();});});
   els.colorPreset.addEventListener('change',function(){if(this.value!=='custom'){els.accentColor.value=this.value;els.accentHex.textContent=this.value.toUpperCase();}render();});
   els.accentColor.addEventListener('input',function(){els.colorPreset.value='custom';els.accentHex.textContent=this.value.toUpperCase();render();});
   els.contentToggle.addEventListener('click',function(){this.classList.toggle('on');this.setAttribute('aria-pressed',this.classList.contains('on')?'true':'false');els.subtitleText.disabled=!this.classList.contains('on');render();});
   els.decorToggle.addEventListener('click',function(){this.classList.toggle('on');this.setAttribute('aria-pressed',this.classList.contains('on')?'true':'false');render();});
   document.getElementById('transparentView').addEventListener('click',function(){this.classList.add('active');document.getElementById('darkView').classList.remove('active');els.stage.classList.remove('dark');});
   document.getElementById('darkView').addEventListener('click',function(){this.classList.add('active');document.getElementById('transparentView').classList.remove('active');els.stage.classList.add('dark');});
-  document.getElementById('downloadPng').addEventListener('click',exportPng);document.getElementById('downloadJson').addEventListener('click',exportJson);document.getElementById('reset').addEventListener('click',function(){els.textStyle.value='white';els.decorDensity.value='standard';if(!els.contentToggle.classList.contains('on'))els.contentToggle.click();if(!els.decorToggle.classList.contains('on'))els.decorToggle.click();applyPreset('delicious');setStatus('已重設為 BUFF「美味爆擊」；原檔分層與控制項已復原。');});
+  document.getElementById('downloadPng').addEventListener('click',exportPng);document.getElementById('downloadJson').addEventListener('click',exportJson);document.getElementById('reset').addEventListener('click',function(){els.textStyle.value='white';els.decorDensity.value='standard';els.titleSize.value='42';els.titleSizeValue.textContent='42 px';els.contentSize.value='22';els.contentSizeValue.textContent='22 px';if(!els.contentToggle.classList.contains('on'))els.contentToggle.click();if(!els.decorToggle.classList.contains('on'))els.decorToggle.click();applyPreset('delicious');setStatus('已重設為高亮黃 BUFF「美味爆擊」；字級、原檔分層與控制項已復原。');});
 }
-drawDecorOptions();drawPresetButtons();bind();
-function finishAssetLoad(){if(assetsReady()){render();setStatus('2026-08-20 外框、色塊、標籤、閃光與語意圖示已分層載入；可開始編輯。');}}
+drawDecorOptions();bind();applyPreset('delicious');
+function finishAssetLoad(){if(assetsReady()){render();setStatus('V0.1.9 正式分層、5 組系統主色、字級控制與 13 組效果裝飾已載入；可開始編輯。');}}
 frame.onload=function(){frameReady=true;finishAssetLoad();};
 frame.onerror=function(){setStatus('正式外框載入失敗，請重新整理。',true);};
 [[accentBottom,ACCENT_BOTTOM_SRC],[accentRight,ACCENT_RIGHT_SRC],[accentLeft,ACCENT_LEFT_SRC]].forEach(function(pair){pair[0].onload=function(){accentReady+=1;finishAssetLoad();};pair[0].onerror=function(){setStatus('PSD 可換色色塊載入失敗，請重新整理。',true);};pair[0].src=pair[1];});
