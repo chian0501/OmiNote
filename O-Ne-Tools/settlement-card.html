@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>O-Ne 片尾結算卡生成器 V0.1.0</title>
+<title>O-Ne 片尾結算卡生成器 V0.1.1</title>
 <style>
 @font-face{font-family:"O-Ne Noto Sans TC";src:url("./assets/NotoSansTC-O-Ne.woff?v=010") format("woff");font-style:normal;font-weight:100 900;font-display:swap}
 :root{--bg:#0e1117;--panel:#151a23;--panel2:#101620;--line:#2a3240;--line2:#394355;--text:#f5efe7;--muted:#9ea7b3;--teal:#29a6a7;--teal2:#53ced0;--gold:#ffbe37;--red:#fd4537;--purple:#8d67aa}
 *{box-sizing:border-box}
 body{margin:0;min-height:100vh;background:var(--bg);color:var(--text);font-family:"O-Ne Noto Sans TC","Noto Sans TC","Microsoft JhengHei",sans-serif}
-button,input{font:inherit}
+button,input,select,textarea{font:inherit}
 .app{max-width:1760px;margin:auto;padding:24px}
 .home{display:inline-flex;align-items:center;min-height:42px;margin-bottom:8px;color:var(--teal2);font-size:14px;font-weight:800;text-decoration:none}
 .title-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
@@ -25,14 +25,18 @@ h1{margin:0;font-size:25px}
 .section-title small{color:var(--muted);font-size:10px;font-weight:600}
 .note{padding:10px 12px;border:1px solid #273244;border-radius:10px;color:#c4cad3;background:var(--panel2);font-size:11px;line-height:1.65}
 label{display:block;margin:10px 0 6px;color:#b9c0ca;font-size:12px;font-weight:800}
-input[type="text"],input[type="number"]{width:100%;height:42px;padding:0 11px;border:1px solid var(--line2);border-radius:9px;outline:none;color:white;background:var(--panel2)}
-input:focus{border-color:var(--teal)}
+input[type="text"],input[type="number"],select,textarea{width:100%;min-height:42px;padding:0 11px;border:1px solid var(--line2);border-radius:9px;outline:none;color:white;background:var(--panel2)}
+select{padding-right:30px}textarea{min-height:92px;padding:10px 11px;resize:vertical;line-height:1.6}
+input:focus,select:focus,textarea:focus{border-color:var(--teal)}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.row-editor{display:grid;grid-template-columns:46px minmax(0,1fr) minmax(0,.82fr);gap:9px;align-items:end;margin-top:10px;padding:10px;border:1px solid #273244;border-radius:11px;background:var(--panel2)}
-.row-no{align-self:center;color:var(--gold);font-size:12px;font-weight:900;text-align:center}
+.rows-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}.rows-toolbar span{color:var(--muted);font-size:11px}.add-row{min-height:36px;padding:0 14px;border:1px solid #2f7374;border-radius:8px;color:#dffafa;background:#173738;cursor:pointer;font-size:11px;font-weight:900}.add-row:disabled{opacity:.45;cursor:not-allowed}
+.row-editor{display:grid;grid-template-columns:40px 138px minmax(0,1fr) minmax(0,1fr) 34px;gap:8px;align-items:end;margin-top:10px;padding:10px;border:1px solid #273244;border-radius:11px;background:var(--panel2)}
+.row-no{grid-row:1/3;align-self:center;color:var(--gold);font-size:12px;font-weight:900;text-align:center}
 .row-editor label{margin-top:0}
-.accent-check{grid-column:2/4;display:flex;align-items:center;gap:7px;margin:0;color:#aeb6c2;font-size:10px;font-weight:700}
+.icon-field{grid-column:2}.preset-field{grid-column:3/5}.row-title-field{grid-column:2/4}.row-value-field{grid-column:4/6}.row-remove{grid-column:5;grid-row:1;min-height:42px;border:1px solid #57373d;border-radius:8px;color:#ff9d9b;background:#302127;cursor:pointer;font-size:18px;font-weight:900}.row-remove:disabled{opacity:.35;cursor:not-allowed}.custom-icon{display:none;margin-top:7px}.custom-icon.show{display:block}
+.accent-check{grid-column:2/6;display:flex;align-items:center;gap:7px;margin:0;color:#aeb6c2;font-size:10px;font-weight:700}
 .accent-check input{width:16px;height:16px;margin:0;accent-color:var(--gold)}
+.conditional{margin-top:11px;padding:11px;border:1px solid #273244;border-radius:11px;background:var(--panel2)}.conditional.hidden{display:none}.conditional label:first-child{margin-top:0}
 .switch-row{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:11px;padding:10px 11px;border:1px solid #273244;border-radius:10px;background:var(--panel2)}
 .switch-copy strong{display:block;font-size:12px}.switch-copy small{display:block;margin-top:3px;color:var(--muted);font-size:10px;line-height:1.5}
 .switch-row input[type="checkbox"]{width:19px;height:19px;flex:0 0 auto;accent-color:var(--teal)}
@@ -66,14 +70,14 @@ canvas{display:block;width:min(100%,1120px);height:auto;filter:drop-shadow(0 10p
 .action.secondary{border-color:#60416b;color:#f0caef;background:#3a2942}.action.ghost{border-color:var(--line2);color:#c5ccd5;background:#30394a}
 .formal-note{margin-top:10px;color:#76818f;font-size:10px;line-height:1.6;text-align:center}
 @media(max-width:1280px){.workspace{grid-template-columns:1fr}.stage{min-height:500px}}
-@media(max-width:680px){.app{padding:15px}.two,.buttons,.row-editor,.adjust{grid-template-columns:1fr}.row-no{text-align:left}.accent-check{grid-column:1}.preview-toolbar{align-items:flex-start;flex-direction:column}.stage{min-height:360px;padding:12px}}
+@media(max-width:680px){.app{padding:15px}.two,.buttons,.row-editor,.adjust{grid-template-columns:1fr}.row-no,.icon-field,.preset-field,.row-title-field,.row-value-field,.row-remove,.accent-check{grid-column:1;grid-row:auto}.row-no{text-align:left}.preview-toolbar{align-items:flex-start;flex-direction:column}.stage{min-height:360px;padding:12px}}
 </style>
 </head>
 <body>
 <main class="app">
   <a class="home" href="./">← 回工具入口</a>
-  <div class="title-row"><h1>O-Ne 片尾結算卡生成器</h1><span class="version">V0.1.0</span><span class="badge">CANDIDATE</span></div>
-  <p class="sub">QST-03｜settlement_panel_16x9｜RESULT。依「結算卡.psd」FORMAL V1.1 原位分層：固定五列結果、單行總結、NEXT、16:9 下一影片框、圓形訂閱框與內部狀態徽章；可替換文字、背景與兩個媒體槽，不改正式母版。</p>
+  <div class="title-row"><h1>O-Ne 片尾結算卡生成器</h1><span class="version">V0.1.1</span><span class="badge">CANDIDATE</span></div>
+  <p class="sub">QST-03｜settlement_panel_16x9｜RESULT。沿用「結算卡.psd」FORMAL V1.1 正式視覺，擴充 1–8 列動態結果、Icon／欄位預設、觀眾互動問題、NEXT、背景與媒體槽；右上訂閱圓框預設不顯示。</p>
   <div class="workspace">
     <section class="panel">
       <div class="section">
@@ -88,28 +92,33 @@ canvas{display:block;width:min(100%,1120px);height:auto;filter:drop-shadow(0 10p
         </div>
       </div>
       <div class="section">
-        <div class="section-title"><span>02｜五列結果</span><small>列數固定；標題／數值可替換</small></div>
-        <div class="row-editor"><div class="row-no">01</div><div><label for="row1Title">欄位名稱</label><input id="row1Title" type="text" maxlength="12" value="結果欄位 01"></div><div><label for="row1Value">結果值</label><input id="row1Value" type="text" maxlength="14" value="替換結果值"></div><label class="accent-check"><input id="row1Accent" type="checkbox">結果值使用金色強調</label></div>
-        <div class="row-editor"><div class="row-no">02</div><div><label for="row2Title">欄位名稱</label><input id="row2Title" type="text" maxlength="12" value="結果欄位 02"></div><div><label for="row2Value">結果值</label><input id="row2Value" type="text" maxlength="14" value="替換結果值"></div><label class="accent-check"><input id="row2Accent" type="checkbox">結果值使用金色強調</label></div>
-        <div class="row-editor"><div class="row-no">03</div><div><label for="row3Title">欄位名稱</label><input id="row3Title" type="text" maxlength="12" value="結果欄位 03"></div><div><label for="row3Value">結果值</label><input id="row3Value" type="text" maxlength="14" value="替換結果值"></div><label class="accent-check"><input id="row3Accent" type="checkbox">結果值使用金色強調</label></div>
-        <div class="row-editor"><div class="row-no">04</div><div><label for="row4Title">欄位名稱</label><input id="row4Title" type="text" maxlength="12" value="結果欄位 04"></div><div><label for="row4Value">結果值</label><input id="row4Value" type="text" maxlength="14" value="替換結果值"></div><label class="accent-check"><input id="row4Accent" type="checkbox">結果值使用金色強調</label></div>
-        <div class="row-editor"><div class="row-no">05</div><div><label for="row5Title">欄位名稱</label><input id="row5Title" type="text" maxlength="12" value="結果欄位 05"></div><div><label for="row5Value">結果值</label><input id="row5Value" type="text" maxlength="14" value="替換結果值"></div><label class="accent-check"><input id="row5Accent" type="checkbox" checked>結果值使用金色強調</label></div>
+        <div class="section-title"><span>02｜結果欄位</span><small>可自由增減 1–8 列</small></div>
+        <div class="rows-toolbar"><span id="rowCount">目前 5 列</span><button id="addRow" class="add-row" type="button">＋ 新增結果列</button></div>
+        <div id="rowsEditor"></div>
       </div>
       <div class="section">
-        <div class="section-title"><span>03｜背景與媒體槽</span><small>圖片皆保留原比例裁滿</small></div>
+        <div class="section-title"><span>03｜左側框內容</span><small>空框／問題／影片縮圖三選一</small></div>
+        <label for="leftMode">左側框用途</label>
+        <select id="leftMode"><option value="empty">保留空框</option><option value="question" selected>觀眾互動問題</option><option value="thumbnail">下一影片縮圖</option></select>
+        <div id="questionControls" class="conditional">
+          <label for="questionHint">問題上方小字</label><input id="questionHint" type="text" maxlength="16" value="留言告訴我們">
+          <label for="viewerQuestion">觀眾互動問題</label><textarea id="viewerQuestion" maxlength="90">你見過外國旅客買過最意外的台灣商品是什麼？</textarea>
+        </div>
+        <div id="nextControls" class="conditional hidden">
+          <div class="asset-head"><strong>下一影片內容</strong><span id="nextName">尚未上傳</span></div>
+          <div class="asset-actions"><label class="file-button">上傳縮圖<input id="nextUpload" type="file" accept="image/*"></label><button id="clearNext" class="tiny-button" type="button">清除</button></div>
+          <div class="adjust"><label>縮放 <output id="nextScaleOut">1.00×</output><input id="nextScale" type="range" min="1" max="2.5" step="0.01" value="1"></label><label>水平位移<input id="nextX" type="number" min="-500" max="500" step="1" value="0"></label><label>垂直位移<input id="nextY" type="number" min="-350" max="350" step="1" value="0"></label></div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-title"><span>04｜背景與訂閱框</span><small>圖片皆保留原比例裁滿</small></div>
         <div class="switch-row"><div class="switch-copy"><strong>顯示背景</strong><small>關閉後輸出透明 PNG；正式 UI、角色與卡體仍保留。</small></div><input id="bgVisible" type="checkbox" checked></div>
         <div class="asset">
           <div class="asset-head"><strong>背景圖片</strong><span id="bgName">正式背景</span></div>
           <div class="asset-actions"><label class="file-button">上傳背景<input id="bgUpload" type="file" accept="image/*"></label><button id="clearBg" class="tiny-button" type="button">使用正式背景</button></div>
           <div class="adjust"><label>縮放 <output id="bgScaleOut">1.00×</output><input id="bgScale" type="range" min="1" max="2.5" step="0.01" value="1"></label><label>水平位移<input id="bgX" type="number" min="-900" max="900" step="1" value="0"></label><label>垂直位移<input id="bgY" type="number" min="-600" max="600" step="1" value="0"></label></div>
         </div>
-        <div class="switch-row"><div class="switch-copy"><strong>放入下一影片縮圖</strong><small>留白時可交由 YouTube 片尾元素覆蓋；上傳後會裁入左側 16:9 安全框。</small></div><input id="nextVisible" type="checkbox"></div>
-        <div class="asset">
-          <div class="asset-head"><strong>下一影片內容</strong><span id="nextName">尚未上傳</span></div>
-          <div class="asset-actions"><label class="file-button">上傳縮圖<input id="nextUpload" type="file" accept="image/*"></label><button id="clearNext" class="tiny-button" type="button">清除</button></div>
-          <div class="adjust"><label>縮放 <output id="nextScaleOut">1.00×</output><input id="nextScale" type="range" min="1" max="2.5" step="0.01" value="1"></label><label>水平位移<input id="nextX" type="number" min="-500" max="500" step="1" value="0"></label><label>垂直位移<input id="nextY" type="number" min="-350" max="350" step="1" value="0"></label></div>
-        </div>
-        <div class="switch-row"><div class="switch-copy"><strong>放入訂閱頭像</strong><small>上傳後會裁入右上圓形安全框；留白時供 YouTube 訂閱元素使用。</small></div><input id="subscribeVisible" type="checkbox"></div>
+        <div class="switch-row"><div class="switch-copy"><strong>顯示訂閱圓框</strong><small>預設關閉；需要 YouTube 訂閱元素或頭像時再開啟。</small></div><input id="subscribeVisible" type="checkbox"></div>
         <div class="asset">
           <div class="asset-head"><strong>訂閱頭像</strong><span id="subscribeName">尚未上傳</span></div>
           <div class="asset-actions"><label class="file-button">上傳頭像<input id="subscribeUpload" type="file" accept="image/*"></label><button id="clearSubscribe" class="tiny-button" type="button">清除</button></div>
@@ -118,8 +127,8 @@ canvas{display:block;width:min(100%,1120px);height:auto;filter:drop-shadow(0 10p
         <div class="switch-row"><div class="switch-copy"><strong>顯示 Nomi／Kuma</strong><small>角色直接取自正式 PSD；只切換顯示，不改造角色。</small></div><input id="catsVisible" type="checkbox" checked></div>
       </div>
       <div class="section">
-        <div class="section-title"><span>04｜版本邊界</span><small>FORMAL SOURCE</small></div>
-        <div class="note">正式母版：<b>結算卡.psd</b>（Drive ID：10TEJVIL…，SHA-256：c6529ab1…）。工具只讀取正式圖層製作衍生輸出，未覆蓋 PSD；固定五列與正式安全框不可增減或拖動。</div>
+        <div class="section-title"><span>05｜版本邊界</span><small>FORMAL SOURCE＋OMI EXTENSION</small></div>
+        <div class="note">正式母版：<b>結算卡.psd</b>（Drive ID：10TEJVIL…，SHA-256：c6529ab1…）。工具未覆蓋 PSD；V0.1.1 依 Omi 指示新增動態列、Icon／名稱預設與觀眾互動問題，正式版型與安全框位置維持不動。</div>
       </div>
     </section>
     <section class="panel preview-panel">
@@ -131,12 +140,12 @@ canvas{display:block;width:min(100%,1120px);height:auto;filter:drop-shadow(0 10p
       <div class="export">
         <div id="status" class="status">正在載入正式母版與字體…</div>
         <div class="buttons"><button id="downloadPng" class="action" type="button">下載 1920×1080 PNG</button><button id="downloadJson" class="action secondary" type="button">下載設定 JSON</button><button id="reset" class="action ghost" type="button">重設</button></div>
-        <div class="formal-note">schema=o-ne.settlement-card.candidate.v0.1.0｜QST-03｜FORMAL V1.1｜固定五列｜文字溢位阻擋｜背景可透明｜媒體槽原比例裁滿</div>
+        <div class="formal-note">schema=o-ne.settlement-card.candidate.v0.1.1｜QST-03｜FORMAL V1.1＋OMI EXTENSION｜1–8 列｜問題／縮圖模式｜訂閱圓框預設關閉</div>
       </div>
     </section>
   </div>
 </main>
-<script>
+<script type="application/x-o-ne-v010-archive">
 const VERSION='0.1.0';
 const SCHEMA='o-ne.settlement-card.candidate.v0.1.0';
 const FORMAL={component_id:'QST-03',semantic_id:'settlement_panel_16x9',usage:'RESULT',formal_version:'V1.1',folder_id:'1pMkqpnAXxWkVehQfNbxPIY8wEUhzxG1i',psd_id:'10TEJVILkN_wmVlstXxhJS_2NkLB41QA_',psd_sha256:'c6529ab176ae53bc8e3d8aa5d64788e07e699e60be9e07b40cee6c8d4081f599',preview_id:'1SxExxdhWGrC6X9rNL-k51gfTlvSkCj-J',record_id:'1WaDTHdWqXIut-Lup6wzwQs9GwG011pGOKrHo9H84DiM',manifest_id:'1IJp9SUsCMhAiA-bLGc7NTI8n382rXnr0',mapping_id:'1-9cMX-gdTlYJ5Ej29o08oyy6Nu0Wu9ej',qa_id:'1VDtQLtu1yKvC5XqZpfgpKs49HsOQoTZf'};
@@ -180,5 +189,6 @@ $('downloadJson').onclick=downloadJson;$('reset').onclick=resetAll;
 
 Promise.all([loadStatic('background',STATIC_SOURCES.background),loadStatic('overlay',STATIC_SOURCES.overlay),loadStatic('ui',STATIC_SOURCES.ui),loadStatic('cats',STATIC_SOURCES.cats),document.fonts.load('700 36px "O-Ne Noto Sans TC"'),document.fonts.load('800 52px "O-Ne Noto Sans TC"')]).then(()=>{assetsReady=true;for(const id of ['bgScale','nextScale','subscribeScale'])syncRange(id);render()}).catch(error=>{$('status').classList.add('error');$('status').textContent=`載入失敗：${error.message}`});
 </script>
+<script src="./settlement-card-v011.js?v=011"></script>
 </body>
 </html>

@@ -1,5 +1,5 @@
 {
-  "schema": "o-ne.settlement-card.mapping.v0.1.0",
+  "schema": "o-ne.settlement-card.mapping.v0.1.1",
   "status": "CANDIDATE",
   "component_id": "QST-03",
   "semantic_id": "settlement_panel_16x9",
@@ -21,6 +21,18 @@
     "qa_id": "1VDtQLtu1yKvC5XqZpfgpKs49HsOQoTZf",
     "formal_version": "V1.1",
     "overwritten": false
+  },
+  "generator_extension": {
+    "version": "V0.1.1_20260820",
+    "approved_by": "Omi",
+    "formal_master_preserved": true,
+    "features": [
+      "dynamic_result_rows_1_to_8",
+      "replaceable_row_icons",
+      "field_name_presets_and_custom_input",
+      "viewer_question_left_panel_mode",
+      "subscribe_circle_hidden_by_default"
+    ]
   },
   "fixed_structure": {
     "result_label": [770, 127, 193, 40],
@@ -71,21 +83,37 @@
     {
       "key": "rows[].title",
       "psd_layer": "TITLE",
-      "anchors": [[830, 343], [830, 416], [830, 489], [830, 562], [830, 635]],
+      "layout": "dynamic_vertical_stack",
+      "supported_row_count": [1, 8],
       "max_width": 390,
       "font_size": 28,
-      "min_size": 22,
-      "max_chars": 12
+      "min_size": 15,
+      "max_chars": 14,
+      "preset_or_custom": true
     },
     {
       "key": "rows[].value",
       "psd_layer": "VALUE",
-      "anchors": [[1482, 343], [1482, 416], [1482, 489], [1482, 562], [1482, 635]],
+      "layout": "dynamic_vertical_stack",
+      "supported_row_count": [1, 8],
       "align": "right",
       "max_width": 300,
       "font_size": 27,
-      "min_size": 21,
-      "max_chars": 14
+      "min_size": 15,
+      "max_chars": 16
+    },
+    {
+      "key": "rows[].icon",
+      "layout": "dynamic_vertical_stack",
+      "source": "formal_icon_presets_or_custom_glyph",
+      "values": ["check", "list", "location", "star", "plus", "money", "count", "time", "question", "heart", "none", "custom"]
+    },
+    {
+      "key": "viewer_question",
+      "bbox": [26, 117, 656, 385],
+      "max_chars": 90,
+      "max_lines": 4,
+      "mode": "left_panel_question"
     },
     {
       "key": "summary",
@@ -114,9 +142,10 @@
       "visible_default": true,
       "transparent_export_supported": true
     },
-    "next_video": {
+    "left_panel": {
       "safe_bbox": [26, 117, 656, 385],
-      "visible_default": false,
+      "modes": ["empty", "question", "thumbnail"],
+      "default_mode": "question",
       "fit": "cover",
       "preserve_aspect_ratio": true
     },
@@ -137,6 +166,8 @@
     "dimensions": [1920, 1080],
     "block_on_text_overflow": true,
     "guide_layers_rendered": false,
-    "missing_glyph_target": 0
+    "missing_glyph_target": 0,
+    "dynamic_row_range": [1, 8],
+    "subscribe_circle_default_visible": false
   }
 }
