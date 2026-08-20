@@ -1,6 +1,6 @@
 {
   "schema": "o-ne.settlement-card.mapping.v0.1.1",
-  "status": "CANDIDATE",
+  "status": "READY",
   "component_id": "QST-03",
   "semantic_id": "settlement_panel_16x9",
   "usage": "RESULT",
@@ -25,6 +25,8 @@
   "generator_extension": {
     "version": "V0.1.1_20260820",
     "approved_by": "Omi",
+    "approval_status": "READY",
+    "approved_for_use_on": "2026-08-20",
     "formal_master_preserved": true,
     "features": [
       "dynamic_result_rows_1_to_8",

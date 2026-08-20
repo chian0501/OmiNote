@@ -15,7 +15,7 @@ button,input,select,textarea{font:inherit}
 .title-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 h1{margin:0;font-size:25px}
 .version{color:#8c96a5;font-size:12px}
-.badge{padding:4px 9px;border:1px solid #8b6b24;border-radius:999px;color:#ffd978;background:#3b2d12;font-size:10px;font-weight:900;letter-spacing:.08em}
+.badge{padding:4px 9px;border:1px solid #2b7777;border-radius:999px;color:#8fd4c8;background:#14312e;font-size:10px;font-weight:900;letter-spacing:.08em}
 .sub{max-width:1180px;margin:8px 0 20px;color:var(--muted);font-size:13px;line-height:1.7}
 .workspace{display:grid;grid-template-columns:560px minmax(0,1fr);gap:20px;align-items:start}
 .panel{overflow:hidden;border:1px solid var(--line);border-radius:16px;background:var(--panel);box-shadow:0 12px 30px rgba(0,0,0,.24)}
@@ -76,7 +76,7 @@ canvas{display:block;width:min(100%,1120px);height:auto;filter:drop-shadow(0 10p
 <body>
 <main class="app">
   <a class="home" href="./">← 回工具入口</a>
-  <div class="title-row"><h1>O-Ne 片尾結算卡生成器</h1><span class="version">V0.1.1</span><span class="badge">CANDIDATE</span></div>
+  <div class="title-row"><h1>O-Ne 片尾結算卡生成器</h1><span class="version">V0.1.1</span><span class="badge">READY</span></div>
   <p class="sub">QST-03｜settlement_panel_16x9｜RESULT。沿用「結算卡.psd」FORMAL V1.1 正式視覺，擴充 1–8 列動態結果、Icon／欄位預設、觀眾互動問題、NEXT、背景與媒體槽；右上訂閱圓框預設不顯示。</p>
   <div class="workspace">
     <section class="panel">
@@ -140,7 +140,7 @@ canvas{display:block;width:min(100%,1120px);height:auto;filter:drop-shadow(0 10p
       <div class="export">
         <div id="status" class="status">正在載入正式母版與字體…</div>
         <div class="buttons"><button id="downloadPng" class="action" type="button">下載 1920×1080 PNG</button><button id="downloadJson" class="action secondary" type="button">下載設定 JSON</button><button id="reset" class="action ghost" type="button">重設</button></div>
-        <div class="formal-note">schema=o-ne.settlement-card.candidate.v0.1.1｜QST-03｜FORMAL V1.1＋OMI EXTENSION｜1–8 列｜問題／縮圖模式｜訂閱圓框預設關閉</div>
+        <div class="formal-note">schema=o-ne.settlement-card.ready.v0.1.1｜READY｜QST-03｜FORMAL V1.1＋OMI APPROVED EXTENSION｜1–8 列｜問題／縮圖模式｜訂閱圓框預設關閉</div>
       </div>
     </section>
   </div>
@@ -189,6 +189,6 @@ $('downloadJson').onclick=downloadJson;$('reset').onclick=resetAll;
 
 Promise.all([loadStatic('background',STATIC_SOURCES.background),loadStatic('overlay',STATIC_SOURCES.overlay),loadStatic('ui',STATIC_SOURCES.ui),loadStatic('cats',STATIC_SOURCES.cats),document.fonts.load('700 36px "O-Ne Noto Sans TC"'),document.fonts.load('800 52px "O-Ne Noto Sans TC"')]).then(()=>{assetsReady=true;for(const id of ['bgScale','nextScale','subscribeScale'])syncRange(id);render()}).catch(error=>{$('status').classList.add('error');$('status').textContent=`載入失敗：${error.message}`});
 </script>
-<script src="./settlement-card-v011.js?v=011"></script>
+<script src="./settlement-card-v011.js?v=011-ready"></script>
 </body>
 </html>

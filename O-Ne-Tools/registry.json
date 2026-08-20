@@ -1,9 +1,9 @@
 {
-  "version": "V2.4_20260820",
+  "version": "V2.5_20260820",
   "principle": "one_function_one_entry",
   "total": 15,
-  "ready": 7,
-  "candidate": 2,
+  "ready": 8,
+  "candidate": 1,
   "ai_bridge": {
     "version": "V1.2_20260807",
     "mode": "chatgpt_pro_manual_json_bridge",
@@ -284,8 +284,8 @@
       "family": "QST-03｜FORMAL V1.1",
       "group": "結算／結果",
       "desc": "1–8 列自由增減、Icon 與欄位名稱預設／自訂、觀眾互動問題／下一影片模式；訂閱圓框預設關閉",
-      "status": "candidate",
-      "href": "./settlement-card.html?v=011",
+      "status": "ready",
+      "href": "./settlement-card.html?v=011&ready=1",
       "features": [
         "formal_1920x1080_canvas",
         "dynamic_result_rows_1_to_8",
@@ -313,7 +313,9 @@
       "panel_fill_opacity": 0.8,
       "generator_version": "V0.1.1_20260820",
       "mapping": "./settlement-card-mapping.json",
-      "visual_status": "CANDIDATE"
+      "visual_status": "READY",
+      "ready_approved_by": "Omi",
+      "ready_approved_on": "2026-08-20"
     },
     {
       "id": "player1",
