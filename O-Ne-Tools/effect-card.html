@@ -133,7 +133,7 @@ ICON_NODES.Heart=[["path",{"d":"M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1
 ICON_NODES.Moon=[["path",{"d":"M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"}]];
 delete ICON_NODES.UtensilsCrossed;
 const PRESETS=[
-  {id:'delicious',name:'美味爆擊',primary:'ChefHat',secondary:'Heart',bottomPrimary:'Heart',state:'BUFF',title:'美味爆擊！！',subtitle:'味覺傷害 +999',color:'#29A6A7',decor:'spark',sparkles:false},
+  {id:'delicious',name:'美味爆擊',primary:'ChefHat',secondary:'Heart',bottomPrimary:'Heart',state:'BUFF',title:'美味爆擊！！',subtitle:'味覺傷害 +999',color:'#29A6A7',decor:'formalSpark',sparkles:false},
   {id:'heal',name:'體力回復',primary:'HeartPulse',secondary:'CirclePlus',state:'BUFF',title:'體力恢復！',subtitle:'HP +30',color:'#21A74D',decor:'heart'},
   {id:'lucky',name:'幸運提升',primary:'Clover',secondary:'Sparkles',state:'BUFF',title:'幸運值提升！',subtitle:'稀有掉落率 UP',color:'#FFBE37',decor:'clover',sparkles:true},
   {id:'speed',name:'速度提升',primary:'Gauge',secondary:'Zap',state:'BUFF',title:'移動速度 UP！',subtitle:'探索效率提升',color:'#3F8FB7',decor:'speed'},
@@ -278,7 +278,7 @@ function render(){
 }
 function getConfig(){
   const preset=PRESETS.find(function(p){return p.id===current;})||PRESETS[0];
-  const decorPreset=PRESETS.find(function(p){return p.decor===els.decorSelect.value;});
+  const decorPreset=PRESETS.find(function(p){return p.decor===els.decorSelect.value;})||(els.decorSelect.value==='spark'?PRESETS[0]:null);
   const decorIcons=els.decorSelect.value==='formalSpark'?['閃光2.png','閃光1.png']:decorPreset?[decorPreset.primary,decorPreset.secondary,decorPreset.bottomPrimary,decorPreset.bottomSecondary].filter(Boolean):[];
   return {schema:SCHEMA,version:VERSION,status:'CANDIDATE',formal_source:{master_psd:'效果卡.psd',drive_id:'1ZZdipJXr7Ujt_u1KUK2WxkRkJn8xjOoY',mapping:'STA-02',state_family:'Buff/Debuff',source_date:'2026-08-20'},render_strategy:'native_psd_layer_composite_v018',frame_repair:'none',frame_source:'外框.png',frame_bounds:{x:15,y:19,width:1886,height:1037},accent_layers:['left','right','bottom','label_bar','state_pill'],label_source:'PSD separated panel/bar/pill',icon_source:'Lucide official vectors',formal_sparkle_source:['閃光1.png','閃光2.png'],preset:current,state:els.stateText.value,title:els.titleText.value.trim(),subtitle:els.subtitleText.value.trim(),content_visible:els.contentToggle.classList.contains('on'),accent:getAccent(),palette_mode:els.colorPreset.value==='custom'?'CUSTOM':'O-NE_FORMAL_TOKENS',content_zone:'top_left_label_only',decoration_zone:'top_right_and_bottom_left',text_style:els.textStyle.value,decoration:els.decorSelect.value,decoration_icons:decorIcons,decoration_density:els.decorDensity.value,decoration_visible:els.decorToggle.classList.contains('on'),canvas:{width:1920,height:1080,transparent:true},generated_at:new Date().toISOString()};
 }
