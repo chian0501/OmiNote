@@ -1,5 +1,5 @@
 {
-  "schema": "o-ne.settlement-card.mapping.v0.1.1",
+  "schema": "o-ne.settlement-card.mapping.v0.1.2",
   "status": "READY",
   "component_id": "QST-03",
   "semantic_id": "settlement_panel_16x9",
@@ -23,7 +23,7 @@
     "overwritten": false
   },
   "generator_extension": {
-    "version": "V0.1.1_20260820",
+    "version": "V0.1.2_20260820",
     "approved_by": "Omi",
     "approval_status": "READY",
     "approved_for_use_on": "2026-08-20",
@@ -33,7 +33,8 @@
       "replaceable_row_icons",
       "field_name_presets_and_custom_input",
       "viewer_question_left_panel_mode",
-      "subscribe_circle_hidden_by_default"
+      "subscribe_circle_hidden_by_default",
+      "dynamic_row_legacy_artifact_cleanup"
     ]
   },
   "fixed_structure": {

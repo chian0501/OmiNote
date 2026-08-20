@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>O-Ne 片尾結算卡生成器 V0.1.1</title>
+<title>O-Ne 片尾結算卡生成器 V0.1.2</title>
 <style>
 @font-face{font-family:"O-Ne Noto Sans TC";src:url("./assets/NotoSansTC-O-Ne.woff?v=010") format("woff");font-style:normal;font-weight:100 900;font-display:swap}
 :root{--bg:#0e1117;--panel:#151a23;--panel2:#101620;--line:#2a3240;--line2:#394355;--text:#f5efe7;--muted:#9ea7b3;--teal:#29a6a7;--teal2:#53ced0;--gold:#ffbe37;--red:#fd4537;--purple:#8d67aa}
@@ -76,7 +76,7 @@ canvas{display:block;width:min(100%,1120px);height:auto;filter:drop-shadow(0 10p
 <body>
 <main class="app">
   <a class="home" href="./">← 回工具入口</a>
-  <div class="title-row"><h1>O-Ne 片尾結算卡生成器</h1><span class="version">V0.1.1</span><span class="badge">READY</span></div>
+  <div class="title-row"><h1>O-Ne 片尾結算卡生成器</h1><span class="version">V0.1.2</span><span class="badge">READY</span></div>
   <p class="sub">QST-03｜settlement_panel_16x9｜RESULT。沿用「結算卡.psd」FORMAL V1.1 正式視覺，擴充 1–8 列動態結果、Icon／欄位預設、觀眾互動問題、NEXT、背景與媒體槽；右上訂閱圓框預設不顯示。</p>
   <div class="workspace">
     <section class="panel">
@@ -128,7 +128,7 @@ canvas{display:block;width:min(100%,1120px);height:auto;filter:drop-shadow(0 10p
       </div>
       <div class="section">
         <div class="section-title"><span>05｜版本邊界</span><small>FORMAL SOURCE＋OMI EXTENSION</small></div>
-        <div class="note">正式母版：<b>結算卡.psd</b>（Drive ID：10TEJVIL…，SHA-256：c6529ab1…）。工具未覆蓋 PSD；V0.1.1 依 Omi 指示新增動態列、Icon／名稱預設與觀眾互動問題，正式版型與安全框位置維持不動。</div>
+        <div class="note">正式母版：<b>結算卡.psd</b>（Drive ID：10TEJVIL…，SHA-256：c6529ab1…）。工具未覆蓋 PSD；V0.1.2 保留動態列、Icon／名稱預設與觀眾互動問題，並修正增減列後舊五列框／Icon 殘影；正式版型與安全框位置維持不動。</div>
       </div>
     </section>
     <section class="panel preview-panel">
@@ -140,7 +140,7 @@ canvas{display:block;width:min(100%,1120px);height:auto;filter:drop-shadow(0 10p
       <div class="export">
         <div id="status" class="status">正在載入正式母版與字體…</div>
         <div class="buttons"><button id="downloadPng" class="action" type="button">下載 1920×1080 PNG</button><button id="downloadJson" class="action secondary" type="button">下載設定 JSON</button><button id="reset" class="action ghost" type="button">重設</button></div>
-        <div class="formal-note">schema=o-ne.settlement-card.ready.v0.1.1｜READY｜QST-03｜FORMAL V1.1＋OMI APPROVED EXTENSION｜1–8 列｜問題／縮圖模式｜訂閱圓框預設關閉</div>
+        <div class="formal-note">schema=o-ne.settlement-card.ready.v0.1.2｜READY｜QST-03｜FORMAL V1.1＋OMI APPROVED EXTENSION｜1–8 列｜增減列殘影修正｜問題／縮圖模式｜訂閱圓框預設關閉</div>
       </div>
     </section>
   </div>
@@ -189,6 +189,6 @@ $('downloadJson').onclick=downloadJson;$('reset').onclick=resetAll;
 
 Promise.all([loadStatic('background',STATIC_SOURCES.background),loadStatic('overlay',STATIC_SOURCES.overlay),loadStatic('ui',STATIC_SOURCES.ui),loadStatic('cats',STATIC_SOURCES.cats),document.fonts.load('700 36px "O-Ne Noto Sans TC"'),document.fonts.load('800 52px "O-Ne Noto Sans TC"')]).then(()=>{assetsReady=true;for(const id of ['bgScale','nextScale','subscribeScale'])syncRange(id);render()}).catch(error=>{$('status').classList.add('error');$('status').textContent=`載入失敗：${error.message}`});
 </script>
-<script src="./settlement-card-v011.js?v=011-ready"></script>
+<script src="./settlement-card-v011.js?v=012-ready"></script>
 </body>
 </html>
