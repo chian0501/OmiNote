@@ -1,0 +1,142 @@
+{
+  "schema": "o-ne.settlement-card.mapping.v0.1.0",
+  "status": "CANDIDATE",
+  "component_id": "QST-03",
+  "semantic_id": "settlement_panel_16x9",
+  "usage": "RESULT",
+  "canvas": {
+    "width": 1920,
+    "height": 1080,
+    "color_mode": "RGB",
+    "bit_depth": 8
+  },
+  "formal_source": {
+    "folder_id": "1pMkqpnAXxWkVehQfNbxPIY8wEUhzxG1i",
+    "psd_id": "10TEJVILkN_wmVlstXxhJS_2NkLB41QA_",
+    "psd_sha256": "c6529ab176ae53bc8e3d8aa5d64788e07e699e60be9e07b40cee6c8d4081f599",
+    "preview_id": "1SxExxdhWGrC6X9rNL-k51gfTlvSkCj-J",
+    "record_id": "1WaDTHdWqXIut-Lup6wzwQs9GwG011pGOKrHo9H84DiM",
+    "manifest_id": "1IJp9SUsCMhAiA-bLGc7NTI8n382rXnr0",
+    "mapping_id": "1-9cMX-gdTlYJ5Ej29o08oyy6Nu0Wu9ej",
+    "qa_id": "1VDtQLtu1yKvC5XqZpfgpKs49HsOQoTZf",
+    "formal_version": "V1.1",
+    "overwritten": false
+  },
+  "fixed_structure": {
+    "result_label": [770, 127, 193, 40],
+    "result_panel": [726, 88, 815, 849],
+    "row_count": 5,
+    "row_boxes": [
+      [754, 297, 762, 69],
+      [754, 371, 762, 69],
+      [754, 443, 762, 69],
+      [754, 517, 762, 69],
+      [754, 589, 762, 69]
+    ],
+    "summary_box": [754, 670, 762, 140],
+    "next_box": [754, 822, 762, 90],
+    "next_video_frame": [18, 110, 671, 400],
+    "subscribe_circle": {
+      "bbox": [1563, 115, 351, 350],
+      "center": [1738.5, 290],
+      "safe_radius": 165
+    },
+    "internal_badges": [
+      "CLEAR",
+      "EVENT LOG",
+      "RECOVERY"
+    ]
+  },
+  "editable_fields": [
+    {
+      "key": "chapter_title",
+      "psd_layer": "TITLE",
+      "bbox": [770, 186, 700, 43],
+      "font": "NotoSansTC",
+      "font_weight": 800,
+      "font_size": 52,
+      "min_size": 40,
+      "max_chars": 18
+    },
+    {
+      "key": "chapter_subtitle",
+      "psd_layer": "SUBTITLE",
+      "bbox": [771, 242, 700, 24],
+      "font": "NotoSansTC",
+      "font_weight": 700,
+      "font_size": 27,
+      "min_size": 20,
+      "max_chars": 34
+    },
+    {
+      "key": "rows[].title",
+      "psd_layer": "TITLE",
+      "anchors": [[830, 343], [830, 416], [830, 489], [830, 562], [830, 635]],
+      "max_width": 390,
+      "font_size": 28,
+      "min_size": 22,
+      "max_chars": 12
+    },
+    {
+      "key": "rows[].value",
+      "psd_layer": "VALUE",
+      "anchors": [[1482, 343], [1482, 416], [1482, 489], [1482, 562], [1482, 635]],
+      "align": "right",
+      "max_width": 300,
+      "font_size": 27,
+      "min_size": 21,
+      "max_chars": 14
+    },
+    {
+      "key": "summary",
+      "psd_layer": "SUMMARY_TEXT",
+      "anchor": [779, 720],
+      "max_width": 705,
+      "font_size": 27,
+      "min_size": 20,
+      "max_chars": 32,
+      "line_count": 1
+    },
+    {
+      "key": "next_text",
+      "psd_layer": "NEXT_TEXT",
+      "anchor": [1258, 888],
+      "align": "center",
+      "max_width": 470,
+      "font_size": 36,
+      "min_size": 26,
+      "max_chars": 26
+    }
+  ],
+  "replaceable_assets": {
+    "background": {
+      "bbox": [0, 0, 1920, 1080],
+      "visible_default": true,
+      "transparent_export_supported": true
+    },
+    "next_video": {
+      "safe_bbox": [26, 117, 656, 385],
+      "visible_default": false,
+      "fit": "cover",
+      "preserve_aspect_ratio": true
+    },
+    "subscribe": {
+      "safe_circle": [1738.5, 290, 165],
+      "visible_default": false,
+      "fit": "cover",
+      "preserve_aspect_ratio": true
+    },
+    "characters": {
+      "names": ["Nomi", "Kuma"],
+      "visible_default": true,
+      "source": "formal_psd_layers"
+    }
+  },
+  "export_rules": {
+    "format": "PNG",
+    "dimensions": [1920, 1080],
+    "block_on_text_overflow": true,
+    "guide_layers_rendered": false,
+    "missing_glyph_target": 0
+  }
+}

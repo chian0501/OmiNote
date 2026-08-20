@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>O-Ne 片尾結算卡生成器 V0.1.0</title>
+<style>
+@font-face{font-family:"O-Ne Noto Sans TC";src:url("./assets/NotoSansTC-O-Ne.woff?v=010") format("woff");font-style:normal;font-weight:100 900;font-display:swap}
+:root{--bg:#0e1117;--panel:#151a23;--panel2:#101620;--line:#2a3240;--line2:#394355;--text:#f5efe7;--muted:#9ea7b3;--teal:#29a6a7;--teal2:#53ced0;--gold:#ffbe37;--red:#fd4537;--purple:#8d67aa}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--text);font-family:"O-Ne Noto Sans TC","Noto Sans TC","Microsoft JhengHei",sans-serif}
+button,input{font:inherit}
+.app{max-width:1760px;margin:auto;padding:24px}
+.home{display:inline-flex;align-items:center;min-height:42px;margin-bottom:8px;color:var(--teal2);font-size:14px;font-weight:800;text-decoration:none}
+.title-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+h1{margin:0;font-size:25px}
+.version{color:#8c96a5;font-size:12px}
+.badge{padding:4px 9px;border:1px solid #8b6b24;border-radius:999px;color:#ffd978;background:#3b2d12;font-size:10px;font-weight:900;letter-spacing:.08em}
+.sub{max-width:1180px;margin:8px 0 20px;color:var(--muted);font-size:13px;line-height:1.7}
+.workspace{display:grid;grid-template-columns:560px minmax(0,1fr);gap:20px;align-items:start}
+.panel{overflow:hidden;border:1px solid var(--line);border-radius:16px;background:var(--panel);box-shadow:0 12px 30px rgba(0,0,0,.24)}
+.section{padding:17px 18px;border-bottom:1px solid var(--line)}
+.section:last-child{border-bottom:0}
+.section-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;color:#f0a8cf;font-size:14px;font-weight:900}
+.section-title small{color:var(--muted);font-size:10px;font-weight:600}
+.note{padding:10px 12px;border:1px solid #273244;border-radius:10px;color:#c4cad3;background:var(--panel2);font-size:11px;line-height:1.65}
+label{display:block;margin:10px 0 6px;color:#b9c0ca;font-size:12px;font-weight:800}
+input[type="text"],input[type="number"]{width:100%;height:42px;padding:0 11px;border:1px solid var(--line2);border-radius:9px;outline:none;color:white;background:var(--panel2)}
+input:focus{border-color:var(--teal)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.row-editor{display:grid;grid-template-columns:46px minmax(0,1fr) minmax(0,.82fr);gap:9px;align-items:end;margin-top:10px;padding:10px;border:1px solid #273244;border-radius:11px;background:var(--panel2)}
+.row-no{align-self:center;color:var(--gold);font-size:12px;font-weight:900;text-align:center}
+.row-editor label{margin-top:0}
+.accent-check{grid-column:2/4;display:flex;align-items:center;gap:7px;margin:0;color:#aeb6c2;font-size:10px;font-weight:700}
+.accent-check input{width:16px;height:16px;margin:0;accent-color:var(--gold)}
+.switch-row{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:11px;padding:10px 11px;border:1px solid #273244;border-radius:10px;background:var(--panel2)}
+.switch-copy strong{display:block;font-size:12px}.switch-copy small{display:block;margin-top:3px;color:var(--muted);font-size:10px;line-height:1.5}
+.switch-row input[type="checkbox"]{width:19px;height:19px;flex:0 0 auto;accent-color:var(--teal)}
+.asset{margin-top:11px;padding:11px;border:1px solid #273244;border-radius:11px;background:var(--panel2)}
+.asset-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.asset-head strong{font-size:12px}.asset-head span{max-width:280px;overflow:hidden;color:var(--muted);font-size:10px;text-overflow:ellipsis;white-space:nowrap}
+.asset-actions{display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:9px}
+.file-button,.tiny-button{min-height:37px;display:flex;align-items:center;justify-content:center;border:1px solid var(--line2);border-radius:8px;color:#c8d0d9;background:#202938;cursor:pointer;font-size:11px;font-weight:800}
+.file-button input{display:none}
+.tiny-button{padding:0 12px}
+.adjust{display:grid;grid-template-columns:1.2fr .8fr .8fr;gap:8px;margin-top:9px}
+.adjust label{margin:0;color:#87919f;font-size:9px}
+.adjust input[type="range"]{width:100%;margin:6px 0 0;accent-color:var(--teal)}
+.adjust input[type="number"]{height:32px;margin-top:4px;padding:0 7px;font-size:10px}
+.preview-panel{min-width:0}
+.preview-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 16px;border-bottom:1px solid var(--line)}
+.preview-toolbar strong{font-size:13px}.preview-toolbar small{display:block;margin-top:3px;color:var(--muted);font-size:10px}
+.toolbar-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.view-tabs{display:flex}
+.view-tabs button{height:35px;padding:0 12px;border:1px solid var(--line2);color:#bec6cf;background:#111923;cursor:pointer;font-size:11px;font-weight:800}
+.view-tabs button:first-child{border-radius:8px 0 0 8px}.view-tabs button:last-child{border-left:0;border-radius:0 8px 8px 0}
+.view-tabs button.active{border-color:var(--teal);color:white;background:var(--teal)}
+.guide-check{display:flex;align-items:center;gap:6px;margin:0;color:#aeb6c2;font-size:10px;white-space:nowrap}.guide-check input{accent-color:var(--teal2)}
+.stage{min-height:640px;display:flex;align-items:center;justify-content:center;padding:24px;background-color:#252b32;background-image:linear-gradient(45deg,#30363d 25%,transparent 25%),linear-gradient(-45deg,#30363d 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#30363d 75%),linear-gradient(-45deg,transparent 75%,#30363d 75%);background-position:0 0,0 15px,15px -15px,-15px 0;background-size:30px 30px}
+.stage.dark{background:#26313a;background-image:none}
+canvas{display:block;width:min(100%,1120px);height:auto;filter:drop-shadow(0 10px 24px rgba(0,0,0,.35))}
+.export{padding:14px 16px 16px;border-top:1px solid var(--line);background:#111923}
+.status{min-height:20px;margin-bottom:10px;color:#8fd4c8;font-size:11px;line-height:1.5}.status.error{color:#ff7770}
+.buttons{display:grid;grid-template-columns:1.2fr 1fr .75fr;gap:9px}
+.action{min-height:48px;border:1px solid transparent;border-radius:9px;color:white;background:var(--teal);cursor:pointer;font-weight:900}
+.action.secondary{border-color:#60416b;color:#f0caef;background:#3a2942}.action.ghost{border-color:var(--line2);color:#c5ccd5;background:#30394a}
+.formal-note{margin-top:10px;color:#76818f;font-size:10px;line-height:1.6;text-align:center}
+@media(max-width:1280px){.workspace{grid-template-columns:1fr}.stage{min-height:500px}}
+@media(max-width:680px){.app{padding:15px}.two,.buttons,.row-editor,.adjust{grid-template-columns:1fr}.row-no{text-align:left}.accent-check{grid-column:1}.preview-toolbar{align-items:flex-start;flex-direction:column}.stage{min-height:360px;padding:12px}}
+</style>
+</head>
+<body>
+<main class="app">
+  <a class="home" href="./">← 回工具入口</a>
+  <div class="title-row"><h1>O-Ne 片尾結算卡生成器</h1><span class="version">V0.1.0</span><span class="badge">CANDIDATE</span></div>
+  <p class="sub">QST-03｜settlement_panel_16x9｜RESULT。依「結算卡.psd」FORMAL V1.1 原位分層：固定五列結果、單行總結、NEXT、16:9 下一影片框、圓形訂閱框與內部狀態徽章；可替換文字、背景與兩個媒體槽，不改正式母版。</p>
+  <div class="workspace">
+    <section class="panel">
+      <div class="section">
+        <div class="section-title"><span>01｜篇章文字</span><small>自動縮字；溢位會阻擋輸出</small></div>
+        <label for="chapterTitle">篇章標題</label>
+        <input id="chapterTitle" type="text" maxlength="18" value="篇章任務完成">
+        <label for="chapterSubtitle">篇章副標</label>
+        <input id="chapterSubtitle" type="text" maxlength="34" value="D1／D2｜替換篇名與章節副標">
+        <div class="two">
+          <div><label for="summaryText">單行總結</label><input id="summaryText" type="text" maxlength="32" value="總結置於此處。"></div>
+          <div><label for="nextText">NEXT 文字</label><input id="nextText" type="text" maxlength="26" value="下一篇／下一任務"></div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-title"><span>02｜五列結果</span><small>列數固定；標題／數值可替換</small></div>
+        <div class="row-editor"><div class="row-no">01</div><div><label for="row1Title">欄位名稱</label><input id="row1Title" type="text" maxlength="12" value="結果欄位 01"></div><div><label for="row1Value">結果值</label><input id="row1Value" type="text" maxlength="14" value="替換結果值"></div><label class="accent-check"><input id="row1Accent" type="checkbox">結果值使用金色強調</label></div>
+        <div class="row-editor"><div class="row-no">02</div><div><label for="row2Title">欄位名稱</label><input id="row2Title" type="text" maxlength="12" value="結果欄位 02"></div><div><label for="row2Value">結果值</label><input id="row2Value" type="text" maxlength="14" value="替換結果值"></div><label class="accent-check"><input id="row2Accent" type="checkbox">結果值使用金色強調</label></div>
+        <div class="row-editor"><div class="row-no">03</div><div><label for="row3Title">欄位名稱</label><input id="row3Title" type="text" maxlength="12" value="結果欄位 03"></div><div><label for="row3Value">結果值</label><input id="row3Value" type="text" maxlength="14" value="替換結果值"></div><label class="accent-check"><input id="row3Accent" type="checkbox">結果值使用金色強調</label></div>
+        <div class="row-editor"><div class="row-no">04</div><div><label for="row4Title">欄位名稱</label><input id="row4Title" type="text" maxlength="12" value="結果欄位 04"></div><div><label for="row4Value">結果值</label><input id="row4Value" type="text" maxlength="14" value="替換結果值"></div><label class="accent-check"><input id="row4Accent" type="checkbox">結果值使用金色強調</label></div>
+        <div class="row-editor"><div class="row-no">05</div><div><label for="row5Title">欄位名稱</label><input id="row5Title" type="text" maxlength="12" value="結果欄位 05"></div><div><label for="row5Value">結果值</label><input id="row5Value" type="text" maxlength="14" value="替換結果值"></div><label class="accent-check"><input id="row5Accent" type="checkbox" checked>結果值使用金色強調</label></div>
+      </div>
+      <div class="section">
+        <div class="section-title"><span>03｜背景與媒體槽</span><small>圖片皆保留原比例裁滿</small></div>
+        <div class="switch-row"><div class="switch-copy"><strong>顯示背景</strong><small>關閉後輸出透明 PNG；正式 UI、角色與卡體仍保留。</small></div><input id="bgVisible" type="checkbox" checked></div>
+        <div class="asset">
+          <div class="asset-head"><strong>背景圖片</strong><span id="bgName">正式背景</span></div>
+          <div class="asset-actions"><label class="file-button">上傳背景<input id="bgUpload" type="file" accept="image/*"></label><button id="clearBg" class="tiny-button" type="button">使用正式背景</button></div>
+          <div class="adjust"><label>縮放 <output id="bgScaleOut">1.00×</output><input id="bgScale" type="range" min="1" max="2.5" step="0.01" value="1"></label><label>水平位移<input id="bgX" type="number" min="-900" max="900" step="1" value="0"></label><label>垂直位移<input id="bgY" type="number" min="-600" max="600" step="1" value="0"></label></div>
+        </div>
+        <div class="switch-row"><div class="switch-copy"><strong>放入下一影片縮圖</strong><small>留白時可交由 YouTube 片尾元素覆蓋；上傳後會裁入左側 16:9 安全框。</small></div><input id="nextVisible" type="checkbox"></div>
+        <div class="asset">
+          <div class="asset-head"><strong>下一影片內容</strong><span id="nextName">尚未上傳</span></div>
+          <div class="asset-actions"><label class="file-button">上傳縮圖<input id="nextUpload" type="file" accept="image/*"></label><button id="clearNext" class="tiny-button" type="button">清除</button></div>
+          <div class="adjust"><label>縮放 <output id="nextScaleOut">1.00×</output><input id="nextScale" type="range" min="1" max="2.5" step="0.01" value="1"></label><label>水平位移<input id="nextX" type="number" min="-500" max="500" step="1" value="0"></label><label>垂直位移<input id="nextY" type="number" min="-350" max="350" step="1" value="0"></label></div>
+        </div>
+        <div class="switch-row"><div class="switch-copy"><strong>放入訂閱頭像</strong><small>上傳後會裁入右上圓形安全框；留白時供 YouTube 訂閱元素使用。</small></div><input id="subscribeVisible" type="checkbox"></div>
+        <div class="asset">
+          <div class="asset-head"><strong>訂閱頭像</strong><span id="subscribeName">尚未上傳</span></div>
+          <div class="asset-actions"><label class="file-button">上傳頭像<input id="subscribeUpload" type="file" accept="image/*"></label><button id="clearSubscribe" class="tiny-button" type="button">清除</button></div>
+          <div class="adjust"><label>縮放 <output id="subscribeScaleOut">1.00×</output><input id="subscribeScale" type="range" min="1" max="2.5" step="0.01" value="1"></label><label>水平位移<input id="subscribeX" type="number" min="-300" max="300" step="1" value="0"></label><label>垂直位移<input id="subscribeY" type="number" min="-300" max="300" step="1" value="0"></label></div>
+        </div>
+        <div class="switch-row"><div class="switch-copy"><strong>顯示 Nomi／Kuma</strong><small>角色直接取自正式 PSD；只切換顯示，不改造角色。</small></div><input id="catsVisible" type="checkbox" checked></div>
+      </div>
+      <div class="section">
+        <div class="section-title"><span>04｜版本邊界</span><small>FORMAL SOURCE</small></div>
+        <div class="note">正式母版：<b>結算卡.psd</b>（Drive ID：10TEJVIL…，SHA-256：c6529ab1…）。工具只讀取正式圖層製作衍生輸出，未覆蓋 PSD；固定五列與正式安全框不可增減或拖動。</div>
+      </div>
+    </section>
+    <section class="panel preview-panel">
+      <div class="preview-toolbar">
+        <div><strong>1920 × 1080 即時預覽</strong><small>透明格／深色底只影響檢查；安全框不會輸出。</small></div>
+        <div class="toolbar-actions"><label class="guide-check"><input id="showGuides" type="checkbox">顯示安全框</label><div class="view-tabs"><button id="transparentView" class="active" type="button">透明格</button><button id="darkView" type="button">深色底</button></div></div>
+      </div>
+      <div id="stage" class="stage"><canvas id="canvas" width="1920" height="1080"></canvas></div>
+      <div class="export">
+        <div id="status" class="status">正在載入正式母版與字體…</div>
+        <div class="buttons"><button id="downloadPng" class="action" type="button">下載 1920×1080 PNG</button><button id="downloadJson" class="action secondary" type="button">下載設定 JSON</button><button id="reset" class="action ghost" type="button">重設</button></div>
+        <div class="formal-note">schema=o-ne.settlement-card.candidate.v0.1.0｜QST-03｜FORMAL V1.1｜固定五列｜文字溢位阻擋｜背景可透明｜媒體槽原比例裁滿</div>
+      </div>
+    </section>
+  </div>
+</main>
+<script>
+const VERSION='0.1.0';
+const SCHEMA='o-ne.settlement-card.candidate.v0.1.0';
+const FORMAL={component_id:'QST-03',semantic_id:'settlement_panel_16x9',usage:'RESULT',formal_version:'V1.1',folder_id:'1pMkqpnAXxWkVehQfNbxPIY8wEUhzxG1i',psd_id:'10TEJVILkN_wmVlstXxhJS_2NkLB41QA_',psd_sha256:'c6529ab176ae53bc8e3d8aa5d64788e07e699e60be9e07b40cee6c8d4081f599',preview_id:'1SxExxdhWGrC6X9rNL-k51gfTlvSkCj-J',record_id:'1WaDTHdWqXIut-Lup6wzwQs9GwG011pGOKrHo9H84DiM',manifest_id:'1IJp9SUsCMhAiA-bLGc7NTI8n382rXnr0',mapping_id:'1-9cMX-gdTlYJ5Ej29o08oyy6Nu0Wu9ej',qa_id:'1VDtQLtu1yKvC5XqZpfgpKs49HsOQoTZf'};
+const STATIC_SOURCES={background:'./assets/settlement-background-v010.jpg',overlay:'./assets/settlement-background-overlay-v010.png',ui:'./assets/settlement-ui-v010.png',cats:'./assets/settlement-cats-v010.png'};
+const $=id=>document.getElementById(id);
+const canvas=$('canvas'),ctx=canvas.getContext('2d');
+const staticImages={},uploads={background:null,next:null,subscribe:null},objectUrls={background:null,next:null,subscribe:null},imageNames={background:'正式背景',next:'尚未上傳',subscribe:'尚未上傳'};
+const rowBaselines=[343,416,489,562,635];
+let assetsReady=false,lastIssues=[];
+
+function fontSpec(size,weight){return `${weight} ${size}px "O-Ne Noto Sans TC","Noto Sans TC","Microsoft JhengHei",sans-serif`}
+function loadStatic(key,src){return new Promise((resolve,reject)=>{const img=new Image();img.onload=()=>{staticImages[key]=img;resolve()};img.onerror=()=>reject(new Error(`無法載入 ${src}`));img.src=src})}
+function drawCover(img,x,y,w,h,scale,offsetX,offsetY){const base=Math.max(w/img.naturalWidth,h/img.naturalHeight),factor=base*Number(scale||1),dw=img.naturalWidth*factor,dh=img.naturalHeight*factor;ctx.drawImage(img,x+(w-dw)/2+Number(offsetX||0),y+(h-dh)/2+Number(offsetY||0),dw,dh)}
+function drawNextImage(){if(!$('nextVisible').checked||!uploads.next)return;ctx.save();ctx.beginPath();ctx.moveTo(28,117);ctx.lineTo(675,117);ctx.lineTo(682,124);ctx.lineTo(682,495);ctx.lineTo(675,502);ctx.lineTo(28,502);ctx.closePath();ctx.clip();drawCover(uploads.next,26,117,656,385,$('nextScale').value,$('nextX').value,$('nextY').value);ctx.restore()}
+function drawSubscribeImage(){if(!$('subscribeVisible').checked||!uploads.subscribe)return;ctx.save();ctx.beginPath();ctx.arc(1738.5,290,165,0,Math.PI*2);ctx.clip();drawCover(uploads.subscribe,1573.5,125,330,330,$('subscribeScale').value,$('subscribeX').value,$('subscribeY').value);ctx.restore()}
+function fitText(text,maxWidth,startSize,minSize,weight,issueLabel){let size=startSize;ctx.font=fontSpec(size,weight);while(size>minSize&&ctx.measureText(text).width>maxWidth){size--;ctx.font=fontSpec(size,weight)}if(ctx.measureText(text).width>maxWidth)lastIssues.push(`${issueLabel}超出版位`);return size}
+function paintText(text,x,y,maxWidth,startSize,minSize,weight,color,align,issueLabel){const value=String(text||'').trim();if(!value){lastIssues.push(`${issueLabel}不可空白`);return}const size=fitText(value,maxWidth,startSize,minSize,weight,issueLabel);ctx.font=fontSpec(size,weight);ctx.fillStyle=color;ctx.textAlign=align||'left';ctx.textBaseline='alphabetic';ctx.fillText(value,x,y)}
+function drawEditableText(){const cream='#F5EFE7',gold='#FFBE37',ink='#2B211C';paintText($('chapterTitle').value,770,226,700,52,40,800,cream,'left','篇章標題');paintText($('chapterSubtitle').value,771,265,700,27,20,700,gold,'left','篇章副標');for(let i=1;i<=5;i++){paintText($(`row${i}Title`).value,830,rowBaselines[i-1],390,28,22,700,cream,'left',`第 ${i} 列名稱`);paintText($(`row${i}Value`).value,1482,rowBaselines[i-1],300,27,21,700,$(`row${i}Accent`).checked?gold:cream,'right',`第 ${i} 列結果`)}paintText($('summaryText').value,779,720,705,27,20,700,ink,'left','單行總結');paintText($('nextText').value,1258,888,470,36,26,700,cream,'center','NEXT 文字')}
+function drawGuides(){ctx.save();ctx.setLineDash([14,10]);ctx.lineWidth=3;ctx.strokeStyle='#53CED0';ctx.fillStyle='#53CED0';ctx.font=fontSpec(18,800);ctx.textAlign='left';ctx.strokeRect(26,117,656,385);ctx.fillText('NEXT VIDEO SAFE',35,142);ctx.beginPath();ctx.arc(1738.5,290,166,0,Math.PI*2);ctx.stroke();ctx.fillText('SUBSCRIBE SAFE',1580,100);ctx.strokeRect(754,110,762,802);ctx.fillText('RESULT CONTENT SAFE',762,103);ctx.restore()}
+function render(exportMode=false){if(!assetsReady)return false;lastIssues=[];ctx.clearRect(0,0,1920,1080);if($('bgVisible').checked){const bg=uploads.background||staticImages.background;drawCover(bg,0,0,1920,1080,$('bgScale').value,$('bgX').value,$('bgY').value);ctx.drawImage(staticImages.overlay,0,0)}ctx.drawImage(staticImages.ui,0,0);drawNextImage();drawSubscribeImage();if($('catsVisible').checked)ctx.drawImage(staticImages.cats,0,0);drawEditableText();if(!exportMode&&$('showGuides').checked)drawGuides();if(!exportMode){const fontOk=document.fonts.check('700 28px "O-Ne Noto Sans TC"');$('status').classList.toggle('error',lastIssues.length>0||!fontOk);$('status').textContent=lastIssues.length?`請修正後再輸出：${lastIssues.join('、')}`:`版位檢查通過｜五列固定｜文字溢位 0｜正式字體${fontOk?'已載入':'待載入'}｜${$('bgVisible').checked?'含背景':'透明背景'}`;}return lastIssues.length===0}
+function syncRange(id){$(`${id}Out`).value=`${Number($(id).value).toFixed(2)}×`;render()}
+function revokeUpload(key){if(objectUrls[key])URL.revokeObjectURL(objectUrls[key]);objectUrls[key]=null;uploads[key]=null}
+function assetPrefix(key){return key==='background'?'bg':key}
+function loadUpload(file,key){if(!file)return;if(!file.type.startsWith('image/')){alert('請選擇圖片檔');return}if(file.size>25*1024*1024){alert('圖片請小於 25 MB');return}revokeUpload(key);const url=URL.createObjectURL(file),img=new Image(),prefix=assetPrefix(key);objectUrls[key]=url;img.onload=()=>{uploads[key]=img;imageNames[key]=file.name;$(`${prefix}Name`).textContent=file.name;if(key==='next')$('nextVisible').checked=true;if(key==='subscribe')$('subscribeVisible').checked=true;render()};img.onerror=()=>{revokeUpload(key);alert('圖片讀取失敗')};img.src=url}
+function clearUpload(key){const prefix=assetPrefix(key);revokeUpload(key);imageNames[key]=key==='background'?'正式背景':'尚未上傳';$(`${prefix}Name`).textContent=imageNames[key];$(`${prefix}Upload`).value='';if(key==='next')$('nextVisible').checked=false;if(key==='subscribe')$('subscribeVisible').checked=false;render()}
+function downloadBlob(blob,name){const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1200)}
+function currentRows(){return Array.from({length:5},(_,index)=>{const i=index+1;return{position:i,title:$(`row${i}Title`).value,value:$(`row${i}Value`).value,accent_value:$(`row${i}Accent`).checked}})}
+function downloadJson(){if(!render())return;const payload={schema:SCHEMA,status:'CANDIDATE',generator_version:VERSION,component_id:FORMAL.component_id,semantic_id:FORMAL.semantic_id,usage:FORMAL.usage,formal_source:FORMAL,canvas:{width:1920,height:1080,color_mode:'RGB',bit_depth:8},content:{chapter_title:$('chapterTitle').value,chapter_subtitle:$('chapterSubtitle').value,rows:currentRows(),summary:$('summaryText').value,next_text:$('nextText').value},assets:{background:{visible:$('bgVisible').checked,source:uploads.background?'upload':'formal',file_name:imageNames.background,scale:Number($('bgScale').value),x:Number($('bgX').value),y:Number($('bgY').value)},next_video:{visible:$('nextVisible').checked&&!!uploads.next,source:uploads.next?'upload':'youtube_overlay_slot',file_name:imageNames.next,scale:Number($('nextScale').value),x:Number($('nextX').value),y:Number($('nextY').value)},subscribe:{visible:$('subscribeVisible').checked&&!!uploads.subscribe,source:uploads.subscribe?'upload':'youtube_overlay_slot',file_name:imageNames.subscribe,scale:Number($('subscribeScale').value),x:Number($('subscribeX').value),y:Number($('subscribeY').value)},characters:{visible:$('catsVisible').checked,source:'formal_psd_layers',names:['Nomi','Kuma']}},safe_zones:{next_video:[26,117,656,385],subscribe_circle:{cx:1738.5,cy:290,radius:165},result_content:[754,110,762,802]},qa:{fixed_row_count:5,overflow_count:lastIssues.length,guide_layers_rendered:false,psd_overwritten:false}};downloadBlob(new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}),'O-Ne_QST-03_片尾結算_CANDIDATE_V0.1.0.json')}
+function resetAll(){const defaults={chapterTitle:'篇章任務完成',chapterSubtitle:'D1／D2｜替換篇名與章節副標',summaryText:'總結置於此處。',nextText:'下一篇／下一任務'};Object.entries(defaults).forEach(([id,value])=>$(id).value=value);for(let i=1;i<=5;i++){$(`row${i}Title`).value=`結果欄位 0${i}`;$(`row${i}Value`).value='替換結果值';$(`row${i}Accent`).checked=i===5}$('bgVisible').checked=true;$('catsVisible').checked=true;$('showGuides').checked=false;for(const key of ['background','next','subscribe'])clearUpload(key);for(const id of ['bgScale','nextScale','subscribeScale']){$(id).value='1';syncRange(id)}for(const id of ['bgX','bgY','nextX','nextY','subscribeX','subscribeY'])$(id).value='0';render()}
+
+document.querySelectorAll('input[type="text"],input[type="number"],input[type="checkbox"]').forEach(el=>el.addEventListener(el.type==='text'||el.type==='number'?'input':'change',render));
+for(const id of ['bgScale','nextScale','subscribeScale'])$(id).addEventListener('input',()=>syncRange(id));
+$('bgUpload').addEventListener('change',event=>loadUpload(event.target.files[0],'background'));
+$('nextUpload').addEventListener('change',event=>loadUpload(event.target.files[0],'next'));
+$('subscribeUpload').addEventListener('change',event=>loadUpload(event.target.files[0],'subscribe'));
+$('clearBg').onclick=()=>clearUpload('background');$('clearNext').onclick=()=>clearUpload('next');$('clearSubscribe').onclick=()=>clearUpload('subscribe');
+$('transparentView').onclick=()=>{$('stage').classList.remove('dark');$('transparentView').classList.add('active');$('darkView').classList.remove('active')};
+$('darkView').onclick=()=>{$('stage').classList.add('dark');$('darkView').classList.add('active');$('transparentView').classList.remove('active')};
+$('downloadPng').onclick=()=>{if(!render(true)){render(false);return}canvas.toBlob(blob=>{if(blob)downloadBlob(blob,'O-Ne_QST-03_片尾結算_CANDIDATE_V0.1.0_1920x1080.png');render(false)},'image/png')};
+$('downloadJson').onclick=downloadJson;$('reset').onclick=resetAll;
+
+Promise.all([loadStatic('background',STATIC_SOURCES.background),loadStatic('overlay',STATIC_SOURCES.overlay),loadStatic('ui',STATIC_SOURCES.ui),loadStatic('cats',STATIC_SOURCES.cats),document.fonts.load('700 36px "O-Ne Noto Sans TC"'),document.fonts.load('800 52px "O-Ne Noto Sans TC"')]).then(()=>{assetsReady=true;for(const id of ['bgScale','nextScale','subscribeScale'])syncRange(id);render()}).catch(error=>{$('status').classList.add('error');$('status').textContent=`載入失敗：${error.message}`});
+</script>
+</body>
+</html>

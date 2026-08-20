@@ -10,14 +10,19 @@ O-Ne 字卡工具入口與編輯器集合。
 - 選項卡
 - 對話卡
 - 評分卡
+- 焦點／說明內容卡
+- 縮圖品牌框
 
 ## 候選測試
-- 焦點內容卡 V0.5.1 CANDIDATE：一般內文、項目、步驟、逐列底框、文字重點與左右商品圖。此工具不取代正式 O-Ne UI 母版。
+- 效果卡 V0.1.8 CANDIDATE：依正式施工圖分離外框、色塊、文字與語意裝飾，中央影片區維持透明。
+- 片尾結算卡 V0.1.0 CANDIDATE：QST-03／FORMAL V1.1 固定五列結果、單行總結、NEXT、下一影片與訂閱安全框；支援透明背景、媒體替換、設定 JSON 與 Nomi／Kuma 顯示切換。
 
 ## 使用方式
 1. 開啟 `index.html`。
 2. 在入口頁選擇要製作的字卡。
-3. 各編輯器可直接輸出透明 PNG。
+3. 各編輯器可直接輸出 PNG；是否含背景依工具設定。
+
+片尾結算卡的欄位與安全框定義另見 `settlement-card-mapping.json`。正式 PSD 只作來源，生成器不會覆蓋 Drive 母檔。
 
 ## 全工具視覺硬規則
 - **主底板／卡體底色固定 80% 透明度（opacity = 0.80）。**
@@ -39,4 +44,4 @@ O-Ne 字卡工具入口與編輯器集合。
 - 後續新工具或版本更新，直接更新 `O-Ne-Tools/` 內對應檔案。
 - 新增工具時，同步更新 `index.html` 與 `registry.json`。
 - 不另建平行工具包。
-
+- `assets/NotoSansTC-O-Ne.woff` 依 SIL Open Font License 1.1 使用；授權文字見 `assets/OFL-NotoSansTC.txt`。
