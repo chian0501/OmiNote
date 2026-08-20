@@ -2,7 +2,7 @@
   'use strict';
 
   var VERSION = '0.1.1';
-  var SCHEMA = 'o-ne.settlement-card.candidate.v0.1.1';
+  var SCHEMA = 'o-ne.settlement-card.ready.v0.1.1';
   var FORMAL = {
     component_id: 'QST-03',
     semantic_id: 'settlement_panel_16x9',
@@ -565,7 +565,7 @@
     var leftMode = $('leftMode').value;
     var payload = {
       schema: SCHEMA,
-      status: 'CANDIDATE',
+      status: 'READY',
       generator_version: VERSION,
       component_id: FORMAL.component_id,
       semantic_id: FORMAL.semantic_id,
@@ -629,7 +629,7 @@
     };
     downloadBlob(
       new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' }),
-      'O-Ne_QST-03_片尾結算_CANDIDATE_V0.1.1.json'
+      'O-Ne_QST-03_片尾結算_READY_V0.1.1.json'
     );
   }
 
@@ -709,7 +709,7 @@
       return;
     }
     canvas.toBlob(function (blob) {
-      if (blob) downloadBlob(blob, 'O-Ne_QST-03_片尾結算_CANDIDATE_V0.1.1_1920x1080.png');
+      if (blob) downloadBlob(blob, 'O-Ne_QST-03_片尾結算_READY_V0.1.1_1920x1080.png');
       render(false);
     }, 'image/png');
   };
