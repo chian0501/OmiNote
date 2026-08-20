@@ -5,9 +5,10 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>O-Ne 效果卡生成器 V0.1.9</title>
 <style>
+@font-face{font-family:"O-Ne Noto Sans TC";src:url("./assets/NotoSansTC-O-Ne.woff?v=019") format("woff");font-style:normal;font-weight:100 900;font-display:swap}
 :root{--bg:#0e1117;--panel:#151a23;--panel2:#101620;--line:#2a3240;--line2:#394355;--text:#f5efe7;--muted:#9ea7b3;--teal:#29a6a7;--teal2:#53ced0;--gold:#ffbe37;--red:#fd4537;--purple:#8d67aa}
 *{box-sizing:border-box}
-body{margin:0;min-height:100vh;background:var(--bg);color:var(--text);font-family:"Noto Sans TC","Noto Sans CJK TC","Microsoft JhengHei",sans-serif}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--text);font-family:"O-Ne Noto Sans TC","Noto Sans TC","Noto Sans CJK TC","Microsoft JhengHei",sans-serif}
 button,input,select{font:inherit}
 .app{max-width:1740px;margin:auto;padding:24px}
 .home{display:inline-flex;align-items:center;min-height:42px;margin-bottom:8px;color:var(--teal2);font-size:14px;font-weight:800;text-decoration:none}
@@ -230,8 +231,8 @@ function contrastText(hex){
   return luminance>.62?'#3B170C':'#FDF3E7';
 }
 function fitFont(text,maxSize,minSize,maxWidth,weight){
-  let size=maxSize;ctx.font=(weight||900)+' '+size+'px "Noto Sans TC","Microsoft JhengHei",sans-serif';
-  while(size>minSize&&ctx.measureText(text).width>maxWidth){size-=2;ctx.font=(weight||900)+' '+size+'px "Noto Sans TC","Microsoft JhengHei",sans-serif';}
+  let size=maxSize;ctx.font=(weight||900)+' '+size+'px "O-Ne Noto Sans TC","Noto Sans TC","Microsoft JhengHei",sans-serif';
+  while(size>minSize&&ctx.measureText(text).width>maxWidth){size-=2;ctx.font=(weight||900)+' '+size+'px "O-Ne Noto Sans TC","Noto Sans TC","Microsoft JhengHei",sans-serif';}
   return size;
 }
 function drawTintedAsset(image,x,y,w,h,color){
@@ -246,10 +247,10 @@ function drawReplacementLabel(accent){
   // Full PSD layer replacement: the blank panel resets the old pill/text before new content is drawn.
   ctx.drawImage(labelPanel,65,27,535,129);drawTintedAsset(labelBar,68,49,13,87,accent);drawTintedAsset(labelPill,93,64,143,57,accent);
   const state=(els.stateText.value.trim()||'BUFF').toUpperCase();
-  const stateSize=fitFont(state,29,19,112,900);ctx.font='900 '+stateSize+'px "Noto Sans TC","Microsoft JhengHei",sans-serif';ctx.fillStyle=contrastText(accent);ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(state,164.5,92.5);
+  const stateSize=fitFont(state,29,19,112,900);ctx.font='900 '+stateSize+'px "O-Ne Noto Sans TC","Noto Sans TC","Microsoft JhengHei",sans-serif';ctx.fillStyle=contrastText(accent);ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(state,164.5,92.5);
   const title=els.titleText.value.trim()||'效果發動！';const subtitle=els.contentToggle.classList.contains('on')?els.subtitleText.value.trim():'';
-  const titleY=subtitle?72:94;const titleSize=fitFont(title,Number(els.titleSize.value),22,318,900);ctx.font='900 '+titleSize+'px "Noto Sans TC","Microsoft JhengHei",sans-serif';ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillStyle=els.textStyle.value==='accent'?accent:els.textStyle.value==='gold'?'#FFBE37':'#FDF3E7';ctx.fillText(title,260,titleY);
-  if(subtitle){const subSize=fitFont(subtitle,Number(els.contentSize.value),14,318,800);ctx.font='800 '+subSize+'px "Noto Sans TC","Microsoft JhengHei",sans-serif';ctx.fillStyle='rgba(253,243,231,.86)';ctx.fillText(subtitle,260,119);}
+  const titleY=subtitle?72:94;const titleSize=fitFont(title,Number(els.titleSize.value),22,318,900);ctx.font='900 '+titleSize+'px "O-Ne Noto Sans TC","Noto Sans TC","Microsoft JhengHei",sans-serif';ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillStyle=els.textStyle.value==='accent'?accent:els.textStyle.value==='gold'?'#FFBE37':'#FDF3E7';ctx.fillText(title,260,titleY);
+  if(subtitle){const subSize=fitFont(subtitle,Number(els.contentSize.value),14,318,800);ctx.font='800 '+subSize+'px "O-Ne Noto Sans TC","Noto Sans TC","Microsoft JhengHei",sans-serif';ctx.fillStyle='rgba(253,243,231,.86)';ctx.fillText(subtitle,260,119);}
 }
 function drawFormalSparkles(density){
   ctx.drawImage(formalSparkTop,1740,29,150,134);
@@ -279,7 +280,7 @@ function drawDecoration(type,color,density){
     drawIcon(bottomPrimary,118,970,more?60:54,primary,.06);
     if(more){drawIcon(topSecondary,1718,103,36,secondary,.06);drawIcon(bottomSecondary,168,938,30,secondary,-.08);}
   }
-  if(love){ctx.font='900 34px "Noto Sans TC","Microsoft JhengHei",sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.lineWidth=8;ctx.strokeStyle='rgba(31,23,19,.94)';ctx.fillStyle=primary;ctx.strokeText('LOVE',1685,163);ctx.fillText('LOVE',1685,163);}
+  if(love){ctx.font='900 34px "O-Ne Noto Sans TC","Noto Sans TC","Microsoft JhengHei",sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.lineWidth=8;ctx.strokeStyle='rgba(31,23,19,.94)';ctx.fillStyle=primary;ctx.strokeText('LOVE',1685,163);ctx.fillText('LOVE',1685,163);}
   ctx.restore();
   if(lucky)drawFormalSparkles(density);
 }
