@@ -1,8 +1,8 @@
 (function () {
   'use strict';
 
-  var VERSION = '0.1.1';
-  var SCHEMA = 'o-ne.settlement-card.ready.v0.1.1';
+  var VERSION = '0.1.2';
+  var SCHEMA = 'o-ne.settlement-card.ready.v0.1.2';
   var FORMAL = {
     component_id: 'QST-03',
     semantic_id: 'settlement_panel_16x9',
@@ -83,6 +83,7 @@
   var nextRowId = 1;
   var assetsReady = false;
   var lastIssues = [];
+  var DYNAMIC_RESULT_REGION = { x: 754, y: 284, width: 762, height: 378 };
 
   function cloneDefaultRows() {
     return DEFAULT_ROWS.map(function (item) {
@@ -137,6 +138,23 @@
       drawWidth,
       drawHeight
     );
+  }
+
+  function drawConfiguredBackground() {
+    if (!$('bgVisible').checked) return;
+    var background = uploads.background || staticImages.background;
+    drawCover(background, 0, 0, 1920, 1080, $('bgScale').value, $('bgX').value, $('bgY').value);
+    ctx.drawImage(staticImages.overlay, 0, 0);
+  }
+
+  function restoreBackgroundRegion(region) {
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(region.x, region.y, region.width, region.height);
+    ctx.clip();
+    ctx.clearRect(region.x, region.y, region.width, region.height);
+    drawConfiguredBackground();
+    ctx.restore();
   }
 
   function fitText(text, maxWidth, startSize, minSize, weight, issueLabel) {
@@ -291,10 +309,11 @@
   }
 
   function drawDynamicRows() {
-    var patchX = 754;
-    var patchY = 284;
-    var patchWidth = 762;
-    var patchHeight = 378;
+    var patchX = DYNAMIC_RESULT_REGION.x;
+    var patchY = DYNAMIC_RESULT_REGION.y;
+    var patchWidth = DYNAMIC_RESULT_REGION.width;
+    var patchHeight = DYNAMIC_RESULT_REGION.height;
+    restoreBackgroundRegion(DYNAMIC_RESULT_REGION);
     ctx.drawImage(staticImages.resultPanel, 28, 196, patchWidth, patchHeight, patchX, patchY, patchWidth, patchHeight);
 
     var areaTop = 297;
@@ -444,11 +463,7 @@
     lastIssues = [];
     ctx.clearRect(0, 0, 1920, 1080);
 
-    if ($('bgVisible').checked) {
-      var bg = uploads.background || staticImages.background;
-      drawCover(bg, 0, 0, 1920, 1080, $('bgScale').value, $('bgX').value, $('bgY').value);
-      ctx.drawImage(staticImages.overlay, 0, 0);
-    }
+    drawConfiguredBackground();
 
     ctx.drawImage(staticImages.ui, 0, 0);
     drawNextImage();
@@ -629,7 +644,7 @@
     };
     downloadBlob(
       new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' }),
-      'O-Ne_QST-03_片尾結算_READY_V0.1.1.json'
+      'O-Ne_QST-03_片尾結算_READY_V0.1.2.json'
     );
   }
 
@@ -709,7 +724,7 @@
       return;
     }
     canvas.toBlob(function (blob) {
-      if (blob) downloadBlob(blob, 'O-Ne_QST-03_片尾結算_READY_V0.1.1_1920x1080.png');
+      if (blob) downloadBlob(blob, 'O-Ne_QST-03_片尾結算_READY_V0.1.2_1920x1080.png');
       render(false);
     }, 'image/png');
   };

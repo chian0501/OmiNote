@@ -1,5 +1,5 @@
 {
-  "version": "V2.5_20260820",
+  "version": "V2.6_20260820",
   "principle": "one_function_one_entry",
   "total": 15,
   "ready": 8,
@@ -285,10 +285,11 @@
       "group": "結算／結果",
       "desc": "1–8 列自由增減、Icon 與欄位名稱預設／自訂、觀眾互動問題／下一影片模式；訂閱圓框預設關閉",
       "status": "ready",
-      "href": "./settlement-card.html?v=011&ready=1",
+      "href": "./settlement-card.html?v=012&ready=1",
       "features": [
         "formal_1920x1080_canvas",
         "dynamic_result_rows_1_to_8",
+        "dynamic_row_legacy_artifact_cleanup",
         "replaceable_row_icons",
         "field_name_presets_and_custom_input",
         "chapter_title_and_subtitle",
@@ -311,7 +312,7 @@
       "formal_sha256": "c6529ab176ae53bc8e3d8aa5d64788e07e699e60be9e07b40cee6c8d4081f599",
       "formal_version": "V1.1",
       "panel_fill_opacity": 0.8,
-      "generator_version": "V0.1.1_20260820",
+      "generator_version": "V0.1.2_20260820",
       "mapping": "./settlement-card-mapping.json",
       "visual_status": "READY",
       "ready_approved_by": "Omi",
