@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>O-Ne 效果卡生成器 V0.2.0</title>
+<title>O-Ne 效果卡生成器 V0.2.2</title>
 <style>
-@font-face{font-family:"O-Ne Noto Sans TC";src:url("./assets/NotoSansTC-O-Ne.woff?v=020") format("woff");font-style:normal;font-weight:100 900;font-display:swap}
+@font-face{font-family:"O-Ne Noto Sans TC";src:url("./assets/NotoSansTC-O-Ne.woff?v=022") format("woff");font-style:normal;font-weight:100 900;font-display:swap}
 :root{--bg:#0e1117;--panel:#151a23;--panel2:#101620;--line:#2a3240;--line2:#394355;--text:#f5efe7;--muted:#9ea7b3;--teal:#29a6a7;--teal2:#53ced0;--gold:#ffbe37;--red:#fd4537;--purple:#8d67aa}
 *{box-sizing:border-box}
 body{margin:0;min-height:100vh;background:var(--bg);color:var(--text);font-family:"O-Ne Noto Sans TC","Noto Sans TC","Noto Sans CJK TC","Microsoft JhengHei",sans-serif}
@@ -16,39 +16,39 @@ button,input,select{font:inherit}.app{max-width:1740px;margin:auto;padding:24px}
 <body>
 <main class="app">
 <a class="home" href="./">← 回工具入口</a>
-<div class="title-row"><h1>O-Ne 效果卡生成器</h1><span class="version">V0.2.0</span><span class="badge">CANDIDATE</span></div>
-<p class="sub">STA-02｜Buff／Debuff。V2 裝飾改為「右上主裝飾＋左下呼應＋少量補點」，保留正式效果卡框與透明中央影片區；情緒色採少量語意色，不再全部只有黃色。</p>
+<div class="title-row"><h1>O-Ne 效果卡生成器</h1><span class="version">V0.2.2</span><span class="badge">CANDIDATE</span></div>
+<p class="sub">STA-02｜Buff／Debuff。八種效果改為一眼能懂的語意裝飾；有表情的主圖統一使用圓潤對話框，不再像票券。右上主裝飾、旁側副裝飾與左下補點成組替換，中央影片區維持真透明。</p>
 <div class="workspace">
 <section class="panel">
 <div class="section"><div class="section-title"><span>01｜效果預設</span><small>預設帶入，可再修改</small></div><div id="presets" class="preset-grid"></div></div>
 <div class="section">
 <div class="section-title"><span>02｜文字內容</span><small>可自由修改</small></div>
 <div class="two"><div><label for="stateText">效果種類／狀態</label><select id="stateText"><option value="BUFF">BUFF</option><option value="DEBUFF">DEBUFF</option></select></div><div><label for="decorSelect">效果裝飾組合</label><select id="decorSelect"></select></div></div>
-<label for="titleText">效果標題（最多 10 字）</label><input id="titleText" maxlength="10" value="美味爆擊！！">
-<div id="subtitleWrap"><label for="subtitleText">效果內容（選填，最多 16 字）</label><input id="subtitleText" maxlength="16" value="味覺傷害 +999"></div>
+<label for="titleText">效果標題（最多 10 字）</label><input id="titleText" maxlength="10" value="好吃到爆！">
+<div id="subtitleWrap"><label for="subtitleText">效果內容（選填，最多 16 字）</label><input id="subtitleText" maxlength="16" value="幸福感 +999"></div>
 <div class="two size-grid"><div><label class="size-label" for="titleSize"><span>標題字級</span><output id="titleSizeValue" for="titleSize">42 px</output></label><input id="titleSize" type="range" min="22" max="54" step="1" value="42"></div><div><label class="size-label" for="contentSize"><span>內容字級</span><output id="contentSizeValue" for="contentSize">22 px</output></label><input id="contentSize" type="range" min="14" max="30" step="1" value="22"></div></div>
 <div class="switch-row"><div class="switch-copy"><strong>顯示效果內容</strong><small>關閉後只保留狀態與效果標題，輸入文字不會被清除。</small></div><button id="contentToggle" class="switch on" type="button" aria-pressed="true"></button></div>
 </div>
 <div class="section">
-<div class="section-title"><span>03｜顏色與裝飾</span><small>正式色票＋V2 語意配色</small></div>
+<div class="section-title"><span>03｜顏色與裝飾</span><small>正式色票＋透明語意素材</small></div>
 <div class="color-row"><div><label for="colorPreset">正式系統色</label><select id="colorPreset"><optgroup label="色票.psd｜5 組主色"><option value="#FDF3E7">亮色和框線｜#FDF3E7</option><option value="#3F8FB7">移動卡藍｜#3F8FB7</option><option value="#29A6A7">一般卡青綠｜#29A6A7</option><option value="#FD4537">挑戰卡紅｜#FD4537</option><option value="#FFBE37" selected>高亮黃｜#FFBE37</option></optgroup><optgroup label="補充效果語意色"><option value="#21A74D">成功綠｜回復／完成</option><option value="#333333">失敗灰｜疲勞／失效</option></optgroup><option value="custom">自訂顏色</option></select></div><div><label for="accentColor">自訂顏色</label><div class="color-control"><input id="accentColor" type="color" value="#ffbe37"><code id="accentHex">#FFBE37</code></div></div></div>
 <div class="two"><div><label for="textStyle">主字顏色</label><select id="textStyle"><option value="white">奶油白</option><option value="accent">跟隨效果色</option><option value="gold">金黃色</option></select></div><div><label for="decorDensity">裝飾份量</label><select id="decorDensity"><option value="light">少一點</option><option value="standard" selected>標準</option></select></div></div>
-<div class="two"><div><label for="decorColorMode">裝飾配色</label><select id="decorColorMode"><option value="semantic" selected>語意配色（建議）</option><option value="accent">全部跟隨主色</option></select></div><div><label>V2 原則</label><div class="note" style="margin:0;height:42px;padding:10px 11px;overflow:hidden">主 1＋副 1＋補點 2–3</div></div></div>
-<div class="hint">語意配色：黃色維持系統主體；粉紅＝愛心／害羞、藍＝汗／雨、紅＝怒氣／受傷、紫＝暈眩／怪味。只有局部上色，不改正式框。</div>
+<div class="two"><div><label for="decorColorMode">裝飾配色</label><select id="decorColorMode"><option value="semantic" selected>素材固定語意配色</option></select></div><div><label>裝飾原則</label><div class="note" style="margin:0;height:42px;padding:10px 11px;overflow:hidden">主 1＋副 1＋補點 2–3</div></div></div>
+<div class="hint">透明裝飾保留原本的語意配色，不跟著框線一起染色；框線、標籤與文字強調仍使用正式效果色。</div>
 <div class="switch-row"><div class="switch-copy"><strong>顯示邊框效果裝飾</strong><small>只出現在右上、左下與框角安全區；中央影片區保持乾淨。</small></div><button id="decorToggle" class="switch on" type="button" aria-pressed="true"></button></div>
 </div>
-<div class="section"><div class="section-title"><span>04｜版本邊界</span><small>FORMAL SOURCE</small></div><div class="note">正式母版仍為 <b>效果卡.psd</b>（Drive ID：1ZZdipJX…）。V0.2.0 只更新網頁候選裝飾邏輯；正式 PSD／PNG、家族與 STA-02 state 不覆蓋、不新增。</div></div>
+<div class="section"><div class="section-title"><span>04｜版本邊界</span><small>FORMAL SOURCE</small></div><div class="note">正式母版仍為 <b>效果卡.psd</b>（Drive ID：1ZZdipJX…）。V0.2.2 沿用正式框體與分層，加入本輪核准的 8 組、共 24 張透明裝飾；只更新 GitHub 候選工具，不覆蓋正式 PSD／PNG。</div></div>
 </section>
 <section class="panel preview-panel">
 <div class="preview-toolbar"><div><strong>1920 × 1080 即時預覽</strong><small>輸出永遠是透明 PNG；底色只供檢查。</small></div><div class="view-tabs"><button id="transparentView" class="active" type="button">透明格</button><button id="darkView" type="button">深色底</button></div></div>
 <div id="stage" class="stage"><canvas id="canvas" width="1920" height="1080"></canvas></div>
-<div class="export"><div id="status" class="status">正在載入正式母版…</div><div class="buttons"><button id="downloadPng" class="action" type="button">下載透明 PNG</button><button id="downloadJson" class="action secondary" type="button">下載設定 JSON</button><button id="reset" class="action ghost" type="button">重設</button></div><div class="formal-note">schema=o-ne.effect-card.candidate.v0.2.0｜正式框＋V2 裝飾組合｜語意色可切換｜中央影片區留空</div></div>
+<div class="export"><div id="status" class="status">正在載入正式母版…</div><div class="buttons"><button id="downloadPng" class="action" type="button">下載透明 PNG</button><button id="downloadJson" class="action secondary" type="button">下載設定 JSON</button><button id="reset" class="action ghost" type="button">重設</button></div><div class="formal-note">schema=o-ne.effect-card.candidate.v0.2.2｜正式框＋8 組透明語意裝飾｜對話框表情｜中央影片區留空</div></div>
 </section>
 </div>
 </main>
 <script>
-const VERSION='0.2.0';
-const SCHEMA='o-ne.effect-card.candidate.v0.2.0';
+const VERSION='0.2.2';
+const SCHEMA='o-ne.effect-card.candidate.v0.2.2';
 const FRAME_SRC='./assets/effect-card-frame-v018.png';
 const ACCENT_BOTTOM_SRC='./assets/effect-card-accent-bottom-v018.png';
 const ACCENT_RIGHT_SRC='./assets/effect-card-accent-right-v018.png';
@@ -58,6 +58,17 @@ const LABEL_BAR_SRC='./assets/effect-card-label-bar-v018.png';
 const LABEL_PILL_SRC='./assets/effect-card-label-pill-v018.png';
 const FORMAL_SPARK_BOTTOM_SRC='./assets/effect-card-spark-bottom-v018.png';
 const FORMAL_SPARK_TOP_SRC='./assets/effect-card-spark-top-v018.png';
+const DECOR_ASSET_BASE='./assets/effect-card-decor-v022/';
+const DECOR_ASSET_SOURCES={
+delicious:{main:DECOR_ASSET_BASE+'delicious-main.png',accent:DECOR_ASSET_BASE+'delicious-accent.png',support:DECOR_ASSET_BASE+'delicious-support.png'},
+cute:{main:DECOR_ASSET_BASE+'cute-main.png',accent:DECOR_ASSET_BASE+'cute-accent.png',support:DECOR_ASSET_BASE+'cute-support.png'},
+love:{main:DECOR_ASSET_BASE+'love-main.png',accent:DECOR_ASSET_BASE+'love-accent.png',support:DECOR_ASSET_BASE+'love-support.png'},
+praised:{main:DECOR_ASSET_BASE+'praised-main.png',accent:DECOR_ASSET_BASE+'praised-accent.png',support:DECOR_ASSET_BASE+'praised-support.png'},
+badTaste:{main:DECOR_ASSET_BASE+'bad-taste-main.png',accent:DECOR_ASSET_BASE+'bad-taste-accent.png',support:DECOR_ASSET_BASE+'bad-taste-support.png'},
+shock:{main:DECOR_ASSET_BASE+'shock-main.png',accent:DECOR_ASSET_BASE+'shock-accent.png',support:DECOR_ASSET_BASE+'shock-support.png'},
+backstab:{main:DECOR_ASSET_BASE+'backstab-main.png',accent:DECOR_ASSET_BASE+'backstab-accent.png',support:DECOR_ASSET_BASE+'backstab-support.png'},
+sick:{main:DECOR_ASSET_BASE+'sick-main.png',accent:DECOR_ASSET_BASE+'sick-accent.png',support:DECOR_ASSET_BASE+'sick-support.png'}
+};
 const TOKENS={gold:'#FFBE37',cream:'#FDF3E7',dark:'#3B170C',red:'#FD4537',blue:'#59B8FF',pink:'#FF6F91',purple:'#8D67AA',green:'#21A74D',teal:'#29A6A7',navy:'#3F8FB7',grey:'#333333'};
 const ICON_NODES={
 Sparkles:[["path",{"d":"M12 2l1.65 5.35L19 9l-5.35 1.65L12 16l-1.65-5.35L5 9l5.35-1.65Z"}],["path",{"d":"M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8Z"}]],
@@ -90,50 +101,37 @@ Plus:[["circle",{"cx":"12","cy":"12","r":"9"}],["path",{"d":"M12 8v8M8 12h8"}]],
 Binoculars:[["circle",{"cx":"7","cy":"14","r":"4"}],["circle",{"cx":"17","cy":"14","r":"4"}],["path",{"d":"M8 10V6h3l1 4M16 10V6h-3l-1 4"}]]
 };
 const PRESETS=[
-{id:'delicious',name:'美味爆擊',primary:'ChefHat',state:'BUFF',title:'美味爆擊！！',subtitle:'味覺傷害 +999',color:TOKENS.gold,decor:'food'},
-{id:'heal',name:'體力回復',primary:'HeartPulse',state:'BUFF',title:'體力恢復！',subtitle:'HP +30',color:TOKENS.green,decor:'heal'},
-{id:'lucky',name:'幸運提升',primary:'Sparkles',state:'BUFF',title:'幸運值提升！',subtitle:'稀有掉落率 UP',color:TOKENS.gold,decor:'lucky'},
-{id:'speed',name:'速度提升',primary:'Speed',state:'BUFF',title:'移動速度 UP！',subtitle:'探索效率提升',color:TOKENS.navy,decor:'speed'},
-{id:'hpdown',name:'體力下降',primary:'HeartCrack',state:'DEBUFF',title:'體力下降…',subtitle:'HP -20',color:TOKENS.red,decor:'hurt'},
-{id:'tired',name:'疲勞累積',primary:'BatteryLow',state:'DEBUFF',title:'疲勞累積',subtitle:'行動速度下降',color:TOKENS.grey,decor:'tired'},
-{id:'lost',name:'迷路狀態',primary:'Question',state:'DEBUFF',title:'迷路中…',subtitle:'方向感暫時離線',color:TOKENS.navy,decor:'confused'},
-{id:'rain',name:'淋雨狀態',primary:'CloudRain',state:'DEBUFF',title:'淋雨狀態',subtitle:'心情 -10',color:TOKENS.navy,decor:'rain'}
+{id:'delicious',name:'美食好吃',state:'BUFF',title:'好吃到爆！',subtitle:'幸福感 +999',color:TOKENS.gold,decor:'delicious'},
+{id:'cute',name:'好萌喔可愛',state:'BUFF',title:'好萌喔！',subtitle:'可愛值爆表',color:TOKENS.gold,decor:'cute'},
+{id:'love',name:'愛了愛了 Love',state:'BUFF',title:'愛了愛了！',subtitle:'心動值 MAX',color:TOKENS.red,decor:'love'},
+{id:'praised',name:'被誇獎了開心',state:'BUFF',title:'被誇獎了！',subtitle:'開心值 UP',color:TOKENS.teal,decor:'praised'},
+{id:'badTaste',name:'踩雷難吃',state:'DEBUFF',title:'踩雷了…',subtitle:'味覺受到傷害',color:TOKENS.red,decor:'badTaste'},
+{id:'shock',name:'晴天霹靂打擊',state:'DEBUFF',title:'晴天霹靂！',subtitle:'精神打擊 -50',color:TOKENS.navy,decor:'shock'},
+{id:'backstab',name:'背後中箭背刺',state:'DEBUFF',title:'背後中箭！',subtitle:'信任值大幅下降',color:TOKENS.red,decor:'backstab'},
+{id:'sick',name:'生病不舒服',state:'DEBUFF',title:'身體不舒服…',subtitle:'行動力下降',color:TOKENS.teal,decor:'sick'}
 ];
 const DECORS=[
-{id:'formalSpark',group:'原檔／萬用',name:'原檔閃光',formal:true},
-{id:'spark',group:'原檔／萬用',name:'萬用閃光',main:'Sparkles',secondary:'Sparkles',bottom:'Sparkles',colors:['cream','gold']},
-{id:'speed',group:'原檔／萬用',name:'速度／前進',main:'Speed',secondary:'Zap',bottom:'Speed',colors:['accent','cream']},
-{id:'food',group:'主題',name:'美味／料理',main:'ChefHat',secondary:'Sparkles',bottom:'Utensils',colors:['accent','cream']},
-{id:'badTaste',group:'主題',name:'難吃／怪味',main:'Frown',secondary:'Smoke',bottom:'Swirl',colors:['purple','cream']},
-{id:'heal',group:'主題',name:'回復／補血',main:'HeartPulse',secondary:'Plus',bottom:'Heart',colors:['green','pink']},
-{id:'love',group:'情緒',name:'喜歡／心動',main:'Heart',secondary:'Sparkles',bottom:'Heart',colors:['pink','cream']},
-{id:'cute',group:'情緒',name:'萌萌／可愛',main:'CatEar',secondary:'Heart',bottom:'Paw',colors:['accent','pink']},
-{id:'shy',group:'情緒',name:'害羞／不好意思',main:'Smile',secondary:'Heart',bottom:'Droplets',colors:['pink','blue']},
-{id:'sweat',group:'情緒',name:'緊張／冒汗',main:'Droplets',secondary:'Exclaim',bottom:'Droplets',colors:['blue','accent']},
-{id:'shock',group:'情緒',name:'震驚／嚇到',main:'Exclaim',secondary:'Sparkles',bottom:'Exclaim',colors:['accent','cream']},
-{id:'confused',group:'情緒',name:'疑惑／迷路',main:'Question',secondary:'Swirl',bottom:'Question',colors:['blue','purple']},
-{id:'angry',group:'情緒',name:'爆氣／火大',main:'Angry',secondary:'Zap',bottom:'Smoke',colors:['red','cream']},
-{id:'dizzy',group:'情緒',name:'暈眩／混亂',main:'Swirl',secondary:'Question',bottom:'Swirl',colors:['purple','blue']},
-{id:'tired',group:'狀態',name:'疲勞／想睡',main:'BatteryLow',secondary:'Moon',bottom:'Swirl',colors:['grey','cream']},
-{id:'hurt',group:'狀態',name:'受傷／破防',main:'HeartCrack',secondary:'Zap',bottom:'HeartCrack',colors:['red','accent']},
-{id:'defense',group:'狀態',name:'防禦／穩住',main:'Target',secondary:'Sparkles',bottom:'Target',colors:['accent','cream']},
-{id:'rain',group:'狀態',name:'淋雨／濕答答',main:'CloudRain',secondary:'Droplets',bottom:'Droplets',colors:['blue','cream']},
-{id:'observe',group:'探索／事件',name:'觀察／發現',main:'Binoculars',secondary:'Sparkles',bottom:'Eye',colors:['accent','cream']},
-{id:'location',group:'探索／事件',name:'抵達／定位',main:'MapPin',secondary:'Sparkles',bottom:'MapPin',colors:['accent','cream']},
-{id:'music',group:'探索／事件',name:'音樂／氣氛',main:'Music',secondary:'Sparkles',bottom:'Music',colors:['pink','accent']},
-{id:'rare',group:'探索／事件',name:'稀有／成就',main:'Crown',secondary:'Sparkles',bottom:'Crown',colors:['gold','cream']},
-{id:'lucky',group:'探索／事件',name:'幸運／閃耀',main:'Sparkles',secondary:'Crown',bottom:'Sparkles',colors:['gold','cream'],formalSpark:true},
+{id:'delicious',group:'正向效果',name:'美食好吃｜星星眼對話框＋愛心＋閃光',asset:'delicious',main:{x:1570,y:-24,w:320,h:235},accent:{x:1478,y:96,w:158,h:112},accentRotation:-.1,support:{x:42,y:892,w:170,h:145}},
+{id:'cute',group:'正向效果',name:'好萌喔可愛｜貓耳對話框＋愛心肉球',asset:'cute',main:{x:1570,y:-24,w:320,h:235},accent:{x:1478,y:96,w:158,h:112},accentRotation:-.1,support:{x:42,y:892,w:170,h:145}},
+{id:'love',group:'正向效果',name:'愛了愛了｜翅膀雙愛心＋心動軌道',asset:'love',main:{x:1570,y:-18,w:320,h:225},accent:{x:1472,y:92,w:166,h:116},accentRotation:-.08,support:{x:42,y:892,w:170,h:145}},
+{id:'praised',group:'正向效果',name:'被誇獎了｜皇冠對話框＋拍手彩帶',asset:'praised',main:{x:1580,y:-24,w:310,h:235},accent:{x:1468,y:94,w:170,h:116},accentRotation:-.08,support:{x:42,y:892,w:170,h:145}},
+{id:'badTaste',group:'負向效果',name:'踩雷難吃｜反胃對話框＋臭味雲',asset:'badTaste',main:{x:1570,y:-22,w:320,h:235},accent:{x:1470,y:94,w:168,h:116},accentRotation:-.1,support:{x:42,y:892,w:170,h:145}},
+{id:'shock',group:'負向效果',name:'晴天霹靂｜雷雲爆擊＋衝擊圈',asset:'shock',main:{x:1565,y:-24,w:325,h:235},accent:{x:1470,y:92,w:170,h:118},accentRotation:-.09,support:{x:42,y:892,w:170,h:145}},
+{id:'backstab',group:'負向效果',name:'背後中箭｜中箭盾牌＋破裂箭組',asset:'backstab',main:{x:1590,y:-18,w:300,h:230},accent:{x:1464,y:90,w:176,h:120},accentRotation:-.08,support:{x:42,y:892,w:170,h:145}},
+{id:'sick',group:'負向效果',name:'生病不舒服｜病容對話框＋體溫計',asset:'sick',main:{x:1575,y:-20,w:315,h:232},accent:{x:1470,y:92,w:168,h:118},accentRotation:-.08,support:{x:42,y:892,w:170,h:145}},
 {id:'none',group:'關閉',name:'不加裝飾'}
 ];
 const els={presets:document.getElementById('presets'),stateText:document.getElementById('stateText'),titleText:document.getElementById('titleText'),subtitleText:document.getElementById('subtitleText'),titleSize:document.getElementById('titleSize'),titleSizeValue:document.getElementById('titleSizeValue'),contentSize:document.getElementById('contentSize'),contentSizeValue:document.getElementById('contentSizeValue'),contentToggle:document.getElementById('contentToggle'),decorSelect:document.getElementById('decorSelect'),colorPreset:document.getElementById('colorPreset'),accentColor:document.getElementById('accentColor'),accentHex:document.getElementById('accentHex'),textStyle:document.getElementById('textStyle'),decorDensity:document.getElementById('decorDensity'),decorColorMode:document.getElementById('decorColorMode'),decorToggle:document.getElementById('decorToggle'),canvas:document.getElementById('canvas'),stage:document.getElementById('stage'),status:document.getElementById('status')};
 const ctx=els.canvas.getContext('2d');const tintCanvas=document.createElement('canvas');const tintCtx=tintCanvas.getContext('2d');
 const frame=new Image(),accentBottom=new Image(),accentRight=new Image(),accentLeft=new Image(),labelPanel=new Image(),labelBar=new Image(),labelPill=new Image(),formalSparkBottom=new Image(),formalSparkTop=new Image();
-const iconImages={};let current='delicious',frameReady=false,accentReady=0,labelReady=0,formalSparkReady=0,iconsReady=0;
+const iconImages={},decorAssetImages={};
+const decorAssetTotal=Object.values(DECOR_ASSET_SOURCES).reduce((total,sources)=>total+Object.keys(sources).length,0);
+let current='delicious',frameReady=false,accentReady=0,labelReady=0,formalSparkReady=0,iconsReady=0,decorAssetsReady=0;
 function svgAttrs(attrs){return Object.entries(attrs).map(([k,v])=>k+'="'+v+'"').join(' ')}
 function iconDataUri(name,color){const body=(ICON_NODES[name]||[]).map(n=>'<'+n[0]+' '+svgAttrs(n[1])+'/>').join('');const svg='<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 24 24" fill="none" stroke="'+(color||'#fff')+'" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">'+body+'</svg>';return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg)}
-function assetsReady(){return frameReady&&accentReady===3&&labelReady===3&&formalSparkReady===2&&iconsReady===Object.keys(ICON_NODES).length}
+function assetsReady(){return frameReady&&accentReady===3&&labelReady===3&&formalSparkReady===2&&iconsReady===Object.keys(ICON_NODES).length&&decorAssetsReady===decorAssetTotal}
 function setStatus(message,error){els.status.textContent=message;els.status.classList.toggle('error',!!error)}
-function drawPresetButtons(){els.presets.innerHTML='';PRESETS.forEach(p=>{const b=document.createElement('button');b.type='button';b.className='preset'+(p.id===current?' active':'');b.style.setProperty('--preset-color',p.color);b.innerHTML='<img class="preset-icon" alt="" src="'+iconDataUri(p.primary,p.color)+'"><span class="preset-name">'+p.name+'</span><span class="preset-state">'+p.state+'</span>';b.onclick=()=>applyPreset(p.id);els.presets.appendChild(b)})}
+function drawPresetButtons(){els.presets.innerHTML='';PRESETS.forEach(p=>{const b=document.createElement('button');const d=DECORS.find(x=>x.id===p.decor);const previewSrc=d?.asset?DECOR_ASSET_SOURCES[d.asset].main:iconDataUri(p.primary,p.color);b.type='button';b.className='preset'+(p.id===current?' active':'');b.style.setProperty('--preset-color',p.color);b.innerHTML='<img class="preset-icon" alt="" src="'+previewSrc+'"><span class="preset-name">'+p.name+'</span><span class="preset-state">'+p.state+'</span>';b.onclick=()=>applyPreset(p.id);els.presets.appendChild(b)})}
 function drawDecorOptions(){els.decorSelect.innerHTML='';const groups=[...new Set(DECORS.map(d=>d.group))];groups.forEach(g=>{const opt=document.createElement('optgroup');opt.label=g;DECORS.filter(d=>d.group===g).forEach(d=>{const o=document.createElement('option');o.value=d.id;o.textContent=d.name;opt.appendChild(o)});els.decorSelect.appendChild(opt)})}
 function applyPreset(id){const p=PRESETS.find(x=>x.id===id)||PRESETS[0];current=p.id;els.stateText.value=p.state;els.titleText.value=p.title;els.subtitleText.value=p.subtitle;els.decorSelect.value=p.decor;els.colorPreset.value=p.color.toUpperCase();els.accentColor.value=p.color;els.accentHex.textContent=p.color.toUpperCase();drawPresetButtons();render()}
 function getAccent(){return els.accentColor.value.toUpperCase()}
@@ -141,24 +139,27 @@ function contrastText(hex){const rgb=[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16
 function fitFont(text,maxSize,minSize,maxWidth,weight){let size=maxSize;ctx.font=(weight||900)+' '+size+'px "O-Ne Noto Sans TC","Noto Sans TC","Microsoft JhengHei",sans-serif';while(size>minSize&&ctx.measureText(text).width>maxWidth){size-=2;ctx.font=(weight||900)+' '+size+'px "O-Ne Noto Sans TC","Noto Sans TC","Microsoft JhengHei",sans-serif'}return size}
 function drawTintedAsset(image,x,y,w,h,color){tintCanvas.width=w;tintCanvas.height=h;tintCtx.clearRect(0,0,w,h);tintCtx.globalCompositeOperation='source-over';tintCtx.drawImage(image,0,0,w,h);tintCtx.globalCompositeOperation='source-in';tintCtx.fillStyle=color;tintCtx.fillRect(0,0,w,h);tintCtx.globalCompositeOperation='source-over';ctx.drawImage(tintCanvas,x,y,w,h)}
 function drawIcon(name,x,y,size,color,rotation,alpha){const image=iconImages[name];if(!image||!image.complete)return;tintCanvas.width=256;tintCanvas.height=256;tintCtx.clearRect(0,0,256,256);tintCtx.globalCompositeOperation='source-over';tintCtx.drawImage(image,0,0,256,256);tintCtx.globalCompositeOperation='source-in';tintCtx.fillStyle=color;tintCtx.fillRect(0,0,256,256);tintCtx.globalCompositeOperation='source-over';ctx.save();ctx.translate(x,y);ctx.rotate(rotation||0);ctx.globalAlpha=alpha??1;ctx.filter='drop-shadow(0 4px 0 rgba(31,23,19,.92)) drop-shadow(0 0 3px rgba(31,23,19,.8))';ctx.drawImage(tintCanvas,-size/2,-size/2,size,size);ctx.restore()}
+function drawContainedAsset(image,box,scale,rotation){if(!image||!image.complete||!image.naturalWidth)return;const ratio=Math.min(box.w/image.naturalWidth,box.h/image.naturalHeight)*(scale||1),w=image.naturalWidth*ratio,h=image.naturalHeight*ratio,x=box.x+(box.w-w)/2,y=box.y+(box.h-h)/2;ctx.save();ctx.translate(x+w/2,y+h/2);ctx.rotate(rotation||0);ctx.filter='drop-shadow(0 6px 6px rgba(31,23,19,.38))';ctx.drawImage(image,-w/2,-h/2,w,h);ctx.restore()}
+function drawRasterDecoration(d,density){const images=decorAssetImages[d.asset];if(!images)return;const scale=density==='light'?.84:1;ctx.save();ctx.beginPath();ctx.rect(0,0,1920,225);ctx.rect(0,885,1920,195);ctx.rect(0,0,205,1080);ctx.rect(1715,0,205,1080);ctx.clip();drawContainedAsset(images.accent,d.accent,scale,d.accentRotation??-.1);drawContainedAsset(images.main,d.main,scale,d.mainRotation??-.035);drawContainedAsset(images.support,d.support,scale,d.supportRotation??.035);ctx.restore()}
 function drawReplacementLabel(accent){ctx.drawImage(labelPanel,65,27,535,129);drawTintedAsset(labelBar,68,49,13,87,accent);drawTintedAsset(labelPill,93,64,143,57,accent);const state=(els.stateText.value.trim()||'BUFF').toUpperCase();const stateSize=fitFont(state,29,19,112,900);ctx.font='900 '+stateSize+'px "O-Ne Noto Sans TC","Noto Sans TC","Microsoft JhengHei",sans-serif';ctx.fillStyle=contrastText(accent);ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(state,164.5,92.5);const title=els.titleText.value.trim()||'效果發動！';const subtitle=els.contentToggle.classList.contains('on')?els.subtitleText.value.trim():'';const titleY=subtitle?72:94;const titleSize=fitFont(title,Number(els.titleSize.value),22,318,900);ctx.font='900 '+titleSize+'px "O-Ne Noto Sans TC","Noto Sans TC","Microsoft JhengHei",sans-serif';ctx.textAlign='left';ctx.fillStyle=els.textStyle.value==='accent'?accent:els.textStyle.value==='gold'?TOKENS.gold:TOKENS.cream;ctx.fillText(title,260,titleY);if(subtitle){const subSize=fitFont(subtitle,Number(els.contentSize.value),14,318,800);ctx.font='800 '+subSize+'px "O-Ne Noto Sans TC","Noto Sans TC","Microsoft JhengHei",sans-serif';ctx.fillStyle='rgba(253,243,231,.86)';ctx.fillText(subtitle,260,119)}}
 function drawFormalSparkles(density){ctx.drawImage(formalSparkTop,1740,29,150,134);if(density==='standard')ctx.drawImage(formalSparkBottom,60,953,68,68)}
 function drawAccentLayers(accent){drawTintedAsset(accentBottom,636,1020,642,27,accent);drawTintedAsset(accentRight,1860,793,29,162,accent);drawTintedAsset(accentLeft,26,123,28,162,accent)}
 function resolveColor(token,accent){if(els.decorColorMode.value==='accent'&&token!=='cream')return accent;if(token==='accent')return accent;return TOKENS[token]||accent}
-function drawDecoration(type,accent,density){if(type==='none')return;if(type==='formalSpark'){drawFormalSparkles(density);return}const d=DECORS.find(x=>x.id===type)||DECORS[1];const more=density==='standard';const c1=resolveColor(d.colors?.[0]||'accent',accent),c2=resolveColor(d.colors?.[1]||'cream',accent);ctx.save();ctx.beginPath();ctx.rect(0,0,1920,190);ctx.rect(0,890,1920,190);ctx.rect(0,0,190,1080);ctx.rect(1730,0,190,1080);ctx.clip();drawIcon(d.main,1800,118,more?78:68,c1,-.03);if(d.secondary)drawIcon(d.secondary,1712,96,more?34:28,c2,.06,.95);if(d.bottom)drawIcon(d.bottom,118,970,more?56:48,c1,.05,.96);if(more){drawIcon('Sparkles',166,936,28,c2,-.04,.92);if(['angry','shock','hurt'].includes(d.id))drawIcon('Exclaim',1750,154,26,c2,.08,.9);if(['love','cute','shy'].includes(d.id))drawIcon('Heart',1710,150,24,resolveColor('pink',accent),.05,.9);if(['sweat','confused','rain'].includes(d.id))drawIcon('Droplets',170,926,25,resolveColor('blue',accent),-.06,.9)}ctx.restore();if(d.formalSpark)drawFormalSparkles(density)}
+function drawDecoration(type,accent,density){if(type==='none')return;const d=DECORS.find(x=>x.id===type)||DECORS[0];if(d.asset){drawRasterDecoration(d,density);return}const more=density==='standard',c1=resolveColor(d.colors?.[0]||'accent',accent),c2=resolveColor(d.colors?.[1]||'cream',accent);ctx.save();ctx.beginPath();ctx.rect(0,0,1920,190);ctx.rect(0,890,1920,190);ctx.rect(0,0,190,1080);ctx.rect(1730,0,190,1080);ctx.clip();drawIcon(d.main,1800,118,more?78:68,c1,-.03);if(d.secondary)drawIcon(d.secondary,1712,96,more?34:28,c2,.06,.95);if(d.bottom)drawIcon(d.bottom,118,970,more?56:48,c1,.05,.96);ctx.restore()}
 function render(){ctx.clearRect(0,0,1920,1080);if(!assetsReady())return;const accent=getAccent();ctx.drawImage(frame,15,19,1886,1037);drawAccentLayers(accent);if(els.decorToggle.classList.contains('on'))drawDecoration(els.decorSelect.value,accent,els.decorDensity.value);drawReplacementLabel(accent)}
-function getConfig(){const d=DECORS.find(x=>x.id===els.decorSelect.value);return {schema:SCHEMA,version:VERSION,status:'CANDIDATE',formal_source:{master_psd:'效果卡.psd',drive_id:'1ZZdipJXr7Ujt_u1KUK2WxkRkJn8xjOoY',mapping:'STA-02',state_family:'Buff/Debuff',source_date:'2026-08-20'},render_strategy:'formal_psd_layers_plus_v2_semantic_decor',frame_source:'effect-card-frame-v018.png',preset:current,state:els.stateText.value,title:els.titleText.value.trim(),subtitle:els.subtitleText.value.trim(),title_font_size:Number(els.titleSize.value),content_font_size:Number(els.contentSize.value),content_visible:els.contentToggle.classList.contains('on'),accent:getAccent(),text_style:els.textStyle.value,decoration:els.decorSelect.value,decoration_group:d?.group||null,decoration_icons:d?[d.main,d.secondary,d.bottom].filter(Boolean):[],decoration_density:els.decorDensity.value,decoration_color_mode:els.decorColorMode.value,decoration_visible:els.decorToggle.classList.contains('on'),decoration_zone:'top_right_bottom_left_border_only',canvas:{width:1920,height:1080,transparent:true},generated_at:new Date().toISOString()}}
+function getConfig(){const d=DECORS.find(x=>x.id===els.decorSelect.value);return {schema:SCHEMA,version:VERSION,status:'CANDIDATE',formal_source:{master_psd:'效果卡.psd',drive_id:'1ZZdipJXr7Ujt_u1KUK2WxkRkJn8xjOoY',mapping:'STA-02',state_family:'Buff/Debuff',source_date:'2026-08-20'},render_strategy:'formal_psd_layers_plus_semantic_png_v022',frame_source:'effect-card-frame-v018.png',preset:current,state:els.stateText.value,title:els.titleText.value.trim(),subtitle:els.subtitleText.value.trim(),title_font_size:Number(els.titleSize.value),content_font_size:Number(els.contentSize.value),content_visible:els.contentToggle.classList.contains('on'),accent:getAccent(),text_style:els.textStyle.value,decoration:els.decorSelect.value,decoration_group:d?.group||null,decoration_assets:d?.asset?Object.values(DECOR_ASSET_SOURCES[d.asset]):[],decoration_icons:d&&!d.asset?[d.main,d.secondary,d.bottom].filter(Boolean):[],decoration_density:els.decorDensity.value,decoration_color_mode:'fixed_semantic_asset',decoration_visible:els.decorToggle.classList.contains('on'),decoration_zone:'top_right_bottom_left_border_only',semantic_decor_source:{origin:'Omi approved generated semantic set',reference_expression_folder_id:'1Vj1kJJxotFX-HIFlLhXG9uM8CtygLr_z',asset_base:DECOR_ASSET_BASE,asset_count:24,effect_count:8,layout:'main_accent_support',face_container:'rounded_speech_bubble'},canvas:{width:1920,height:1080,transparent:true},generated_at:new Date().toISOString()}}
 function downloadBlob(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1200)}
 function safeName(){return (els.titleText.value.trim()||'EFFECT').replace(/[\\/:*?"<>|\s]+/g,'_').slice(0,30)}
-function exportPng(){if(!assetsReady()){setStatus('正式母版與替換素材尚未載入，請稍後再試。',true);return}render();els.canvas.toBlob(blob=>{if(!blob){setStatus('PNG 產生失敗，請重新整理。',true);return}downloadBlob(blob,'O-NE_EFFECT_'+safeName()+'_V0.2.0.png');setStatus('已輸出 1920×1080 透明 PNG；V2 裝飾只使用框邊安全區。')},'image/png')}
-function exportJson(){downloadBlob(new Blob([JSON.stringify(getConfig(),null,2)],{type:'application/json;charset=utf-8'}),'O-NE_EFFECT_'+safeName()+'_V0.2.0.json');setStatus('已輸出 V0.2.0 設定 JSON。')}
-function bind(){[els.stateText,els.titleText,els.subtitleText,els.decorSelect,els.textStyle,els.decorDensity,els.decorColorMode].forEach(el=>{el.addEventListener('input',render);el.addEventListener('change',render)});[[els.titleSize,els.titleSizeValue],[els.contentSize,els.contentSizeValue]].forEach(pair=>pair[0].addEventListener('input',function(){pair[1].textContent=this.value+' px';render()}));els.colorPreset.addEventListener('change',function(){if(this.value!=='custom'){els.accentColor.value=this.value;els.accentHex.textContent=this.value.toUpperCase()}render()});els.accentColor.addEventListener('input',function(){els.colorPreset.value='custom';els.accentHex.textContent=this.value.toUpperCase();render()});els.contentToggle.onclick=function(){this.classList.toggle('on');this.setAttribute('aria-pressed',this.classList.contains('on')?'true':'false');els.subtitleText.disabled=!this.classList.contains('on');render()};els.decorToggle.onclick=function(){this.classList.toggle('on');this.setAttribute('aria-pressed',this.classList.contains('on')?'true':'false');render()};document.getElementById('transparentView').onclick=function(){this.classList.add('active');document.getElementById('darkView').classList.remove('active');els.stage.classList.remove('dark')};document.getElementById('darkView').onclick=function(){this.classList.add('active');document.getElementById('transparentView').classList.remove('active');els.stage.classList.add('dark')};document.getElementById('downloadPng').onclick=exportPng;document.getElementById('downloadJson').onclick=exportJson;document.getElementById('reset').onclick=function(){els.textStyle.value='white';els.decorDensity.value='standard';els.decorColorMode.value='semantic';els.titleSize.value='42';els.titleSizeValue.textContent='42 px';els.contentSize.value='22';els.contentSizeValue.textContent='22 px';if(!els.contentToggle.classList.contains('on'))els.contentToggle.click();if(!els.decorToggle.classList.contains('on'))els.decorToggle.click();applyPreset('delicious');setStatus('已重設為 V0.2.0「美味爆擊」；V2 語意配色與框邊配置已復原。')}}
-function finishAssetLoad(){if(assetsReady()){render();setStatus('V0.2.0 已載入：正式效果卡框＋23 組 V2 裝飾；可開始編輯。')}}
+function exportPng(){if(!assetsReady()){setStatus('正式母版與語意裝飾尚未載入，請稍後再試。',true);return}render();els.canvas.toBlob(blob=>{if(!blob){setStatus('PNG 產生失敗，請重新整理。',true);return}downloadBlob(blob,'O-NE_EFFECT_'+safeName()+'_V0.2.2.png');setStatus('已輸出 1920×1080 透明 PNG；語意裝飾只使用框邊安全區。')},'image/png')}
+function exportJson(){downloadBlob(new Blob([JSON.stringify(getConfig(),null,2)],{type:'application/json;charset=utf-8'}),'O-NE_EFFECT_'+safeName()+'_V0.2.2.json');setStatus('已輸出 V0.2.2 設定 JSON。')}
+function bind(){[els.stateText,els.titleText,els.subtitleText,els.decorSelect,els.textStyle,els.decorDensity,els.decorColorMode].forEach(el=>{el.addEventListener('input',render);el.addEventListener('change',render)});[[els.titleSize,els.titleSizeValue],[els.contentSize,els.contentSizeValue]].forEach(pair=>pair[0].addEventListener('input',function(){pair[1].textContent=this.value+' px';render()}));els.colorPreset.addEventListener('change',function(){if(this.value!=='custom'){els.accentColor.value=this.value;els.accentHex.textContent=this.value.toUpperCase()}render()});els.accentColor.addEventListener('input',function(){els.colorPreset.value='custom';els.accentHex.textContent=this.value.toUpperCase();render()});els.contentToggle.onclick=function(){this.classList.toggle('on');this.setAttribute('aria-pressed',this.classList.contains('on')?'true':'false');els.subtitleText.disabled=!this.classList.contains('on');render()};els.decorToggle.onclick=function(){this.classList.toggle('on');this.setAttribute('aria-pressed',this.classList.contains('on')?'true':'false');render()};document.getElementById('transparentView').onclick=function(){this.classList.add('active');document.getElementById('darkView').classList.remove('active');els.stage.classList.remove('dark')};document.getElementById('darkView').onclick=function(){this.classList.add('active');document.getElementById('transparentView').classList.remove('active');els.stage.classList.add('dark')};document.getElementById('downloadPng').onclick=exportPng;document.getElementById('downloadJson').onclick=exportJson;document.getElementById('reset').onclick=function(){els.textStyle.value='white';els.decorDensity.value='standard';els.decorColorMode.value='semantic';els.titleSize.value='42';els.titleSizeValue.textContent='42 px';els.contentSize.value='22';els.contentSizeValue.textContent='22 px';if(!els.contentToggle.classList.contains('on'))els.contentToggle.click();if(!els.decorToggle.classList.contains('on'))els.decorToggle.click();applyPreset('delicious');setStatus('已重設為 V0.2.2「美食好吃」；對話框表情與三區裝飾已復原。')}}
+function finishAssetLoad(){if(assetsReady()){render();setStatus('V0.2.2 已載入：8 組效果、24 張透明語意裝飾；可開始編輯。')}}
 frame.onload=()=>{frameReady=true;finishAssetLoad()};frame.onerror=()=>setStatus('正式外框載入失敗，請重新整理。',true);
 [[accentBottom,ACCENT_BOTTOM_SRC],[accentRight,ACCENT_RIGHT_SRC],[accentLeft,ACCENT_LEFT_SRC]].forEach(pair=>{pair[0].onload=()=>{accentReady++;finishAssetLoad()};pair[0].onerror=()=>setStatus('PSD 可換色色塊載入失敗，請重新整理。',true);pair[0].src=pair[1]});
 [[labelPanel,LABEL_PANEL_SRC],[labelBar,LABEL_BAR_SRC],[labelPill,LABEL_PILL_SRC]].forEach(pair=>{pair[0].onload=()=>{labelReady++;finishAssetLoad()};pair[0].onerror=()=>setStatus('PSD 標籤替換件載入失敗，請重新整理。',true);pair[0].src=pair[1]});
 [[formalSparkBottom,FORMAL_SPARK_BOTTOM_SRC],[formalSparkTop,FORMAL_SPARK_TOP_SRC]].forEach(pair=>{pair[0].onload=()=>{formalSparkReady++;finishAssetLoad()};pair[0].onerror=()=>setStatus('正式閃光圖層載入失敗，請重新整理。',true);pair[0].src=pair[1]});
 Object.keys(ICON_NODES).forEach(name=>{const image=new Image();image.onload=()=>{iconsReady++;finishAssetLoad()};image.onerror=()=>setStatus('效果語意圖示載入失敗，請重新整理。',true);image.src=iconDataUri(name,'#FFFFFF');iconImages[name]=image});
+Object.entries(DECOR_ASSET_SOURCES).forEach(([id,sources])=>{decorAssetImages[id]={};Object.entries(sources).forEach(([role,src])=>{const image=new Image();image.onload=()=>{decorAssetsReady++;finishAssetLoad()};image.onerror=()=>setStatus('語意裝飾載入失敗：'+id+'／'+role,true);image.src=src;decorAssetImages[id][role]=image})});
 drawDecorOptions();bind();applyPreset('delicious');frame.src=FRAME_SRC;if(document.fonts&&document.fonts.ready)document.fonts.ready.then(render);
 </script>
 </body>
