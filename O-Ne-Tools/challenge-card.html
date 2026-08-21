@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>O-Ne 挑戰卡生成器 V0.1.0</title>
+<style>
+@font-face{font-family:ONeNoto;src:url('./assets/NotoSansTC-O-Ne.woff') format('woff');font-style:normal;font-weight:100 900;font-display:swap}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:#0e1117;color:#f3efe8;font-family:ONeNoto,"Noto Sans TC","Microsoft JhengHei",sans-serif}
+.app{max-width:1380px;margin:auto;padding:26px}
+a{color:#53ced0;text-decoration:none;font-weight:800}.home{height:44px;display:inline-flex;align-items:center;margin-bottom:4px}
+h1{margin:0 0 8px;font-size:24px}.ver{font-size:12px;color:#8c96a5}.sub{color:#9ea7b3;font-size:13px;line-height:1.7;margin-bottom:22px}
+.grid{display:grid;grid-template-columns:450px 1fr;gap:22px;align-items:start}.panel{background:#151a23;border:1px solid #2a3240;border-radius:16px;padding:18px;box-shadow:0 12px 30px rgba(0,0,0,.25)}
+.section{font-size:14px;font-weight:900;color:#f0a8cf;margin-bottom:12px}.note{font-size:12px;color:#c4cad3;background:#101620;border:1px solid #273244;border-radius:10px;padding:10px 12px;line-height:1.7;margin-bottom:14px}
+label{display:block;font-size:12px;font-weight:800;color:#b9c0ca;margin:12px 0 6px}input{width:100%;border:1px solid #394355;border-radius:9px;background:#101620;color:white;padding:10px 11px;font-size:14px;outline:none;font-family:inherit}input:focus{border-color:#29A6A7}input.bad{border-color:#FD4537;background:#241415}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.seg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}.seg button{background:#242d3b;color:#bfc7d3;border:1px solid #394355}.seg button.active{background:#29A6A7;color:#fff;border-color:#29A6A7}.seg.yellow button.active{background:#FFBE37;color:#201914;border-color:#FFBE37}
+button{border:0;border-radius:9px;padding:10px 13px;font-weight:900;cursor:pointer;background:#29A6A7;color:#fff;font-family:inherit}button.secondary{background:#30394a}.buttons{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.status{min-height:22px;margin-top:12px;font-size:12px;color:#8fd4c8;line-height:1.6}.status.error{color:#ff7770}
+.preview-wrap{min-height:570px;display:flex;justify-content:center;align-items:center;background:linear-gradient(45deg,#222832 25%,transparent 25%),linear-gradient(-45deg,#222832 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#222832 75%),linear-gradient(-45deg,transparent 75%,#222832 75%);background-size:24px 24px;background-position:0 0,0 12px,12px -12px,-12px 0;border-radius:14px;padding:28px 18px}canvas{width:min(100%,900px);height:auto;filter:drop-shadow(0 8px 18px rgba(0,0,0,.28))}
+.mini{margin-top:14px;padding:12px;border-radius:10px;background:#101620;color:#aeb7c3;font-size:12px;line-height:1.7}.lock{color:#ffcf6d}.source{font-size:11px;color:#7f8997;margin-top:8px;word-break:break-all}
+@media(max-width:1000px){.grid{grid-template-columns:1fr}.preview-wrap{min-height:420px}}@media(max-width:560px){.app{padding:18px}.row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+<a class="home" href="./">← 回工具入口</a>
+<h1>O-Ne 挑戰卡生成器 <span class="ver">V0.1.0</span></h1>
+<div class="sub">沿用正式「挑戰任務－接受／放棄」固定卡外觀，不重設計。可切換接受／放棄、YES／NO 選取狀態，並修改主句與按鈕文字。</div>
+<div class="grid">
+<div class="panel">
+  <div class="section">01｜狀態與文字</div>
+  <div class="note"><b>接受</b>預設使用獎勵黃；<b>放棄</b>預設使用 O-Ne 青綠。按鈕預設改為 <b>YES / NO</b>，兩邊文字都可自行修改。</div>
+
+  <label>挑戰動作</label>
+  <div class="seg" id="modeSeg">
+    <button type="button" data-mode="accept" class="active">接受</button>
+    <button type="button" data-mode="abandon">放棄</button>
+  </div>
+
+  <label>目前選取</label>
+  <div class="seg yellow" id="selectSeg">
+    <button type="button" data-selected="yes" class="active">YES</button>
+    <button type="button" data-selected="no">NO</button>
+  </div>
+
+  <div class="row">
+    <div><label>主句前段</label><input id="prefix" value="確認"></div>
+    <div><label>重點字</label><input id="emphasis" value="接受"></div>
+  </div>
+  <label>主句後段</label>
+  <input id="suffix" value="挑戰任務？">
+
+  <div class="row">
+    <div><label>左按鈕</label><input id="yesText" value="YES"></div>
+    <div><label>右按鈕</label><input id="noText" value="NO"></div>
+  </div>
+
+  <div id="status" class="status">READY｜可輸出透明 PNG</div>
+  <div class="buttons">
+    <button id="download">輸出透明 PNG</button>
+    <button id="jsonBtn" class="secondary">輸出設定 JSON</button>
+    <button id="reset" class="secondary">回復預設</button>
+  </div>
+
+  <div class="mini"><b class="lock">🔒 固定不改：</b>SELECT 標籤、外框、左紅條、卡體 80% 透明、按鈕形狀與正式色票。<br><b>可改：</b>接受／放棄狀態、YES／NO 選取、主句三段文字、左右按鈕文字。<br>文字過長時會自動縮字；低於安全字級仍放不下時停止輸出。</div>
+  <div class="source">正式來源：固定卡／挑戰任務-接受.psd（1SqUYmbv5VfVWei1Gp4hoUFPDiynwoIPU）＋挑戰任務-放棄.psd（1eNgO2nsgtK9A4h6Ieak6WkYv6J232gWd）</div>
+</div>
+
+<div class="panel">
+  <div class="section">02｜即時預覽</div>
+  <div class="preview-wrap"><canvas id="c" width="692" height="326"></canvas></div>
+</div>
+</div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const canvas=$('c'),ctx=canvas.getContext('2d');
+const C={panel:'rgba(31,23,19,.80)',cream:'#FDF3E7',red:'#FD4537',yellow:'#FFBE37',teal:'#29A6A7',dark:'#1F1713',dim:'#433A35',white80:'rgba(255,255,255,.80)'};
+const DEFAULTS={mode:'accept',selected:'yes',prefix:'確認',suffix:'挑戰任務？',yesText:'YES',noText:'NO'};
+let state={...DEFAULTS,emphasis:'接受'};
+function font(weight,size){return `${weight} ${size}px ONeNoto,"Noto Sans TC","Microsoft JhengHei",sans-serif`}
+function rr(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()}
+function drawOuter(){ctx.save();ctx.fillStyle=C.panel;ctx.strokeStyle=C.white80;ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(20,2);ctx.lineTo(671,2);ctx.lineTo(690,20);ctx.lineTo(690,305);ctx.lineTo(671,324);ctx.lineTo(20,324);ctx.lineTo(2,305);ctx.lineTo(2,21);ctx.closePath();ctx.fill();ctx.stroke();ctx.fillStyle=C.red;ctx.fillRect(3,22,10,283);ctx.restore()}
+function drawBadge(){rr(33,20,193,40,10);ctx.fillStyle=C.red;ctx.fill();ctx.fillStyle='#fff';ctx.font=font(900,25);ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('SELECT',129.5,41)}
+function fitSegments(parts,maxWidth,start,min){let s=start;for(;s>=min;s--){ctx.font=font(900,s);const w=parts.reduce((a,p)=>a+ctx.measureText(p.text).width,0);if(w<=maxWidth)return {size:s,width:w,ok:true}}ctx.font=font(900,min);return {size:min,width:parts.reduce((a,p)=>a+ctx.measureText(p.text).width,0),ok:false}}
+function fitSingle(text,maxWidth,start,min){let s=start;for(;s>=min;s--){ctx.font=font(900,s);if(ctx.measureText(text).width<=maxWidth)return {size:s,ok:true}}return {size:min,ok:false}}
+function drawMain(){const parts=[{text:$('prefix').value,color:C.cream},{text:$('emphasis').value,color:state.mode==='accept'?C.yellow:C.teal},{text:$('suffix').value,color:C.cream}];const fit=fitSegments(parts,620,53,34);ctx.font=font(900,fit.size);ctx.textAlign='left';ctx.textBaseline='alphabetic';let x=37;for(const p of parts){ctx.fillStyle=p.color;ctx.fillText(p.text,x,158);x+=ctx.measureText(p.text).width}return fit.ok}
+function drawButton(x,text,on){rr(x,210,297,65,10);ctx.fillStyle=on?C.yellow:C.dim;ctx.fill();ctx.strokeStyle='rgba(255,255,255,.92)';ctx.lineWidth=1.4;ctx.stroke();const fit=fitSingle(text,245,48,26);ctx.font=font(900,fit.size);ctx.fillStyle=on?C.dark:C.cream;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(text,x+148.5,244);return fit.ok}
+function render(){ctx.clearRect(0,0,692,326);drawOuter();drawBadge();const okMain=drawMain();const okYes=drawButton(38,$('yesText').value,state.selected==='yes');const okNo=drawButton(364,$('noText').value,state.selected==='no');const ok=okMain&&okYes&&okNo;['prefix','emphasis','suffix'].forEach(id=>$(id).classList.toggle('bad',!okMain));$('yesText').classList.toggle('bad',!okYes);$('noText').classList.toggle('bad',!okNo);$('download').disabled=!ok;$('status').textContent=ok?'READY｜可輸出透明 PNG':'BLOCKED｜文字超出安全範圍，請縮短內容';$('status').className='status'+(ok?'':' error');return ok}
+function setMode(mode,resetEmphasis=true){state.mode=mode;if(resetEmphasis)$('emphasis').value=mode==='accept'?'接受':'放棄';document.querySelectorAll('#modeSeg button').forEach(b=>b.classList.toggle('active',b.dataset.mode===mode));render()}
+function setSelected(v){state.selected=v;document.querySelectorAll('#selectSeg button').forEach(b=>b.classList.toggle('active',b.dataset.selected===v));render()}
+document.querySelectorAll('#modeSeg button').forEach(b=>b.onclick=()=>setMode(b.dataset.mode,true));document.querySelectorAll('#selectSeg button').forEach(b=>b.onclick=()=>setSelected(b.dataset.selected));['prefix','emphasis','suffix','yesText','noText'].forEach(id=>$(id).addEventListener('input',render));
+$('download').onclick=()=>{if(!render())return;canvas.toBlob(blob=>{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`O-Ne_挑戰卡_${state.mode}_${state.selected}_V0.1.0.png`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)},'image/png')};
+$('jsonBtn').onclick=()=>{const payload={schema:'o-ne.challenge-card.candidate.v0.1.0',status:'CANDIDATE',mode:state.mode,selected:state.selected,copy:{prefix:$('prefix').value,emphasis:$('emphasis').value,suffix:$('suffix').value,yes:$('yesText').value,no:$('noText').value},formal_sources:{accept_psd_id:'1SqUYmbv5VfVWei1Gp4hoUFPDiynwoIPU',abandon_psd_id:'1eNgO2nsgtK9A4h6Ieak6WkYv6J232gWd'},visual_rules:{panel_fill_opacity:.8,select_label_locked:true}};const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='O-Ne_挑戰卡設定_V0.1.0.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
+$('reset').onclick=()=>{$('prefix').value=DEFAULTS.prefix;$('suffix').value=DEFAULTS.suffix;$('yesText').value=DEFAULTS.yesText;$('noText').value=DEFAULTS.noText;setMode('accept',true);setSelected('yes')};
+document.fonts.ready.then(()=>render());render();
+</script>
+</body>
+</html>
