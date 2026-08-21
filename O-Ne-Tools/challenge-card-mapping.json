@@ -1,6 +1,8 @@
 {
   "schema": "o-ne.challenge-card.mapping.v0.1.0",
-  "status": "CANDIDATE",
+  "status": "READY",
+  "approved_by": "Omi",
+  "approved_on": "2026-08-21",
   "generator": "./challenge-card.html?v=010",
   "canvas": {
     "width": 692,
