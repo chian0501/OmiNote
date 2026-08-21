@@ -1,9 +1,9 @@
 {
-  "version": "V2.7_20260821",
+  "version": "V2.8_20260821",
   "principle": "one_function_one_entry",
-  "total": 14,
+  "total": 15,
   "ready": 8,
-  "candidate": 1,
+  "candidate": 2,
   "ai_bridge": {
     "version": "V1.2_20260807",
     "mode": "chatgpt_pro_manual_json_bridge",
@@ -137,6 +137,36 @@
       "formal_source_folder": "https://drive.google.com/drive/folders/1NLJaPk0AlZk0lt1U9crqbD_GyePyGbvc",
       "formal_psd_id": "1wYnhZVvoQMl4hn1W7msw_oh3k-RqbHca",
       "panel_fill_opacity": 0.8
+    },
+    {
+      "id": "challenge",
+      "name": "挑戰卡",
+      "family": "固定卡衍生｜接受／放棄",
+      "group": "選擇／確認",
+      "desc": "接受／放棄＋YES／NO；主句與左右按鈕文字可自訂",
+      "status": "candidate",
+      "href": "./challenge-card.html?v=010",
+      "features": [
+        "accept_or_abandon_mode",
+        "yes_or_no_selected_state",
+        "editable_prefix_emphasis_suffix",
+        "editable_yes_no_labels",
+        "yes_no_default_labels",
+        "transparent_png",
+        "field_json_export",
+        "overflow_export_block"
+      ],
+      "formal_source_folder": "https://drive.google.com/drive/folders/11-mXINBGZX8UyDGElik7hgSa-0yAJRcT",
+      "formal_accept_psd_id": "1SqUYmbv5VfVWei1Gp4hoUFPDiynwoIPU",
+      "formal_abandon_psd_id": "1eNgO2nsgtK9A4h6Ieak6WkYv6J232gWd",
+      "mapping": "./challenge-card-mapping.json",
+      "generator_version": "V0.1.0_20260821",
+      "visual_status": "CANDIDATE",
+      "panel_fill_opacity": 0.8,
+      "default_labels": {
+        "yes": "YES",
+        "no": "NO"
+      }
     },
     {
       "id": "dialogue",
