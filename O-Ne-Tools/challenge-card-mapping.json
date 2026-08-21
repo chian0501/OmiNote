@@ -1,0 +1,57 @@
+{
+  "schema": "o-ne.challenge-card.mapping.v0.1.0",
+  "status": "CANDIDATE",
+  "generator": "./challenge-card.html?v=010",
+  "canvas": {
+    "width": 692,
+    "height": 326,
+    "transparent_background": true,
+    "panel_fill_opacity": 0.8
+  },
+  "defaults": {
+    "prefix": "確認",
+    "suffix": "挑戰任務？",
+    "yes_text": "YES",
+    "no_text": "NO",
+    "mode": "accept",
+    "selected": "yes"
+  },
+  "modes": {
+    "accept": {
+      "default_emphasis": "接受",
+      "emphasis_color": "#FFBE37",
+      "formal_psd_id": "1SqUYmbv5VfVWei1Gp4hoUFPDiynwoIPU",
+      "reference_png_yes_selected_id": "1rZdfsqO1l3UAlWE1AlVHTLjH3UF_LSm9",
+      "reference_png_no_selected_id": "1g_9nmbHRYIjh-oRYhoag4gVn8zXanhr3"
+    },
+    "abandon": {
+      "default_emphasis": "放棄",
+      "emphasis_color": "#29A6A7",
+      "formal_psd_id": "1eNgO2nsgtK9A4h6Ieak6WkYv6J232gWd",
+      "reference_png_yes_selected_id": "1pUuOfG819W98EDHflXrLcQFbRa2ERrQw",
+      "reference_png_no_selected_id": "1uX7zTPI3tu7b5VJZkNPRnl_QwJTDRSvj"
+    }
+  },
+  "states": [
+    "accept_yes",
+    "accept_no",
+    "abandon_yes",
+    "abandon_no"
+  ],
+  "locked_visuals": [
+    "SELECT label",
+    "outer frame",
+    "left red accent bar",
+    "button geometry",
+    "formal color semantics"
+  ],
+  "editable_fields": [
+    "prefix",
+    "emphasis",
+    "suffix",
+    "yes_text",
+    "no_text",
+    "mode",
+    "selected"
+  ]
+}
