@@ -1,9 +1,9 @@
 {
-  "version": "V2.8_20260821",
+  "version": "V2.9_20260821",
   "principle": "one_function_one_entry",
   "total": 15,
-  "ready": 8,
-  "candidate": 2,
+  "ready": 9,
+  "candidate": 1,
   "ai_bridge": {
     "version": "V1.2_20260807",
     "mode": "chatgpt_pro_manual_json_bridge",
@@ -144,7 +144,7 @@
       "family": "固定卡衍生｜接受／放棄",
       "group": "選擇／確認",
       "desc": "接受／放棄＋YES／NO；主句與左右按鈕文字可自訂",
-      "status": "candidate",
+      "status": "ready",
       "href": "./challenge-card.html?v=010",
       "features": [
         "accept_or_abandon_mode",
@@ -161,7 +161,9 @@
       "formal_abandon_psd_id": "1eNgO2nsgtK9A4h6Ieak6WkYv6J232gWd",
       "mapping": "./challenge-card-mapping.json",
       "generator_version": "V0.1.0_20260821",
-      "visual_status": "CANDIDATE",
+      "visual_status": "READY",
+      "ready_approved_by": "Omi",
+      "ready_approved_on": "2026-08-21",
       "panel_fill_opacity": 0.8,
       "default_labels": {
         "yes": "YES",
