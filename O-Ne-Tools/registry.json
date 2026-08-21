@@ -1,7 +1,7 @@
 {
-  "version": "V2.6_20260820",
+  "version": "V2.7_20260821",
   "principle": "one_function_one_entry",
-  "total": 15,
+  "total": 14,
   "ready": 8,
   "candidate": 1,
   "ai_bridge": {
@@ -137,15 +137,6 @@
       "formal_source_folder": "https://drive.google.com/drive/folders/1NLJaPk0AlZk0lt1U9crqbD_GyePyGbvc",
       "formal_psd_id": "1wYnhZVvoQMl4hn1W7msw_oh3k-RqbHca",
       "panel_fill_opacity": 0.8
-    },
-    {
-      "id": "challenge",
-      "name": "挑戰任務",
-      "family": "選項卡",
-      "group": "選擇／確認",
-      "desc": "接受／放棄與確認／取消",
-      "status": "planned",
-      "href": ""
     },
     {
       "id": "dialogue",
