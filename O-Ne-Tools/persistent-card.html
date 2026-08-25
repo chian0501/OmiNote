@@ -36,7 +36,7 @@ canvas{width:min(100%,900px);height:auto;filter:drop-shadow(0 8px 18px rgba(0,0,
   <div class="note"><b>MISSION</b>：任務進行中。<br><b>DONE!</b>：成功狀態，自動出現綠色勾勾，任務文字轉橘色。<br><b>FAIL</b>：失敗狀態，自動出現灰色叉叉。</div>
   <label for="state">卡片狀態</label>
   <select id="state"><option value="MISSION">MISSION｜任務中</option><option value="DONE">DONE!｜成功</option><option value="FAIL">FAIL｜失敗</option></select>
-  <label for="task">任務文字</label><input id="task" value="Osaka Castle｜大阪城任務中任務中">
+  <label for="task">任務文字</label><input id="task" value="Osaka Castle｜大阪城任務中">
   <div class="label-row"><label for="taskSize">任務文字大小</label><span id="taskSizeValue" class="px-value">21px</span></div>
   <input id="taskSize" type="range" min="14" max="32" step="1" value="21">
   <label for="progress">進度</label><input id="progress" value="0/1">
@@ -60,7 +60,7 @@ const canvas=document.getElementById('c');
 const ctx=canvas.getContext('2d');
 const $=id=>document.getElementById(id);
 const COLORS={dark:'rgba(31,23,19,.80)',cream:'#FDF3E7',white:'#FFFFFF',yellow:'#FFBE37',fail:'#333333',green:'#21A74D'};
-const defaults={state:'MISSION',task:'Osaka Castle｜大阪城任務中任務中',progress:'0/1',taskSize:21,progressSize:20};
+const defaults={state:'MISSION',task:'Osaka Castle｜大阪城任務中',progress:'0/1',taskSize:21,progressSize:20};
 const STORAGE_KEY='o-ne.persistent-card.history.v1';
 const HISTORY_LIMIT=5;
 let historyTimer=null;
