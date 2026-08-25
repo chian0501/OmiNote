@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>O-Ne 常駐卡生成器 V1.0.2</title>
+<title>O-Ne 常駐卡生成器 V1.1.0</title>
 <style>
 *{box-sizing:border-box}
 body{margin:0;min-height:100vh;background:#0e1117;color:#f3efe8;font-family:"Noto Sans TC","Noto Sans CJK TC","Microsoft JhengHei",sans-serif}
@@ -11,13 +11,16 @@ body{margin:0;min-height:100vh;background:#0e1117;color:#f3efe8;font-family:"Not
 h1{margin:0 0 8px;font-size:24px}.sub{color:#9ea7b3;font-size:13px;line-height:1.7;margin-bottom:22px}
 .grid{display:grid;grid-template-columns:430px 1fr;gap:22px;align-items:start}
 .panel{background:#151a23;border:1px solid #2a3240;border-radius:16px;padding:18px;box-shadow:0 12px 30px rgba(0,0,0,.25)}
-.section-title{font-size:14px;font-weight:800;margin:0 0 12px;color:#f0a8cf}.note{font-size:12px;color:#c4cad3;background:#101620;border:1px solid #273244;border-radius:10px;padding:10px 12px;line-height:1.7;margin-bottom:12px}
+.section-title{font-size:14px;font-weight:800;margin:0 0 12px;color:#f0a8cf}.section-title.history-title{margin-top:22px;padding-top:18px;border-top:1px solid #2a3240}
+.note{font-size:12px;color:#c4cad3;background:#101620;border:1px solid #273244;border-radius:10px;padding:10px 12px;line-height:1.7;margin-bottom:12px}
 label{display:block;font-size:12px;font-weight:700;color:#b9c0ca;margin:12px 0 6px}
-input,select{width:100%;border:1px solid #394355;border-radius:9px;background:#101620;color:white;padding:10px 11px;font-size:14px;outline:none}
-input:focus,select:focus{border-color:#29A6A7}input.bad{border-color:#FD4537;background:#241415}
+input:not([type="range"]),select{width:100%;border:1px solid #394355;border-radius:9px;background:#101620;color:white;padding:10px 11px;font-size:14px;outline:none}
+input:not([type="range"]):focus,select:focus{border-color:#29A6A7}input:not([type="range"]).bad{border-color:#FD4537;background:#241415}
+.label-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:12px 0 6px}.label-row label{margin:0}.px-value{color:#8fd4c8;font-size:12px;font-weight:900}
+input[type="range"]{width:100%;margin:0;accent-color:#29A6A7}input[type="range"].bad{accent-color:#FD4537}
 .preview-wrap{min-height:420px;display:flex;justify-content:center;align-items:center;background:linear-gradient(45deg,#222832 25%,transparent 25%),linear-gradient(-45deg,#222832 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#222832 75%),linear-gradient(-45deg,transparent 75%,#222832 75%);background-size:24px 24px;background-position:0 0,0 12px,12px -12px,-12px 0;border-radius:14px;overflow:hidden;padding:34px 20px}
 canvas{width:min(100%,900px);height:auto;filter:drop-shadow(0 8px 18px rgba(0,0,0,.26))}
-.buttons{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}button{border:0;border-radius:9px;padding:11px 15px;font-weight:800;cursor:pointer;background:#29A6A7;color:white}button.secondary{background:#30394a}
+.buttons{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}button{border:0;border-radius:9px;padding:11px 15px;font-weight:800;cursor:pointer;background:#29A6A7;color:white}button.secondary{background:#30394a}button:disabled{cursor:not-allowed;opacity:.45}
 .status{min-height:22px;margin-top:12px;font-size:12px;color:#8fd4c8;line-height:1.6}.status.error{color:#ff7770}
 .mini{margin-top:14px;padding:12px;border-radius:10px;background:#101620;color:#aeb7c3;font-size:12px;line-height:1.7}.lock{color:#ffcf6d}
 @media(max-width:950px){.grid{grid-template-columns:1fr}}
@@ -25,21 +28,31 @@ canvas{width:min(100%,900px);height:auto;filter:drop-shadow(0 8px 18px rgba(0,0,
 </head>
 <body>
 <div class="app"><a class="tool-home-link" href="./" style="min-width:118px;height:44px;display:inline-flex;align-items:center;color:#53ced0;font-size:14px;font-weight:800;text-decoration:none">回工具入口</a>
-<h1>O-Ne 常駐卡生成器 <span style="font-size:12px;color:#8c96a5">V1.0.2</span></h1>
-<div class="sub">同一工具切換 MISSION／DONE!／FAIL。主底板固定 #1F1713、80% 透明；外框、標籤、圖示、文字維持實色。</div>
+<h1>O-Ne 常駐卡生成器 <span style="font-size:12px;color:#8c96a5">V1.1.0</span></h1>
+<div class="sub">同一工具切換 MISSION／DONE!／FAIL。任務文字與進度字級改為手動控制；最近 5 次內容自動暫存在此瀏覽器。</div>
 <div class="grid">
 <div class="panel">
   <div class="section-title">01｜內容輸入</div>
   <div class="note"><b>MISSION</b>：任務進行中。<br><b>DONE!</b>：成功狀態，自動出現綠色勾勾，任務文字轉橘色。<br><b>FAIL</b>：失敗狀態，自動出現灰色叉叉。</div>
-  <label>卡片狀態</label>
+  <label for="state">卡片狀態</label>
   <select id="state"><option value="MISSION">MISSION｜任務中</option><option value="DONE">DONE!｜成功</option><option value="FAIL">FAIL｜失敗</option></select>
-  <label>任務文字</label><input id="task" value="Osaka Castle｜大阪城任務中任務中">
-  <label>進度</label><input id="progress" value="0/1">
+  <label for="task">任務文字</label><input id="task" value="Osaka Castle｜大阪城任務中任務中">
+  <div class="label-row"><label for="taskSize">任務文字大小</label><span id="taskSizeValue" class="px-value">21px</span></div>
+  <input id="taskSize" type="range" min="14" max="32" step="1" value="21">
+  <label for="progress">進度</label><input id="progress" value="0/1">
+  <div class="label-row"><label for="progressSize">進度文字大小</label><span id="progressSizeValue" class="px-value">20px</span></div>
+  <input id="progressSize" type="range" min="14" max="28" step="1" value="20">
   <div id="status" class="status">READY｜可輸出透明 PNG</div>
   <div class="buttons"><button id="download">輸出透明 PNG</button><button id="jsonBtn" class="secondary">輸出欄位 JSON</button><button id="reset" class="secondary">回復示例</button></div>
-  <div class="mini"><b class="lock">🔒 固定不改：</b>634×62、主底板 80%、白框、MISSION／DONE!／FAIL 標籤、成功／失敗圖示、正式色彩、透明背景。<br><b>可改：</b>狀態、任務文字、進度。</div>
+  <div class="section-title history-title">02｜最近暫存</div>
+  <div class="note">自動保留這台裝置最近 5 次不同內容，重新開啟頁面會還原最新一筆。暫存不會同步到其他瀏覽器或裝置。</div>
+  <label for="history">最近編輯內容</label>
+  <select id="history"></select>
+  <div id="historyStatus" class="status"></div>
+  <div class="buttons"><button id="restoreHistory" class="secondary">載入選取暫存</button><button id="clearHistory" class="secondary">清除暫存</button></div>
+  <div class="mini"><b class="lock">🔒 固定不改：</b>634×62、主底板 80%、白框、MISSION／DONE!／FAIL 標籤、成功／失敗圖示、正式色彩、透明背景。<br><b>可改：</b>狀態、任務文字、進度、任務字級、進度字級。</div>
 </div>
-<div class="panel"><div class="section-title">02｜正式母版即時預覽</div><div class="preview-wrap"><canvas id="c" width="634" height="62"></canvas></div></div>
+<div class="panel"><div class="section-title">03｜正式母版即時預覽</div><div class="preview-wrap"><canvas id="c" width="634" height="62"></canvas></div></div>
 </div>
 </div>
 <script>
@@ -47,20 +60,132 @@ const canvas=document.getElementById('c');
 const ctx=canvas.getContext('2d');
 const $=id=>document.getElementById(id);
 const COLORS={dark:'rgba(31,23,19,.80)',cream:'#FDF3E7',white:'#FFFFFF',yellow:'#FFBE37',fail:'#333333',green:'#21A74D'};
-const defaults={state:'MISSION',task:'Osaka Castle｜大阪城任務中任務中',progress:'0/1'};
-function font(weight,px){return `${weight} ${px}px "Noto Sans TC","Noto Sans CJK TC","Microsoft JhengHei",sans-serif`;}
-function fitText(text,maxWidth,startSize,minSize,weight=800){let size=startSize;while(size>=minSize){ctx.font=font(weight,size);const width=ctx.measureText(text).width;if(width<=maxWidth)return{size,width,ok:true};size--;}ctx.font=font(weight,minSize);return{size:minSize,width:ctx.measureText(text).width,ok:false};}
+const defaults={state:'MISSION',task:'Osaka Castle｜大阪城任務中任務中',progress:'0/1',taskSize:21,progressSize:20};
+const STORAGE_KEY='o-ne.persistent-card.history.v1';
+const HISTORY_LIMIT=5;
+let historyTimer=null;
+let storageReady=canUseStorage();
+function font(weight,px){return weight+' '+px+'px "Noto Sans TC","Noto Sans CJK TC","Microsoft JhengHei",sans-serif';}
+function clamp(value,min,max,fallback){const n=Number(value);return Number.isFinite(n)?Math.min(max,Math.max(min,Math.round(n))):fallback;}
+function canUseStorage(){try{const key=STORAGE_KEY+'.probe';localStorage.setItem(key,'1');localStorage.removeItem(key);return true;}catch(error){return false;}}
 function roundedRect(x,y,w,h,r,fill){ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fillStyle=fill;ctx.fill();}
 function drawPanel(){ctx.save();ctx.beginPath();ctx.moveTo(0,2);ctx.lineTo(613,2);ctx.lineTo(632,21);ctx.lineTo(632,60);ctx.lineTo(0,60);ctx.closePath();ctx.fillStyle=COLORS.dark;ctx.fill();ctx.strokeStyle=COLORS.white;ctx.lineWidth=3;ctx.stroke();ctx.restore();}
 function drawBadge(state){const x=state==='MISSION'?8:11,y=13,w=141,h=33;const fill=state==='FAIL'?COLORS.fail:COLORS.yellow;const textColor=state==='FAIL'?COLORS.cream:'#3B170C';roundedRect(x,y,w,h,10,fill);ctx.font=font(800,20);ctx.fillStyle=textColor;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(state==='DONE'?'DONE!':state,x+w/2,y+h/2+0.5);}
 function drawSuccessIcon(){roundedRect(543,8,46,46,4,COLORS.cream);roundedRect(547,12,38,38,2,COLORS.green);ctx.strokeStyle=COLORS.cream;ctx.lineWidth=7;ctx.lineCap='square';ctx.lineJoin='miter';ctx.beginPath();ctx.moveTo(552,31);ctx.lineTo(560,39);ctx.lineTo(580,18);ctx.stroke();}
 function drawFailIcon(){roundedRect(543,8,46,46,4,COLORS.cream);roundedRect(547,12,38,38,2,COLORS.fail);ctx.strokeStyle=COLORS.cream;ctx.lineWidth=7;ctx.lineCap='square';ctx.beginPath();ctx.moveTo(554,20);ctx.lineTo(578,43);ctx.moveTo(578,20);ctx.lineTo(554,43);ctx.stroke();}
-function render(){const state=$('state').value;ctx.clearRect(0,0,634,62);drawPanel();drawBadge(state);if(state==='DONE')drawSuccessIcon();if(state==='FAIL')drawFailIcon();let blocked=false;const task=$('task').value;const taskFit=fitText(task,319,21,14,800);$('task').classList.toggle('bad',!taskFit.ok);ctx.font=font(800,taskFit.size);ctx.fillStyle=state==='DONE'?COLORS.yellow:COLORS.cream;ctx.textAlign='left';ctx.textBaseline='alphabetic';ctx.fillText(task,163,42);blocked ||= !taskFit.ok;const prog=$('progress').value;const progFit=fitText(prog,40,20,14,800);$('progress').classList.toggle('bad',!progFit.ok);ctx.font=font(800,progFit.size);ctx.fillStyle=COLORS.cream;ctx.fillText(prog,498,42);blocked ||= !progFit.ok;const status=$('status');$('download').disabled=blocked;if(blocked){status.textContent='BLOCKED｜任務文字或進度超出正式安全範圍，請縮短內容';status.className='status error';}else{status.textContent='READY｜可輸出透明 PNG';status.className='status';}return blocked;}
-$('state').addEventListener('change',render);$('task').addEventListener('input',render);$('progress').addEventListener('input',render);
-$('download').onclick=()=>{if(render())return;canvas.toBlob(blob=>{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`O-Ne_常駐卡_${$('state').value}.png`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);},'image/png');};
-$('jsonBtn').onclick=()=>{const payload={component_id:'PERSISTENT-MISSION',master_psd_id:'1VMBCecO8QLuwtSMxy-BplfUa2Ybr3YDU',generator_version:'V1.0.2_20260807',panel_fill_opacity:.8,state:$('state').value,task_text:$('task').value,progress:$('progress').value};const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='O-Ne_常駐卡_data_v102.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);};
-$('reset').onclick=()=>{$('state').value=defaults.state;$('task').value=defaults.task;$('progress').value=defaults.progress;render();};
-render();
+function measure(text,size,weight){ctx.font=font(weight,size);return ctx.measureText(text).width;}
+function render(){
+  const state=$('state').value;
+  const taskSize=clamp($('taskSize').value,14,32,defaults.taskSize);
+  const progressSize=clamp($('progressSize').value,14,28,defaults.progressSize);
+  $('taskSize').value=taskSize;$('progressSize').value=progressSize;
+  $('taskSizeValue').textContent=taskSize+'px';$('progressSizeValue').textContent=progressSize+'px';
+  ctx.clearRect(0,0,634,62);drawPanel();drawBadge(state);if(state==='DONE')drawSuccessIcon();if(state==='FAIL')drawFailIcon();
+  let blocked=false;
+  const task=$('task').value;
+  const taskOk=measure(task,taskSize,800)<=319;
+  $('task').classList.toggle('bad',!taskOk);$('taskSize').classList.toggle('bad',!taskOk);
+  ctx.font=font(800,taskSize);ctx.fillStyle=state==='DONE'?COLORS.yellow:COLORS.cream;ctx.textAlign='left';ctx.textBaseline='alphabetic';ctx.fillText(task,163,42);
+  blocked ||= !taskOk;
+  const prog=$('progress').value;
+  const progressOk=measure(prog,progressSize,800)<=40;
+  $('progress').classList.toggle('bad',!progressOk);$('progressSize').classList.toggle('bad',!progressOk);
+  ctx.font=font(800,progressSize);ctx.fillStyle=COLORS.cream;ctx.fillText(prog,498,42);
+  blocked ||= !progressOk;
+  const status=$('status');$('download').disabled=blocked;
+  if(blocked){status.textContent='BLOCKED｜文字超出正式安全範圍，請手動縮小字級或縮短內容';status.className='status error';}
+  else{status.textContent='READY｜可輸出透明 PNG';status.className='status';}
+  return blocked;
+}
+function normalizedSnapshot(item){
+  const state=['MISSION','DONE','FAIL'].includes(item&&item.state)?item.state:defaults.state;
+  return {
+    state:state,
+    task:String(item&&item.task!=null?item.task:defaults.task),
+    progress:String(item&&item.progress!=null?item.progress:defaults.progress),
+    taskSize:clamp(item&&item.taskSize,14,32,defaults.taskSize),
+    progressSize:clamp(item&&item.progressSize,14,28,defaults.progressSize),
+    savedAt:item&&typeof item.savedAt==='string'?item.savedAt:new Date().toISOString()
+  };
+}
+function currentSnapshot(){return normalizedSnapshot({state:$('state').value,task:$('task').value,progress:$('progress').value,taskSize:$('taskSize').value,progressSize:$('progressSize').value,savedAt:new Date().toISOString()});}
+function sameContent(a,b){return a.state===b.state&&a.task===b.task&&a.progress===b.progress&&a.taskSize===b.taskSize&&a.progressSize===b.progressSize;}
+function readHistory(){
+  if(!storageReady)return [];
+  try{
+    const raw=localStorage.getItem(STORAGE_KEY);
+    if(!raw)return [];
+    const parsed=JSON.parse(raw);
+    if(!Array.isArray(parsed))return [];
+    return parsed.filter(item=>item&&typeof item==='object').map(normalizedSnapshot).slice(0,HISTORY_LIMIT);
+  }catch(error){
+    try{localStorage.removeItem(STORAGE_KEY);}catch(ignore){}
+    return [];
+  }
+}
+function writeHistory(history){
+  if(!storageReady)return false;
+  try{localStorage.setItem(STORAGE_KEY,JSON.stringify(history.slice(0,HISTORY_LIMIT)));return true;}
+  catch(error){storageReady=false;return false;}
+}
+function shortText(text,limit){const clean=String(text||'').replace(/\s+/g,' ').trim();return clean.length>limit?clean.slice(0,limit-1)+'…':clean||'（空白）';}
+function formatTime(value){const date=new Date(value);if(Number.isNaN(date.getTime()))return '未知時間';return new Intl.DateTimeFormat('zh-TW',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false}).format(date);}
+function refreshHistory(message){
+  const history=readHistory();
+  const select=$('history');
+  select.innerHTML='';
+  if(!storageReady){
+    const option=document.createElement('option');option.textContent='此瀏覽器無法使用本機暫存';option.value='';select.appendChild(option);
+    select.disabled=true;$('restoreHistory').disabled=true;$('clearHistory').disabled=true;
+    $('historyStatus').textContent='暫存不可用｜目前瀏覽器阻擋本機儲存';$('historyStatus').className='status error';
+    return history;
+  }
+  if(!history.length){
+    const option=document.createElement('option');option.textContent='尚無暫存';option.value='';select.appendChild(option);
+    select.disabled=true;$('restoreHistory').disabled=true;$('clearHistory').disabled=true;
+    $('historyStatus').textContent=message||'開始編輯後，會自動保留最近 5 次不同內容';$('historyStatus').className='status';
+    return history;
+  }
+  history.forEach((item,index)=>{
+    const option=document.createElement('option');
+    option.value=String(index);
+    option.textContent=(index+1)+'｜'+formatTime(item.savedAt)+'｜'+item.state+'｜'+shortText(item.task,18)+'｜'+item.progress;
+    select.appendChild(option);
+  });
+  select.disabled=false;$('restoreHistory').disabled=false;$('clearHistory').disabled=false;
+  $('historyStatus').textContent=message||('已保留 '+history.length+'／'+HISTORY_LIMIT+' 筆本機暫存');
+  $('historyStatus').className='status';
+  return history;
+}
+function saveCurrentHistory(message){
+  if(!storageReady){refreshHistory();return;}
+  const snapshot=currentSnapshot();
+  const history=readHistory().filter(item=>!sameContent(item,snapshot));
+  history.unshift(snapshot);
+  if(writeHistory(history)){refreshHistory(message||('已自動暫存｜'+formatTime(snapshot.savedAt)));}
+  else{refreshHistory();}
+}
+function scheduleHistorySave(){clearTimeout(historyTimer);historyTimer=setTimeout(()=>saveCurrentHistory(),700);}
+function applySnapshot(item){
+  const snapshot=normalizedSnapshot(item);
+  $('state').value=snapshot.state;$('task').value=snapshot.task;$('progress').value=snapshot.progress;
+  $('taskSize').value=snapshot.taskSize;$('progressSize').value=snapshot.progressSize;
+  render();
+}
+function handleEdit(){render();scheduleHistorySave();}
+$('state').addEventListener('change',handleEdit);
+$('task').addEventListener('input',handleEdit);
+$('progress').addEventListener('input',handleEdit);
+$('taskSize').addEventListener('input',handleEdit);
+$('progressSize').addEventListener('input',handleEdit);
+$('download').onclick=()=>{if(render())return;saveCurrentHistory('已暫存目前內容');canvas.toBlob(blob=>{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='O-Ne_常駐卡_'+$('state').value+'.png';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);},'image/png');};
+$('jsonBtn').onclick=()=>{saveCurrentHistory('已暫存目前內容');const payload={component_id:'PERSISTENT-MISSION',master_psd_id:'1VMBCecO8QLuwtSMxy-BplfUa2Ybr3YDU',generator_version:'V1.1.0_20260825',panel_fill_opacity:.8,state:$('state').value,task_text:$('task').value,progress:$('progress').value,task_font_size:Number($('taskSize').value),progress_font_size:Number($('progressSize').value),font_size_mode:'manual'};const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='O-Ne_常駐卡_data_v110.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);};
+$('reset').onclick=()=>{clearTimeout(historyTimer);applySnapshot(defaults);saveCurrentHistory('已回復示例並暫存');};
+$('restoreHistory').onclick=()=>{const history=readHistory();const index=Number($('history').value);if(!Number.isInteger(index)||!history[index])return;clearTimeout(historyTimer);applySnapshot(history[index]);saveCurrentHistory('已載入選取暫存');};
+$('clearHistory').onclick=()=>{if(!storageReady||!readHistory().length)return;if(!window.confirm('確定清除這台裝置的常駐卡暫存嗎？'))return;try{localStorage.removeItem(STORAGE_KEY);refreshHistory('已清除暫存');}catch(error){storageReady=false;refreshHistory();}};
+const initialHistory=readHistory();
+if(initialHistory.length){applySnapshot(initialHistory[0]);refreshHistory('已還原上次編輯內容｜'+formatTime(initialHistory[0].savedAt));}
+else{render();refreshHistory();}
 </script>
 </body>
 </html>
