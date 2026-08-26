@@ -1,5 +1,5 @@
 {
-  "generator_version": "V1.1.0_20260825",
+  "generator_version": "V1.1.1_20260826",
   "component_id": "PERSISTENT-MISSION",
   "family": "常駐卡",
   "formal_source_folder": "https://drive.google.com/drive/folders/1p8U9F7OwLlKkUZNFdwsXS1jFN8ue-fub",
@@ -97,5 +97,23 @@
     "autosave_debounce_ms": 700,
     "restore_latest_on_load": true,
     "cross_device_sync": false
+  },
+  "json_import": {
+    "max_file_bytes": 262144,
+    "accepted_identifiers": {
+      "component_id": "PERSISTENT-MISSION",
+      "tool": "persistent-card"
+    },
+    "required_fields": [
+      "state",
+      "task_text|task",
+      "progress"
+    ],
+    "optional_fields": [
+      "task_font_size",
+      "progress_font_size"
+    ],
+    "imports_to_local_history": true,
+    "rejects_without_mutation": true
   }
 }

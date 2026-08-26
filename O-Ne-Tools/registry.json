@@ -1,5 +1,5 @@
 {
-  "version": "V2.10_20260825",
+  "version": "V2.11_20260826",
   "principle": "one_function_one_entry",
   "total": 15,
   "ready": 9,
@@ -79,9 +79,9 @@
       "name": "常駐卡",
       "family": "常駐卡",
       "group": "任務／事件",
-      "desc": "MISSION／DONE!／FAIL｜手動字級／最近 5 次暫存",
+      "desc": "MISSION／DONE!／FAIL｜手動字級／最近 5 次暫存／JSON 還原",
       "status": "ready",
-      "href": "./persistent-card.html?v=110",
+      "href": "./persistent-card.html?v=111",
       "ai_href": "./ai-card.html?tool=persistent&v=12",
       "features": [
         "state_switch",
@@ -96,11 +96,12 @@
         "manual_task_font_size",
         "manual_progress_font_size",
         "local_edit_history_5",
-        "restore_latest_on_load"
+        "restore_latest_on_load",
+        "json_import_restore"
       ],
       "formal_source_folder": "https://drive.google.com/drive/folders/1p8U9F7OwLlKkUZNFdwsXS1jFN8ue-fub",
       "formal_psd_id": "1VMBCecO8QLuwtSMxy-BplfUa2Ybr3YDU",
-      "generator_version": "V1.1.0_20260825",
+      "generator_version": "V1.1.1_20260826",
       "mapping": "./persistent-card-mapping.json"
     },
     {
