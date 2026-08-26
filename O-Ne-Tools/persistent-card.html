@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>O-Ne 常駐卡生成器 V1.1.0</title>
+<title>O-Ne 常駐卡生成器 V1.1.1</title>
 <style>
 *{box-sizing:border-box}
 body{margin:0;min-height:100vh;background:#0e1117;color:#f3efe8;font-family:"Noto Sans TC","Noto Sans CJK TC","Microsoft JhengHei",sans-serif}
@@ -28,8 +28,8 @@ canvas{width:min(100%,900px);height:auto;filter:drop-shadow(0 8px 18px rgba(0,0,
 </head>
 <body>
 <div class="app"><a class="tool-home-link" href="./" style="min-width:118px;height:44px;display:inline-flex;align-items:center;color:#53ced0;font-size:14px;font-weight:800;text-decoration:none">回工具入口</a>
-<h1>O-Ne 常駐卡生成器 <span style="font-size:12px;color:#8c96a5">V1.1.0</span></h1>
-<div class="sub">同一工具切換 MISSION／DONE!／FAIL。任務文字與進度字級改為手動控制；最近 5 次內容自動暫存在此瀏覽器。</div>
+<h1>O-Ne 常駐卡生成器 <span style="font-size:12px;color:#8c96a5">V1.1.1</span></h1>
+<div class="sub">同一工具切換 MISSION／DONE!／FAIL。文字大小手動控制；最近 5 次內容自動暫存，也可用 JSON 備份或跨裝置還原。</div>
 <div class="grid">
 <div class="panel">
   <div class="section-title">01｜內容輸入</div>
@@ -43,14 +43,14 @@ canvas{width:min(100%,900px);height:auto;filter:drop-shadow(0 8px 18px rgba(0,0,
   <div class="label-row"><label for="progressSize">進度文字大小</label><span id="progressSizeValue" class="px-value">20px</span></div>
   <input id="progressSize" type="range" min="14" max="28" step="1" value="20">
   <div id="status" class="status">READY｜可輸出透明 PNG</div>
-  <div class="buttons"><button id="download">輸出透明 PNG</button><button id="jsonBtn" class="secondary">輸出欄位 JSON</button><button id="reset" class="secondary">回復示例</button></div>
+  <div class="buttons"><button id="download">輸出透明 PNG</button><button id="jsonBtn" class="secondary">輸出欄位 JSON</button><button id="loadJson" class="secondary">載入 JSON</button><input id="jsonFile" type="file" accept=".json,application/json" hidden><button id="reset" class="secondary">回復示例</button></div>
   <div class="section-title history-title">02｜最近暫存</div>
-  <div class="note">自動保留這台裝置最近 5 次不同內容，重新開啟頁面會還原最新一筆。暫存不會同步到其他瀏覽器或裝置。</div>
+  <div class="note">自動保留這台裝置最近 5 次不同內容，重新開啟頁面會還原最新一筆。暫存不會自動同步；要換瀏覽器或裝置時，先輸出 JSON，再用「載入 JSON」還原。</div>
   <label for="history">最近編輯內容</label>
   <select id="history"></select>
   <div id="historyStatus" class="status"></div>
   <div class="buttons"><button id="restoreHistory" class="secondary">載入選取暫存</button><button id="clearHistory" class="secondary">清除暫存</button></div>
-  <div class="mini"><b class="lock">🔒 固定不改：</b>634×62、主底板 80%、白框、MISSION／DONE!／FAIL 標籤、成功／失敗圖示、正式色彩、透明背景。<br><b>可改：</b>狀態、任務文字、進度、任務字級、進度字級。</div>
+  <div class="mini"><b class="lock">🔒 固定不改：</b>634×62、主底板 80%、白框、MISSION／DONE!／FAIL 標籤、成功／失敗圖示、正式色彩、透明背景。<br><b>可改：</b>狀態、任務文字、進度、任務字級、進度字級；可用 JSON 備份與還原。</div>
 </div>
 <div class="panel"><div class="section-title">03｜正式母版即時預覽</div><div class="preview-wrap"><canvas id="c" width="634" height="62"></canvas></div></div>
 </div>
@@ -63,6 +63,7 @@ const COLORS={dark:'rgba(31,23,19,.80)',cream:'#FDF3E7',white:'#FFFFFF',yellow:'
 const defaults={state:'MISSION',task:'Osaka Castle｜大阪城任務中',progress:'0/1',taskSize:21,progressSize:20};
 const STORAGE_KEY='o-ne.persistent-card.history.v1';
 const HISTORY_LIMIT=5;
+const MAX_JSON_FILE_BYTES=256*1024;
 let historyTimer=null;
 let storageReady=canUseStorage();
 function font(weight,px){return weight+' '+px+'px "Noto Sans TC","Noto Sans CJK TC","Microsoft JhengHei",sans-serif';}
@@ -172,6 +173,29 @@ function applySnapshot(item){
   $('taskSize').value=snapshot.taskSize;$('progressSize').value=snapshot.progressSize;
   render();
 }
+function parseImportPayload(payload){
+  if(!payload||typeof payload!=='object'||Array.isArray(payload))throw new Error('JSON 最外層必須是物件');
+  if(payload.component_id!=null&&payload.component_id!=='PERSISTENT-MISSION')throw new Error('component_id 不是 PERSISTENT-MISSION');
+  if(payload.tool!=null&&payload.tool!=='persistent-card')throw new Error('tool 不是 persistent-card');
+  const state=String(payload.state==null?'':payload.state).toUpperCase().replace(/!/g,'').trim();
+  if(!['MISSION','DONE','FAIL'].includes(state))throw new Error('state 必須是 MISSION、DONE! 或 FAIL');
+  const hasTask=payload.task_text!=null||payload.task!=null;
+  if(!hasTask)throw new Error('缺少 task_text');
+  if(payload.progress==null)throw new Error('缺少 progress');
+  const current=currentSnapshot();
+  return normalizedSnapshot({
+    state:state,
+    task:payload.task_text!=null?payload.task_text:payload.task,
+    progress:payload.progress,
+    taskSize:payload.task_font_size!=null?payload.task_font_size:current.taskSize,
+    progressSize:payload.progress_font_size!=null?payload.progress_font_size:current.progressSize,
+    savedAt:new Date().toISOString()
+  });
+}
+function showImportError(message){
+  $('historyStatus').textContent='載入失敗｜'+message;
+  $('historyStatus').className='status error';
+}
 function handleEdit(){render();scheduleHistorySave();}
 $('state').addEventListener('change',handleEdit);
 $('task').addEventListener('input',handleEdit);
@@ -179,7 +203,24 @@ $('progress').addEventListener('input',handleEdit);
 $('taskSize').addEventListener('input',handleEdit);
 $('progressSize').addEventListener('input',handleEdit);
 $('download').onclick=()=>{if(render())return;saveCurrentHistory('已暫存目前內容');canvas.toBlob(blob=>{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='O-Ne_常駐卡_'+$('state').value+'.png';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);},'image/png');};
-$('jsonBtn').onclick=()=>{saveCurrentHistory('已暫存目前內容');const payload={component_id:'PERSISTENT-MISSION',master_psd_id:'1VMBCecO8QLuwtSMxy-BplfUa2Ybr3YDU',generator_version:'V1.1.0_20260825',panel_fill_opacity:.8,state:$('state').value,task_text:$('task').value,progress:$('progress').value,task_font_size:Number($('taskSize').value),progress_font_size:Number($('progressSize').value),font_size_mode:'manual'};const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='O-Ne_常駐卡_data_v110.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);};
+$('jsonBtn').onclick=()=>{saveCurrentHistory('已暫存目前內容');const payload={component_id:'PERSISTENT-MISSION',tool:'persistent-card',schema_version:'1.1',master_psd_id:'1VMBCecO8QLuwtSMxy-BplfUa2Ybr3YDU',generator_version:'V1.1.1_20260826',panel_fill_opacity:.8,state:$('state').value,task_text:$('task').value,progress:$('progress').value,task_font_size:Number($('taskSize').value),progress_font_size:Number($('progressSize').value),font_size_mode:'manual'};const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='O-Ne_常駐卡_data_v111.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);};
+$('loadJson').onclick=()=>$('jsonFile').click();
+$('jsonFile').addEventListener('change',async event=>{
+  const file=event.target.files&&event.target.files[0];
+  if(!file)return;
+  try{
+    if(file.size>MAX_JSON_FILE_BYTES)throw new Error('檔案超過 256 KB');
+    const payload=JSON.parse(await file.text());
+    const snapshot=parseImportPayload(payload);
+    clearTimeout(historyTimer);
+    applySnapshot(snapshot);
+    saveCurrentHistory('已載入 JSON 並暫存');
+  }catch(error){
+    showImportError(error&&error.name==='SyntaxError'?'JSON 格式錯誤':(error&&error.message?error.message:'無法讀取檔案'));
+  }finally{
+    event.target.value='';
+  }
+});
 $('reset').onclick=()=>{clearTimeout(historyTimer);applySnapshot(defaults);saveCurrentHistory('已回復示例並暫存');};
 $('restoreHistory').onclick=()=>{const history=readHistory();const index=Number($('history').value);if(!Number.isInteger(index)||!history[index])return;clearTimeout(historyTimer);applySnapshot(history[index]);saveCurrentHistory('已載入選取暫存');};
 $('clearHistory').onclick=()=>{if(!storageReady||!readHistory().length)return;if(!window.confirm('確定清除這台裝置的常駐卡暫存嗎？'))return;try{localStorage.removeItem(STORAGE_KEY);refreshHistory('已清除暫存');}catch(error){storageReady=false;refreshHistory();}};
