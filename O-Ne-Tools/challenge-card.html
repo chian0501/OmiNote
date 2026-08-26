@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>O-Ne 挑戰卡生成器 V0.1.0 READY</title>
+<title>O-Ne 挑戰卡生成器 V0.1.1 READY</title>
 <style>
 @font-face{font-family:ONeNoto;src:url('./assets/NotoSansTC-O-Ne.woff') format('woff');font-style:normal;font-weight:100 900;font-display:swap}
 *{box-sizing:border-box}
@@ -24,7 +24,7 @@ button{border:0;border-radius:9px;padding:10px 13px;font-weight:900;cursor:point
 <body>
 <div class="app">
 <a class="home" href="./">← 回工具入口</a>
-<h1>O-Ne 挑戰卡生成器 <span class="ver">V0.1.0 READY</span></h1>
+<h1>O-Ne 挑戰卡生成器 <span class="ver">V0.1.1 READY</span></h1>
 <div class="sub">沿用正式「挑戰任務－接受／放棄」固定卡外觀，不重設計。可切換接受／放棄、YES／NO 選取狀態，並修改主句與按鈕文字。</div>
 <div class="grid">
 <div class="panel">
@@ -72,6 +72,7 @@ button{border:0;border-radius:9px;padding:10px 13px;font-weight:900;cursor:point
 </div>
 </div>
 </div>
+<script src="./edit-backup-v1.js?v=100"></script>
 <script>
 const $=id=>document.getElementById(id);
 const canvas=$('c'),ctx=canvas.getContext('2d');
@@ -90,10 +91,21 @@ function render(){ctx.clearRect(0,0,692,326);drawOuter();drawBadge();const okMai
 function setMode(mode,resetEmphasis=true){state.mode=mode;if(resetEmphasis)$('emphasis').value=mode==='accept'?'接受':'放棄';document.querySelectorAll('#modeSeg button').forEach(b=>b.classList.toggle('active',b.dataset.mode===mode));render()}
 function setSelected(v){state.selected=v;document.querySelectorAll('#selectSeg button').forEach(b=>b.classList.toggle('active',b.dataset.selected===v));render()}
 document.querySelectorAll('#modeSeg button').forEach(b=>b.onclick=()=>setMode(b.dataset.mode,true));document.querySelectorAll('#selectSeg button').forEach(b=>b.onclick=()=>setSelected(b.dataset.selected));['prefix','emphasis','suffix','yesText','noText'].forEach(id=>$(id).addEventListener('input',render));
-$('download').onclick=()=>{if(!render())return;canvas.toBlob(blob=>{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`O-Ne_挑戰卡_${state.mode}_${state.selected}_READY_V0.1.0.png`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)},'image/png')};
-$('jsonBtn').onclick=()=>{const payload={schema:'o-ne.challenge-card.ready.v0.1.0',status:'READY',approved_by:'Omi',approved_on:'2026-08-21',mode:state.mode,selected:state.selected,copy:{prefix:$('prefix').value,emphasis:$('emphasis').value,suffix:$('suffix').value,yes:$('yesText').value,no:$('noText').value},formal_sources:{accept_psd_id:'1SqUYmbv5VfVWei1Gp4hoUFPDiynwoIPU',abandon_psd_id:'1eNgO2nsgtK9A4h6Ieak6WkYv6J232gWd'},visual_rules:{panel_fill_opacity:.8,select_label_locked:true}};const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='O-Ne_挑戰卡設定_READY_V0.1.0.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
+$('download').onclick=()=>{if(!render())return;canvas.toBlob(blob=>{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`O-Ne_挑戰卡_${state.mode}_${state.selected}_READY_V0.1.1.png`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)},'image/png')};
+$('jsonBtn').onclick=()=>{const payload={schema:'o-ne.challenge-card.ready.v0.1.1',status:'READY',generator_version:'V0.1.1_20260826',approved_by:'Omi',approved_on:'2026-08-21',mode:state.mode,selected:state.selected,copy:{prefix:$('prefix').value,emphasis:$('emphasis').value,suffix:$('suffix').value,yes:$('yesText').value,no:$('noText').value},formal_sources:{accept_psd_id:'1SqUYmbv5VfVWei1Gp4hoUFPDiynwoIPU',abandon_psd_id:'1eNgO2nsgtK9A4h6Ieak6WkYv6J232gWd'},visual_rules:{panel_fill_opacity:.8,select_label_locked:true}};const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='O-Ne_挑戰卡設定_READY_V0.1.1.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
 $('reset').onclick=()=>{$('prefix').value=DEFAULTS.prefix;$('suffix').value=DEFAULTS.suffix;$('yesText').value=DEFAULTS.yesText;$('noText').value=DEFAULTS.noText;setMode('accept',true);setSelected('yes')};
 document.fonts.ready.then(()=>render());render();
+function challengeSnapshot(){return{mode:state.mode,selected:state.selected,copy:{prefix:$('prefix').value,emphasis:$('emphasis').value,suffix:$('suffix').value,yes:$('yesText').value,no:$('noText').value}}}
+function validateChallenge(snapshot){
+  if(!snapshot||!['accept','abandon'].includes(snapshot.mode)||!['yes','no'].includes(snapshot.selected)||!snapshot.copy)throw new Error('挑戰卡狀態或文字欄位不完整。');
+  return snapshot;
+}
+ONEEditBackup.mount({
+  id:'challenge-card',generatorVersion:'V0.1.1_20260826',anchor:document.querySelector('.buttons'),
+  capture:challengeSnapshot,
+  apply:snapshot=>{snapshot=validateChallenge(snapshot);$('prefix').value=String(snapshot.copy.prefix??'');$('emphasis').value=String(snapshot.copy.emphasis??'');$('suffix').value=String(snapshot.copy.suffix??'');$('yesText').value=String(snapshot.copy.yes??'');$('noText').value=String(snapshot.copy.no??'');setMode(snapshot.mode,false);setSelected(snapshot.selected);render()},
+  fromJSON:payload=>{if(!payload||typeof payload.schema!=='string'||!payload.schema.startsWith('o-ne.challenge-card.ready.'))throw new Error('這不是挑戰卡設定 JSON。');return validateChallenge({mode:payload.mode,selected:payload.selected,copy:payload.copy})}
+});
 </script>
 </body>
 </html>

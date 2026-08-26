@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>O-Ne 觸發卡生成器 V1.0.1</title>
+<title>O-Ne 觸發卡生成器 V1.0.2</title>
 <style>
 *{box-sizing:border-box}
 body{margin:0;min-height:100vh;background:#0e1117;color:#f3efe8;font-family:"Noto Sans TC","Noto Sans CJK TC","Microsoft JhengHei",sans-serif}
@@ -12,7 +12,7 @@ body{margin:0;min-height:100vh;background:#0e1117;color:#f3efe8;font-family:"Not
 </head>
 <body>
 <div class="app"><a class="tool-home-link" href="./" style="min-width:118px;height:44px;display:inline-flex;align-items:center;color:#53ced0;font-size:14px;font-weight:800;text-decoration:none">回工具入口</a>
-<h1>O-Ne 觸發卡生成器 <span style="font-size:12px;color:#8c96a5">V1.0.1</span></h1>
+<h1>O-Ne 觸發卡生成器 <span style="font-size:12px;color:#8c96a5">V1.0.2</span></h1>
 <div class="sub">同一工具切換 EVENT／DONE!／FAIL。主底板 80% 透明；外框、色條、標籤、圖示與文字維持實色。</div>
 <div class="grid">
 <div class="panel">
@@ -28,6 +28,7 @@ body{margin:0;min-height:100vh;background:#0e1117;color:#f3efe8;font-family:"Not
 </div>
 <div class="panel"><div class="section-title">02｜正式母版即時預覽</div><div class="preview-wrap"><canvas id="c" width="653" height="127"></canvas></div></div>
 </div></div>
+<script src="./edit-backup-v1.js?v=100"></script>
 <script>
 const canvas=document.getElementById('c'),ctx=canvas.getContext('2d'),$=id=>document.getElementById(id);const C={orange:'#FFBE37',cream:'#FDF3E7',dark:'#1F1713',darkText:'#3B170C',fail:'#333333',failText:'#E2E2E2',green:'#21A74D'};const defaults={state:'EVENT',title:'在機場看煙火',subtitle:'關西國際機場 (KIX) 看到煙火',progress:'0/1'};
 function font(weight,px){return `${weight} ${px}px "Noto Sans TC","Noto Sans CJK TC","Microsoft JhengHei",sans-serif`}
@@ -38,5 +39,16 @@ function drawLabel(state){const x=30,y=20,w=141,h=33;roundedRect(x,y,w,h,10);ctx
 function drawSuccessIcon(){const x=522,y=19,w=90,h=90;roundedRect(x,y,w,h,10);ctx.fillStyle=C.cream;ctx.fill();roundedRect(x+4,y+4,w-8,h-8,7);ctx.fillStyle=C.green;ctx.fill();ctx.strokeStyle=C.cream;ctx.lineWidth=11;ctx.lineCap='square';ctx.lineJoin='miter';ctx.beginPath();ctx.moveTo(x+18,y+45);ctx.lineTo(x+34,y+61);ctx.lineTo(x+71,y+25);ctx.stroke()}
 function drawFailIcon(){const x=522,y=19,w=90,h=90;roundedRect(x,y,w,h,10);ctx.fillStyle=C.cream;ctx.fill();roundedRect(x+4,y+4,w-8,h-8,7);ctx.fillStyle=C.fail;ctx.fill();ctx.strokeStyle=C.cream;ctx.lineWidth=11;ctx.lineCap='square';ctx.beginPath();ctx.moveTo(x+25,y+26);ctx.lineTo(x+65,y+66);ctx.moveTo(x+65,y+26);ctx.lineTo(x+25,y+66);ctx.stroke()}
 function render(){const state=$('state').value;ctx.clearRect(0,0,653,127);drawBase();drawLabel(state);if(state==='DONE')drawSuccessIcon();if(state==='FAIL')drawFailIcon();let blocked=false;const resultState=state!=='EVENT';const title=$('title').value,titleFit=fitText(title,resultState?320:430,34,18,800);$('title').classList.toggle('bad',!titleFit.ok);ctx.font=font(800,titleFit.size);ctx.fillStyle=C.orange;ctx.textAlign='left';ctx.textBaseline='alphabetic';ctx.fillText(title,183,49);blocked=blocked||!titleFit.ok;const subBase=$('subtitle').value.trim(),prog=$('progress').value.trim(),subText=[subBase,prog].filter(Boolean).join(' '),subFit=fitText(subText,resultState?470:585,21,14,700);$('subtitle').classList.toggle('bad',!subFit.ok);$('progress').classList.toggle('bad',!subFit.ok);ctx.font=font(700,subFit.size);ctx.fillStyle=state==='DONE'?C.orange:C.cream;ctx.fillText(subText,34,92);blocked=blocked||!subFit.ok;const st=$('statusText');$('download').disabled=blocked;if(blocked){st.textContent='BLOCKED｜大標或副標超出正式安全範圍，請縮短內容';st.className='status error'}else{st.textContent='READY｜可輸出透明 PNG';st.className='status'}return blocked}
-['state','title','subtitle','progress'].forEach(id=>$(id).addEventListener(id==='state'?'change':'input',render));$('download').onclick=()=>{if(render())return;canvas.toBlob(blob=>{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`O-Ne_觸發卡_${$('state').value}.png`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)},'image/png')};$('jsonBtn').onclick=()=>{const payload={component_id:'TRIGGER-CARD',master_psd_id:'10sd-QP_W3YqYksm1cVGYhaAqLbppjBJY',generator_version:'V1.0.1_20260807',panel_fill_opacity:.8,state:$('state').value,title:$('title').value,subtitle:$('subtitle').value,progress:$('progress').value};const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='O-Ne_觸發卡_data_v101.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};$('reset').onclick=()=>{$('state').value=defaults.state;$('title').value=defaults.title;$('subtitle').value=defaults.subtitle;$('progress').value=defaults.progress;render()};render();
+['state','title','subtitle','progress'].forEach(id=>$(id).addEventListener(id==='state'?'change':'input',render));$('download').onclick=()=>{if(render())return;canvas.toBlob(blob=>{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`O-Ne_觸發卡_${$('state').value}.png`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)},'image/png')};$('jsonBtn').onclick=()=>{const payload={component_id:'TRIGGER-CARD',master_psd_id:'10sd-QP_W3YqYksm1cVGYhaAqLbppjBJY',generator_version:'V1.0.2_20260826',panel_fill_opacity:.8,state:$('state').value,title:$('title').value,subtitle:$('subtitle').value,progress:$('progress').value};const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='O-Ne_觸發卡_data_v102.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};$('reset').onclick=()=>{$('state').value=defaults.state;$('title').value=defaults.title;$('subtitle').value=defaults.subtitle;$('progress').value=defaults.progress;render()};render();
+ONEEditBackup.mount({
+  id:'trigger-card',generatorVersion:'V1.0.2_20260826',anchor:document.querySelector('.buttons'),
+  afterApply:render,
+  fromJSON:payload=>{
+    if(!payload||payload.component_id!=='TRIGGER-CARD')throw new Error('component_id 必須是 TRIGGER-CARD。');
+    if(!['EVENT','DONE','FAIL'].includes(payload.state))throw new Error('state 必須是 EVENT、DONE 或 FAIL。');
+    const fields=ONEEditBackup.captureFields();
+    ['state','title','subtitle','progress'].forEach(id=>{fields[id]={kind:'value',value:String(payload[id]??'')}});
+    return{fields};
+  }
+});
 </script></body></html>

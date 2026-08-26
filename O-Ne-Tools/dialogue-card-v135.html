@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>O-Ne 對話卡生成器 V1.3.6</title>
+<title>O-Ne 對話卡生成器 V1.3.7</title>
 <style>
 *{box-sizing:border-box}
 body{margin:0;min-height:100vh;background:#0e1117;color:#f3efe8;font-family:"Noto Sans TC","Noto Sans CJK TC","Microsoft JhengHei",sans-serif}
@@ -32,7 +32,7 @@ canvas{width:617px;max-width:100%;height:auto;image-rendering:auto;filter:drop-s
 </head>
 <body>
 <div class="app"><a class="tool-home-link" href="./" style="min-width:118px;height:44px;display:inline-flex;align-items:center;color:#53ced0;font-size:14px;font-weight:800;text-decoration:none">回工具入口</a>
-<h1>O-Ne 對話卡生成器 <span style="font-size:12px;color:#8c96a5">V1.3.6</span></h1>
+<h1>O-Ne 對話卡生成器 <span style="font-size:12px;color:#8c96a5">V1.3.7</span></h1>
 <div class="sub">正式資產修正版：直接使用 Drive 的 24 張獨立透明頭像；每張以 224 px 高密度資產載入，先裁透明空白、只縮小不放大。正式框與人物完全分離，原生 617×120。</div>
 <div class="grid">
 <div class="panel">
@@ -56,6 +56,7 @@ canvas{width:617px;max-width:100%;height:auto;image-rendering:auto;filter:drop-s
 <script src="./dialogue-assets-niete.js?v=136"></script>
 <script src="./dialogue-assets-kuma.js?v=136"></script>
 <script src="./dialogue-assets-nomi.js?v=136"></script>
+<script src="./edit-backup-v1.js?v=100"></script>
 <script>
 'use strict';
 const EXPRESSIONS=['大笑','驚訝','生氣','委屈哭','疑惑','無奈'];
@@ -99,7 +100,22 @@ init();
 $('dialogue').addEventListener('input',render);
 $('swap').onclick=()=>{const a=snap('left'),b=snap('right');put('left',b);put('right',a);render()};
 $('reset').onclick=()=>reset(true);
-$('jsonBtn').onclick=()=>{const data={component_id:'DIALOGUE-CARD',generator_version:'V1.3.6_20260811',left:snap('left'),right:snap('right'),dialogue:$('dialogue').value};saveBlob(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),'O-Ne_對話卡_data.json')};
+$('jsonBtn').onclick=()=>{const data={component_id:'DIALOGUE-CARD',generator_version:'V1.3.7_20260826',left:snap('left'),right:snap('right'),dialogue:$('dialogue').value};saveBlob(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),'O-Ne_對話卡_data_v137.json')};
+function validateDialogue(snapshot){
+  if(!snapshot||!snapshot.left||!snapshot.right)throw new Error('JSON 缺少左右角色。');
+  for(const side of ['left','right']){
+    if(!Object.prototype.hasOwnProperty.call(CHARACTERS,snapshot[side].character))throw new Error(side+' 角色無效。');
+    if(CHARACTERS[snapshot[side].character].portrait&&!EXPRESSIONS.includes(snapshot[side].expression))throw new Error(side+' 表情無效。');
+  }
+  if(snapshot.left.character==='NONE'&&snapshot.right.character==='NONE')throw new Error('左右至少保留一個角色或 NPC。');
+  return snapshot;
+}
+ONEEditBackup.mount({
+  id:'dialogue-card',generatorVersion:'V1.3.7_20260826',anchor:document.querySelector('.buttons'),
+  capture:()=>({left:snap('left'),right:snap('right'),dialogue:$('dialogue').value}),
+  apply:snapshot=>{snapshot=validateDialogue(snapshot);put('left',snapshot.left);put('right',snapshot.right);$('dialogue').value=String(snapshot.dialogue??'');syncAll();render()},
+  fromJSON:payload=>{if(!payload||payload.component_id!=='DIALOGUE-CARD')throw new Error('component_id 必須是 DIALOGUE-CARD。');return validateDialogue({left:payload.left,right:payload.right,dialogue:payload.dialogue})}
+});
 render();loadAssets();
 </script>
 </body>

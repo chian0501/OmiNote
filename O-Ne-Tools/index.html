@@ -12,25 +12,25 @@
 <body>
 <div class="app">
   <div class="hero"><div><h1>O-Ne 字卡工具入口</h1><div class="sub">原工具是主入口；需要 AI 時才使用 AI 幫填。不同狀態、數量或變體仍在同一編輯器內切換。</div></div><div class="stat"><b id="statNum">—</b><span>可使用／測試</span></div></div>
-  <div class="ai-banner"><b>✨ ChatGPT Pro AI Bridge 是選用功能</b><br>直接編輯永遠是主入口。挑戰卡 V0.1.0 READY 已正式啟用：沿用正式接受／放棄固定卡，可改主句與 YES／NO 按鈕文字，並切換接受／放棄與 YES／NO 選取狀態。</div>
+  <div class="ai-banner"><b>🕘 所有可用卡片都會自動保留最近 5 次編輯</b><br>關閉視窗後仍可還原；清除瀏覽器網站資料或換裝置時，請使用各工具的「載入 JSON」。含圖片的卡片會還原文字與設定，圖片檔需重新選取。ChatGPT Pro AI Bridge 仍是選用功能。</div>
   <div class="toolbar"><input id="search" class="search" placeholder="搜尋：移動、選項、挑戰、對話、評分…"><button class="filter active" data-group="全部">全部</button><button class="filter" data-group="任務／事件">任務／事件</button><button class="filter" data-group="路線／導航">路線／導航</button><button class="filter" data-group="選擇／確認">選擇／確認</button><button class="filter" data-group="對話／角色">對話／角色</button><button class="filter" data-group="資訊／閱讀">資訊／閱讀</button><button class="filter" data-group="縮圖／品牌">縮圖／品牌</button><button class="filter" data-group="效果／狀態">效果／狀態</button><button class="filter" data-group="結算／結果">結算／結果</button></div>
   <div id="grid" class="grid"></div>
-  <div class="footer"><b>規則：</b>直接編輯永遠保留；AI 只作輔助填欄位，不取代原工具、不改版型。所有卡體主底色固定 80% 透明，其他元件維持正式透明度。固定支援資產不列入生成器待辦。</div>
+  <div class="footer"><b>規則：</b>直接編輯永遠保留；AI 只作輔助填欄位，不取代原工具、不改版型。每個工具自動保留同一瀏覽器最近 5 次編輯，並可載入該工具輸出的 JSON。所有卡體主底色固定 80% 透明，其他元件維持正式透明度。</div>
 </div>
 <script>
 const tools=[
-{id:'general',name:'一般卡',family:'一般卡',group:'任務／事件',desc:'HERE／GET!｜位置／場景定位、商品／道具解鎖',status:'ready',direct:'./general-card.html?v=110&build=787865a',ai:'./ai-card.html?tool=general&v=12'},
-{id:'trigger',name:'觸發卡',family:'觸發卡',group:'任務／事件',desc:'EVENT／DONE!／FAIL｜事件觸發、成功、失敗',status:'ready',direct:'./trigger-card.html?v=101',ai:'./ai-card.html?tool=trigger&v=12'},
+{id:'general',name:'一般卡',family:'一般卡',group:'任務／事件',desc:'HERE／GET!｜位置／場景定位、商品／道具解鎖',status:'ready',direct:'./general-card.html?v=121&build=history-json-v1',ai:'./ai-card.html?tool=general&v=12'},
+{id:'trigger',name:'觸發卡',family:'觸發卡',group:'任務／事件',desc:'EVENT／DONE!／FAIL｜事件觸發、成功、失敗',status:'ready',direct:'./trigger-card.html?v=102',ai:'./ai-card.html?tool=trigger&v=12'},
 {id:'persistent',name:'常駐卡',family:'常駐卡',group:'任務／事件',desc:'MISSION／DONE!／FAIL｜手動字級／5 筆暫存／JSON 還原',status:'ready',direct:'./persistent-card.html?v=111',ai:'./ai-card.html?tool=persistent&v=12'},
-{id:'effect',name:'效果卡',family:'STA-02｜Buff／Debuff',group:'效果／狀態',desc:'READY｜V0.3.0；6 款 1920×1080 半透明滿版氛圍',status:'ready',direct:'./effect-card.html?v=030&build=atmosphere-opacity-v6',ai:''},
-{id:'move',name:'移動卡',family:'移動卡',group:'路線／導航',desc:'MOVE｜站點增減、每段實線／虛線、白色／橘色版',status:'ready',direct:'./move-card.html?v=106',ai:'./ai-card.html?tool=move&v=12'},
-{id:'choice',name:'選項卡',family:'選項卡',group:'選擇／確認',desc:'SELECT｜自由增減選項；每項獨立亮／暗',status:'ready',direct:'./choice-card.html?v=100',ai:'./ai-card.html?tool=choice&v=12'},
-{id:'challenge',name:'挑戰卡',family:'READY｜固定卡衍生｜接受／放棄',group:'選擇／確認',desc:'READY｜接受／放棄＋YES／NO；主句與按鈕文字可自訂',status:'ready',direct:'./challenge-card.html?v=010',ai:''},
-{id:'dialogue',name:'對話卡',family:'對話卡',group:'對話／角色',desc:'正式框＋完整獨立透明頭像；左右角色／表情／名稱獨立',status:'ready',direct:'./dialogue-card.html?v=140',ai:''},
-{id:'rating',name:'評分卡',family:'說明／評分',group:'資訊／閱讀',desc:'正式 16:9 品鑑卡；1–8 列、分數／文字；商品圖可左／右／雙圖／不顯示',status:'ready',direct:'./rating-card.html?v=130',ai:''},
-{id:'focus',name:'焦點／說明內容卡',family:'READY｜焦點／說明共用',group:'資訊／閱讀',desc:'一般內文／項目／步驟；大字級、常用／自訂寬度與自動高度',status:'ready',direct:'./focus-card.html?v=056&build=d3122b5a',ai:''},
-{id:'thumbnail-frame',name:'縮圖品牌框',family:'首頁框｜1920×1080',group:'縮圖／品牌',desc:'底圖可選填；可輸出品牌框透明版，角標可移動與替換',status:'ready',direct:'./thumbnail-frame.html?v=125',ai:''},
-{id:'settlement',name:'片尾結算',family:'QST-03｜FORMAL V1.1＋OMI APPROVED EXTENSION',group:'結算／結果',desc:'READY｜1–8 列自由增減，Icon 與欄位名稱可換，左框可打觀眾問題或放下一影片',status:'ready',direct:'./settlement-card.html?v=012&ready=1',ai:''}
+{id:'effect',name:'效果卡',family:'STA-02｜Buff／Debuff',group:'效果／狀態',desc:'READY｜V0.3.1；6 款 1920×1080 半透明滿版氛圍',status:'ready',direct:'./effect-card.html?v=031&build=history-json-v1',ai:''},
+{id:'move',name:'移動卡',family:'移動卡',group:'路線／導航',desc:'MOVE｜站點增減、每段實線／虛線、白色／橘色版',status:'ready',direct:'./move-card.html?v=107',ai:'./ai-card.html?tool=move&v=12'},
+{id:'choice',name:'選項卡',family:'選項卡',group:'選擇／確認',desc:'SELECT｜自由增減選項；每項獨立亮／暗',status:'ready',direct:'./choice-card.html?v=101',ai:'./ai-card.html?tool=choice&v=12'},
+{id:'challenge',name:'挑戰卡',family:'READY｜固定卡衍生｜接受／放棄',group:'選擇／確認',desc:'READY｜接受／放棄＋YES／NO；主句與按鈕文字可自訂',status:'ready',direct:'./challenge-card.html?v=011',ai:''},
+{id:'dialogue',name:'對話卡',family:'對話卡',group:'對話／角色',desc:'正式框＋完整獨立透明頭像；左右角色／表情／名稱獨立',status:'ready',direct:'./dialogue-card.html?v=141',ai:''},
+{id:'rating',name:'評分卡',family:'說明／評分',group:'資訊／閱讀',desc:'正式 16:9 品鑑卡；1–8 列、分數／文字；商品圖可左／右／雙圖／不顯示',status:'ready',direct:'./rating-card.html?v=131',ai:''},
+{id:'focus',name:'焦點／說明內容卡',family:'READY｜焦點／說明共用',group:'資訊／閱讀',desc:'一般內文／項目／步驟；大字級、常用／自訂寬度與自動高度',status:'ready',direct:'./focus-card.html?v=057&build=history-json-v1',ai:''},
+{id:'thumbnail-frame',name:'縮圖品牌框',family:'首頁框｜1920×1080',group:'縮圖／品牌',desc:'底圖可選填；可輸出品牌框透明版，角標可移動與替換',status:'ready',direct:'./thumbnail-frame.html?v=126',ai:''},
+{id:'settlement',name:'片尾結算',family:'QST-03｜FORMAL V1.1＋OMI APPROVED EXTENSION',group:'結算／結果',desc:'READY｜1–8 列自由增減，Icon 與欄位名稱可換，左框可打觀眾問題或放下一影片',status:'ready',direct:'./settlement-card.html?v=013&ready=1',ai:''}
 ];
 const usable=tools.filter(t=>t.status==='ready'||t.status==='candidate').length;document.getElementById('statNum').textContent=`${usable} / ${tools.length}`;
 let group='全部';const grid=document.getElementById('grid'),search=document.getElementById('search');
@@ -39,3 +39,5 @@ search.oninput=render;document.querySelectorAll('.filter').forEach(b=>b.onclick=
 </script>
 </body>
 </html>
+
+

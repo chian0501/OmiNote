@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>O-Ne 選項卡生成器 V1.0</title>
+<title>O-Ne 選項卡生成器 V1.0.1</title>
 <style>
 *{box-sizing:border-box}
 body{margin:0;min-height:100vh;background:#0e1117;color:#f3efe8;font-family:"Noto Sans TC","Noto Sans CJK TC","Microsoft JhengHei",sans-serif}
@@ -50,7 +50,7 @@ button.tiny{padding:7px 10px;font-size:12px}
 </head>
 <body>
 <div class="app"><a class="tool-home-link" href="./" style="min-width:118px;height:44px;display:inline-flex;align-items:center;color:#53ced0;font-size:14px;font-weight:800;text-decoration:none">回工具入口</a>
-<h1>O-Ne 選項卡生成器 <span style="font-size:12px;color:#8c96a5">V1.0</span></h1>
+<h1>O-Ne 選項卡生成器 <span style="font-size:12px;color:#8c96a5">V1.0.1</span></h1>
 <div class="sub">選項可自由增加／刪除；每一項都有獨立「亮／暗」開關。亮幾個都可以，編號與卡片高度自動調整。</div>
 
 <div class="grid">
@@ -106,6 +106,7 @@ button.tiny{padding:7px 10px;font-size:12px}
 </div>
 </div>
 
+<script src="./edit-backup-v1.js?v=100"></script>
 <script>
 const canvas=document.getElementById('c');
 const ctx=canvas.getContext('2d');
@@ -326,6 +327,7 @@ $('download').onclick=()=>{
 $('jsonBtn').onclick=()=>{
   const payload={
     component_id:'SELECT-CARD',
+    generator_version:'V1.0.1_20260826',
     master_psd_id:'1wYnhZVvoQMl4hn1W7msw_oh3k-RqbHca',
     title:$('title').value,
     question:$('question').value,
@@ -347,6 +349,21 @@ $('reset').onclick=()=>{
 
 renderForm();
 render();
+function validateChoice(snapshot){
+  if(!snapshot||!Array.isArray(snapshot.options)||snapshot.options.length<1||snapshot.options.length>20)throw new Error('選項數量須為 1～20。');
+  snapshot.options=snapshot.options.map(option=>({text:String(option.text??''),bright:Boolean(option.bright)}));
+  return snapshot;
+}
+ONEEditBackup.mount({
+  id:'choice-card',generatorVersion:'V1.0.1_20260826',anchor:document.querySelectorAll('.buttons')[1],
+  capture:()=>({title:$('title').value,question:$('question').value,options:JSON.parse(JSON.stringify(data.options))}),
+  apply:snapshot=>{snapshot=validateChoice(snapshot);data.options=JSON.parse(JSON.stringify(snapshot.options));$('title').value=String(snapshot.title??'');$('question').value=String(snapshot.question??'');renderForm();render()},
+  fromJSON:payload=>{
+    if(!payload||payload.component_id!=='SELECT-CARD')throw new Error('component_id 必須是 SELECT-CARD。');
+    if(!Array.isArray(payload.options))throw new Error('JSON 缺少 options。');
+    return validateChoice({title:String(payload.title??''),question:String(payload.question??''),options:payload.options.map(option=>({text:option.text,bright:option.state==='BRIGHT'}))});
+  }
+});
 </script>
 </body>
 </html>

@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>O-Ne 一般卡生成器 V1.2.0</title>
+<title>O-Ne 一般卡生成器 V1.2.1</title>
 <style>
 *{box-sizing:border-box}body{margin:0;min-height:100vh;background:#0e1117;color:#f3efe8;font-family:"Noto Sans TC","Noto Sans CJK TC","Microsoft JhengHei",sans-serif}
 .app{max-width:1320px;margin:auto;padding:26px}h1{margin:0 0 8px;font-size:24px}.sub{color:#9ea7b3;font-size:13px;line-height:1.7;margin-bottom:22px}
@@ -16,7 +16,7 @@ canvas{width:min(100%,900px);height:auto;filter:drop-shadow(0 8px 18px rgba(0,0,
 @media(max-width:950px){.grid{grid-template-columns:1fr}}
 </style></head>
 <body><div class="app"><a class="tool-home-link" href="./" style="min-width:118px;height:44px;display:inline-flex;align-items:center;color:#53ced0;font-size:14px;font-weight:800;text-decoration:none">回工具入口</a>
-<h1>O-Ne 一般卡生成器 <span style="font-size:12px;color:#8c96a5">V1.2.0</span></h1>
+<h1>O-Ne 一般卡生成器 <span style="font-size:12px;color:#8c96a5">V1.2.1</span></h1>
 <div class="sub">同一工具切換 HERE／GET!／COST／自訂標籤。主底板固定 80% 透明；標籤、外框、左側識別條與文字維持正式實色。</div>
 <div class="grid">
 <div class="panel"><div class="section-title">01｜內容輸入</div>
@@ -34,6 +34,7 @@ canvas{width:min(100%,900px);height:auto;filter:drop-shadow(0 8px 18px rgba(0,0,
 </div>
 <div class="panel"><div class="section-title">02｜正式母版即時預覽</div><div class="preview-wrap"><canvas id="c" width="653" height="127"></canvas></div></div>
 </div></div>
+<script src="./edit-backup-v1.js?v=100"></script>
 <script>
 const canvas=document.getElementById('c'),ctx=canvas.getContext('2d'),$=id=>document.getElementById(id);
 const C={panel:'rgba(31,23,19,.80)',cream:'#FDF3E7',white:'#FFFFFF',orange:'#FFBE37',teal:'#29A6A7',blue:'#3F8FB7',red:'#FD4537',dark:'#433A35',deep:'#1F1713',darkText:'#3B170C'};
@@ -62,6 +63,35 @@ $('mode').onchange=()=>{saveDraft();currentMode=$('mode').value;loadMode(current
 $('title').oninput=()=>{drafts[currentMode].title=$('title').value;render()};$('subtitle').oninput=()=>{drafts[currentMode].subtitle=$('subtitle').value;render()};
 $('customLabel').oninput=()=>{drafts.CUSTOM.label=$('customLabel').value;render()};$('labelColor').onchange=()=>{drafts.CUSTOM.color=$('labelColor').value;render()};
 $('download').onclick=()=>{if(render())return;const c=config[$('mode').value];canvas.toBlob(b=>{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=c.file+'.png';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)},'image/png')};
-$('jsonBtn').onclick=()=>{if(render())return;const mode=$('mode').value,c=config[mode],label=activeLabel(),accent=activeAccent(),p={component_id:c.componentId,mapping_status:mode==='CUSTOM'?'CUSTOM_DERIVATIVE_UNMAPPED':'MAPPED',generator_version:'V1.2.0_20260820',panel_fill_opacity:.8,mode,variant:c.variant,label:{text:label,color:accent,text_color:mode==='CUSTOM'?contrastText(accent):c.labelText,custom:mode==='CUSTOM'},title:$('title').value,subtitle:$('subtitle').value};const u=URL.createObjectURL(new Blob([JSON.stringify(p,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=u;a.download=`O-Ne_一般卡_${mode}_data_v120.json`;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000)};
-$('reset').onclick=()=>{drafts[currentMode]={...config[currentMode].defaults};loadMode(currentMode);render()};loadMode(currentMode);render();
+$('jsonBtn').onclick=()=>{if(render())return;const mode=$('mode').value,c=config[mode],label=activeLabel(),accent=activeAccent(),p={component_id:c.componentId,mapping_status:mode==='CUSTOM'?'CUSTOM_DERIVATIVE_UNMAPPED':'MAPPED',generator_version:'V1.2.1_20260826',panel_fill_opacity:.8,mode,variant:c.variant,label:{text:label,color:accent,text_color:mode==='CUSTOM'?contrastText(accent):c.labelText,custom:mode==='CUSTOM'},title:$('title').value,subtitle:$('subtitle').value};const u=URL.createObjectURL(new Blob([JSON.stringify(p,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=u;a.download=`O-Ne_一般卡_${mode}_data_v121.json`;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000)};
+$('reset').onclick=()=>{drafts[currentMode]={...config[currentMode].defaults};loadMode(currentMode);render()};
+loadMode(currentMode);render();
+ONEEditBackup.mount({
+  id:'general-card',
+  generatorVersion:'V1.2.1_20260826',
+  anchor:document.querySelector('.buttons'),
+  capture:()=>{saveDraft();return{currentMode,drafts:JSON.parse(JSON.stringify(drafts))}},
+  apply:snapshot=>{
+    if(!snapshot||!config[snapshot.currentMode]||!snapshot.drafts)throw new Error('一般卡備份內容不完整。');
+    Object.keys(config).forEach(mode=>{if(snapshot.drafts[mode])drafts[mode]={...config[mode].defaults,...snapshot.drafts[mode]}});
+    currentMode=snapshot.currentMode;$('mode').value=currentMode;loadMode(currentMode);render();
+  },
+  fromJSON:payload=>{
+    if(!payload||!config[payload.mode])throw new Error('找不到有效的 mode。');
+    const expected=config[payload.mode].componentId;
+    if(payload.component_id!==undefined&&payload.component_id!==expected)throw new Error('component_id 與卡片形式不符。');
+    const snapshot={currentMode:payload.mode,drafts:JSON.parse(JSON.stringify(drafts))};
+    snapshot.drafts[payload.mode]={
+      ...snapshot.drafts[payload.mode],
+      title:String(payload.title??''),
+      subtitle:String(payload.subtitle??'')
+    };
+    if(payload.mode==='CUSTOM'){
+      snapshot.drafts.CUSTOM.label=String(payload.label?.text??'CUSTOM');
+      snapshot.drafts.CUSTOM.color=String(payload.label?.color??C.teal).toUpperCase();
+      if(!PALETTE.includes(snapshot.drafts.CUSTOM.color))throw new Error('自訂標籤顏色不在 O-Ne 色票內。');
+    }
+    return snapshot;
+  }
+});
 </script></body></html>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>O-Ne 縮圖品牌框工具 V1.2.5</title>
+  <title>O-Ne 縮圖品牌框工具 V1.2.6</title>
   <style>
     :root{
       --bg:#0e1117;
@@ -337,7 +337,7 @@
       font-size:14px;
       font-weight:900;
     }
-    .export-button:disabled{cursor:not-allowed;opacity:.42}
+    .export-button.secondary{border-color:var(--line-strong);background:#30394a}.export-button:disabled{cursor:not-allowed;opacity:.42}
     .status{min-width:0;color:#8fd4c8;font-size:11px;line-height:1.55}
     .status.error{color:var(--danger)}
     @media(max-width:1120px){
@@ -362,7 +362,7 @@
       <a class="tool-home-link" href="./">回工具入口</a>
       <span class="header-divider" aria-hidden="true"></span>
       <div class="title-block">
-        <h1>O-Ne 縮圖品牌框工具 <span>V1.2.5</span></h1>
+        <h1>O-Ne 縮圖品牌框工具 <span>V1.2.6</span></h1>
         <div class="sub">底圖可選填；可輸出「底圖＋品牌框」，也可直接輸出透明背景的品牌框 PNG。</div>
       </div>
       <div class="candidate-status">CANDIDATE</div>
@@ -477,12 +477,14 @@
         </div>
         <div class="export-bar">
           <button id="download" class="export-button" type="button" disabled>輸出透明底框 PNG</button>
+          <button id="jsonBtn" class="export-button secondary" type="button">輸出設定 JSON</button>
           <div id="status" class="status" aria-live="polite">品牌框載入中…</div>
         </div>
       </section>
     </section>
   </main>
 
+  <script src="./edit-backup-v1.js?v=100"></script>
   <script>
     (function(){
       "use strict";
@@ -780,6 +782,71 @@
         },"image/png");
       }
 
+      function thumbnailSnapshot(){
+        return {
+          mode:mode,
+          cornerContent:cornerContent,
+          cornerPosition:cornerPosition,
+          fields:{
+            zoom:$("zoom").value,
+            positionX:$("positionX").value,
+            positionY:$("positionY").value,
+            backgroundColor:$("backgroundColor").value,
+            cornerText:$("cornerText").value,
+            cornerTextColor:$("cornerTextColor").value
+          }
+        };
+      }
+      function validateThumbnailSnapshot(snapshot){
+        if(!snapshot||!["cover","contain"].includes(snapshot.mode)||!["logo","text","image","none"].includes(snapshot.cornerContent)||!["top-left","top-right","bottom-left","bottom-right"].includes(snapshot.cornerPosition)||!snapshot.fields)throw new Error("縮圖品牌框 JSON 結構不完整。");
+        if(!/^#[0-9A-Fa-f]{6}$/.test(String(snapshot.fields.backgroundColor))||!/^#[0-9A-Fa-f]{6}$/.test(String(snapshot.fields.cornerTextColor)))throw new Error("顏色必須是 6 碼色票。");
+        var zoom=Number(snapshot.fields.zoom),x=Number(snapshot.fields.positionX),y=Number(snapshot.fields.positionY);
+        if(!Number.isFinite(zoom)||zoom<20||zoom>220||!Number.isFinite(x)||x<-100||x>100||!Number.isFinite(y)||y<-100||y>100)throw new Error("縮放或位置超出允許範圍。");
+        return snapshot;
+      }
+      function applyThumbnailSnapshot(snapshot){
+        snapshot=validateThumbnailSnapshot(snapshot);
+        mode=snapshot.mode;cornerContent=snapshot.cornerContent;cornerPosition=snapshot.cornerPosition;
+        ["zoom","positionX","positionY","backgroundColor","cornerText","cornerTextColor"].forEach(function(id){$(id).value=String(snapshot.fields[id])});
+        document.querySelectorAll("[data-mode]").forEach(function(button){button.classList.toggle("is-active",button.dataset.mode===mode)});
+        document.querySelectorAll("[data-corner-content]").forEach(function(button){button.classList.toggle("is-active",button.dataset.cornerContent===cornerContent)});
+        document.querySelectorAll("[data-corner-position]").forEach(function(button){button.classList.toggle("is-active",button.dataset.cornerPosition===cornerPosition)});
+        $("cornerTextPreset").value=[].slice.call($("cornerTextPreset").options).some(function(option){return option.value===$("cornerText").value})?$("cornerText").value:"";
+        updateLabels();updateCornerControls();draw();
+      }
+      function importThumbnail(payload){
+        if(!payload||payload.component_id!=="THUMBNAIL-FRAME"||typeof payload.schema!=="string"||payload.schema.indexOf("o-ne.thumbnail-frame.ready.")!==0)throw new Error("這不是縮圖品牌框設定 JSON。");
+        return validateThumbnailSnapshot({
+          mode:payload.source_image&&payload.source_image.mode,
+          cornerContent:payload.corner&&payload.corner.content,
+          cornerPosition:payload.corner&&payload.corner.position,
+          fields:{
+            zoom:payload.source_image&&payload.source_image.zoom_percent,
+            positionX:payload.source_image&&payload.source_image.position_x,
+            positionY:payload.source_image&&payload.source_image.position_y,
+            backgroundColor:payload.source_image&&payload.source_image.background_color,
+            cornerText:payload.corner&&payload.corner.text,
+            cornerTextColor:payload.corner&&payload.corner.text_color
+          }
+        });
+      }
+      function downloadJson(){
+        var snapshot=thumbnailSnapshot();
+        var payload={
+          schema:"o-ne.thumbnail-frame.ready.v1.2.6",
+          status:"READY",
+          component_id:"THUMBNAIL-FRAME",
+          generator_version:"V1.2.6_20260826",
+          canvas:[WIDTH,HEIGHT],
+          source_image:{embedded:false,present:Boolean(sourceImage),mode:snapshot.mode,zoom_percent:Number(snapshot.fields.zoom),position_x:Number(snapshot.fields.positionX),position_y:Number(snapshot.fields.positionY),background_color:snapshot.fields.backgroundColor},
+          corner:{content:snapshot.cornerContent,position:snapshot.cornerPosition,text:snapshot.fields.cornerText,text_color:snapshot.fields.cornerTextColor,custom_image_embedded:false,custom_image_present:Boolean(cornerCustomImage)}
+        };
+        var url=URL.createObjectURL(new Blob([JSON.stringify(payload,null,2)],{type:"application/json"}));
+        var link=document.createElement("a");link.href=url;link.download="O-Ne_縮圖品牌框設定_READY_V1.2.6.json";link.click();
+        setTimeout(function(){URL.revokeObjectURL(url)},1200);
+        setStatus("已輸出設定 JSON；圖片檔本體不會嵌入。",false);
+      }
+
       function bindAsset(image,key,source){
         image.onload=function(){
           assetState[key]=true;
@@ -828,6 +895,7 @@
       $("resetPosition").addEventListener("click",resetAdjustments);
       $("removeImage").addEventListener("click",removeImage);
       $("download").addEventListener("click",download);
+      $("jsonBtn").addEventListener("click",downloadJson);
 
       ["dragenter","dragover"].forEach(function(type){
         $("dropZone").addEventListener(type,function(event){
@@ -848,7 +916,9 @@
       updateLabels();
       updateCornerControls();
       draw();
+      ONEEditBackup.mount({id:"thumbnail-frame",generatorVersion:"V1.2.6_20260826",host:document.querySelector("aside"),imageNote:true,capture:thumbnailSnapshot,apply:applyThumbnailSnapshot,fromJSON:importThumbnail});
     })();
   </script>
 </body>
 </html>
+
