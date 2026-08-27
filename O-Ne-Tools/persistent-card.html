@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>O-Ne 常駐卡生成器 V1.1.1</title>
+<title>O-Ne 常駐卡生成器 V1.1.2</title>
 <style>
 *{box-sizing:border-box}
 body{margin:0;min-height:100vh;background:#0e1117;color:#f3efe8;font-family:"Noto Sans TC","Noto Sans CJK TC","Microsoft JhengHei",sans-serif}
@@ -28,8 +28,8 @@ canvas{width:min(100%,900px);height:auto;filter:drop-shadow(0 8px 18px rgba(0,0,
 </head>
 <body>
 <div class="app"><a class="tool-home-link" href="./" style="min-width:118px;height:44px;display:inline-flex;align-items:center;color:#53ced0;font-size:14px;font-weight:800;text-decoration:none">回工具入口</a>
-<h1>O-Ne 常駐卡生成器 <span style="font-size:12px;color:#8c96a5">V1.1.1</span></h1>
-<div class="sub">同一工具切換 MISSION／DONE!／FAIL。文字大小手動控制；最近 5 次內容自動暫存，也可用 JSON 備份或跨裝置還原。</div>
+<h1>O-Ne 常駐卡生成器 <span style="font-size:12px;color:#8c96a5">V1.1.2</span></h1>
+<div class="sub">同一工具切換 MISSION／DONE!／FAIL。文字大小手動控制；只有按下暫存按鈕才會保留最近 5 次內容，也可用 JSON 備份或跨裝置還原。</div>
 <div class="grid">
 <div class="panel">
   <div class="section-title">01｜內容輸入</div>
@@ -45,11 +45,11 @@ canvas{width:min(100%,900px);height:auto;filter:drop-shadow(0 8px 18px rgba(0,0,
   <div id="status" class="status">READY｜可輸出透明 PNG</div>
   <div class="buttons"><button id="download">輸出透明 PNG</button><button id="jsonBtn" class="secondary">輸出欄位 JSON</button><button id="loadJson" class="secondary">載入 JSON</button><input id="jsonFile" type="file" accept=".json,application/json" hidden><button id="reset" class="secondary">回復示例</button></div>
   <div class="section-title history-title">02｜最近暫存</div>
-  <div class="note">自動保留這台裝置最近 5 次不同內容，重新開啟頁面會還原最新一筆。暫存不會自動同步；要換瀏覽器或裝置時，先輸出 JSON，再用「載入 JSON」還原。</div>
+  <div class="note">只有按「暫存目前內容」才會保留這台裝置最近 5 次不同內容。未暫存的修改在重新整理或重開後會回到最後一筆；要換瀏覽器或裝置時，請使用 JSON 備份。</div>
   <label for="history">最近編輯內容</label>
   <select id="history"></select>
   <div id="historyStatus" class="status"></div>
-  <div class="buttons"><button id="restoreHistory" class="secondary">載入選取暫存</button><button id="clearHistory" class="secondary">清除暫存</button></div>
+  <div class="buttons"><button id="saveHistory">暫存目前內容</button><button id="restoreHistory" class="secondary">載入選取暫存</button><button id="clearHistory" class="secondary">清除暫存</button></div>
   <div class="mini"><b class="lock">🔒 固定不改：</b>634×62、主底板 80%、白框、MISSION／DONE!／FAIL 標籤、成功／失敗圖示、正式色彩、透明背景。<br><b>可改：</b>狀態、任務文字、進度、任務字級、進度字級；可用 JSON 備份與還原。</div>
 </div>
 <div class="panel"><div class="section-title">03｜正式母版即時預覽</div><div class="preview-wrap"><canvas id="c" width="634" height="62"></canvas></div></div>
@@ -64,7 +64,6 @@ const defaults={state:'MISSION',task:'Osaka Castle｜大阪城任務中',progres
 const STORAGE_KEY='o-ne.persistent-card.history.v1';
 const HISTORY_LIMIT=5;
 const MAX_JSON_FILE_BYTES=256*1024;
-let historyTimer=null;
 let storageReady=canUseStorage();
 function font(weight,px){return weight+' '+px+'px "Noto Sans TC","Noto Sans CJK TC","Microsoft JhengHei",sans-serif';}
 function clamp(value,min,max,fallback){const n=Number(value);return Number.isFinite(n)?Math.min(max,Math.max(min,Math.round(n))):fallback;}
@@ -144,7 +143,7 @@ function refreshHistory(message){
   if(!history.length){
     const option=document.createElement('option');option.textContent='尚無暫存';option.value='';select.appendChild(option);
     select.disabled=true;$('restoreHistory').disabled=true;$('clearHistory').disabled=true;
-    $('historyStatus').textContent=message||'開始編輯後，會自動保留最近 5 次不同內容';$('historyStatus').className='status';
+    $('historyStatus').textContent=message||'尚無手動暫存；完成編輯後請按「暫存目前內容」';$('historyStatus').className='status';
     return history;
   }
   history.forEach((item,index)=>{
@@ -159,14 +158,19 @@ function refreshHistory(message){
   return history;
 }
 function saveCurrentHistory(message){
-  if(!storageReady){refreshHistory();return;}
+  if(!storageReady){refreshHistory();return false;}
   const snapshot=currentSnapshot();
-  const history=readHistory().filter(item=>!sameContent(item,snapshot));
+  const currentHistory=readHistory();
+  if(currentHistory[0]&&sameContent(currentHistory[0],snapshot)){
+    refreshHistory('目前內容與最新暫存相同，未新增重複版本');
+    return false;
+  }
+  const history=currentHistory.filter(item=>!sameContent(item,snapshot));
   history.unshift(snapshot);
-  if(writeHistory(history)){refreshHistory(message||('已自動暫存｜'+formatTime(snapshot.savedAt)));}
-  else{refreshHistory();}
+  if(writeHistory(history)){refreshHistory(message||('已暫存目前內容｜'+formatTime(snapshot.savedAt)));return true;}
+  refreshHistory();
+  return false;
 }
-function scheduleHistorySave(){clearTimeout(historyTimer);historyTimer=setTimeout(()=>saveCurrentHistory(),700);}
 function applySnapshot(item){
   const snapshot=normalizedSnapshot(item);
   $('state').value=snapshot.state;$('task').value=snapshot.task;$('progress').value=snapshot.progress;
@@ -196,14 +200,15 @@ function showImportError(message){
   $('historyStatus').textContent='載入失敗｜'+message;
   $('historyStatus').className='status error';
 }
-function handleEdit(){render();scheduleHistorySave();}
+function handleEdit(){render();}
 $('state').addEventListener('change',handleEdit);
 $('task').addEventListener('input',handleEdit);
 $('progress').addEventListener('input',handleEdit);
 $('taskSize').addEventListener('input',handleEdit);
 $('progressSize').addEventListener('input',handleEdit);
-$('download').onclick=()=>{if(render())return;saveCurrentHistory('已暫存目前內容');canvas.toBlob(blob=>{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='O-Ne_常駐卡_'+$('state').value+'.png';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);},'image/png');};
-$('jsonBtn').onclick=()=>{saveCurrentHistory('已暫存目前內容');const payload={component_id:'PERSISTENT-MISSION',tool:'persistent-card',schema_version:'1.1',master_psd_id:'1VMBCecO8QLuwtSMxy-BplfUa2Ybr3YDU',generator_version:'V1.1.1_20260826',panel_fill_opacity:.8,state:$('state').value,task_text:$('task').value,progress:$('progress').value,task_font_size:Number($('taskSize').value),progress_font_size:Number($('progressSize').value),font_size_mode:'manual'};const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='O-Ne_常駐卡_data_v111.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);};
+$('saveHistory').onclick=()=>saveCurrentHistory();
+$('download').onclick=()=>{if(render())return;canvas.toBlob(blob=>{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='O-Ne_常駐卡_'+$('state').value+'.png';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);},'image/png');};
+$('jsonBtn').onclick=()=>{const payload={component_id:'PERSISTENT-MISSION',tool:'persistent-card',schema_version:'1.2',master_psd_id:'1VMBCecO8QLuwtSMxy-BplfUa2Ybr3YDU',generator_version:'V1.1.2_20260827',panel_fill_opacity:.8,state:$('state').value,task_text:$('task').value,progress:$('progress').value,task_font_size:Number($('taskSize').value),progress_font_size:Number($('progressSize').value),font_size_mode:'manual'};const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='O-Ne_常駐卡_data_v112.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);};
 $('loadJson').onclick=()=>$('jsonFile').click();
 $('jsonFile').addEventListener('change',async event=>{
   const file=event.target.files&&event.target.files[0];
@@ -212,20 +217,19 @@ $('jsonFile').addEventListener('change',async event=>{
     if(file.size>MAX_JSON_FILE_BYTES)throw new Error('檔案超過 256 KB');
     const payload=JSON.parse(await file.text());
     const snapshot=parseImportPayload(payload);
-    clearTimeout(historyTimer);
     applySnapshot(snapshot);
-    saveCurrentHistory('已載入 JSON 並暫存');
+    refreshHistory('JSON 載入成功；目前尚未暫存，需要保留時請按「暫存目前內容」');
   }catch(error){
     showImportError(error&&error.name==='SyntaxError'?'JSON 格式錯誤':(error&&error.message?error.message:'無法讀取檔案'));
   }finally{
     event.target.value='';
   }
 });
-$('reset').onclick=()=>{clearTimeout(historyTimer);applySnapshot(defaults);saveCurrentHistory('已回復示例並暫存');};
-$('restoreHistory').onclick=()=>{const history=readHistory();const index=Number($('history').value);if(!Number.isInteger(index)||!history[index])return;clearTimeout(historyTimer);applySnapshot(history[index]);saveCurrentHistory('已載入選取暫存');};
+$('reset').onclick=()=>{applySnapshot(defaults);refreshHistory('已回復示例；目前尚未暫存');};
+$('restoreHistory').onclick=()=>{const history=readHistory();const index=Number($('history').value);if(!Number.isInteger(index)||!history[index])return;applySnapshot(history[index]);refreshHistory('已載入選取暫存；未新增紀錄');};
 $('clearHistory').onclick=()=>{if(!storageReady||!readHistory().length)return;if(!window.confirm('確定清除這台裝置的常駐卡暫存嗎？'))return;try{localStorage.removeItem(STORAGE_KEY);refreshHistory('已清除暫存');}catch(error){storageReady=false;refreshHistory();}};
 const initialHistory=readHistory();
-if(initialHistory.length){applySnapshot(initialHistory[0]);refreshHistory('已還原上次編輯內容｜'+formatTime(initialHistory[0].savedAt));}
+if(initialHistory.length){applySnapshot(initialHistory[0]);refreshHistory('已載入最後一筆暫存；未暫存的修改不會寫入紀錄');}
 else{render();refreshHistory();}
 </script>
 </body>

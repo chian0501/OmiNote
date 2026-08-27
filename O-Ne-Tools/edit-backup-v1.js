@@ -1,4 +1,4 @@
-/* O-Ne shared edit backup / JSON import — V1.1.0 */
+/* O-Ne shared edit backup / JSON import — V1.2.0 */
 (function (global) {
   'use strict';
 
@@ -93,7 +93,7 @@
   }
 
   function isManual(instance) {
-    return Boolean(instance && instance.config && instance.config.saveMode === 'manual');
+    return !(instance && instance.config && instance.config.saveMode === 'automatic');
   }
 
   function shouldPersist(instance, reason) {
@@ -201,6 +201,9 @@
     if (history[0] && sameData(history[0].data, snapshot)) {
       return { saved: false, ignored: false, duplicate: true };
     }
+    history = history.filter(function (item) {
+      return !sameData(item && item.data, snapshot);
+    });
     history.unshift({
       schema: SCHEMA,
       tool_id: instance.id,
@@ -399,7 +402,7 @@
   global.ONEEditBackup = {
     mount: mount,
     schema: SCHEMA,
-    version: '1.1.0',
+    version: '1.2.0',
     captureFields: function (root) { return collectFields(root || document); },
     applyFields: function (fields, root) { return applyFields(fields, root || document); },
     __test: {
