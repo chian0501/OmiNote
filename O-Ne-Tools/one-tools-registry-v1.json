@@ -1,5 +1,5 @@
 {
-  "version": "V2.13_20260827",
+  "version": "V2.14_20260827",
   "principle": "one_function_one_entry",
   "total": 17,
   "ready": 12,
@@ -330,9 +330,9 @@
       "name": "焦點內容卡",
       "family": "READY｜焦點／說明共用",
       "group": "資訊／閱讀",
-      "desc": "一般內文／項目／步驟；換行與段落自動加高，標籤採精簡內距與加寬標題間距",
+      "desc": "一般內文／項目／步驟；圖片真實縮放至 45%，標題與內文手動字級，固定行高並自動換行",
       "status": "ready",
-      "href": "./focus-card.html?v=058&build=autoheight-label-spacing-v1",
+      "href": "./focus-card.html?v=059&build=manual-type-image-v1",
       "features": [
         "body_list_steps_modes",
         "up_to_8_rows",
@@ -343,7 +343,10 @@
         "optional_custom_label",
         "left_right_or_both_product_images",
         "small_medium_large_card_sizes",
-        "85_to_115_percent_text_scale",
+        "manual_title_32_to_72_px",
+        "manual_content_20_to_48_px",
+        "fixed_145_percent_content_line_height",
+        "no_automatic_text_shrink",
         "transparent_png_and_json_export",
         "local_edit_history_5",
         "restore_latest_on_load",
@@ -351,17 +354,20 @@
         "uploaded_images_reselect_after_restore",
         "explicit_line_break_auto_height",
         "compact_label_vertical_padding",
-        "expanded_label_title_gap"
+        "expanded_label_title_gap",
+        "image_width_18_to_45_percent",
+        "image_top_aligned_to_label",
+        "image_growth_downward_only"
       ],
-      "generator_version": "V0.5.8_20260827",
+      "generator_version": "V0.5.9_20260827",
       "visual_status": "READY",
       "formal_replacement": false,
       "panel_fill_opacity": 0.8,
       "qa": {
-        "vite_build": "pass",
-        "sites_worker": "4_of_4_pass",
-        "browser_main_and_portable": "pass",
-        "console_errors": 0,
+        "static_bundle_parse": "pass",
+        "edit_backup_regression": "pass",
+        "browser_main_and_portable": "blocked_candidate_preview_proxy",
+        "console_errors": "pending_candidate_preview",
         "focus_layout_regression": "pass"
       }
     },
