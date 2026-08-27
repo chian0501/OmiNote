@@ -1,5 +1,5 @@
 {
-  "version": "V2.12_20260826",
+  "version": "V2.13_20260827",
   "principle": "one_function_one_entry",
   "total": 17,
   "ready": 12,
@@ -330,9 +330,9 @@
       "name": "焦點內容卡",
       "family": "READY｜焦點／說明共用",
       "group": "資訊／閱讀",
-      "desc": "一般內文／項目／步驟；每列獨立底框與文字重點，可插入左右商品圖",
+      "desc": "一般內文／項目／步驟；換行與段落自動加高，標籤採精簡內距與加寬標題間距",
       "status": "ready",
-      "href": "./focus-card.html?v=057&build=history-json-v1",
+      "href": "./focus-card.html?v=058&build=autoheight-label-spacing-v1",
       "features": [
         "body_list_steps_modes",
         "up_to_8_rows",
@@ -348,9 +348,12 @@
         "local_edit_history_5",
         "restore_latest_on_load",
         "json_import_restore",
-        "uploaded_images_reselect_after_restore"
+        "uploaded_images_reselect_after_restore",
+        "explicit_line_break_auto_height",
+        "compact_label_vertical_padding",
+        "expanded_label_title_gap"
       ],
-      "generator_version": "V0.5.7_20260826",
+      "generator_version": "V0.5.8_20260827",
       "visual_status": "READY",
       "formal_replacement": false,
       "panel_fill_opacity": 0.8,
@@ -358,7 +361,8 @@
         "vite_build": "pass",
         "sites_worker": "4_of_4_pass",
         "browser_main_and_portable": "pass",
-        "console_errors": 0
+        "console_errors": 0,
+        "focus_layout_regression": "pass"
       }
     },
     {
@@ -489,4 +493,3 @@
     "image_restore_policy": "text_and_settings_restore; uploaded_image_files_must_be_selected_again"
   }
 }
-
