@@ -36,8 +36,34 @@ vm.runInNewContext(librarySource, context, { filename: 'edit-backup-v1.js' });
 const backup = fakeWindow.ONEEditBackup;
 assert(backup, 'shared backup library must load');
 assert.strictEqual(backup.schema, 'o-ne.edit-backup.v1');
+assert.strictEqual(backup.version, '1.1.0');
 assert.strictEqual(backup.__test.constants.historyLimit, 5);
 assert.strictEqual(backup.__test.constants.maxJsonBytes, 1024 * 1024);
+assert.strictEqual(backup.__test.shouldPersist({}, 'edit'), true, 'automatic mode must keep edit autosave');
+assert.strictEqual(backup.__test.shouldPersist({ saveMode: 'manual' }, 'edit'), false, 'manual mode must ignore edits');
+assert.strictEqual(backup.__test.shouldPersist({ saveMode: 'manual' }, 'initial'), false, 'manual mode must not create an initial snapshot');
+assert.strictEqual(backup.__test.shouldPersist({ saveMode: 'manual' }, 'restore'), false, 'manual restore must not add history');
+assert.strictEqual(backup.__test.shouldPersist({ saveMode: 'manual' }, 'json-import'), false, 'manual JSON import must not add history');
+assert.strictEqual(backup.__test.shouldPersist({ saveMode: 'manual' }, 'manual'), true, 'manual button must be allowed to save');
+assert(librarySource.includes('data-action="save">暫存目前內容</button>'));
+assert(librarySource.includes('目前內容與最新暫存相同，未新增重複版本。'));
+
+let persisted = backup.__test.persistSnapshot('manual-card', { saveMode: 'manual' }, { value: 0 }, 'edit');
+assert.strictEqual(persisted.ignored, true, 'typing in manual mode must not write');
+assert.strictEqual(backup.__test.readHistory('manual-card').length, 0);
+persisted = backup.__test.persistSnapshot('manual-card', { saveMode: 'manual' }, { value: 0 }, 'manual');
+assert.strictEqual(persisted.saved, true, 'manual action must write');
+persisted = backup.__test.persistSnapshot('manual-card', { saveMode: 'manual' }, { value: 0 }, 'manual');
+assert.strictEqual(persisted.duplicate, true, 'identical manual snapshots must be deduplicated');
+assert.strictEqual(backup.__test.readHistory('manual-card').length, 1);
+for (let value = 1; value <= 6; value += 1) {
+  backup.__test.persistSnapshot('manual-card', { saveMode: 'manual' }, { value }, 'manual');
+}
+assert.deepStrictEqual(
+  Array.from(backup.__test.readHistory('manual-card'), item => item.data.value),
+  [6, 5, 4, 3, 2],
+  'manual history must retain the newest five snapshots only'
+);
 
 const seven = Array.from({ length: 7 }, (_, index) => ({
   saved_at: new Date(2026, 7, 26, 10, 0, index).toISOString(),
@@ -88,20 +114,30 @@ const tools = [
   ['challenge-card.html', 'challenge-card', 'V0.1.1'],
   ['dialogue-card-v135.html', 'dialogue-card', 'V1.3.7'],
   ['rating-card.html', 'rating-card', 'V1.3.1'],
-  ['focus-card.html', 'focus-card', 'V0.5.10'],
+  ['focus-card.html', 'focus-card', 'V0.5.11'],
   ['thumbnail-frame.html', 'thumbnail-frame', 'V1.2.6'],
   ['settlement-card.html', 'settlement-card', 'V0.1.3']
 ];
 
 for (const [file, id, version] of tools) {
   const html = fs.readFileSync(path.join(root, file), 'utf8');
-  assert(html.includes('edit-backup-v1.js?v=100'), file + ' must load shared backup library');
+  const backupQuery = id === 'focus-card' ? '110' : '100';
+  assert(html.includes('edit-backup-v1.js?v=' + backupQuery), file + ' must load the expected shared backup library');
   const implementation = file === 'settlement-card.html'
     ? fs.readFileSync(path.join(root, 'settlement-card-v011.js'), 'utf8')
     : html;
   assert(implementation.includes(`id:'${id}'`) || implementation.includes(`id: '${id}'`) || implementation.includes(`id:"${id}"`), file + ' must mount the correct tool id');
   assert(html.includes(version), file + ' must show the expected version');
   assert(implementation.includes('fromJSON:'), file + ' must define legacy JSON import mapping');
+}
+
+const focusHtml = fs.readFileSync(path.join(root, 'focus-card.html'), 'utf8');
+assert(focusHtml.includes('saveMode:"manual"'), 'focus card must opt into manual history mode');
+for (const [file, id] of tools.filter(([, toolId]) => toolId !== 'focus-card')) {
+  const implementation = file === 'settlement-card.html'
+    ? fs.readFileSync(path.join(root, 'settlement-card-v011.js'), 'utf8')
+    : fs.readFileSync(path.join(root, file), 'utf8');
+  assert(!implementation.includes('saveMode:"manual"') && !implementation.includes("saveMode: 'manual'"), id + ' must remain automatic');
 }
 
 for (const file of ['rating-card.html', 'focus-card.html', 'thumbnail-frame.html']) {
@@ -127,7 +163,7 @@ for (const file of ['edit-backup-v1.js', 'settlement-card-v011.js']) {
 assert.deepStrictEqual(syntaxFailures, []);
 
 const registry = JSON.parse(fs.readFileSync(path.join(root, 'one-tools-registry-v1.json'), 'utf8'));
-assert.strictEqual(registry.version, 'V2.15_20260827');
+assert.strictEqual(registry.version, 'V2.16_20260827');
 assert.strictEqual(registry.total, 17);
 assert.strictEqual(registry.ready, 12);
 assert.strictEqual(registry.candidate, 0);
@@ -141,12 +177,18 @@ for (const id of registryIds) {
 }
 assert.strictEqual(registry.shared_edit_backup.history_limit, 5);
 assert.strictEqual(registry.shared_edit_backup.max_json_bytes, 1048576);
+assert.strictEqual(registry.shared_edit_backup.default_save_mode, 'automatic');
+assert.strictEqual(registry.shared_edit_backup.manual_save_supported, true);
+assert.deepStrictEqual(registry.shared_edit_backup.manual_save_tools, ['focus-card']);
+const focusEntry = registry.tools.find(tool => tool.id === 'focus');
+assert(focusEntry.features.includes('manual_edit_history_save'));
+assert(focusEntry.features.includes('unsaved_edits_not_persisted'));
 
 const index = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 for (const href of [
   'general-card.html?v=121', 'trigger-card.html?v=102', 'effect-card.html?v=031',
   'move-card.html?v=107', 'choice-card.html?v=101', 'challenge-card.html?v=011',
-  'dialogue-card.html?v=141', 'rating-card.html?v=131', 'focus-card.html?v=0510',
+  'dialogue-card.html?v=141', 'rating-card.html?v=131', 'focus-card.html?v=0511',
   'thumbnail-frame.html?v=126', 'settlement-card.html?v=013'
 ]) assert(index.includes(href), 'index missing cache-busted link ' + href);
 

@@ -129,6 +129,6 @@ assert(source.includes('W=f;s.save()'), 'image drawing must stay top-anchored in
 assert(source.includes('max:"45"'), 'image control must allow 45% width');
 assert(source.includes('不再自動縮字'));
 assert(source.includes('放大只向下延伸'));
-assert(source.includes('V0.5.10_20260827'));
+assert(source.includes('V0.5.11_20260827'));
 
 console.log('PASS: manual type, fixed rhythm, top-anchored image growth, and 45% image scaling work.');
