@@ -1,5 +1,5 @@
 {
-  "version": "V2.16_20260827",
+  "version": "V2.17_20260827",
   "principle": "one_function_one_entry",
   "total": 17,
   "ready": 12,
@@ -38,7 +38,7 @@
       "group": "任務／事件",
       "desc": "HERE｜目前位置、場景定位、畫面主題",
       "status": "ready",
-      "href": "./general-card.html?v=121&build=history-json-v1",
+      "href": "./general-card.html?v=121&build=manual-history-v2",
       "ai_href": "./ai-card.html?tool=general&v=12",
       "features": [
         "title",
@@ -47,6 +47,8 @@
         "transparent_png",
         "optional_ai_json_bridge",
         "local_edit_history_5",
+        "manual_edit_history_save",
+        "unsaved_edits_not_persisted",
         "restore_latest_on_load",
         "json_import_restore"
       ],
@@ -61,7 +63,7 @@
       "group": "任務／事件",
       "desc": "EVENT／DONE!／FAIL｜事件觸發、成功、失敗",
       "status": "ready",
-      "href": "./trigger-card.html?v=102",
+      "href": "./trigger-card.html?v=102&build=manual-history-v2",
       "ai_href": "./ai-card.html?tool=trigger&v=12",
       "features": [
         "state_switch",
@@ -75,6 +77,8 @@
         "self_contained_canvas",
         "optional_ai_json_bridge",
         "local_edit_history_5",
+        "manual_edit_history_save",
+        "unsaved_edits_not_persisted",
         "restore_latest_on_load",
         "json_import_restore"
       ],
@@ -89,7 +93,7 @@
       "group": "任務／事件",
       "desc": "MISSION／DONE!／FAIL｜手動字級／最近 5 次暫存／JSON 還原",
       "status": "ready",
-      "href": "./persistent-card.html?v=111",
+      "href": "./persistent-card.html?v=112&build=manual-history-v2",
       "ai_href": "./ai-card.html?tool=persistent&v=12",
       "features": [
         "state_switch",
@@ -104,12 +108,14 @@
         "manual_task_font_size",
         "manual_progress_font_size",
         "local_edit_history_5",
+        "manual_edit_history_save",
+        "unsaved_edits_not_persisted",
         "restore_latest_on_load",
         "json_import_restore"
       ],
       "formal_source_folder": "https://drive.google.com/drive/folders/1p8U9F7OwLlKkUZNFdwsXS1jFN8ue-fub",
       "formal_psd_id": "1VMBCecO8QLuwtSMxy-BplfUa2Ybr3YDU",
-      "generator_version": "V1.1.1_20260826",
+      "generator_version": "V1.1.2_20260827",
       "mapping": "./persistent-card-mapping.json"
     },
     {
@@ -119,7 +125,7 @@
       "group": "效果／狀態",
       "desc": "8 組效果、6 款滿版氛圍；文字、色票、裝飾與氛圍可還原",
       "status": "ready",
-      "href": "./effect-card.html?v=031&build=history-json-v1",
+      "href": "./effect-card.html?v=031&build=manual-history-v2",
       "features": [
         "preset_effects",
         "editable_copy",
@@ -130,6 +136,8 @@
         "transparent_png",
         "field_json_export",
         "local_edit_history_5",
+        "manual_edit_history_save",
+        "unsaved_edits_not_persisted",
         "restore_latest_on_load",
         "json_import_restore"
       ],
@@ -143,7 +151,7 @@
       "group": "路線／導航",
       "desc": "MOVE｜增減站點、實線／虛線、白色／橘色版",
       "status": "ready",
-      "href": "./move-card.html?v=107",
+      "href": "./move-card.html?v=107&build=manual-history-v2",
       "ai_href": "./ai-card.html?tool=move&v=12",
       "features": [
         "dynamic_stations",
@@ -152,6 +160,8 @@
         "cross_border_same_tool",
         "optional_ai_json_bridge",
         "local_edit_history_5",
+        "manual_edit_history_save",
+        "unsaved_edits_not_persisted",
         "restore_latest_on_load",
         "json_import_restore"
       ],
@@ -164,7 +174,7 @@
       "group": "選擇／確認",
       "desc": "SELECT｜自由增減選項，每項獨立亮／暗",
       "status": "ready",
-      "href": "./choice-card.html?v=101",
+      "href": "./choice-card.html?v=101&build=manual-history-v2",
       "ai_href": "./ai-card.html?tool=choice&v=12",
       "features": [
         "dynamic_options",
@@ -176,6 +186,8 @@
         "self_contained_canvas",
         "optional_ai_json_bridge",
         "local_edit_history_5",
+        "manual_edit_history_save",
+        "unsaved_edits_not_persisted",
         "restore_latest_on_load",
         "json_import_restore"
       ],
@@ -191,7 +203,7 @@
       "group": "選擇／確認",
       "desc": "接受／放棄＋YES／NO；主句與左右按鈕文字可自訂",
       "status": "ready",
-      "href": "./challenge-card.html?v=011",
+      "href": "./challenge-card.html?v=011&build=manual-history-v2",
       "features": [
         "accept_or_abandon_mode",
         "yes_or_no_selected_state",
@@ -202,6 +214,8 @@
         "field_json_export",
         "overflow_export_block",
         "local_edit_history_5",
+        "manual_edit_history_save",
+        "unsaved_edits_not_persisted",
         "restore_latest_on_load",
         "json_import_restore"
       ],
@@ -226,7 +240,7 @@
       "group": "對話／角色",
       "desc": "正式框與完整獨立透明頭像分離；左右角色／表情／名稱獨立；24／24 表情已驗證；NPC 無頭像；單人／雙人同一工具",
       "status": "ready",
-      "href": "./dialogue-card.html?v=141",
+      "href": "./dialogue-card.html?v=141&build=manual-history-v2",
       "features": [
         "left_right_independent",
         "character_select",
@@ -242,6 +256,8 @@
         "native_canvas_preview",
         "asset_decode_24_of_24",
         "local_edit_history_5",
+        "manual_edit_history_save",
+        "unsaved_edits_not_persisted",
         "restore_latest_on_load",
         "json_import_restore"
       ],
@@ -294,7 +310,7 @@
       "group": "資訊／閱讀",
       "desc": "COL-02｜正式 1920×1080 品鑑卡；分數列、文字結果、價格／心得、背景與店家資訊影像",
       "status": "ready",
-      "href": "./rating-card.html?v=131",
+      "href": "./rating-card.html?v=131&build=manual-history-v2",
       "features": [
         "formal_1920x1080_canvas",
         "two_numeric_segmented_ratings",
@@ -308,6 +324,8 @@
         "png_export",
         "field_json_export",
         "local_edit_history_5",
+        "manual_edit_history_save",
+        "unsaved_edits_not_persisted",
         "restore_latest_on_load",
         "json_import_restore",
         "uploaded_images_reselect_after_restore"
@@ -332,7 +350,7 @@
       "group": "資訊／閱讀",
       "desc": "一般內文／項目／步驟；圖片真實縮放至 45%，手動字級與行高，按鈕手動保留最近 5 次",
       "status": "ready",
-      "href": "./focus-card.html?v=0511&build=manual-history-v1",
+      "href": "./focus-card.html?v=0511&build=manual-history-v2",
       "features": [
         "body_list_steps_modes",
         "up_to_8_rows",
@@ -381,7 +399,7 @@
       "group": "縮圖／品牌",
       "desc": "透明品牌框、底圖調整與可替換角標；圖片檔需在還原後重新選取",
       "status": "ready",
-      "href": "./thumbnail-frame.html?v=126",
+      "href": "./thumbnail-frame.html?v=126&build=manual-history-v2",
       "features": [
         "formal_brand_frame",
         "optional_background",
@@ -391,6 +409,8 @@
         "transparent_png",
         "field_json_export",
         "local_edit_history_5",
+        "manual_edit_history_save",
+        "unsaved_edits_not_persisted",
         "restore_latest_on_load",
         "json_import_restore",
         "uploaded_images_reselect_after_restore"
@@ -404,7 +424,7 @@
       "group": "結算／結果",
       "desc": "1–8 列自由增減、Icon 與欄位名稱預設／自訂、觀眾互動問題／下一影片模式；訂閱圓框預設關閉",
       "status": "ready",
-      "href": "./settlement-card.html?v=013&ready=1",
+      "href": "./settlement-card.html?v=013&ready=1&build=manual-history-v2",
       "features": [
         "formal_1920x1080_canvas",
         "dynamic_result_rows_1_to_8",
@@ -424,6 +444,8 @@
         "text_overflow_export_block",
         "png_and_json_export",
         "local_edit_history_5",
+        "manual_edit_history_save",
+        "unsaved_edits_not_persisted",
         "restore_latest_on_load",
         "json_import_restore",
         "uploaded_images_reselect_after_restore"
@@ -491,13 +513,24 @@
     ]
   },
   "shared_edit_backup": {
-    "version": "V1.1.0_20260827",
+    "version": "V1.2.0_20260827",
     "history_limit": 5,
     "storage": "browser_localStorage",
-    "default_save_mode": "automatic",
+    "default_save_mode": "manual",
     "manual_save_supported": true,
     "manual_save_tools": [
-      "focus-card"
+      "general-card",
+      "trigger-card",
+      "persistent-card",
+      "effect-card",
+      "move-card",
+      "choice-card",
+      "challenge-card",
+      "dialogue-card",
+      "rating-card",
+      "focus-card",
+      "thumbnail-frame",
+      "settlement-card"
     ],
     "restore_latest_on_load": true,
     "json_import": true,

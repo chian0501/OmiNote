@@ -36,10 +36,11 @@ vm.runInNewContext(librarySource, context, { filename: 'edit-backup-v1.js' });
 const backup = fakeWindow.ONEEditBackup;
 assert(backup, 'shared backup library must load');
 assert.strictEqual(backup.schema, 'o-ne.edit-backup.v1');
-assert.strictEqual(backup.version, '1.1.0');
+assert.strictEqual(backup.version, '1.2.0');
 assert.strictEqual(backup.__test.constants.historyLimit, 5);
 assert.strictEqual(backup.__test.constants.maxJsonBytes, 1024 * 1024);
-assert.strictEqual(backup.__test.shouldPersist({}, 'edit'), true, 'automatic mode must keep edit autosave');
+assert.strictEqual(backup.__test.shouldPersist({}, 'edit'), false, 'default mode must ignore edits');
+assert.strictEqual(backup.__test.shouldPersist({ saveMode: 'automatic' }, 'edit'), true, 'explicit automatic mode must keep edit autosave');
 assert.strictEqual(backup.__test.shouldPersist({ saveMode: 'manual' }, 'edit'), false, 'manual mode must ignore edits');
 assert.strictEqual(backup.__test.shouldPersist({ saveMode: 'manual' }, 'initial'), false, 'manual mode must not create an initial snapshot');
 assert.strictEqual(backup.__test.shouldPersist({ saveMode: 'manual' }, 'restore'), false, 'manual restore must not add history');
@@ -48,21 +49,27 @@ assert.strictEqual(backup.__test.shouldPersist({ saveMode: 'manual' }, 'manual')
 assert(librarySource.includes('data-action="save">暫存目前內容</button>'));
 assert(librarySource.includes('目前內容與最新暫存相同，未新增重複版本。'));
 
-let persisted = backup.__test.persistSnapshot('manual-card', { saveMode: 'manual' }, { value: 0 }, 'edit');
+let persisted = backup.__test.persistSnapshot('manual-card', {}, { value: 0 }, 'edit');
 assert.strictEqual(persisted.ignored, true, 'typing in manual mode must not write');
 assert.strictEqual(backup.__test.readHistory('manual-card').length, 0);
-persisted = backup.__test.persistSnapshot('manual-card', { saveMode: 'manual' }, { value: 0 }, 'manual');
+persisted = backup.__test.persistSnapshot('manual-card', {}, { value: 0 }, 'manual');
 assert.strictEqual(persisted.saved, true, 'manual action must write');
-persisted = backup.__test.persistSnapshot('manual-card', { saveMode: 'manual' }, { value: 0 }, 'manual');
+persisted = backup.__test.persistSnapshot('manual-card', {}, { value: 0 }, 'manual');
 assert.strictEqual(persisted.duplicate, true, 'identical manual snapshots must be deduplicated');
 assert.strictEqual(backup.__test.readHistory('manual-card').length, 1);
 for (let value = 1; value <= 6; value += 1) {
-  backup.__test.persistSnapshot('manual-card', { saveMode: 'manual' }, { value }, 'manual');
+  backup.__test.persistSnapshot('manual-card', {}, { value }, 'manual');
 }
 assert.deepStrictEqual(
   Array.from(backup.__test.readHistory('manual-card'), item => item.data.value),
   [6, 5, 4, 3, 2],
   'manual history must retain the newest five snapshots only'
+);
+backup.__test.persistSnapshot('manual-card', {}, { value: 4 }, 'manual');
+assert.deepStrictEqual(
+  Array.from(backup.__test.readHistory('manual-card'), item => item.data.value),
+  [4, 6, 5, 3, 2],
+  'saving an older version again must move it to the front without creating a duplicate'
 );
 
 const seven = Array.from({ length: 7 }, (_, index) => ({
@@ -121,8 +128,7 @@ const tools = [
 
 for (const [file, id, version] of tools) {
   const html = fs.readFileSync(path.join(root, file), 'utf8');
-  const backupQuery = id === 'focus-card' ? '110' : '100';
-  assert(html.includes('edit-backup-v1.js?v=' + backupQuery), file + ' must load the expected shared backup library');
+  assert(html.includes('edit-backup-v1.js?v=120'), file + ' must load the manual-by-default shared backup library');
   const implementation = file === 'settlement-card.html'
     ? fs.readFileSync(path.join(root, 'settlement-card-v011.js'), 'utf8')
     : html;
@@ -131,13 +137,11 @@ for (const [file, id, version] of tools) {
   assert(implementation.includes('fromJSON:'), file + ' must define legacy JSON import mapping');
 }
 
-const focusHtml = fs.readFileSync(path.join(root, 'focus-card.html'), 'utf8');
-assert(focusHtml.includes('saveMode:"manual"'), 'focus card must opt into manual history mode');
-for (const [file, id] of tools.filter(([, toolId]) => toolId !== 'focus-card')) {
+for (const [file, id] of tools) {
   const implementation = file === 'settlement-card.html'
     ? fs.readFileSync(path.join(root, 'settlement-card-v011.js'), 'utf8')
     : fs.readFileSync(path.join(root, file), 'utf8');
-  assert(!implementation.includes('saveMode:"manual"') && !implementation.includes("saveMode: 'manual'"), id + ' must remain automatic');
+  assert(!implementation.includes('saveMode:"automatic"') && !implementation.includes("saveMode: 'automatic'"), id + ' must not opt back into autosave');
 }
 
 for (const file of ['rating-card.html', 'focus-card.html', 'thumbnail-frame.html']) {
@@ -163,33 +167,51 @@ for (const file of ['edit-backup-v1.js', 'settlement-card-v011.js']) {
 assert.deepStrictEqual(syntaxFailures, []);
 
 const registry = JSON.parse(fs.readFileSync(path.join(root, 'one-tools-registry-v1.json'), 'utf8'));
-assert.strictEqual(registry.version, 'V2.16_20260827');
+assert.strictEqual(registry.version, 'V2.17_20260827');
 assert.strictEqual(registry.total, 17);
 assert.strictEqual(registry.ready, 12);
 assert.strictEqual(registry.candidate, 0);
-const registryIds = ['general', 'trigger', 'effect', 'move', 'choice', 'challenge', 'dialogue', 'rating', 'focus', 'thumbnail-frame', 'settlement'];
+const registryIds = ['general', 'trigger', 'persistent', 'effect', 'move', 'choice', 'challenge', 'dialogue', 'rating', 'focus', 'thumbnail-frame', 'settlement'];
 for (const id of registryIds) {
   const entry = registry.tools.find(tool => tool.id === id);
   assert(entry, 'registry missing ' + id);
-  for (const feature of ['local_edit_history_5', 'restore_latest_on_load', 'json_import_restore']) {
+  for (const feature of ['local_edit_history_5', 'manual_edit_history_save', 'unsaved_edits_not_persisted', 'restore_latest_on_load', 'json_import_restore']) {
     assert(entry.features.includes(feature), id + ' missing ' + feature);
   }
 }
 assert.strictEqual(registry.shared_edit_backup.history_limit, 5);
 assert.strictEqual(registry.shared_edit_backup.max_json_bytes, 1048576);
-assert.strictEqual(registry.shared_edit_backup.default_save_mode, 'automatic');
+assert.strictEqual(registry.shared_edit_backup.version, 'V1.2.0_20260827');
+assert.strictEqual(registry.shared_edit_backup.default_save_mode, 'manual');
 assert.strictEqual(registry.shared_edit_backup.manual_save_supported, true);
-assert.deepStrictEqual(registry.shared_edit_backup.manual_save_tools, ['focus-card']);
-const focusEntry = registry.tools.find(tool => tool.id === 'focus');
-assert(focusEntry.features.includes('manual_edit_history_save'));
-assert(focusEntry.features.includes('unsaved_edits_not_persisted'));
+assert.deepStrictEqual(registry.shared_edit_backup.manual_save_tools, [
+  'general-card', 'trigger-card', 'persistent-card', 'effect-card', 'move-card', 'choice-card',
+  'challenge-card', 'dialogue-card', 'rating-card', 'focus-card', 'thumbnail-frame', 'settlement-card'
+]);
 
 const index = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
-for (const href of [
-  'general-card.html?v=121', 'trigger-card.html?v=102', 'effect-card.html?v=031',
-  'move-card.html?v=107', 'choice-card.html?v=101', 'challenge-card.html?v=011',
-  'dialogue-card.html?v=141', 'rating-card.html?v=131', 'focus-card.html?v=0511',
-  'thumbnail-frame.html?v=126', 'settlement-card.html?v=013'
-]) assert(index.includes(href), 'index missing cache-busted link ' + href);
+for (const id of registryIds) {
+  const entry = registry.tools.find(tool => tool.id === id);
+  const href = entry.href.replace(/^\.\//, '');
+  assert(index.includes(href), 'index missing cache-busted link ' + href);
+}
 
-console.log('PASS: shared history, JSON validation boundaries, 11 adapters, syntax, registry and index checks.');
+const aiBridge = fs.readFileSync(path.join(root, 'ai-card.html'), 'utf8');
+for (const href of [
+  'general-card.html?v=121&build=manual-history-v2',
+  'trigger-card.html?v=102&build=manual-history-v2',
+  'persistent-card.html?v=112&build=manual-history-v2',
+  'move-card.html?v=107&build=manual-history-v2',
+  'choice-card.html?v=101&build=manual-history-v2'
+]) assert(aiBridge.includes(href), 'AI Bridge missing current editor link ' + href);
+
+const persistentMapping = JSON.parse(fs.readFileSync(path.join(root, 'persistent-card-mapping.json'), 'utf8'));
+assert.strictEqual(persistentMapping.generator_version, 'V1.1.2_20260827');
+const legacyRegistry = JSON.parse(fs.readFileSync(path.join(root, 'registry.json'), 'utf8'));
+const legacyPersistent = legacyRegistry.tools.find(tool => tool.id === 'persistent');
+assert.strictEqual(legacyPersistent.href, './persistent-card.html?v=112&build=manual-history-v2');
+assert.strictEqual(legacyPersistent.generator_version, 'V1.1.2_20260827');
+assert(legacyPersistent.features.includes('manual_edit_history_save'));
+assert(legacyPersistent.features.includes('unsaved_edits_not_persisted'));
+
+console.log('PASS: manual shared history, JSON validation boundaries, 11 shared adapters, syntax, registries, index and AI Bridge links.');
