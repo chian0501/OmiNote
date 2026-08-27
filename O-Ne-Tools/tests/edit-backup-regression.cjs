@@ -88,7 +88,7 @@ const tools = [
   ['challenge-card.html', 'challenge-card', 'V0.1.1'],
   ['dialogue-card-v135.html', 'dialogue-card', 'V1.3.7'],
   ['rating-card.html', 'rating-card', 'V1.3.1'],
-  ['focus-card.html', 'focus-card', 'V0.5.9'],
+  ['focus-card.html', 'focus-card', 'V0.5.10'],
   ['thumbnail-frame.html', 'thumbnail-frame', 'V1.2.6'],
   ['settlement-card.html', 'settlement-card', 'V0.1.3']
 ];
@@ -127,7 +127,7 @@ for (const file of ['edit-backup-v1.js', 'settlement-card-v011.js']) {
 assert.deepStrictEqual(syntaxFailures, []);
 
 const registry = JSON.parse(fs.readFileSync(path.join(root, 'one-tools-registry-v1.json'), 'utf8'));
-assert.strictEqual(registry.version, 'V2.14_20260827');
+assert.strictEqual(registry.version, 'V2.15_20260827');
 assert.strictEqual(registry.total, 17);
 assert.strictEqual(registry.ready, 12);
 assert.strictEqual(registry.candidate, 0);
@@ -146,7 +146,7 @@ const index = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 for (const href of [
   'general-card.html?v=121', 'trigger-card.html?v=102', 'effect-card.html?v=031',
   'move-card.html?v=107', 'choice-card.html?v=101', 'challenge-card.html?v=011',
-  'dialogue-card.html?v=141', 'rating-card.html?v=131', 'focus-card.html?v=059',
+  'dialogue-card.html?v=141', 'rating-card.html?v=131', 'focus-card.html?v=0510',
   'thumbnail-frame.html?v=126', 'settlement-card.html?v=013'
 ]) assert(index.includes(href), 'index missing cache-busted link ' + href);
 

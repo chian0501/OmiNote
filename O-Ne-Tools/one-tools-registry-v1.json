@@ -1,5 +1,5 @@
 {
-  "version": "V2.14_20260827",
+  "version": "V2.15_20260827",
   "principle": "one_function_one_entry",
   "total": 17,
   "ready": 12,
@@ -332,7 +332,7 @@
       "group": "資訊／閱讀",
       "desc": "一般內文／項目／步驟；圖片真實縮放至 45%，標題與內文手動字級，固定行高並自動換行",
       "status": "ready",
-      "href": "./focus-card.html?v=059&build=manual-type-image-v1",
+      "href": "./focus-card.html?v=0510&build=manual-type-image-hotfix1",
       "features": [
         "body_list_steps_modes",
         "up_to_8_rows",
@@ -357,9 +357,10 @@
         "expanded_label_title_gap",
         "image_width_18_to_45_percent",
         "image_top_aligned_to_label",
-        "image_growth_downward_only"
+        "image_growth_downward_only",
+        "finite_list_and_steps_auto_height"
       ],
-      "generator_version": "V0.5.9_20260827",
+      "generator_version": "V0.5.10_20260827",
       "visual_status": "READY",
       "formal_replacement": false,
       "panel_fill_opacity": 0.8,
