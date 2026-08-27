@@ -103,6 +103,18 @@ const rows = layout.focusRowMetrics(
 );
 assert.strictEqual(rows.fontSize, 37, 'all list rows must share the same manual font size');
 assert(rows.rows[1].lineCount > rows.rows[0].lineCount, 'long items must wrap instead of shrinking');
+assert(Number.isFinite(rows.totalHeight), 'list row height total must be a finite number');
+
+const listContent = {
+  ...content,
+  items: ['短句', '這是一段比較長但只換行、不縮字的項目文字'],
+  itemHighlights: [false, false],
+  itemFrameStates: ['focus', 'none']
+};
+for (const mode of ['list', 'steps']) {
+  const height = layout.focusAutoHeight(mode, listContent, label, style, noImages, scale);
+  assert(Number.isFinite(height) && height >= 220, `${mode} auto height must remain finite`);
+}
 
 const vertical = layout.focusVerticalMetrics('body', content, label, style, scale, false, false, 520);
 const labelBottom = vertical.labelY + vertical.labelHeight;
@@ -117,6 +129,6 @@ assert(source.includes('W=f;s.save()'), 'image drawing must stay top-anchored in
 assert(source.includes('max:"45"'), 'image control must allow 45% width');
 assert(source.includes('不再自動縮字'));
 assert(source.includes('放大只向下延伸'));
-assert(source.includes('V0.5.9_20260827'));
+assert(source.includes('V0.5.10_20260827'));
 
 console.log('PASS: manual type, fixed rhythm, top-anchored image growth, and 45% image scaling work.');
