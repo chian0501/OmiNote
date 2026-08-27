@@ -1,4 +1,4 @@
-/* O-Ne shared edit backup / JSON import — V1.0.0 */
+/* O-Ne shared edit backup / JSON import — V1.1.0 */
 (function (global) {
   'use strict';
 
@@ -92,6 +92,14 @@
     try { return JSON.stringify(a) === JSON.stringify(b); } catch (error) { return false; }
   }
 
+  function isManual(instance) {
+    return Boolean(instance && instance.config && instance.config.saveMode === 'manual');
+  }
+
+  function shouldPersist(instance, reason) {
+    return !isManual(instance) || reason === 'manual';
+  }
+
   function formatTime(iso) {
     try {
       return new Intl.DateTimeFormat('zh-TW', {
@@ -112,32 +120,40 @@
       '.one-edit-backup__title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px;font-size:12px;font-weight:900;color:#f0a8cf}',
       '.one-edit-backup__badge{padding:3px 7px;border-radius:999px;background:#21363b;color:#8fe0d7;font-size:10px}',
       '.one-edit-backup__row{display:grid;grid-template-columns:minmax(0,1fr) auto auto auto;gap:7px}',
+      '.one-edit-backup__row.is-manual{grid-template-columns:minmax(0,1fr) auto auto auto auto}',
       '.one-edit-backup select,.one-edit-backup button{min-height:38px;border:1px solid #3a4658;border-radius:8px;padding:7px 9px;background:#18212d;color:#f5f1ea;font:700 12px/1.2 inherit}',
       '.one-edit-backup button{cursor:pointer;white-space:nowrap}.one-edit-backup button:hover{border-color:#29a6a7}.one-edit-backup button:disabled{cursor:not-allowed;opacity:.45}',
+      '.one-edit-backup [data-action="save"]{border-color:#29a6a7;background:#12383d;color:#8fe0d7}',
       '.one-edit-backup__note{margin-top:8px;color:#8f9aa8;font-size:10px;line-height:1.55}',
       '.one-edit-backup__status{min-height:17px;margin-top:7px;color:#8fd4c8;font-size:11px;line-height:1.45}',
       '.one-edit-backup__status.error{color:#ff7770}',
-      '@media(max-width:680px){.one-edit-backup__row{grid-template-columns:1fr 1fr}.one-edit-backup__row select{grid-column:1/-1}}'
+      '@media(max-width:680px){.one-edit-backup__row,.one-edit-backup__row.is-manual{grid-template-columns:1fr 1fr}.one-edit-backup__row select{grid-column:1/-1}}'
     ].join('');
     document.head.appendChild(style);
   }
 
   function panelFor(instance) {
     ensureStyles();
+    var manual = isManual(instance);
     var panel = document.createElement('section');
     panel.className = 'one-edit-backup';
     panel.setAttribute('data-one-backup-ui', '');
     panel.setAttribute('aria-label', '最近編輯與 JSON 載入');
     panel.innerHTML =
-      '<div class="one-edit-backup__title"><span>最近編輯與 JSON 載入</span><span class="one-edit-backup__badge">自動保留 5 次</span></div>' +
-      '<div class="one-edit-backup__row">' +
+      '<div class="one-edit-backup__title"><span>最近編輯與 JSON 載入</span><span class="one-edit-backup__badge">' +
+        (manual ? '手動保留 5 次' : '自動保留 5 次') + '</span></div>' +
+      '<div class="one-edit-backup__row' + (manual ? ' is-manual' : '') + '">' +
         '<select aria-label="最近編輯版本"></select>' +
+        (manual ? '<button type="button" data-action="save">暫存目前內容</button>' : '') +
         '<button type="button" data-action="restore">還原</button>' +
         '<button type="button" data-action="load">載入 JSON</button>' +
         '<button type="button" data-action="clear">清除暫存</button>' +
       '</div>' +
       '<input type="file" accept="application/json,.json" hidden>' +
-      '<div class="one-edit-backup__note">關閉視窗後仍會保留；清除瀏覽器網站資料或換裝置則不會。' +
+      '<div class="one-edit-backup__note">' +
+        (manual
+          ? '只有按「暫存目前內容」才會保存；未暫存的修改，重新整理或重開後會回到最後一筆。'
+          : '關閉視窗後仍會保留；清除瀏覽器網站資料或換裝置則不會。') +
         (instance.config.imageNote ? '文字與設定會還原，已上傳的圖片檔需重新選取。' : 'JSON 可用於跨裝置備份。') +
       '</div>' +
       '<div class="one-edit-backup__status" aria-live="polite"></div>';
@@ -177,31 +193,49 @@
       : defaultCapture(instance.config));
   }
 
+  function persistSnapshot(instance, snapshot, reason) {
+    if (!shouldPersist(instance, reason)) {
+      return { saved: false, ignored: true, duplicate: false };
+    }
+    var history = readHistory(instance.id);
+    if (history[0] && sameData(history[0].data, snapshot)) {
+      return { saved: false, ignored: false, duplicate: true };
+    }
+    history.unshift({
+      schema: SCHEMA,
+      tool_id: instance.id,
+      generator_version: instance.config.generatorVersion || null,
+      saved_at: new Date().toISOString(),
+      reason: reason || 'edit',
+      data: snapshot
+    });
+    writeHistory(instance.id, history);
+    return { saved: true, ignored: false, duplicate: false };
+  }
+
   function save(instance, reason) {
-    if (instance.suspended) return;
+    if (instance.suspended || !shouldPersist(instance, reason)) return false;
     var snapshot;
     try {
       snapshot = capture(instance);
-      var history = readHistory(instance.id);
-      if (history[0] && sameData(history[0].data, snapshot)) return;
-      history.unshift({
-        schema: SCHEMA,
-        tool_id: instance.id,
-        generator_version: instance.config.generatorVersion || null,
-        saved_at: new Date().toISOString(),
-        reason: reason || 'edit',
-        data: snapshot
-      });
-      writeHistory(instance.id, history);
+      var result = persistSnapshot(instance, snapshot, reason);
+      if (result.duplicate) {
+        if (reason === 'manual') setStatus(instance, '目前內容與最新暫存相同，未新增重複版本。', false);
+        return false;
+      }
+      if (!result.saved) return false;
       refresh(instance);
-      setStatus(instance, '已自動暫存；目前保留 ' + instance.history.length + '／5 次。', false);
+      setStatus(instance, (reason === 'manual' ? '已暫存目前內容；目前保留 ' : '已自動暫存；目前保留 ') +
+        instance.history.length + '／5 次。', false);
+      return true;
     } catch (error) {
       setStatus(instance, '暫存失敗：' + error.message, true);
+      return false;
     }
   }
 
   function scheduleSave(instance, reason) {
-    if (instance.suspended) return;
+    if (instance.suspended || !shouldPersist(instance, reason)) return;
     global.clearTimeout(instance.timer);
     instance.timer = global.setTimeout(function () { save(instance, reason); }, 650);
   }
@@ -214,9 +248,11 @@
     } finally {
       instance.suspended = false;
     }
-    global.setTimeout(function () {
-      save(instance, reason || 'restore');
-    }, 0);
+    if (!isManual(instance)) {
+      global.setTimeout(function () {
+        save(instance, reason || 'restore');
+      }, 0);
+    }
   }
 
   function restoreSelected(instance) {
@@ -254,7 +290,9 @@
         var parsed = JSON.parse(String(reader.result || ''));
         var snapshot = parseImported(instance, parsed);
         applySnapshot(instance, snapshot, 'json-import');
-        setStatus(instance, 'JSON 載入成功，並已加入最近 5 次編輯。' +
+        setStatus(instance, (isManual(instance)
+          ? 'JSON 載入成功；目前尚未暫存，需要保留時請按「暫存目前內容」。'
+          : 'JSON 載入成功，並已加入最近 5 次編輯。') +
           (instance.config.imageNote ? ' 圖片檔請重新選取。' : ''), false);
       } catch (error) {
         setStatus(instance, '載入失敗：' + error.message + '；目前內容未變更。', true);
@@ -278,12 +316,14 @@
     placePanel(instance);
 
     instance.select = instance.panel.querySelector('select');
+    instance.saveButton = instance.panel.querySelector('[data-action="save"]');
     instance.restoreButton = instance.panel.querySelector('[data-action="restore"]');
     instance.clearButton = instance.panel.querySelector('[data-action="clear"]');
     instance.fileInput = instance.panel.querySelector('input[type="file"]');
     instance.status = instance.panel.querySelector('.one-edit-backup__status');
 
     instance.panel.querySelector('[data-action="load"]').onclick = function () { instance.fileInput.click(); };
+    if (instance.saveButton) instance.saveButton.onclick = function () { save(instance, 'manual'); };
     instance.restoreButton.onclick = function () { restoreSelected(instance); };
     instance.clearButton.onclick = function () {
       try {
@@ -300,20 +340,26 @@
       if (instance.suspended || (event.target && event.target.closest && event.target.closest('[data-one-backup-ui]'))) return;
       scheduleSave(instance, 'edit');
     };
-    document.addEventListener('input', instance.listener, true);
-    document.addEventListener('change', instance.listener, true);
-    document.addEventListener('click', instance.listener, true);
+    if (!isManual(instance)) {
+      document.addEventListener('input', instance.listener, true);
+      document.addEventListener('change', instance.listener, true);
+      document.addEventListener('click', instance.listener, true);
+    }
     refresh(instance);
 
     if (instance.history.length) {
       try {
         applySnapshot(instance, instance.history[0].data, 'page-load');
-        setStatus(instance, '已自動載入上次編輯；可從清單還原最近 5 次。', false);
+        setStatus(instance, isManual(instance)
+          ? '已載入最後一筆暫存；未暫存的修改不會寫入紀錄。'
+          : '已自動載入上次編輯；可從清單還原最近 5 次。', false);
       } catch (error) {
         setStatus(instance, '上次暫存無法還原：' + error.message, true);
       }
-    } else {
+    } else if (!isManual(instance)) {
       global.setTimeout(function () { save(instance, 'initial'); }, 0);
+    } else {
+      setStatus(instance, '尚無手動暫存；完成編輯後請按「暫存目前內容」。', false);
     }
   }
 
@@ -333,7 +379,7 @@
     };
     instance.panel = panelFor(instance);
     instance.api = {
-      saveNow: function () { save(instance, 'manual'); },
+      saveNow: function () { return save(instance, 'manual'); },
       restoreLatest: function () {
         refresh(instance);
         if (instance.history[0]) applySnapshot(instance, instance.history[0].data, 'restore');
@@ -353,7 +399,7 @@
   global.ONEEditBackup = {
     mount: mount,
     schema: SCHEMA,
-    version: '1.0.0',
+    version: '1.1.0',
     captureFields: function (root) { return collectFields(root || document); },
     applyFields: function (fields, root) { return applyFields(fields, root || document); },
     __test: {
@@ -363,6 +409,12 @@
       writeHistory: writeHistory,
       storageKey: storageKey,
       sameData: sameData,
+      shouldPersist: function (config, reason) {
+        return shouldPersist({ config: config || {} }, reason);
+      },
+      persistSnapshot: function (toolId, config, snapshot, reason) {
+        return persistSnapshot({ id: toolId, config: config || {} }, clone(snapshot), reason);
+      },
       parseImported: function (toolId, fromJSON, parsed) {
         return parseImported({ id: toolId, config: { fromJSON: fromJSON } }, parsed);
       },
