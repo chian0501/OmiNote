@@ -1,8 +1,8 @@
 (function () {
   'use strict';
 
-  var VERSION = '0.1.2';
-  var SCHEMA = 'o-ne.settlement-card.ready.v0.1.2';
+  var VERSION = '0.1.3';
+  var SCHEMA = 'o-ne.settlement-card.ready.v0.1.3';
   var FORMAL = {
     component_id: 'QST-03',
     semantic_id: 'settlement_panel_16x9',
@@ -644,7 +644,7 @@
     };
     downloadBlob(
       new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' }),
-      'O-Ne_QST-03_片尾結算_READY_V0.1.2.json'
+      'O-Ne_QST-03_片尾結算_READY_V0.1.3.json'
     );
   }
 
@@ -678,6 +678,125 @@
     });
     syncLeftModeUI();
     render();
+  }
+
+  var SETTLEMENT_TEXT_FIELDS = [
+    'chapterTitle', 'chapterSubtitle', 'summaryText', 'nextText', 'leftMode',
+    'questionHint', 'viewerQuestion', 'bgScale', 'bgX', 'bgY',
+    'nextScale', 'nextX', 'nextY', 'subscribeScale', 'subscribeX', 'subscribeY'
+  ];
+  var SETTLEMENT_CHECK_FIELDS = ['bgVisible', 'subscribeVisible', 'catsVisible', 'showGuides'];
+
+  function settlementSnapshot() {
+    var fields = {};
+    SETTLEMENT_TEXT_FIELDS.forEach(function (id) { fields[id] = $(id).value; });
+    SETTLEMENT_CHECK_FIELDS.forEach(function (id) { fields[id] = $(id).checked; });
+    return {
+      fields: fields,
+      rows: rows.map(function (row) {
+        return {
+          icon: row.icon,
+          customIcon: row.customIcon,
+          preset: row.preset,
+          title: row.title,
+          value: row.value,
+          accent: row.accent
+        };
+      })
+    };
+  }
+
+  function validateSettlementSnapshot(snapshot) {
+    if (!snapshot || !snapshot.fields || !Array.isArray(snapshot.rows) || snapshot.rows.length < 1 || snapshot.rows.length > 8) {
+      throw new Error('片尾結算卡 JSON 結構不完整。');
+    }
+    if (['question', 'thumbnail', 'empty'].indexOf(snapshot.fields.leftMode) < 0) {
+      throw new Error('左側模式必須是 question、thumbnail 或 empty。');
+    }
+    snapshot.rows = snapshot.rows.map(function (row) {
+      if (!row || !ICON_PRESETS.some(function (item) { return item.key === row.icon; })) {
+        throw new Error('結果列 Icon 無效。');
+      }
+      return {
+        icon: row.icon,
+        customIcon: String(row.customIcon == null ? '' : row.customIcon),
+        preset: FIELD_PRESETS.indexOf(row.title) >= 0 ? row.title : 'custom',
+        title: String(row.title == null ? '' : row.title),
+        value: String(row.value == null ? '' : row.value),
+        accent: Boolean(row.accent)
+      };
+    });
+    return snapshot;
+  }
+
+  function applySettlementSnapshot(snapshot) {
+    snapshot = validateSettlementSnapshot(snapshot);
+    SETTLEMENT_TEXT_FIELDS.forEach(function (id) {
+      if (Object.prototype.hasOwnProperty.call(snapshot.fields, id)) $(id).value = String(snapshot.fields[id]);
+    });
+    SETTLEMENT_CHECK_FIELDS.forEach(function (id) {
+      if (Object.prototype.hasOwnProperty.call(snapshot.fields, id)) $(id).checked = Boolean(snapshot.fields[id]);
+    });
+    rows = snapshot.rows.map(function (row) {
+      return {
+        id: nextRowId++,
+        icon: row.icon,
+        customIcon: row.customIcon,
+        preset: row.preset,
+        title: row.title,
+        value: row.value,
+        accent: row.accent
+      };
+    });
+    renderRowsEditor();
+    ['bgScale', 'nextScale', 'subscribeScale'].forEach(function (id) {
+      $(id + 'Out').value = Number($(id).value).toFixed(2) + '×';
+    });
+    syncLeftModeUI();
+    render();
+  }
+
+  function importSettlement(payload) {
+    if (!payload || payload.component_id !== 'QST-03' || typeof payload.schema !== 'string' || payload.schema.indexOf('o-ne.settlement-card.ready.') !== 0) {
+      throw new Error('這不是 QST-03 片尾結算卡 JSON。');
+    }
+    var content = payload.content || {};
+    var assets = payload.assets || {};
+    var background = assets.background || {};
+    var left = assets.left_panel || {};
+    var subscribe = assets.subscribe || {};
+    var fields = {
+      chapterTitle: String(content.chapter_title == null ? '' : content.chapter_title),
+      chapterSubtitle: String(content.chapter_subtitle == null ? '' : content.chapter_subtitle),
+      summaryText: String(content.summary == null ? '' : content.summary),
+      nextText: String(content.next_text == null ? '' : content.next_text),
+      leftMode: left.mode || (content.viewer_question ? 'question' : 'empty'),
+      questionHint: String(content.viewer_question && content.viewer_question.hint || ''),
+      viewerQuestion: String(content.viewer_question && content.viewer_question.text || ''),
+      bgScale: String(background.scale == null ? 1 : background.scale),
+      bgX: String(background.x == null ? 0 : background.x),
+      bgY: String(background.y == null ? 0 : background.y),
+      nextScale: String(left.scale == null ? 1 : left.scale),
+      nextX: String(left.x == null ? 0 : left.x),
+      nextY: String(left.y == null ? 0 : left.y),
+      subscribeScale: String(subscribe.scale == null ? 1 : subscribe.scale),
+      subscribeX: String(subscribe.x == null ? 0 : subscribe.x),
+      subscribeY: String(subscribe.y == null ? 0 : subscribe.y),
+      bgVisible: Boolean(background.visible),
+      subscribeVisible: Boolean(subscribe.frame_visible),
+      catsVisible: Boolean(assets.characters && assets.characters.visible),
+      showGuides: false
+    };
+    var importedRows = Array.isArray(content.rows) ? content.rows.map(function (row) {
+      return {
+        icon: row.icon || 'none',
+        customIcon: row.custom_icon,
+        title: row.title,
+        value: row.value,
+        accent: row.accent_value
+      };
+    }) : [];
+    return validateSettlementSnapshot({ fields: fields, rows: importedRows });
   }
 
   rows = cloneDefaultRows();
@@ -724,12 +843,22 @@
       return;
     }
     canvas.toBlob(function (blob) {
-      if (blob) downloadBlob(blob, 'O-Ne_QST-03_片尾結算_READY_V0.1.2_1920x1080.png');
+      if (blob) downloadBlob(blob, 'O-Ne_QST-03_片尾結算_READY_V0.1.3_1920x1080.png');
       render(false);
     }, 'image/png');
   };
   $('downloadJson').onclick = downloadJson;
   $('reset').onclick = resetAll;
+
+  ONEEditBackup.mount({
+    id: 'settlement-card',
+    generatorVersion: 'V0.1.3_20260826',
+    anchor: document.querySelector('.buttons'),
+    imageNote: true,
+    capture: settlementSnapshot,
+    apply: applySettlementSnapshot,
+    fromJSON: importSettlement
+  });
 
   syncLeftModeUI();
 

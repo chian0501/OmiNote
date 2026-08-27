@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>O-Ne 效果卡生成器 V0.3.0</title>
+<title>O-Ne 效果卡生成器 V0.3.1</title>
 <style>
 @font-face{font-family:"O-Ne Noto Sans TC";src:url("./assets/NotoSansTC-O-Ne.woff?v=023") format("woff");font-style:normal;font-weight:100 900;font-display:swap}
 :root{--bg:#0e1117;--panel:#151a23;--panel2:#101620;--line:#2a3240;--line2:#394355;--text:#f5efe7;--muted:#9ea7b3;--teal:#29a6a7;--teal2:#53ced0;--gold:#ffbe37;--red:#fd4537;--purple:#8d67aa}
@@ -16,7 +16,7 @@ button,input,select{font:inherit}.app{max-width:1740px;margin:auto;padding:24px}
 <body>
 <main class="app">
 <a class="home" href="./">← 回工具入口</a>
-<div class="title-row"><h1>O-Ne 效果卡生成器</h1><span class="version">V0.3.0</span><span class="badge">FORMAL</span></div>
+<div class="title-row"><h1>O-Ne 效果卡生成器</h1><span class="version">V0.3.1</span><span class="badge">FORMAL</span></div>
 <p class="sub">STA-02｜Buff／Debuff。右上保留品牌 Logo 區，主裝飾固定於右下安全區；可選擇 1920×1080 半透明滿版氛圍，框體、文字與語意裝飾仍維持在最上層。</p>
 <div class="workspace">
 <section class="panel">
@@ -44,13 +44,14 @@ button,input,select{font:inherit}.app{max-width:1740px;margin:auto;padding:24px}
 <section class="panel preview-panel">
 <div class="preview-toolbar"><div><strong>1920 × 1080 即時預覽</strong><small>輸出永遠是透明 PNG；底色只供檢查。</small></div><div class="view-tabs"><button id="transparentView" class="active" type="button">透明格</button><button id="darkView" type="button">深色底</button></div></div>
 <div id="stage" class="stage"><canvas id="canvas" width="1920" height="1080"></canvas></div>
-<div class="export"><div id="status" class="status">正在載入正式母版…</div><div class="buttons"><button id="downloadPng" class="action" type="button">下載透明 PNG</button><button id="downloadJson" class="action secondary" type="button">下載設定 JSON</button><button id="reset" class="action ghost" type="button">重設</button></div><div class="formal-note">schema=o-ne.effect-card.formal.v0.3.0｜6 款真透明滿版氛圍｜新增 5 款 40% 疊圖｜透明 PNG</div></div>
+<div class="export"><div id="status" class="status">正在載入正式母版…</div><div class="buttons"><button id="downloadPng" class="action" type="button">下載透明 PNG</button><button id="downloadJson" class="action secondary" type="button">下載設定 JSON</button><button id="reset" class="action ghost" type="button">重設</button></div><div class="formal-note">schema=o-ne.effect-card.formal.v0.3.1｜6 款真透明滿版氛圍｜新增 5 款 40% 疊圖｜透明 PNG</div></div>
 </section>
 </div>
 </main>
+<script src="./edit-backup-v1.js?v=100"></script>
 <script>
-const VERSION='0.2.9';
-const SCHEMA='o-ne.effect-card.formal.v0.3.0';
+const VERSION='0.3.1';
+const SCHEMA='o-ne.effect-card.formal.v0.3.1';
 const FRAME_SRC='./assets/effect-card-frame-v018.png';
 const ACCENT_BOTTOM_SRC='./assets/effect-card-accent-bottom-v018.png';
 const ACCENT_RIGHT_SRC='./assets/effect-card-accent-right-v018.png';
@@ -164,15 +165,49 @@ function render(){ctx.clearRect(0,0,1920,1080);if(!assetsReady())return;const ac
 function getConfig(){const d=DECORS.find(x=>x.id===els.decorSelect.value),atmosphere=els.atmosphereSelect.value;return {schema:SCHEMA,version:VERSION,status:'FORMAL',formal_source:{master_psd:'效果卡.psd',drive_id:'1ZZdipJXr7Ujt_u1KUK2WxkRkJn8xjOoY',mapping:'STA-02',state_family:'Buff/Debuff',source_date:'2026-08-24'},render_strategy:'formal_psd_layers_plus_semantic_png_plus_optional_full_canvas_alpha_atmosphere_v030',frame_source:'effect-card-frame-v018.png',preset:current,state:els.stateText.value,title:els.titleText.value.trim(),subtitle:els.subtitleText.value.trim(),title_font_size:Number(els.titleSize.value),content_font_size:Number(els.contentSize.value),content_visible:els.contentToggle.classList.contains('on'),accent:getAccent(),text_style:els.textStyle.value,decoration:els.decorSelect.value,decoration_group:d?.group||null,decoration_assets:d?.asset?Object.values(DECOR_ASSET_SOURCES[d.asset]):[],decoration_density:els.decorDensity.value,decoration_color_mode:'fixed_semantic_asset',decoration_visible:els.decorToggle.classList.contains('on'),decoration_zone:'bottom_right_main_shifted_left_24px_plus_accent_and_bottom_left_support',atmosphere:{id:atmosphere,name:ATMOSPHERE_META[atmosphere]?.name||atmosphere,source_name:ATMOSPHERE_META[atmosphere]?.source_name||null,visible:atmosphere!=='none',asset:ATMOSPHERE_SOURCES[atmosphere],zone:'full_canvas_1920x1080',layer_order:'above_video_below_frame_text_decor',source_dimensions:{width:1920,height:1080},asset_draw_alpha:ATMOSPHERE_OPACITY[atmosphere]??1,source_alpha_preserved:true,checkerboard_baked:false,additional_mask:false,frame_clip:false,full_canvas:true,hard_rect_edges:false,main_decoration_shift_x:-24},semantic_decor_source:{origin:'Omi approved semantic set + repaired complete shock/backstab mains',reference_expression_folder_id:'1Vj1kJJxotFX-HIFlLhXG9uM8CtygLr_z',active_asset_count:24,effect_count:8,layout:'bottom_right_main_shifted_left_24px_plus_accent_and_bottom_left_support',repaired_bottom_right_main:['shock','backstab']},canvas:{width:1920,height:1080,transparent:true},generated_at:new Date().toISOString()}}
 function downloadBlob(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1200)}
 function safeName(){return (els.titleText.value.trim()||'EFFECT').replace(/[\\/:*?"<>|\s]+/g,'_').slice(0,30)}
-function exportPng(){if(!assetsReady()){setStatus('正式母版與語意裝飾尚未載入，請稍後再試。',true);return}const atmosphereId=els.atmosphereSelect.value;if(!atmosphereIsReady(atmosphereId)){ensureAtmosphere(atmosphereId);setStatus('滿版氛圍仍在載入，完成後再下載。',true);return}render();els.canvas.toBlob(blob=>{if(!blob){setStatus('PNG 產生失敗，請重新整理。',true);return}downloadBlob(blob,'O-NE_EFFECT_'+safeName()+'_V0.3.0.png');setStatus('已輸出 1920×1080 透明 PNG；新增 5 款氛圍以 40% 透明度滿版疊圖，不會整層蓋住影片。')},'image/png')}
-function exportJson(){downloadBlob(new Blob([JSON.stringify(getConfig(),null,2)],{type:'application/json;charset=utf-8'}),'O-NE_EFFECT_'+safeName()+'_V0.3.0.json');setStatus('已輸出 V0.3.0 設定 JSON。')}
+function exportPng(){if(!assetsReady()){setStatus('正式母版與語意裝飾尚未載入，請稍後再試。',true);return}const atmosphereId=els.atmosphereSelect.value;if(!atmosphereIsReady(atmosphereId)){ensureAtmosphere(atmosphereId);setStatus('滿版氛圍仍在載入，完成後再下載。',true);return}render();els.canvas.toBlob(blob=>{if(!blob){setStatus('PNG 產生失敗，請重新整理。',true);return}downloadBlob(blob,'O-NE_EFFECT_'+safeName()+'_V0.3.1.png');setStatus('已輸出 1920×1080 透明 PNG；新增 5 款氛圍以 40% 透明度滿版疊圖，不會整層蓋住影片。')},'image/png')}
+function exportJson(){downloadBlob(new Blob([JSON.stringify(getConfig(),null,2)],{type:'application/json;charset=utf-8'}),'O-NE_EFFECT_'+safeName()+'_V0.3.1.json');setStatus('已輸出 V0.3.1 設定 JSON。')}
 function bind(){[els.stateText,els.titleText,els.subtitleText,els.decorSelect,els.textStyle,els.decorDensity,els.decorColorMode].forEach(el=>{el.addEventListener('input',render);el.addEventListener('change',render)});els.atmosphereSelect.addEventListener('change',function(){ensureAtmosphere(this.value);render()});[[els.titleSize,els.titleSizeValue],[els.contentSize,els.contentSizeValue]].forEach(pair=>pair[0].addEventListener('input',function(){pair[1].textContent=this.value+' px';render()}));els.colorPreset.addEventListener('change',function(){if(this.value!=='custom'){els.accentColor.value=this.value;els.accentHex.textContent=this.value.toUpperCase()}render()});els.accentColor.addEventListener('input',function(){els.colorPreset.value='custom';els.accentHex.textContent=this.value.toUpperCase();render()});els.contentToggle.onclick=function(){this.classList.toggle('on');this.setAttribute('aria-pressed',this.classList.contains('on')?'true':'false');els.subtitleText.disabled=!this.classList.contains('on');render()};els.decorToggle.onclick=function(){this.classList.toggle('on');this.setAttribute('aria-pressed',this.classList.contains('on')?'true':'false');render()};document.getElementById('transparentView').onclick=function(){this.classList.add('active');document.getElementById('darkView').classList.remove('active');els.stage.classList.remove('dark')};document.getElementById('darkView').onclick=function(){this.classList.add('active');document.getElementById('transparentView').classList.remove('active');els.stage.classList.add('dark')};document.getElementById('downloadPng').onclick=exportPng;document.getElementById('downloadJson').onclick=exportJson;document.getElementById('reset').onclick=function(){els.textStyle.value='white';els.decorDensity.value='standard';els.decorColorMode.value='semantic';els.atmosphereSelect.value='none';els.titleSize.value='42';els.titleSizeValue.textContent='42 px';els.contentSize.value='22';els.contentSizeValue.textContent='22 px';if(!els.contentToggle.classList.contains('on'))els.contentToggle.click();if(!els.decorToggle.classList.contains('on'))els.decorToggle.click();applyPreset('delicious');setStatus('已重設為 V0.3.0「美食好吃」；右下主裝飾位於安全區，滿版氛圍已關閉。')}}
 function finishAssetLoad(){if(assetsReady()){render();setStatus('V0.3.0 已載入：8 組效果與 6 款可選 1920×1080 半透明滿版氛圍。')}}
 frame.onload=()=>{frameReady=true;finishAssetLoad()};frame.onerror=()=>setStatus('正式外框載入失敗，請重新整理。',true);
 [[accentBottom,ACCENT_BOTTOM_SRC],[accentRight,ACCENT_RIGHT_SRC],[accentLeft,ACCENT_LEFT_SRC]].forEach(pair=>{pair[0].onload=()=>{accentReady++;finishAssetLoad()};pair[0].onerror=()=>setStatus('PSD 可換色色塊載入失敗，請重新整理。',true);pair[0].src=pair[1]});
 [[labelPanel,LABEL_PANEL_SRC],[labelBar,LABEL_BAR_SRC],[labelPill,LABEL_PILL_SRC]].forEach(pair=>{pair[0].onload=()=>{labelReady++;finishAssetLoad()};pair[0].onerror=()=>setStatus('PSD 標籤替換件載入失敗，請重新整理。',true);pair[0].src=pair[1]});
 Object.entries(DECOR_ASSET_SOURCES).forEach(([id,sources])=>{decorAssetImages[id]={};Object.entries(sources).forEach(([role,src])=>{const image=new Image();image.onload=()=>{decorAssetsReady++;finishAssetLoad()};image.onerror=()=>setStatus('語意裝飾載入失敗：'+id+'／'+role,true);image.src=src;decorAssetImages[id][role]=image})});
-drawDecorOptions();bind();applyPreset('delicious');frame.src=FRAME_SRC;if(document.fonts&&document.fonts.ready)document.fonts.ready.then(render);
+function captureEffect(){
+  return{current,state:els.stateText.value,title:els.titleText.value,subtitle:els.subtitleText.value,
+    titleSize:els.titleSize.value,contentSize:els.contentSize.value,contentVisible:els.contentToggle.classList.contains('on'),
+    decor:els.decorSelect.value,decorVisible:els.decorToggle.classList.contains('on'),decorDensity:els.decorDensity.value,
+    textStyle:els.textStyle.value,colorPreset:els.colorPreset.value,accent:els.accentColor.value,
+    atmosphere:els.atmosphereSelect.value};
+}
+function applyEffect(snapshot){
+  if(!snapshot||!DECORS.some(item=>item.id===snapshot.decor)||!Object.prototype.hasOwnProperty.call(ATMOSPHERE_META,snapshot.atmosphere))throw new Error('效果卡備份內容不完整。');
+  current=PRESETS.some(item=>item.id===snapshot.current)?snapshot.current:'custom';
+  els.stateText.value=String(snapshot.state??'');els.titleText.value=String(snapshot.title??'');els.subtitleText.value=String(snapshot.subtitle??'');
+  els.titleSize.value=String(snapshot.titleSize??42);els.contentSize.value=String(snapshot.contentSize??22);
+  els.titleSizeValue.textContent=els.titleSize.value+' px';els.contentSizeValue.textContent=els.contentSize.value+' px';
+  els.decorSelect.value=snapshot.decor;els.decorDensity.value=snapshot.decorDensity||'standard';els.textStyle.value=snapshot.textStyle||'white';
+  els.accentColor.value=String(snapshot.accent||TOKENS.gold);els.accentHex.textContent=els.accentColor.value.toUpperCase();
+  els.colorPreset.value=Array.from(els.colorPreset.options).some(option=>option.value===snapshot.colorPreset)?snapshot.colorPreset:'custom';
+  els.atmosphereSelect.value=snapshot.atmosphere;
+  els.contentToggle.classList.toggle('on',Boolean(snapshot.contentVisible));els.contentToggle.setAttribute('aria-pressed',snapshot.contentVisible?'true':'false');els.subtitleText.disabled=!snapshot.contentVisible;
+  els.decorToggle.classList.toggle('on',Boolean(snapshot.decorVisible));els.decorToggle.setAttribute('aria-pressed',snapshot.decorVisible?'true':'false');
+  drawPresetButtons();ensureAtmosphere(snapshot.atmosphere);render();
+}
+function importEffect(payload){
+  if(!payload||typeof payload.schema!=='string'||!payload.schema.startsWith('o-ne.effect-card.formal.'))throw new Error('這不是效果卡設定 JSON。');
+  const atmosphere=typeof payload.atmosphere==='string'?payload.atmosphere:payload.atmosphere?.id||'none';
+  const snapshot={...captureEffect(),current:payload.preset||'custom',state:String(payload.state??''),title:String(payload.title??''),subtitle:String(payload.subtitle??''),
+    titleSize:String(payload.title_font_size??42),contentSize:String(payload.content_font_size??22),contentVisible:Boolean(payload.content_visible),
+    accent:String(payload.accent||TOKENS.gold),textStyle:payload.text_style||'white',decor:payload.decoration||'none',
+    decorDensity:payload.decoration_density||'standard',decorVisible:Boolean(payload.decoration_visible),atmosphere};
+  if(!/^#[0-9A-Fa-f]{6}$/.test(snapshot.accent))throw new Error('accent 必須是 6 碼色票。');
+  if(!DECORS.some(item=>item.id===snapshot.decor)||!Object.prototype.hasOwnProperty.call(ATMOSPHERE_META,snapshot.atmosphere))throw new Error('裝飾或氛圍值無效。');
+  return snapshot;
+}
+drawDecorOptions();bind();applyPreset('delicious');
+ONEEditBackup.mount({id:'effect-card',generatorVersion:'V0.3.1_20260826',anchor:document.querySelector('.buttons'),capture:captureEffect,apply:applyEffect,fromJSON:importEffect});
+frame.src=FRAME_SRC;if(document.fonts&&document.fonts.ready)document.fonts.ready.then(render);
 </script>
 </body>
 </html>
