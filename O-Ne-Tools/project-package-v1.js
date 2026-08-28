@@ -599,4 +599,12 @@
   };
 
   wrapEditBackup();
+
+  if (typeof document !== 'undefined' && document.readyState === 'loading' && typeof document.write === 'function') {
+    document.write('<script src="./batch-render-v1.js?v=100"></' + 'script>');
+  } else if (typeof document !== 'undefined' && document.createElement && document.head) {
+    var batchScript = document.createElement('script');
+    batchScript.src = './batch-render-v1.js?v=100';
+    document.head.appendChild(batchScript);
+  }
 })(window);

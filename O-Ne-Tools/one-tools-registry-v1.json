@@ -1,5 +1,5 @@
 {
-  "version": "V2.17_20260827",
+  "version": "V2.18_20260828",
   "principle": "one_function_one_entry",
   "total": 17,
   "ready": 12,
@@ -50,7 +50,8 @@
         "manual_edit_history_save",
         "unsaved_edits_not_persisted",
         "restore_latest_on_load",
-        "json_import_restore"
+        "json_import_restore",
+        "same_tool_batch_render"
       ],
       "formal_source_folder": "https://drive.google.com/drive/folders/1P-05OvWiq9gcc75btZJYOEyL5FYZWSro",
       "formal_psd_id": "1K-Xc7oNcWEoLrHviGhVmeygYISa4j6Q4",
@@ -80,7 +81,8 @@
         "manual_edit_history_save",
         "unsaved_edits_not_persisted",
         "restore_latest_on_load",
-        "json_import_restore"
+        "json_import_restore",
+        "same_tool_batch_render"
       ],
       "formal_source_folder": "https://drive.google.com/drive/folders/1EEoUn-U_zkxNgYtfsJynvw8dbvp_LV7c",
       "formal_psd_id": "10sd-QP_W3YqYksm1cVGYhaAqLbppjBJY",
@@ -111,7 +113,8 @@
         "manual_edit_history_save",
         "unsaved_edits_not_persisted",
         "restore_latest_on_load",
-        "json_import_restore"
+        "json_import_restore",
+        "same_tool_batch_render"
       ],
       "formal_source_folder": "https://drive.google.com/drive/folders/1p8U9F7OwLlKkUZNFdwsXS1jFN8ue-fub",
       "formal_psd_id": "1VMBCecO8QLuwtSMxy-BplfUa2Ybr3YDU",
@@ -139,7 +142,8 @@
         "manual_edit_history_save",
         "unsaved_edits_not_persisted",
         "restore_latest_on_load",
-        "json_import_restore"
+        "json_import_restore",
+        "same_tool_batch_render"
       ],
       "generator_version": "V0.3.1_20260826",
       "panel_fill_opacity": 0.8
@@ -163,7 +167,8 @@
         "manual_edit_history_save",
         "unsaved_edits_not_persisted",
         "restore_latest_on_load",
-        "json_import_restore"
+        "json_import_restore",
+        "same_tool_batch_render"
       ],
       "generator_version": "V1.0.7_20260826"
     },
@@ -189,7 +194,8 @@
         "manual_edit_history_save",
         "unsaved_edits_not_persisted",
         "restore_latest_on_load",
-        "json_import_restore"
+        "json_import_restore",
+        "same_tool_batch_render"
       ],
       "formal_source_folder": "https://drive.google.com/drive/folders/1NLJaPk0AlZk0lt1U9crqbD_GyePyGbvc",
       "formal_psd_id": "1wYnhZVvoQMl4hn1W7msw_oh3k-RqbHca",
@@ -217,7 +223,8 @@
         "manual_edit_history_save",
         "unsaved_edits_not_persisted",
         "restore_latest_on_load",
-        "json_import_restore"
+        "json_import_restore",
+        "same_tool_batch_render"
       ],
       "formal_source_folder": "https://drive.google.com/drive/folders/11-mXINBGZX8UyDGElik7hgSa-0yAJRcT",
       "formal_accept_psd_id": "1SqUYmbv5VfVWei1Gp4hoUFPDiynwoIPU",
@@ -259,7 +266,8 @@
         "manual_edit_history_save",
         "unsaved_edits_not_persisted",
         "restore_latest_on_load",
-        "json_import_restore"
+        "json_import_restore",
+        "same_tool_batch_render"
       ],
       "formal_source_folder": "https://drive.google.com/drive/folders/18ddBMdVUEW6WvNyYF1gmuPSJ_eqYG8ad",
       "formal_psd_id": "16AzfHUXuznSj8adbA9lKDcEYbUZ5iL6U",
@@ -328,7 +336,8 @@
         "unsaved_edits_not_persisted",
         "restore_latest_on_load",
         "json_import_restore",
-        "uploaded_images_reselect_after_restore"
+        "uploaded_images_reselect_after_restore",
+        "same_tool_batch_render"
       ],
       "formal_source_folder": "https://drive.google.com/drive/folders/1AGPXawwx3lBzAyZZl7X56BlAUUHM5ZBg",
       "formal_psd_id": "1RVtZOmq4pMNViGBRnj-qHPtd3NwsuhJU",
@@ -378,7 +387,8 @@
         "image_width_18_to_45_percent",
         "image_top_aligned_to_label",
         "image_growth_downward_only",
-        "finite_list_and_steps_auto_height"
+        "finite_list_and_steps_auto_height",
+        "same_tool_batch_render"
       ],
       "generator_version": "V0.5.11_20260827",
       "visual_status": "READY",
@@ -413,7 +423,8 @@
         "unsaved_edits_not_persisted",
         "restore_latest_on_load",
         "json_import_restore",
-        "uploaded_images_reselect_after_restore"
+        "uploaded_images_reselect_after_restore",
+        "same_tool_batch_render"
       ],
       "generator_version": "V1.2.6_20260826"
     },
@@ -448,7 +459,8 @@
         "unsaved_edits_not_persisted",
         "restore_latest_on_load",
         "json_import_restore",
-        "uploaded_images_reselect_after_restore"
+        "uploaded_images_reselect_after_restore",
+        "same_tool_batch_render"
       ],
       "formal_source_folder": "https://drive.google.com/drive/folders/1pMkqpnAXxWkVehQfNbxPIY8wEUhzxG1i",
       "formal_psd_id": "10TEJVILkN_wmVlstXxhJS_2NkLB41QA_",
@@ -538,5 +550,17 @@
     "invalid_json_mutates_current_state": false,
     "image_binary_embedded": false,
     "image_restore_policy": "text_and_settings_restore; uploaded_image_files_must_be_selected_again"
+  },
+  "shared_batch_render": {
+    "version": "V1.0.0_20260828",
+    "mode": "same_tool_json_zip_to_png_zip",
+    "max_files": 20,
+    "max_total_bytes": 209715200,
+    "mixed_json_zip_input": true,
+    "image_tool_json_policy": "zip_project_package_required",
+    "zip_embedded_png_fast_path": true,
+    "isolated_worker_render_fallback": true,
+    "output": "single_png_zip",
+    "stop_supported": true
   }
 }
