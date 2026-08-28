@@ -63,6 +63,8 @@ assert(guideSource.includes('複製完整 AI 指令'));
 assert(guideSource.includes('複製 JSON 範例'));
 assert(guideSource.includes('下載 JSON 範例'));
 assert(guideSource.includes('grid-column:2'));
+assert(guideSource.includes('ONEEditBackup.__aiJsonGuideWrapped'), 'shared edit-backup tools must mount the AI guide');
+assert(guideSource.includes('ONEProjectPackage.__aiJsonGuideWrapped'), 'persistent/project-package path must mount the AI guide');
 assert(packageSource.includes('ai-json-guide-v1.js?v=100'), 'project package must synchronously load AI JSON guide');
 new Function(guideSource);
 console.log('PASS: 12 AI JSON schemas, raw JSON handoff instructions, image ZIP notes, right-column placement contract and syntax.');

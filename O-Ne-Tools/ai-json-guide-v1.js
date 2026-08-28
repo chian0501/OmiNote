@@ -264,15 +264,25 @@
     return panel;
   }
 
-  function wrapProjectPackage() {
-    if (!global.ONEProjectPackage || !global.ONEProjectPackage.mount || global.ONEProjectPackage.__aiJsonGuideWrapped) return;
-    var originalMount = global.ONEProjectPackage.mount;
-    global.ONEProjectPackage.mount = function (config) {
-      var api = originalMount(config);
-      if (config && config.id && GUIDES[config.id]) global.setTimeout(function () { mountGuide(config.id); }, 0);
-      return api;
-    };
-    global.ONEProjectPackage.__aiJsonGuideWrapped = true;
+  function wrapMounts() {
+    if (global.ONEEditBackup && global.ONEEditBackup.mount && !global.ONEEditBackup.__aiJsonGuideWrapped) {
+      var originalEditMount = global.ONEEditBackup.mount;
+      global.ONEEditBackup.mount = function (config) {
+        var api = originalEditMount(config);
+        if (config && config.id && GUIDES[config.id]) global.setTimeout(function () { mountGuide(config.id); }, 0);
+        return api;
+      };
+      global.ONEEditBackup.__aiJsonGuideWrapped = true;
+    }
+    if (global.ONEProjectPackage && global.ONEProjectPackage.mount && !global.ONEProjectPackage.__aiJsonGuideWrapped) {
+      var originalProjectMount = global.ONEProjectPackage.mount;
+      global.ONEProjectPackage.mount = function (config) {
+        var api = originalProjectMount(config);
+        if (config && config.id && GUIDES[config.id]) global.setTimeout(function () { mountGuide(config.id); }, 0);
+        return api;
+      };
+      global.ONEProjectPackage.__aiJsonGuideWrapped = true;
+    }
   }
 
   global.ONEAIJsonGuide = {
@@ -281,8 +291,8 @@
     mount: mountGuide,
     prompt: function (id) { return GUIDES[id] ? aiPrompt(GUIDES[id]) : ''; },
     example: function (id) { return GUIDES[id] ? JSON.parse(JSON.stringify(GUIDES[id].example)) : null; },
-    wrapProjectPackage: wrapProjectPackage
+    wrapProjectPackage: wrapMounts
   };
 
-  wrapProjectPackage();
+  wrapMounts();
 })(window);
