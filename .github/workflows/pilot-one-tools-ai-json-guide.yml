@@ -1,0 +1,47 @@
+name: Pilot O-Ne Tools AI JSON guide
+
+on:
+  push:
+    branches:
+      - pilot/one-tools-ai-json-guide-20260828
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch-test-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: pilot/one-tools-ai-json-guide-20260828
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Wire AI JSON guide and update control files
+        run: python O-Ne-Tools/tests/apply-ai-json-guide-pilot.py
+      - name: Syntax check
+        run: |
+          node --check O-Ne-Tools/project-package-v1.js
+          node --check O-Ne-Tools/ai-json-guide-v1.js
+      - name: Existing shared edit backup regression
+        run: node O-Ne-Tools/tests/edit-backup-regression.cjs
+      - name: Existing project package regression
+        run: node O-Ne-Tools/tests/project-package-regression.cjs
+      - name: Existing batch renderer regression
+        run: node O-Ne-Tools/tests/batch-render-regression.cjs
+      - name: New AI JSON guide regression
+        run: node O-Ne-Tools/tests/ai-json-guide-regression.cjs
+      - name: Commit validated pilot changes
+        run: |
+          if git diff --quiet; then
+            echo 'No patch changes to commit.'
+            exit 0
+          fi
+          git config user.name 'O-Ne Pilot Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add O-Ne-Tools/project-package-v1.js O-Ne-Tools/README.md O-Ne-Tools/one-tools-registry-v1.json O-Ne-Tools/tests/edit-backup-regression.cjs
+          git commit -m 'feat: wire validated AI JSON format guides'
+          git push origin HEAD:pilot/one-tools-ai-json-guide-20260828
