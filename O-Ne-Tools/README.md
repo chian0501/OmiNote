@@ -61,7 +61,7 @@ O-Ne 字卡工具入口與編輯器集合。
 
 ## 給 AI 的 JSON 格式提示
 
-- 12 個可用工具共用 `ai-json-guide-v1.js` V1.0.0；每張卡在右側預覽下方顯示自己的「給 AI 的 JSON 格式」。
+- 12 個可用工具共用 `ai-json-guide-v1.js` V1.0.1；每張卡的「給 AI 的 JSON 格式」與右側預覽卡放在同一欄，緊接於預覽卡下方；左側編輯／暫存／ZIP／批次區不會被插入此說明。
 - 格式直接依目前各工具真正的 JSON exporter／importer 整理，不另造第二套 schema。
 - 每張卡提供「複製完整 AI 指令」「複製 JSON 範例」「下載 JSON 範例」；完整 AI 指令會要求 AI 回傳 UTF-8 `.json` 檔，若介面不能建立附件則只回 raw JSON，不加 Markdown 程式碼框或解說。
 - 說明區會列出固定 component/schema、重要 enum、陣列數量與其他必要限制；移動卡等結構型工具也會提示站點／路段等相依規則。

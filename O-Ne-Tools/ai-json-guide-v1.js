@@ -1,8 +1,8 @@
-/* O-Ne shared AI JSON format guide — V1.0.0 */
+/* O-Ne shared AI JSON format guide — V1.0.1 */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.0.0';
+  var VERSION = '1.0.1';
   var mounted = Object.create(null);
 
   var GUIDES = {
@@ -188,15 +188,15 @@
     var style = document.createElement('style');
     style.id = 'one-ai-json-guide-style';
     style.textContent = [
-      '.one-ai-json-guide{grid-column:2;min-width:0;margin-top:0;padding:16px;border:1px solid #354052;border-radius:14px;background:#111923;color:#d8dee7;font-family:"Noto Sans TC","Microsoft JhengHei",sans-serif;box-shadow:0 12px 28px rgba(0,0,0,.18)}',
+      '.one-ai-json-guide{min-width:0;width:100%;margin:0;padding:16px;border:1px solid #354052;border-radius:14px;background:#111923;color:#d8dee7;font-family:"Noto Sans TC","Microsoft JhengHei",sans-serif;box-shadow:0 12px 28px rgba(0,0,0,.18)}',
       '.one-ai-json-guide__head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}.one-ai-json-guide__head strong{color:#f0a8cf;font-size:14px}.one-ai-json-guide__badge{padding:4px 8px;border-radius:999px;background:#21363b;color:#8fe0d7;font-size:10px;font-weight:800}',
       '.one-ai-json-guide__note{margin:0 0 10px;color:#9ba6b4;font-size:11px;line-height:1.65}',
       '.one-ai-json-guide__rules{margin:0 0 10px;padding-left:19px;color:#c9d1db;font-size:11px;line-height:1.65}',
       '.one-ai-json-guide__buttons{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}.one-ai-json-guide button{min-height:38px;border:1px solid #3a4658;border-radius:8px;padding:7px 11px;background:#18212d;color:#f5f1ea;font:700 12px/1.2 inherit;cursor:pointer}.one-ai-json-guide button[data-action="copy-prompt"]{border-color:#29a6a7;background:#12383d;color:#8fe0d7}',
       '.one-ai-json-guide__file{margin:0 0 9px;color:#8fd4c8;font-size:10px}.one-ai-json-guide details{border:1px solid #2c3545;border-radius:9px;background:#0d141d}.one-ai-json-guide summary{cursor:pointer;padding:9px 11px;color:#d9dee5;font-size:11px;font-weight:800}.one-ai-json-guide pre{max-height:380px;overflow:auto;margin:0;padding:12px;border-top:1px solid #2c3545;color:#d6e4ef;background:#0b1118;font:11px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:pre-wrap;word-break:break-word}',
       '.one-ai-json-guide__status{min-height:17px;margin-top:8px;color:#8fd4c8;font-size:11px}.one-ai-json-guide__status.error{color:#ff7770}',
-      '.one-ai-json-guide-row{display:grid;grid-template-columns:minmax(430px,.95fr) minmax(0,1.05fr);gap:14px;margin-top:14px}.one-ai-json-guide-row .one-ai-json-guide{grid-column:2}',
-      '@media(max-width:1120px){.one-ai-json-guide,.one-ai-json-guide-row .one-ai-json-guide{grid-column:1/-1}.one-ai-json-guide-row{grid-template-columns:1fr}}'
+      '.one-ai-json-guide-stack{min-width:0;width:100%;display:flex;flex-direction:column;gap:14px;align-self:start}.one-ai-json-guide-stack>.panel,.one-ai-json-guide-stack>.preview-panel{width:100%}.app-shell.one-ai-json-guide-enabled{height:auto;min-height:100dvh}',
+      '@media(max-width:680px){.one-ai-json-guide{padding:13px}.one-ai-json-guide__head{align-items:flex-start;flex-direction:column}}'
     ].join('');
     document.head.appendChild(style);
   }
@@ -236,22 +236,43 @@
     return panel;
   }
 
+  function directPreviewPanel(host) {
+    if (!host || !host.children) return null;
+    var children = Array.prototype.slice.call(host.children);
+    for (var i = 0; i < children.length; i++) {
+      var child = children[i];
+      if (!child || !child.querySelector) continue;
+      if (child.classList && child.classList.contains('preview-panel')) return child;
+      if (child.querySelector('.preview-wrap,.stage,.canvas-stage,canvas')) return child;
+    }
+    return null;
+  }
+
   function insertBelowPreview(panel) {
     var workspace = document.querySelector('.workspace');
     var grid = document.querySelector('.grid');
-    var preview = document.querySelector('.preview-panel') || document.querySelector('.preview-wrap') || document.querySelector('.stage') || document.querySelector('.canvas-stage');
-    if (workspace && workspace.parentNode && workspace.classList && workspace.classList.contains('workspace') && workspace.parentNode.classList && workspace.parentNode.classList.contains('app-shell')) {
-      var row = document.createElement('div');
-      row.className = 'one-ai-json-guide-row';
-      row.appendChild(panel);
-      workspace.parentNode.insertBefore(row, workspace.nextSibling);
-      workspace.parentNode.classList.add('one-ai-json-guide-enabled');
+    var host = workspace || grid;
+    var previewPanel = directPreviewPanel(host);
+
+    // The stack replaces the preview panel at the exact same grid position. This means
+    // two-column tools keep it in the right column, while each tool's own responsive
+    // breakpoint can naturally collapse the same stack to one column without hardcoding widths.
+    if (host && previewPanel && previewPanel.parentNode === host) {
+      var stack = document.createElement('div');
+      stack.className = 'one-ai-json-guide-stack';
+      host.insertBefore(stack, previewPanel);
+      stack.appendChild(previewPanel);
+      stack.appendChild(panel);
+      var shell = host.closest ? host.closest('.app-shell') : null;
+      if (shell && shell.classList) shell.classList.add('one-ai-json-guide-enabled');
       return;
     }
-    var host = workspace || grid;
-    if (host && host.appendChild) { host.appendChild(panel); return; }
-    if (preview && preview.parentNode && preview.parentNode.parentNode) {
-      preview.parentNode.parentNode.insertBefore(panel, preview.parentNode.nextSibling); return;
+
+    var preview = document.querySelector('.preview-panel') || document.querySelector('.preview-wrap') || document.querySelector('.stage') || document.querySelector('.canvas-stage');
+    var container = preview && preview.classList && preview.classList.contains('preview-panel') ? preview : (preview && preview.parentNode);
+    if (container && container.parentNode) {
+      container.parentNode.insertBefore(panel, container.nextSibling);
+      return;
     }
     (document.querySelector('.app') || document.body).appendChild(panel);
   }
