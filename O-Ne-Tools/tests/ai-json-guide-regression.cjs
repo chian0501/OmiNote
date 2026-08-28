@@ -1,0 +1,68 @@
+'use strict';
+
+const assert = require('assert');
+const fs = require('fs');
+const vm = require('vm');
+const path = require('path');
+
+const root = path.join(__dirname, '..');
+const guideSource = fs.readFileSync(path.join(root, 'ai-json-guide-v1.js'), 'utf8');
+const packageSource = fs.readFileSync(path.join(root, 'project-package-v1.js'), 'utf8');
+
+const context = {
+  console, JSON, Blob, URL, Date, setTimeout, clearTimeout,
+  navigator: {},
+  document: {
+    getElementById() { return null; },
+    querySelector() { return null; },
+    createElement(tag) {
+      return {
+        tagName: tag.toUpperCase(), className: '', innerHTML: '', textContent: '', value: '', style: {}, children: [],
+        setAttribute() {}, appendChild(child) { this.children.push(child); return child; }, insertBefore() {}, remove() {}, select() {},
+        querySelector() { return { textContent:'', onclick:null, classList:{toggle(){}} }; },
+        classList: { contains(){return false;}, add(){}, toggle(){} }, click() {}
+      };
+    },
+    head: { appendChild() {} }, body: { appendChild() {} }, execCommand() { return true; }
+  }
+};
+context.window = context;
+vm.createContext(context);
+vm.runInContext(guideSource, context, { filename: 'ai-json-guide-v1.js' });
+
+const guide = context.ONEAIJsonGuide;
+assert(guide, 'AI JSON guide must load');
+assert.strictEqual(guide.version, '1.0.0');
+const ids = ['general-card','trigger-card','persistent-card','effect-card','move-card','choice-card','challenge-card','dialogue-card','rating-card','focus-card','thumbnail-frame','settlement-card'];
+assert.deepStrictEqual(Object.keys(guide.guides), ids);
+for (const id of ids) {
+  const item = guide.guides[id];
+  assert(item.name && item.file && item.example && Array.isArray(item.values), id + ' guide is incomplete');
+  assert.doesNotThrow(() => JSON.stringify(item.example));
+  const prompt = guide.prompt(id);
+  assert(prompt.includes('UTF-8 的 .json 檔'), id + ' prompt must request a JSON file');
+  assert(prompt.includes('只輸出「純 JSON 原文」'), id + ' prompt must define raw JSON fallback');
+  assert(prompt.includes('不要使用 ```json 程式碼框'), id + ' prompt must reject markdown fences');
+  assert(prompt.includes(item.file), id + ' prompt must include the suggested filename');
+}
+assert.strictEqual(guide.example('trigger-card').component_id, 'TRIGGER-CARD');
+assert.strictEqual(guide.example('persistent-card').component_id, 'PERSISTENT-MISSION');
+assert.strictEqual(guide.example('move-card').component_id, 'NAV-01');
+assert.strictEqual(guide.example('choice-card').component_id, 'SELECT-CARD');
+assert.strictEqual(guide.example('dialogue-card').component_id, 'DIALOGUE-CARD');
+assert.strictEqual(guide.example('rating-card').component_id, 'COL-02');
+assert.strictEqual(guide.example('thumbnail-frame').component_id, 'THUMBNAIL-FRAME');
+assert.strictEqual(guide.example('settlement-card').component_id, 'QST-03');
+assert.strictEqual(guide.example('move-card').segments.length, guide.example('move-card').stations.length - 1);
+for (const id of ['rating-card','focus-card','thumbnail-frame','settlement-card']) {
+  assert.strictEqual(guide.guides[id].image, true, id + ' must warn that image binaries require project ZIP');
+  assert(guide.prompt(id).includes('專案 ZIP'), id + ' must mention project ZIP for image handoff');
+}
+assert(guideSource.includes('給 AI 的 JSON 格式'));
+assert(guideSource.includes('複製完整 AI 指令'));
+assert(guideSource.includes('複製 JSON 範例'));
+assert(guideSource.includes('下載 JSON 範例'));
+assert(guideSource.includes('grid-column:2'));
+assert(packageSource.includes('ai-json-guide-v1.js?v=100'), 'project package must synchronously load AI JSON guide');
+new Function(guideSource);
+console.log('PASS: 12 AI JSON schemas, raw JSON handoff instructions, image ZIP notes, right-column placement contract and syntax.');
