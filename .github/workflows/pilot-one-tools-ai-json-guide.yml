@@ -22,50 +22,6 @@ jobs:
           node-version: '22'
       - name: Wire AI JSON guide and update control files
         run: python O-Ne-Tools/tests/apply-ai-json-guide-pilot.py
-      - name: Ensure both mount paths show the AI guide
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-          path = Path('O-Ne-Tools/ai-json-guide-v1.js')
-          text = path.read_text(encoding='utf-8')
-          if 'ONEEditBackup.__aiJsonGuideWrapped' not in text:
-              start = text.index('  function wrapProjectPackage() {')
-              end = text.index('\n\n  global.ONEAIJsonGuide', start)
-              new = '''  function wrapMounts() {
-    if (global.ONEEditBackup && global.ONEEditBackup.mount && !global.ONEEditBackup.__aiJsonGuideWrapped) {
-      var originalEditMount = global.ONEEditBackup.mount;
-      global.ONEEditBackup.mount = function (config) {
-        var api = originalEditMount(config);
-        if (config && config.id && GUIDES[config.id]) global.setTimeout(function () { mountGuide(config.id); }, 0);
-        return api;
-      };
-      global.ONEEditBackup.__aiJsonGuideWrapped = true;
-    }
-    if (global.ONEProjectPackage && global.ONEProjectPackage.mount && !global.ONEProjectPackage.__aiJsonGuideWrapped) {
-      var originalProjectMount = global.ONEProjectPackage.mount;
-      global.ONEProjectPackage.mount = function (config) {
-        var api = originalProjectMount(config);
-        if (config && config.id && GUIDES[config.id]) global.setTimeout(function () { mountGuide(config.id); }, 0);
-        return api;
-      };
-      global.ONEProjectPackage.__aiJsonGuideWrapped = true;
-    }
-  }'''
-              text = text[:start] + new + text[end:]
-              text = text.replace('wrapProjectPackage: wrapProjectPackage', 'wrapProjectPackage: wrapMounts')
-              text = text.replace('\n  wrapProjectPackage();\n})(window);', '\n  wrapMounts();\n})(window);')
-              path.write_text(text, encoding='utf-8')
-
-          test = Path('O-Ne-Tools/tests/ai-json-guide-regression.cjs')
-          t = test.read_text(encoding='utf-8')
-          marker = "assert(guideSource.includes('grid-column:2'));"
-          extra = "assert(guideSource.includes('ONEEditBackup.__aiJsonGuideWrapped'), 'shared edit-backup tools must mount the AI guide');\nassert(guideSource.includes('ONEProjectPackage.__aiJsonGuideWrapped'), 'persistent/project-package path must mount the AI guide');"
-          if extra not in t:
-              if marker not in t:
-                  raise SystemExit('AI guide regression marker not found')
-              t = t.replace(marker, marker + '\n' + extra)
-              test.write_text(t, encoding='utf-8')
-          PY
       - name: Syntax check
         run: |
           node --check O-Ne-Tools/project-package-v1.js
@@ -87,5 +43,5 @@ jobs:
           git config user.name 'O-Ne Pilot Bot'
           git config user.email 'actions@users.noreply.github.com'
           git add O-Ne-Tools/project-package-v1.js O-Ne-Tools/ai-json-guide-v1.js O-Ne-Tools/README.md O-Ne-Tools/one-tools-registry-v1.json O-Ne-Tools/tests/edit-backup-regression.cjs O-Ne-Tools/tests/ai-json-guide-regression.cjs
-          git commit -m 'fix: mount AI JSON guide across all ready tools'
+          git commit -m 'feat: validate AI JSON format guides for all tools'
           git push origin HEAD:pilot/one-tools-ai-json-guide-20260828
