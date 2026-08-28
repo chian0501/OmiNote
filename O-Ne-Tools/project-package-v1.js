@@ -1,8 +1,8 @@
-/* O-Ne shared project package / smart download names — V1.0.0 */
+/* O-Ne shared project package / smart download names — V1.0.1 */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.0.0';
+  var VERSION = '1.0.1';
   var PACKAGE_SCHEMA = 'o-ne.project-package.v1';
   var MAX_PACKAGE_BYTES = 200 * 1024 * 1024;
   var mounts = Object.create(null);
@@ -145,13 +145,47 @@
     };
   }
 
+  function toolFileInputs() {
+    return Array.prototype.slice.call(document.querySelectorAll('input[type="file"]')).filter(function (input) {
+      return !(input.closest && (input.closest('[data-one-backup-ui]') || input.closest('[data-one-project-package-ui]')));
+    });
+  }
+
+  function compactKey(value) {
+    var text = String(value == null ? '' : value)
+      .replace(/[\\/:*?"<>|]/g, ' ')
+      .replace(/[\u0000-\u001f\u007f]/g, ' ')
+      .replace(/\s+/g, '-')
+      .replace(/[^\w\-\u3400-\u9fff]/g, '')
+      .replace(/^-+|-+$/g, '');
+    return text.slice(0, 48);
+  }
+
+  function semanticSlotText(input) {
+    if (!input || !input.closest) return '';
+    var slot = input.closest('.image-slot');
+    if (slot) {
+      var strong = slot.querySelector('strong');
+      var slotText = strong ? String(strong.textContent || '').trim() : '';
+      if (slotText) return slotText;
+    }
+    var aria = input.getAttribute && (input.getAttribute('aria-label') || input.getAttribute('data-label'));
+    if (aria) return String(aria).trim();
+    var label = input.closest('label');
+    if (label) {
+      var labelText = String(label.textContent || '').replace(/尚未選擇圖片/g, '').replace(/選擇圖片|更換圖片/g, '').trim();
+      if (labelText) return labelText;
+    }
+    return '';
+  }
+
   function ensureAssetKey(input, index) {
     if (input.id) return 'id:' + input.id;
-    var existing = input.getAttribute('data-one-project-asset-key');
-    if (existing) return 'data:' + existing;
-    var generated = 'asset-' + index + '-' + Math.random().toString(36).slice(2, 8);
-    input.setAttribute('data-one-project-asset-key', generated);
-    return 'data:' + generated;
+    var name = input.getAttribute && input.getAttribute('name');
+    if (name) return 'name:' + name;
+    var slotText = compactKey(semanticSlotText(input));
+    if (slotText) return 'slot:' + slotText;
+    return 'index:' + String(index);
   }
 
   function isImageFile(file) {
@@ -165,7 +199,7 @@
       if (!input || input.type !== 'file' || (input.closest && (input.closest('[data-one-backup-ui]') || input.closest('[data-one-project-package-ui]')))) return;
       var files = Array.prototype.slice.call(input.files || []).filter(isImageFile);
       if (!files.length) return;
-      var all = Array.prototype.slice.call(document.querySelectorAll('input[type="file"]'));
+      var all = toolFileInputs();
       var key = ensureAssetKey(input, all.indexOf(input));
       instance.assets[key] = files.slice();
     };
@@ -179,8 +213,7 @@
         if (isImageFile(file)) result.push({ key: key, index: index, file: file });
       });
     });
-    Array.prototype.slice.call(document.querySelectorAll('input[type="file"]')).forEach(function (input, index) {
-      if (input.closest && (input.closest('[data-one-backup-ui]') || input.closest('[data-one-project-package-ui]'))) return;
+    toolFileInputs().forEach(function (input, index) {
       var key = ensureAssetKey(input, index);
       Array.prototype.slice.call(input.files || []).filter(isImageFile).forEach(function (file, fileIndex) {
         var duplicate = result.some(function (item) { return item.key === key && item.file.name === file.name && item.file.size === file.size; });
@@ -192,7 +225,10 @@
 
   function findInputByKey(key) {
     if (key.indexOf('id:') === 0) return document.getElementById(key.slice(3));
-    if (key.indexOf('data:') === 0) return document.querySelector('[data-one-project-asset-key="' + CSS.escape(key.slice(5)) + '"]');
+    var inputs = toolFileInputs();
+    for (var i = 0; i < inputs.length; i++) {
+      if (ensureAssetKey(inputs[i], i) === key) return inputs[i];
+    }
     return null;
   }
 
@@ -393,7 +429,7 @@
       var total = 0;
       for (var i = 0; i < assets.length; i++) {
         var file = assets[i].file;
-        var shortKey = cleanPart(assets[i].key.replace(/^id:|^data:/, ''), 'image');
+        var shortKey = cleanPart(assets[i].key.replace(/^id:|^name:|^slot:|^index:/, ''), 'image');
         var original = cleanPart(file.name || ('image-' + (i + 1)), 'image-' + (i + 1));
         var path = 'assets/' + shortKey + '__' + original;
         var n = 2;
@@ -454,6 +490,10 @@
       var project = JSON.parse(decoder.decode(entries[jsonNames[0]]));
       if (!project || project.schema !== PACKAGE_SCHEMA) throw new Error('這不是 O-Ne 專案包。');
       if (project.tool_id !== instance.id) throw new Error('這份專案包屬於其他工具（' + (project.tool_name || project.tool_id || '未知') + '）。');
+
+      if (instance.config.apply) instance.config.apply(clone(project.data));
+      await delay(350);
+
       var restored = 0;
       var missing = 0;
       var assets = Array.isArray(project.assets) ? project.assets : [];
@@ -466,13 +506,11 @@
         if (restoreFileToInput(input, restoredFile)) {
           instance.assets[meta.input_key] = [restoredFile];
           restored++;
-          await delay(120);
+          await delay(160);
         } else missing++;
       }
-      if (assets.length) await delay(500);
-      if (instance.config.apply) instance.config.apply(clone(project.data));
       if (assets.length) {
-        await delay(700);
+        await delay(650);
         if (instance.config.apply) instance.config.apply(clone(project.data));
       }
       setStatus(instance, '專案包載入成功｜設定已還原' + (assets.length ? '，圖片 ' + restored + '／' + assets.length + ' 個已回填' : '') + (missing ? '；' + missing + ' 個圖片欄位未能自動回填' : '') + '。', Boolean(missing));
@@ -555,7 +593,8 @@
       crc32: crc32,
       makeZip: makeZip,
       readZip: readZip,
-      toolName: toolName
+      toolName: toolName,
+      assetKey: ensureAssetKey
     }
   };
 

@@ -44,12 +44,25 @@ vm.runInContext(helperSource, context, { filename: 'project-package-v1.js' });
 
 const helper = context.ONEProjectPackage;
 assert(helper, 'project package helper must load');
-assert.strictEqual(helper.version, '1.0.0');
+assert.strictEqual(helper.version, '1.0.1');
 assert.strictEqual(helper.schema, 'o-ne.project-package.v1');
 assert.strictEqual(helper.__test.cleanPart('道頓堀/觀光船:晚班'), '道頓堀 觀光船 晚班');
 assert.strictEqual(helper.__test.toolName('focus-card'), '焦點卡');
 assert.strictEqual(helper.__test.variantSuffix('O-Ne_NAV-01_MOVE_WHITE.png'), '_WHITE');
 assert.strictEqual(helper.__test.variantSuffix('O-Ne_data.json'), '');
+assert.strictEqual(helper.__test.assetKey({ id: 'heroImage', getAttribute() { return null; }, closest() { return null; } }, 0), 'id:heroImage');
+assert.strictEqual(helper.__test.assetKey({ id: '', getAttribute(name) { return name === 'name' ? 'backgroundImage' : null; }, closest() { return null; } }, 0), 'name:backgroundImage');
+const focusRightInput = {
+  id: '',
+  getAttribute() { return null; },
+  closest(selector) {
+    if (selector === '.image-slot') return { querySelector() { return { textContent: '右側圖片' }; } };
+    return null;
+  }
+};
+assert.strictEqual(helper.__test.assetKey(focusRightInput, 0), 'slot:右側圖片', 'dynamic focus image slot must have a stable semantic key');
+assert.strictEqual(helper.__test.assetKey({ id: '', getAttribute() { return null; }, closest() { return null; } }, 3), 'index:3');
+assert(helperSource.indexOf('instance.config.apply(clone(project.data));') < helperSource.indexOf('var restored = 0;'), 'project settings must be applied before dynamic image inputs are restored');
 
 (async () => {
   const zip = await helper.__test.makeZip([
@@ -81,7 +94,7 @@ assert.strictEqual(helper.__test.variantSuffix('O-Ne_data.json'), '');
 
   new Function(helperSource);
   new Function(backupSource);
-  console.log('PASS: smart filenames, ZIP round trip, shared bridge, persistent adapter and syntax.');
+  console.log('PASS: smart filenames, stable image keys, dynamic-image restore order, ZIP round trip, shared bridge, persistent adapter and syntax.');
 })().catch(error => {
   console.error(error);
   process.exit(1);
