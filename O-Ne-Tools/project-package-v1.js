@@ -607,4 +607,13 @@
     batchScript.src = './batch-render-v1.js?v=100';
     document.head.appendChild(batchScript);
   }
+
+  if (typeof document !== 'undefined' && document.readyState === 'loading' && typeof document.write === 'function') {
+    document.write('<script src="./ai-json-guide-v1.js?v=100"></' + 'script>');
+  } else if (typeof document !== 'undefined' && document.createElement && document.head) {
+    var aiGuideScript = document.createElement('script');
+    aiGuideScript.src = './ai-json-guide-v1.js?v=100';
+    aiGuideScript.onload = function () { if (global.ONEAIJsonGuide) global.ONEAIJsonGuide.wrapProjectPackage(); };
+    document.head.appendChild(aiGuideScript);
+  }
 })(window);

@@ -167,7 +167,7 @@ for (const file of ['edit-backup-v1.js', 'settlement-card-v011.js']) {
 assert.deepStrictEqual(syntaxFailures, []);
 
 const registry = JSON.parse(fs.readFileSync(path.join(root, 'one-tools-registry-v1.json'), 'utf8'));
-assert.strictEqual(registry.version, 'V2.18_20260828');
+assert.strictEqual(registry.version, 'V2.19_20260828');
 assert.strictEqual(registry.total, 17);
 assert.strictEqual(registry.ready, 12);
 assert.strictEqual(registry.candidate, 0);
@@ -175,10 +175,13 @@ const registryIds = ['general', 'trigger', 'persistent', 'effect', 'move', 'choi
 for (const id of registryIds) {
   const entry = registry.tools.find(tool => tool.id === id);
   assert(entry, 'registry missing ' + id);
-  for (const feature of ['local_edit_history_5', 'manual_edit_history_save', 'unsaved_edits_not_persisted', 'restore_latest_on_load', 'json_import_restore']) {
+  for (const feature of ['local_edit_history_5', 'manual_edit_history_save', 'unsaved_edits_not_persisted', 'restore_latest_on_load', 'json_import_restore', 'ai_json_schema_guide']) {
     assert(entry.features.includes(feature), id + ' missing ' + feature);
   }
 }
+assert.strictEqual(registry.shared_ai_json_guide.version, 'V1.0.0_20260828');
+assert.strictEqual(registry.shared_ai_json_guide.tool_count, 12);
+assert.strictEqual(registry.shared_ai_json_guide.raw_json_only_instruction, true);
 assert.strictEqual(registry.shared_batch_render.version, 'V1.0.0_20260828');
 assert.strictEqual(registry.shared_batch_render.max_files, 20);
 assert.strictEqual(registry.shared_batch_render.image_tool_json_policy, 'zip_project_package_required');
