@@ -152,10 +152,13 @@
   }
 
   function compactKey(value) {
-    return cleanPart(value, '')
+    var text = String(value == null ? '' : value)
+      .replace(/[\\/:*?"<>|]/g, ' ')
+      .replace(/[\u0000-\u001f\u007f]/g, ' ')
       .replace(/\s+/g, '-')
       .replace(/[^\w\-\u3400-\u9fff]/g, '')
-      .slice(0, 48);
+      .replace(/^-+|-+$/g, '');
+    return text.slice(0, 48);
   }
 
   function semanticSlotText(input) {
