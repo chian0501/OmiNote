@@ -167,7 +167,7 @@ for (const file of ['edit-backup-v1.js', 'settlement-card-v011.js']) {
 assert.deepStrictEqual(syntaxFailures, []);
 
 const registry = JSON.parse(fs.readFileSync(path.join(root, 'one-tools-registry-v1.json'), 'utf8'));
-assert.strictEqual(registry.version, 'V2.19_20260828');
+assert.strictEqual(registry.version, 'V2.20_20260828');
 assert.strictEqual(registry.total, 17);
 assert.strictEqual(registry.ready, 12);
 assert.strictEqual(registry.candidate, 0);
@@ -179,9 +179,11 @@ for (const id of registryIds) {
     assert(entry.features.includes(feature), id + ' missing ' + feature);
   }
 }
-assert.strictEqual(registry.shared_ai_json_guide.version, 'V1.0.0_20260828');
+assert.strictEqual(registry.shared_ai_json_guide.version, 'V1.0.1_20260828');
 assert.strictEqual(registry.shared_ai_json_guide.tool_count, 12);
 assert.strictEqual(registry.shared_ai_json_guide.raw_json_only_instruction, true);
+assert.strictEqual(registry.shared_ai_json_guide.placement, 'same_right_column_directly_below_preview');
+assert.strictEqual(registry.shared_ai_json_guide.left_controls_untouched, true);
 assert.strictEqual(registry.shared_batch_render.version, 'V1.0.0_20260828');
 assert.strictEqual(registry.shared_batch_render.max_files, 20);
 assert.strictEqual(registry.shared_batch_render.image_tool_json_policy, 'zip_project_package_required');

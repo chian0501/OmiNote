@@ -1,5 +1,5 @@
 {
-  "version": "V2.19_20260828",
+  "version": "V2.20_20260828",
   "principle": "one_function_one_entry",
   "total": 17,
   "ready": 12,
@@ -576,14 +576,16 @@
     "stop_supported": true
   },
   "shared_ai_json_guide": {
-    "version": "V1.0.0_20260828",
+    "version": "V1.0.1_20260828",
     "tool_count": 12,
-    "placement": "below_preview_right_column",
+    "placement": "same_right_column_directly_below_preview",
     "copy_full_ai_prompt": true,
     "copy_json_example": true,
     "download_example_json": true,
     "raw_json_only_instruction": true,
     "schema_source": "current_tool_exporter_importer",
-    "image_binary_policy": "json_does_not_embed_uploads; use_project_zip_for_images"
+    "image_binary_policy": "json_does_not_embed_uploads; use_project_zip_for_images",
+    "layout_strategy": "wrap_preview_and_guide_in_same_grid_item",
+    "left_controls_untouched": true
   }
 }
