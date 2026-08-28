@@ -42,10 +42,10 @@ O-Ne 字卡工具入口與編輯器集合。
 - 12 個可用工具都有「完整專案包」區塊，可下載或載入 `.zip`。
 - ZIP 會包含：目前預覽 PNG、專案設定 JSON，以及使用者在該工具置入的圖片檔；圖片放在 `assets/` 子資料夾。
 - ZIP 專案 JSON 使用 `o-ne.project-package.v1`，會記錄 tool id、標題、生成器版本、設定快照與圖片欄位對應；載入時會拒絕其他工具的專案包。
-- 圖片回填使用原圖片欄位；載入後會再套一次設定，避免圖片讀取完成時把裁切／縮放等值洗回預設。
+- 圖片回填使用穩定欄位 ID／名稱／語意位置；焦點卡這類動態左右圖片欄位會先還原版面狀態，再把原圖回填到正確側，最後重新套用裁切／縮放設定。
 - 專案包目前上限 200 MB，採自包含 ZIP，不依賴外部 CDN；舊 JSON 與最近 5 次暫存機制維持相容。
 
-共用專案包由 `project-package-v1.js` V1.0.0 提供。11 個共用備份工具由 `edit-backup-v1.js` 自動接入；常駐卡因保留既有自訂暫存 UI，直接掛載同一個 project package helper。
+共用專案包由 `project-package-v1.js` V1.0.1 提供。11 個共用備份工具由 `edit-backup-v1.js` 自動接入；常駐卡因保留既有自訂暫存 UI，直接掛載同一個 project package helper。
 
 片尾結算卡的欄位與安全框定義另見 `settlement-card-mapping.json`；挑戰卡四個 state 與正式 PSD／PNG 對照見 `challenge-card-mapping.json`。正式 PSD 只作來源，生成器不會覆蓋 Drive 母檔。
 
