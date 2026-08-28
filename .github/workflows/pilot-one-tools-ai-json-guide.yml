@@ -28,44 +28,33 @@ jobs:
           from pathlib import Path
           path = Path('O-Ne-Tools/ai-json-guide-v1.js')
           text = path.read_text(encoding='utf-8')
-          old = '''  function wrapProjectPackage() {
-            if (!global.ONEProjectPackage || !global.ONEProjectPackage.mount || global.ONEProjectPackage.__aiJsonGuideWrapped) return;
-            var originalMount = global.ONEProjectPackage.mount;
-            global.ONEProjectPackage.mount = function (config) {
-              var api = originalMount(config);
-              if (config && config.id && GUIDES[config.id]) global.setTimeout(function () { mountGuide(config.id); }, 0);
-              return api;
-            };
-            global.ONEProjectPackage.__aiJsonGuideWrapped = true;
-          }
-          '''
-          new = '''  function wrapMounts() {
-            if (global.ONEEditBackup && global.ONEEditBackup.mount && !global.ONEEditBackup.__aiJsonGuideWrapped) {
-              var originalEditMount = global.ONEEditBackup.mount;
-              global.ONEEditBackup.mount = function (config) {
-                var api = originalEditMount(config);
-                if (config && config.id && GUIDES[config.id]) global.setTimeout(function () { mountGuide(config.id); }, 0);
-                return api;
-              };
-              global.ONEEditBackup.__aiJsonGuideWrapped = true;
-            }
-            if (global.ONEProjectPackage && global.ONEProjectPackage.mount && !global.ONEProjectPackage.__aiJsonGuideWrapped) {
-              var originalProjectMount = global.ONEProjectPackage.mount;
-              global.ONEProjectPackage.mount = function (config) {
-                var api = originalProjectMount(config);
-                if (config && config.id && GUIDES[config.id]) global.setTimeout(function () { mountGuide(config.id); }, 0);
-                return api;
-              };
-              global.ONEProjectPackage.__aiJsonGuideWrapped = true;
-            }
-          }
-          '''
-          if old not in text:
-              raise SystemExit('AI guide mount block not found')
-          text = text.replace(old, new)
-          text = text.replace('wrapProjectPackage: wrapProjectPackage', 'wrapProjectPackage: wrapMounts')
-          text = text.replace('\n  wrapProjectPackage();\n})(window);', '\n  wrapMounts();\n})(window);')
-          path.write_text(text, encoding='utf-8')
+          if 'ONEEditBackup.__aiJsonGuideWrapped' not in text:
+              start = text.index('  function wrapProjectPackage() {')
+              end = text.index('\n\n  global.ONEAIJsonGuide', start)
+              new = '''  function wrapMounts() {
+    if (global.ONEEditBackup && global.ONEEditBackup.mount && !global.ONEEditBackup.__aiJsonGuideWrapped) {
+      var originalEditMount = global.ONEEditBackup.mount;
+      global.ONEEditBackup.mount = function (config) {
+        var api = originalEditMount(config);
+        if (config && config.id && GUIDES[config.id]) global.setTimeout(function () { mountGuide(config.id); }, 0);
+        return api;
+      };
+      global.ONEEditBackup.__aiJsonGuideWrapped = true;
+    }
+    if (global.ONEProjectPackage && global.ONEProjectPackage.mount && !global.ONEProjectPackage.__aiJsonGuideWrapped) {
+      var originalProjectMount = global.ONEProjectPackage.mount;
+      global.ONEProjectPackage.mount = function (config) {
+        var api = originalProjectMount(config);
+        if (config && config.id && GUIDES[config.id]) global.setTimeout(function () { mountGuide(config.id); }, 0);
+        return api;
+      };
+      global.ONEProjectPackage.__aiJsonGuideWrapped = true;
+    }
+  }'''
+              text = text[:start] + new + text[end:]
+              text = text.replace('wrapProjectPackage: wrapProjectPackage', 'wrapProjectPackage: wrapMounts')
+              text = text.replace('\n  wrapProjectPackage();\n})(window);', '\n  wrapMounts();\n})(window);')
+              path.write_text(text, encoding='utf-8')
 
           test = Path('O-Ne-Tools/tests/ai-json-guide-regression.cjs')
           t = test.read_text(encoding='utf-8')
@@ -75,7 +64,7 @@ jobs:
               if marker not in t:
                   raise SystemExit('AI guide regression marker not found')
               t = t.replace(marker, marker + '\n' + extra)
-          test.write_text(t, encoding='utf-8')
+              test.write_text(t, encoding='utf-8')
           PY
       - name: Syntax check
         run: |
