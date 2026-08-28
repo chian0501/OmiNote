@@ -55,6 +55,7 @@ canvas{width:min(100%,900px);height:auto;filter:drop-shadow(0 8px 18px rgba(0,0,
 <div class="panel"><div class="section-title">03｜正式母版即時預覽</div><div class="preview-wrap"><canvas id="c" width="634" height="62"></canvas></div></div>
 </div>
 </div>
+<script src="./project-package-v1.js?v=100"></script>
 <script>
 const canvas=document.getElementById('c');
 const ctx=canvas.getContext('2d');
@@ -231,6 +232,15 @@ $('clearHistory').onclick=()=>{if(!storageReady||!readHistory().length)return;if
 const initialHistory=readHistory();
 if(initialHistory.length){applySnapshot(initialHistory[0]);refreshHistory('已載入最後一筆暫存；未暫存的修改不會寫入紀錄');}
 else{render();refreshHistory();}
+ONEProjectPackage.mount({
+  id:'persistent-card',
+  generatorVersion:'V1.1.2_20260827',
+  anchor:document.querySelectorAll('.buttons')[1],
+  getTitle:snapshot=>snapshot&&snapshot.task,
+  getCanvas:()=>canvas,
+  capture:()=>currentSnapshot(),
+  apply:snapshot=>applySnapshot(snapshot)
+});
 </script>
 </body>
 </html>
