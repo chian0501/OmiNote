@@ -309,7 +309,7 @@
   };
 
   if (typeof document !== 'undefined' && document.readyState === 'loading' && typeof document.write === 'function') {
-    document.write('<script src="./project-package-v1.js?v=100"><\\/script>');
+    document.write('<script src="./project-package-v1.js?v=100"></' + 'script>');
   } else if (typeof document !== 'undefined' && document.createElement && document.head) {
     var packageScript = document.createElement('script');
     packageScript.src = './project-package-v1.js?v=100';
