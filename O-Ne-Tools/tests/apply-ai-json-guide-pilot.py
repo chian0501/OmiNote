@@ -21,6 +21,38 @@ if 'ai-json-guide-v1.js?v=100' not in text:
     text = text[:pos] + insert + text[pos:]
     pkg.write_text(text, encoding='utf-8')
 
+# The 11 shared editors enter through ONEEditBackup.mount; persistent card enters through
+# ONEProjectPackage.mount. Cover both so every READY tool gets the guide.
+guide_path = root / 'ai-json-guide-v1.js'
+guide = guide_path.read_text(encoding='utf-8')
+if 'ONEEditBackup.__aiJsonGuideWrapped' not in guide:
+    start = guide.index('  function wrapProjectPackage() {')
+    end = guide.index('\n\n  global.ONEAIJsonGuide', start)
+    replacement = '''  function wrapMounts() {
+    if (global.ONEEditBackup && global.ONEEditBackup.mount && !global.ONEEditBackup.__aiJsonGuideWrapped) {
+      var originalEditMount = global.ONEEditBackup.mount;
+      global.ONEEditBackup.mount = function (config) {
+        var api = originalEditMount(config);
+        if (config && config.id && GUIDES[config.id]) global.setTimeout(function () { mountGuide(config.id); }, 0);
+        return api;
+      };
+      global.ONEEditBackup.__aiJsonGuideWrapped = true;
+    }
+    if (global.ONEProjectPackage && global.ONEProjectPackage.mount && !global.ONEProjectPackage.__aiJsonGuideWrapped) {
+      var originalProjectMount = global.ONEProjectPackage.mount;
+      global.ONEProjectPackage.mount = function (config) {
+        var api = originalProjectMount(config);
+        if (config && config.id && GUIDES[config.id]) global.setTimeout(function () { mountGuide(config.id); }, 0);
+        return api;
+      };
+      global.ONEProjectPackage.__aiJsonGuideWrapped = true;
+    }
+  }'''
+    guide = guide[:start] + replacement + guide[end:]
+    guide = guide.replace('wrapProjectPackage: wrapProjectPackage', 'wrapProjectPackage: wrapMounts')
+    guide = guide.replace('\n  wrapProjectPackage();\n})(window);', '\n  wrapMounts();\n})(window);')
+    guide_path.write_text(guide, encoding='utf-8')
+
 readme = root / 'README.md'
 r = readme.read_text(encoding='utf-8')
 if '## 給 AI 的 JSON 格式提示' not in r:
@@ -75,3 +107,13 @@ if "registry.shared_ai_json_guide.tool_count" not in t:
         raise SystemExit('edit-backup regression insertion marker not found')
     t = t.replace(marker, extra + marker)
 regression.write_text(t, encoding='utf-8')
+
+ai_test = root / 'tests' / 'ai-json-guide-regression.cjs'
+at = ai_test.read_text(encoding='utf-8')
+mount_marker = "assert(guideSource.includes('grid-column:2'));"
+mount_extra = "assert(guideSource.includes('ONEEditBackup.__aiJsonGuideWrapped'), 'shared edit-backup tools must mount the AI guide');\nassert(guideSource.includes('ONEProjectPackage.__aiJsonGuideWrapped'), 'persistent/project-package path must mount the AI guide');"
+if mount_extra not in at:
+    if mount_marker not in at:
+        raise SystemExit('AI guide regression marker not found')
+    at = at.replace(mount_marker, mount_marker + '\n' + mount_extra)
+    ai_test.write_text(at, encoding='utf-8')
