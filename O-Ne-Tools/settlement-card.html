@@ -189,7 +189,7 @@ $('downloadJson').onclick=downloadJson;$('reset').onclick=resetAll;
 
 Promise.all([loadStatic('background',STATIC_SOURCES.background),loadStatic('overlay',STATIC_SOURCES.overlay),loadStatic('ui',STATIC_SOURCES.ui),loadStatic('cats',STATIC_SOURCES.cats),document.fonts.load('700 36px "O-Ne Noto Sans TC"'),document.fonts.load('800 52px "O-Ne Noto Sans TC"')]).then(()=>{assetsReady=true;for(const id of ['bgScale','nextScale','subscribeScale'])syncRange(id);render()}).catch(error=>{$('status').classList.add('error');$('status').textContent=`載入失敗：${error.message}`});
 </script>
-<script src="./edit-backup-v1.js?v=120"></script>
+<script src="./edit-backup-v1.js?v=121"></script>
 <script src="./settlement-card-v011.js?v=013-ready"></script>
 </body>
 </html>

@@ -18,7 +18,7 @@ vm.runInNewContext(
   ';this.__focusLayout={' +
     'FOCUS_TEXT_LIMITS,FOCUS_LABEL_METRICS,FOCUS_TYPE_METRICS,' +
     'focusTextLength,focusEstimatedLineCount,focusTypography,' +
-    'focusImageLayout,focusImageHeight,focusVerticalMetrics,' +
+    'focusImageLayout,focusImageHeight,focusVerticalMetrics,focusImageTop,' +
     'focusRowMetrics,focusAutoHeight' +
   '};',
   context,
@@ -121,14 +121,27 @@ const labelBottom = vertical.labelY + vertical.labelHeight;
 const titleTop = vertical.titleBaseline - vertical.titleFont * 0.8;
 assert(Math.abs(titleTop - labelBottom - vertical.labelTitleGap) < 0.001, 'label-to-title gap must be dedicated and stable');
 assert(vertical.labelHeight < 43, 'label vertical padding must remain compact');
+assert.strictEqual(
+  layout.focusImageTop(content, vertical),
+  titleTop,
+  'image top must align to the rendered title top'
+);
+assert.notStrictEqual(
+  layout.focusImageTop(content, vertical),
+  vertical.labelY,
+  'image top must not remain aligned to the label'
+);
 
 assert(!source.includes('function focusShrinkScale'), 'automatic text shrink helper must be removed');
 assert(!source.includes('Ph(s,B.title'), 'title renderer must not auto-shrink');
-assert(source.includes('const p=f+ht.labelY'), 'image top must align to the label top');
+assert(source.includes('const p=f+focusImageTop(B,ht)'), 'renderer must use the title-aligned image anchor');
+assert(source.includes('zl=ul?focusImageTop(j,W)+ul+'), 'auto height must use the same title-aligned image anchor');
+assert(!source.includes('const p=f+ht.labelY'), 'renderer must not align the image to the label top');
 assert(source.includes('W=f;s.save()'), 'image drawing must stay top-anchored instead of vertically centered');
 assert(source.includes('max:"45"'), 'image control must allow 45% width');
 assert(source.includes('不再自動縮字'));
 assert(source.includes('放大只向下延伸'));
-assert(source.includes('V0.5.11_20260827'));
+assert(source.includes('上緣對齊大標題'));
+assert(source.includes('V0.5.12_20260829'));
 
-console.log('PASS: manual type, fixed rhythm, top-anchored image growth, and 45% image scaling work.');
+console.log('PASS: title-aligned image top, manual type, fixed rhythm, downward growth, and 45% image scaling work.');

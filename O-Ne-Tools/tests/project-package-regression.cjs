@@ -44,12 +44,25 @@ vm.runInContext(helperSource, context, { filename: 'project-package-v1.js' });
 
 const helper = context.ONEProjectPackage;
 assert(helper, 'project package helper must load');
-assert.strictEqual(helper.version, '1.0.1');
+assert.strictEqual(helper.version, '1.1.0');
 assert.strictEqual(helper.schema, 'o-ne.project-package.v1');
 assert.strictEqual(helper.__test.cleanPart('道頓堀/觀光船:晚班'), '道頓堀 觀光船 晚班');
 assert.strictEqual(helper.__test.toolName('focus-card'), '焦點卡');
 assert.strictEqual(helper.__test.variantSuffix('O-Ne_NAV-01_MOVE_WHITE.png'), '_WHITE');
 assert.strictEqual(helper.__test.variantSuffix('O-Ne_data.json'), '');
+assert.strictEqual(helper.__test.buildBaseName('focus-card', '道頓堀觀光船', '步驟-含字'), '焦點卡-道頓堀觀光船-步驟-含字');
+assert.strictEqual(helper.__test.statusFromSnapshot('trigger-card', { fields:{ state:{ value:'DONE' } } }, ''), '成功');
+assert.strictEqual(helper.__test.statusFromSnapshot('persistent-card', { state:'FAIL' }, ''), '失敗');
+assert.strictEqual(helper.__test.statusFromSnapshot('effect-card', { current:'cute', state:'BUFF' }, ''), '可愛');
+assert.strictEqual(helper.__test.statusFromSnapshot('move-card', { previewState:'orange' }, 'O-Ne_NAV-01_MOVE_WHITE.png'), '白色');
+assert.strictEqual(helper.__test.statusFromSnapshot('general-card', { currentMode:'CUSTOM', drafts:{ CUSTOM:{ label:'攻略' } } }, ''), '攻略');
+assert.strictEqual(helper.__test.statusFromSnapshot('choice-card', { options:[{ text:'搭 HARUKA', bright:false }, { text:'搭南海電鐵', bright:true }] }, ''), '高亮-搭南海電鐵');
+assert.strictEqual(helper.__test.statusFromSnapshot('challenge-card', { mode:'accept', selected:'yes' }, ''), '接受-YES');
+assert.strictEqual(helper.__test.statusFromSnapshot('dialogue-card', { left:{ character:'Omi', expression:'疑惑' }, right:{ character:'NieTe', expression:'無奈' } }, ''), 'Omi疑惑-涅特無奈');
+assert.strictEqual(helper.__test.statusFromSnapshot('rating-card', { ratings:[{ type:'score', value:'4.0' }, { type:'score', value:'5.0' }] }, ''), '評分4.5');
+assert.strictEqual(helper.__test.statusFromSnapshot('focus-card', { mode:'steps', label:{ enabled:true, text:'HERE' } }, 'O-NE_focus-card_steps_text_READY.png'), 'HERE-步驟-含字');
+assert.strictEqual(helper.__test.statusFromSnapshot('thumbnail-frame', {}, 'O-Ne_縮圖品牌框_含底圖_1920x1080.png'), '含底圖');
+assert.strictEqual(helper.__test.statusFromSnapshot('settlement-card', { fields:{ leftMode:'question' } }, ''), '提問');
 assert.strictEqual(helper.__test.assetKey({ id: 'heroImage', getAttribute() { return null; }, closest() { return null; } }, 0), 'id:heroImage');
 assert.strictEqual(helper.__test.assetKey({ id: '', getAttribute(name) { return name === 'name' ? 'backgroundImage' : null; }, closest() { return null; } }, 0), 'name:backgroundImage');
 const focusRightInput = {
@@ -74,7 +87,7 @@ assert(helperSource.indexOf('instance.config.apply(clone(project.data));') < hel
   assert.strictEqual(new TextDecoder().decode(entries['焦點卡_道頓堀.json']), '{"ok":true}');
   assert.deepStrictEqual(Array.from(entries['assets/route.png']), [137, 80, 78, 71]);
 
-  assert(backupSource.includes('project-package-v1.js?v=100'), 'shared backup must synchronously bridge to project package helper');
+  assert(backupSource.includes('project-package-v1.js?v=110'), 'shared backup must synchronously bridge to project package helper');
   assert(backupSource.includes("version: '1.2.0'"), 'existing shared backup public version must stay compatible');
 
   const sharedEditors = [
@@ -84,17 +97,17 @@ assert(helperSource.indexOf('instance.config.apply(clone(project.data));') < hel
   ];
   for (const file of sharedEditors) {
     const html = fs.readFileSync(path.join(root, file), 'utf8');
-    assert(html.includes('edit-backup-v1.js?v=120'), file + ' must still load the shared backup bridge');
+    assert(html.includes('edit-backup-v1.js?v=121'), file + ' must still load the shared backup bridge');
   }
 
   const persistent = fs.readFileSync(path.join(root, 'persistent-card.html'), 'utf8');
-  assert(persistent.includes('project-package-v1.js?v=100'), 'persistent card must load project package helper directly');
+  assert(persistent.includes('project-package-v1.js?v=110'), 'persistent card must load project package helper directly');
   assert(persistent.includes("id:'persistent-card'"), 'persistent card must mount its project package adapter');
   assert(persistent.includes('getTitle:snapshot=>snapshot&&snapshot.task'), 'persistent filename title must use task text');
 
   new Function(helperSource);
   new Function(backupSource);
-  console.log('PASS: smart filenames, stable image keys, dynamic-image restore order, ZIP round trip, shared bridge, persistent adapter and syntax.');
+  console.log('PASS: category-title-state filenames, state inference, stable image keys, dynamic-image restore order, ZIP round trip, shared bridge, persistent adapter and syntax.');
 })().catch(error => {
   console.error(error);
   process.exit(1);

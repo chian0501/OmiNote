@@ -1,5 +1,5 @@
 {
-  "version": "V2.20_20260828",
+  "version": "V2.21_20260829",
   "principle": "one_function_one_entry",
   "total": 17,
   "ready": 12,
@@ -366,9 +366,9 @@
       "name": "焦點內容卡",
       "family": "READY｜焦點／說明共用",
       "group": "資訊／閱讀",
-      "desc": "一般內文／項目／步驟；圖片真實縮放至 45%，手動字級與行高，按鈕手動保留最近 5 次",
+      "desc": "一般內文／項目／步驟；圖片真實縮放至 45% 並與大標題上緣切齊，手動字級與行高，按鈕手動保留最近 5 次",
       "status": "ready",
-      "href": "./focus-card.html?v=0511&build=manual-history-v2",
+      "href": "./focus-card.html?v=0512&build=image-title-align-v1",
       "features": [
         "body_list_steps_modes",
         "up_to_8_rows",
@@ -394,21 +394,21 @@
         "compact_label_vertical_padding",
         "expanded_label_title_gap",
         "image_width_18_to_45_percent",
-        "image_top_aligned_to_label",
+        "image_top_aligned_to_title",
         "image_growth_downward_only",
         "finite_list_and_steps_auto_height",
         "same_tool_batch_render",
         "ai_json_schema_guide"
       ],
-      "generator_version": "V0.5.11_20260827",
+      "generator_version": "V0.5.12_20260829",
       "visual_status": "READY",
       "formal_replacement": false,
       "panel_fill_opacity": 0.8,
       "qa": {
         "static_bundle_parse": "pass",
         "edit_backup_regression": "pass",
-        "browser_main_and_portable": "blocked_candidate_preview_proxy",
-        "console_errors": "pending_candidate_preview",
+        "browser_main_and_portable": "pass_candidate_component_preview",
+        "console_errors": 0,
         "focus_layout_regression": "pass"
       }
     },
@@ -563,8 +563,22 @@
     "image_binary_embedded": false,
     "image_restore_policy": "text_and_settings_restore; uploaded_image_files_must_be_selected_again"
   },
+  "shared_project_package": {
+    "version": "V1.1.0_20260829",
+    "tool_count": 12,
+    "filename_pattern": "{card_category}-{title}-{state}.{ext}",
+    "brand_prefix_in_filename": false,
+    "state_source": "current_tool_variant_or_status",
+    "formats": [
+      "png",
+      "json",
+      "zip"
+    ],
+    "same_title_variant_safe": true,
+    "legacy_json_compatible": true
+  },
   "shared_batch_render": {
-    "version": "V1.0.0_20260828",
+    "version": "V1.1.0_20260829",
     "mode": "same_tool_json_zip_to_png_zip",
     "max_files": 20,
     "max_total_bytes": 209715200,
@@ -576,7 +590,7 @@
     "stop_supported": true
   },
   "shared_ai_json_guide": {
-    "version": "V1.0.1_20260828",
+    "version": "V1.0.2_20260829",
     "tool_count": 12,
     "placement": "same_right_column_directly_below_preview",
     "copy_full_ai_prompt": true,
