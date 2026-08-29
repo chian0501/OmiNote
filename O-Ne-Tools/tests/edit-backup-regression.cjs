@@ -128,7 +128,7 @@ const tools = [
 
 for (const [file, id, version] of tools) {
   const html = fs.readFileSync(path.join(root, file), 'utf8');
-  assert(html.includes('edit-backup-v1.js?v=121'), file + ' must load the manual-by-default shared backup library');
+  assert(html.includes(file === 'focus-card.html' ? 'edit-backup-v1.js?v=1213' : 'edit-backup-v1.js?v=121'), file + ' must load the manual-by-default shared backup library');
   const implementation = file === 'settlement-card.html'
     ? fs.readFileSync(path.join(root, 'settlement-card-v011.js'), 'utf8')
     : html;

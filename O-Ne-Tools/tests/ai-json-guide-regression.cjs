@@ -71,6 +71,6 @@ assert(guideSource.includes('directPreviewPanel(host)'), 'placement must resolve
 assert(!guideSource.includes('one-ai-json-guide-row'), 'guide must not create a separate full-width row outside the preview column');
 assert(guideSource.includes('ONEEditBackup.__aiJsonGuideWrapped'), 'shared edit-backup tools must mount the AI guide');
 assert(guideSource.includes('ONEProjectPackage.__aiJsonGuideWrapped'), 'persistent/project-package path must mount the AI guide');
-assert(packageSource.includes('ai-json-guide-v1.js?v=102'), 'project package must synchronously load the cache-busted AI JSON guide');
+assert(packageSource.includes('ai-json-guide-v1.js?v=103'), 'project package must synchronously load the cache-busted AI JSON guide');
 new Function(guideSource);
 console.log('PASS: 12 AI JSON schemas, raw JSON handoff instructions, image ZIP notes, right-column placement contract and syntax.');
