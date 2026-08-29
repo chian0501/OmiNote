@@ -22,3 +22,17 @@ function updatePlace(){const p=findProject($('#placeProject').value);if(!p){$('#
 $('#cmdSearch').oninput=renderCommands;$$('[data-view]').forEach(b=>b.onclick=()=>{cmdView=b.dataset.view;$$('[data-view]').forEach(x=>x.classList.toggle('active',x===b));renderCommands()});
 $('#visSearch').oninput=renderVIS;$('#placeProject').oninput=updatePlace;$('#placeType').onchange=updatePlace;
 renderCommands();renderVIS();renderProjectPanel();updatePlace();
+
+(function injectPreviewAtlases(){
+ const st=document.createElement('style');
+ st.textContent=`
+ .preview.p-general,.detail-preview.p-general,.preview.p-trigger,.detail-preview.p-trigger,.preview.p-move,.detail-preview.p-move,.preview.p-choice,.detail-preview.p-choice,.preview.p-dialogue,.detail-preview.p-dialogue,.preview.p-rating,.detail-preview.p-rating,.preview.p-focus,.detail-preview.p-focus,.preview.p-settlement,.detail-preview.p-settlement,.preview.p-persistent,.detail-preview.p-persistent,.preview.p-effect,.detail-preview.p-effect,.preview.p-challenge,.detail-preview.p-challenge,.preview.p-thumbnail-frame,.detail-preview.p-thumbnail-frame{background-image:url('command-center-assets/v091-ui-atlas.webp');background-size:400% 300%;background-repeat:no-repeat}
+ .p-general{background-position:0% 0%}.p-trigger{background-position:33.333% 0%}.p-move{background-position:66.667% 0%}.p-choice{background-position:100% 0%}
+ .p-dialogue{background-position:0% 50%}.p-rating{background-position:33.333% 50%}.p-focus{background-position:66.667% 50%}.p-settlement{background-position:100% 50%}
+ .p-persistent{background-position:0% 100%}.p-effect{background-position:33.333% 100%}.p-challenge{background-position:66.667% 100%}.p-thumbnail-frame{background-position:100% 100%}
+ .preview.p-omi,.detail-preview.p-omi,.preview.p-niete,.detail-preview.p-niete,.preview.p-kuma,.detail-preview.p-kuma,.preview.p-nomi,.detail-preview.p-nomi,.preview.p-logo,.detail-preview.p-logo,.preview.p-mainvisual,.detail-preview.p-mainvisual,.preview.p-watermark,.detail-preview.p-watermark,.preview.p-avatar,.detail-preview.p-avatar{background-image:url('command-center-assets/v091-vis-atlas.webp');background-size:400% 200%;background-repeat:no-repeat}
+ .p-omi{background-position:0% 0%}.p-niete{background-position:33.333% 0%}.p-kuma{background-position:66.667% 0%}.p-nomi{background-position:100% 0%}
+ .p-logo{background-position:0% 100%}.p-mainvisual{background-position:33.333% 100%}.p-watermark{background-position:66.667% 100%}.p-avatar{background-position:100% 100%}
+ `;
+ document.head.appendChild(st);
+})();
