@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>O-Ne Command Center</title>
+<style>
+:root{--bg:#0e1117;--panel:#151a23;--panel2:#101620;--border:#2a3240;--text:#f5efe7;--muted:#9ea7b3;--teal:#29A6A7;--purple:#70518a;--yellow:#FFBE37;--red:#d45c55}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:"Noto Sans TC","Microsoft JhengHei",sans-serif}.app{max-width:1380px;margin:auto;padding:30px}.hero{display:flex;justify-content:space-between;gap:18px;align-items:flex-start}.eyebrow{font-size:12px;color:var(--teal);font-weight:900;letter-spacing:.08em}.hero h1{font-size:30px;margin:10px 0 8px}.sub{color:var(--muted);font-size:13px;line-height:1.7;max-width:900px}.stats{display:flex;gap:10px}.stat{min-width:110px;background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:12px}.stat b{display:block;color:var(--teal);font-size:22px}.stat span{font-size:10px;color:var(--muted)}.notice{margin:20px 0;padding:13px 15px;border:1px solid #4a3653;background:#201927;border-radius:12px;color:#d8c4df;font-size:12px;line-height:1.65}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}.tab{border:1px solid #394355;border-radius:999px;background:#171e29;color:#c5ccd6;padding:9px 13px;font-size:12px;font-weight:900;cursor:pointer}.tab.active{background:var(--teal);border-color:var(--teal);color:white}.tool-link{margin-left:auto;text-decoration:none}.section{display:none}.section.active{display:block}.section h2{font-size:24px;margin:24px 0 6px}.section .desc{font-size:12px;color:var(--muted);margin-bottom:16px}.toolbar{display:flex;gap:9px;flex-wrap:wrap;margin:14px 0}.search{flex:1;min-width:240px;border:1px solid #394355;border-radius:10px;background:var(--panel2);color:white;padding:11px 13px;font-size:14px;outline:none}.filter{border:1px solid #394355;border-radius:999px;background:#171e29;color:#bfc7d3;padding:8px 12px;font-size:11px;font-weight:800;cursor:pointer}.filter.active{background:var(--teal);color:#fff;border-color:var(--teal)}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}.card{background:linear-gradient(180deg,#171d27,#131923);border:1px solid var(--border);border-radius:15px;padding:16px;position:relative;overflow:hidden}.card:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--teal)}.meta{display:flex;justify-content:space-between;gap:8px;margin-bottom:10px}.group{font-size:10px;color:#9da7b4}.badge{font-size:9px;padding:3px 7px;border-radius:999px;background:#14312e;color:#8fd4c8;font-weight:900}.title{font-size:17px;font-weight:900;margin-bottom:6px}.small{font-size:11px;color:#aeb6c2;line-height:1.6}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.btn{border:0;border-radius:10px;padding:9px 10px;font-weight:900;background:var(--teal);color:#fff;cursor:pointer;text-decoration:none;font-size:11px}.btn.ai{background:#3a2942;color:#f0caef;border:1px solid #60416b}.btn.secondary{background:#30394a;color:#d7dde5}.prompt{display:none;margin-top:10px;padding:10px;border:1px dashed #485365;border-radius:10px;background:#0f141d;color:#d4dae3;font-size:11px;line-height:1.65}.prompt.open{display:block}.private{border-color:#60416b}.private:before{background:var(--purple)}.private .badge{background:#33243c;color:#e4c5ec}.private-box{padding:20px;border:1px solid #4a3653;background:#201927;border-radius:14px}.private-box h3{margin:0 0 8px}.private-box p{margin:0;color:#d8c4df;font-size:12px;line-height:1.7}.footer{margin-top:26px;padding:13px 15px;background:var(--panel);border:1px solid var(--border);border-radius:12px;color:#9fa8b4;font-size:11px;line-height:1.7}@media(max-width:960px){.grid{grid-template-columns:repeat(2,1fr)}.hero{flex-direction:column}.stats{width:100%}.stat{flex:1}}@media(max-width:620px){.app{padding:18px}.grid{grid-template-columns:1fr}.stats{flex-wrap:wrap}.tool-link{margin-left:0}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="hero">
+    <div><div class="eyebrow">O-NE COMMAND CENTER <span style="color:var(--yellow)">V0.8 PUBLIC SAFE</span></div><h1>常用指令＋Maker Tools 快速入口</h1><div class="sub">沿用 O-Ne-Tools 作業面。公開版只放可公開的快捷指令與 Maker Tools 導流；內部專案、Drive、Dashboard、唯一企劃卡與未公開資料不會放進 public GitHub Pages。</div></div>
+    <div class="stats"><div class="stat"><b>12</b><span>常用指令</span></div><div class="stat"><b>12</b><span>Maker Tools</span></div><div class="stat"><b>0</b><span>內部資料外洩</span></div></div>
+  </div>
+  <div class="notice"><b>公開安全版：</b>完整版 Project Hub 需要私有登入／權限層才會載入真實專案、ID 與 Drive 工作入口。這個頁面不建立第二份主資料庫。</div>
+  <div class="tabs">
+    <button class="tab active" data-tab="prompts">常用指令庫</button>
+    <button class="tab" data-tab="tools">UI／Maker Tools</button>
+    <button class="tab" data-tab="project">專案總覽</button>
+    <a class="tab tool-link" href="./">↗ O-Ne-Tools</a>
+  </div>
+
+  <section id="prompts" class="section active">
+    <h2>常用指令庫</h2><div class="desc">搜尋你想做的事，展開後可直接複製整段 Prompt。</div>
+    <div class="toolbar"><input id="promptSearch" class="search" placeholder="搜尋：審片、字卡、封面、字幕、Shorts、命名…"><button class="filter active" data-cat="全部">全部</button><button class="filter" data-cat="剪輯">剪輯</button><button class="filter" data-cat="視覺">視覺</button><button class="filter" data-cat="發布">發布</button><button class="filter" data-cat="專案">專案</button></div>
+    <div id="promptGrid" class="grid"></div>
+  </section>
+
+  <section id="tools" class="section">
+    <h2>UI／Maker Tools</h2><div class="desc">現有 Maker Tools 仍是唯一製作入口；Command Center 只負責快速導流。</div>
+    <div id="toolGrid" class="grid"></div>
+  </section>
+
+  <section id="project" class="section">
+    <h2>專案總覽</h2><div class="desc">公開版刻意不載入真實專案 Registry。</div>
+    <div class="private-box"><h3>🔒 完整 Project Hub 僅限內部版</h3><p>完整版會提供「搜尋專案 → 自動帶入 canonical ID → 母專案／企劃卡／01_企劃文案／02_素材／03_長片／04_Shorts」的真實入口。由於目前 OmiNote／GitHub Pages 是公開 repository，這些資料不應寫進公開程式碼。待私有登入與權限層完成後再啟用。</p></div>
+  </section>
+
+  <div class="footer"><b>O-Ne Command Center：</b>公開版＝快捷指令＋Maker Tools 導流；內部版＝專案 Registry、Drive 路徑、狀態與 Gate。正式主資料仍以 O-Ne Google Drive／Dashboard／唯一企劃卡為準。</div>
+</div>
+<script>
+const prompts=[
+['剪輯','🎬 幫我審片','檢查開頭、節奏、拖點、補強、結尾與 Shorts 切點','幫我完整審這支影片。先確認唯一企劃卡與目前目標，再依實際畫面分析開頭鉤子、前30秒、節奏拖點、可刪內容、需要前移或補強的地方、字卡／動畫需求、結尾是否回答開頭問題，以及可以拆哪些 Shorts。最後分成必改／推薦改／不用改。先不要修改 Drive。'],
+['剪輯','✂️ 整理剪輯施工表','把建議整理成可直接施工的順序清單','依這支影片目前素材與企劃，整理成可以直接施工的剪輯清單。照時間順序列保留、刪減、前移、補畫面、補字卡、補動畫、音效與注意事項。不要寫空泛建議。'],
+['視覺','🃏 這段用什麼卡','從正式 O-Ne UI 中選最適合的卡','幫我判斷這段最適合用 O-Ne 哪一種正式字卡。先看內容目的，再從現有正式 UI 選擇，不要自創新卡。告訴我卡種、卡面完整文字、圖片需求、出現時機、建議停留時間；不需要做卡的也直接說不用做。'],
+['視覺','📚 整理所有字卡','一次盤點整支片的 UI／卡片需求','把這支影片需要的字卡全部整理一次。依時間順序分類成必做／推薦／不建議，並列正式卡種、完整卡面文字、圖片素材、需要查證的資料與放置位置。去除重複卡。'],
+['視覺','🖼️ 規劃 YouTube 封面','做三組封面後收斂一個首選','依這支影片真實內容、主要受眾與目前標題方向，規劃3組 YouTube 封面。每組給主字、人物表情／位置、核心畫面、商品或地標安排與點擊理由。最後只選一個首選，不能誤導。'],
+['視覺','🎯 標題＋封面＋開場','四者承諾同一件事','把這支影片的標題、封面、前3秒與前30秒一起規劃，四者必須承諾同一件事。先找最強鉤子，再給首選組合與一組備選，並說明影片哪個真實畫面可以兌現。'],
+['發布','🌐 多語字幕','依啟用語言做自然在地化','用最新版繁中 SRT 做多語字幕。繁中內容與時間碼為主，翻譯要自然在地化，不逐字直譯。依本片 enabled_languages 製作，完成字幕 QA，並列出有文化語意或翻譯判斷的句子。'],
+['發布','📣 長片上架文案','標題、說明、章節、Tags、置頂留言','幫我做這支影片完整上架文案。先完成繁中標題、說明、章節、公開 Hashtags、後台 Tags、置頂留言與內部上架設定；繁中確認後，再依本片 enabled_languages 做在地化版本。'],
+['發布','📱 從長片找 Shorts','找3到5個能獨立成立的短片','從這支長片找3–5個可以獨立成立的 Shorts。每個列核心事件、開頭鉤子、建議時間碼、20–40秒故事結構、是否導長片、結尾方式與發布優先順序。不要只是把長片裁短。'],
+['專案','📂 這個檔案放哪裡','回傳正確父層與檔名','告訴我這個檔案在 O-Ne 專案裡正式應該放哪裡。請回覆完整父層路徑、建議檔名、是否屬正式／樣品／暫存，以及哪些位置不要放。不要自行搬檔。'],
+['專案','🏷️ 幫我命名','依 canonical 規則產生名稱','依 O-Ne 現行 canonical 命名規則幫我產生這個專案／影片／Shorts／素材的正式名稱。先確認既有 ID，不要猜下一號；同時給我建議檔名與版本／狀態後綴。'],
+['專案','🧹 檢查專案有沒有漏','找缺件、重複與過時版本','檢查這個 O-Ne 專案目前文件、企劃卡、素材、長片、Shorts、封面、發布文案與字幕是否整理完整。找出缺件、重複、過時版本、錯位置與文件互相矛盾的地方。先只回報，不要修改。']
+];
+const tools=[
+['任務／事件','一般卡','HERE／GET!｜位置、場景、道具解鎖','./general-card.html?v=121&build=manual-history-v2'],
+['任務／事件','觸發卡','EVENT／DONE!／FAIL｜事件觸發、成功、失敗','./trigger-card.html?v=102&build=manual-history-v2'],
+['任務／事件','常駐卡','MISSION／DONE!／FAIL｜任務常駐狀態','./persistent-card.html?v=112&build=manual-history-v2'],
+['效果／狀態','效果卡','STA-02｜Buff／Debuff','./effect-card.html?v=031&build=manual-history-v2'],
+['路線／導航','移動卡','MOVE｜站點與交通路線','./move-card.html?v=107&build=manual-history-v2'],
+['選擇／確認','選項卡','SELECT｜2到5項選擇','./choice-card.html?v=101&build=manual-history-v2'],
+['選擇／確認','挑戰卡','接受／放棄＋YES／NO','./challenge-card.html?v=011&build=manual-history-v2'],
+['對話／角色','對話卡','Omi／涅特／Kuma／Nomi／NPC','./dialogue-card.html?v=141&build=manual-history-v2'],
+['資訊／閱讀','評分卡','正式16:9品鑑／評分卡','./rating-card.html?v=131&build=manual-history-v2'],
+['資訊／閱讀','焦點／說明內容卡','圖片＋標籤＋說明文字','./focus-card.html?v=0511&build=manual-history-v2'],
+['縮圖／品牌','縮圖品牌框','1920×1080 首頁品牌框','./thumbnail-frame.html?v=126&build=manual-history-v2'],
+['結算／結果','片尾結算','QST-03｜FORMAL V1.1','./settlement-card.html?v=013&ready=1&build=manual-history-v2']
+];
+const promptGrid=document.getElementById('promptGrid'),toolGrid=document.getElementById('toolGrid'),search=document.getElementById('promptSearch');let cat='全部';
+function renderPrompts(){const q=search.value.trim().toLowerCase();promptGrid.innerHTML='';prompts.filter(p=>(cat==='全部'||p[0]===cat)&&(!q||(p.join(' ')).toLowerCase().includes(q))).forEach((p,i)=>{const el=document.createElement('div');el.className='card';el.innerHTML=`<div class="meta"><span class="group">${p[0]}</span><span class="badge">快捷</span></div><div class="title">${p[1]}</div><div class="small">${p[2]}</div><div class="actions"><button class="btn copy">複製指令</button><button class="btn ai toggle">展開</button></div><div class="prompt">${p[3]}</div>`;el.querySelector('.toggle').addEventListener('click',()=>el.querySelector('.prompt').classList.toggle('open'));el.querySelector('.copy').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(p[3]);el.querySelector('.copy').textContent='已複製 ✓';setTimeout(()=>el.querySelector('.copy').textContent='複製指令',1200)}catch(e){el.querySelector('.prompt').classList.add('open');el.querySelector('.copy').textContent='請手動複製'}});promptGrid.appendChild(el)})}
+function renderTools(){toolGrid.innerHTML='';tools.forEach(t=>{const el=document.createElement('div');el.className='card';el.innerHTML=`<div class="meta"><span class="group">${t[0]}</span><span class="badge">READY</span></div><div class="title">${t[1]}</div><div class="small">${t[2]}</div><div class="actions"><a class="btn" href="${t[3]}">直接編輯</a></div>`;toolGrid.appendChild(el)})}
+search.addEventListener('input',renderPrompts);document.querySelectorAll('.filter').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.filter').forEach(x=>x.classList.remove('active'));b.classList.add('active');cat=b.dataset.cat;renderPrompts()}));
+document.querySelectorAll('.tab[data-tab]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.tab[data-tab]').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.section').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.getElementById(b.dataset.tab).classList.add('active')}));renderPrompts();renderTools();
+</script>
+</body>
+</html>
