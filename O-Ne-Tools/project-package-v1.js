@@ -1,8 +1,8 @@
-/* O-Ne shared project package / smart download names — V1.0.1 */
+/* O-Ne shared project package / smart download names — V1.1.0 */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.0.1';
+  var VERSION = '1.1.0';
   var PACKAGE_SCHEMA = 'o-ne.project-package.v1';
   var MAX_PACKAGE_BYTES = 200 * 1024 * 1024;
   var mounts = Object.create(null);
@@ -49,12 +49,64 @@
     return cleanPart(id || '字卡', '字卡');
   }
 
+  var STATE_NAMES = {
+    EVENT: '事件', MISSION: '任務中', DONE: '成功', FAIL: '失敗', BUFF: '增益', DEBUFF: '減益',
+    WHITE: '白色', ORANGE: '橘色', ACCEPT: '接受', ABANDON: '放棄',
+    YES: 'YES', NO: 'NO', BODY: '內文', LIST: '項目', STEPS: '步驟',
+    HERE: 'HERE', GET: 'GET', COST: 'COST', CUSTOM: '自訂'
+  };
+  var EFFECT_NAMES = {
+    delicious: '好吃', cute: '可愛', love: '心動', praised: '開心',
+    badTaste: '踩雷', shock: '打擊', backstab: '背刺', sick: '不舒服'
+  };
+  var CHARACTER_NAMES = { Omi: 'Omi', NieTe: '涅特', Kuma: 'Kuma', Nomi: 'Nomi', NPC: 'NPC' };
+
+  function valueOfField(value) {
+    if (value && typeof value === 'object' && Object.prototype.hasOwnProperty.call(value, 'value')) return value.value;
+    return value;
+  }
+
+  function snapshotValue(snapshot, key) {
+    if (!snapshot || typeof snapshot !== 'object') return '';
+    if (Object.prototype.hasOwnProperty.call(snapshot, key)) return valueOfField(snapshot[key]);
+    var nested = ['fields', 'data', 'extra', 'content', 'settings'];
+    for (var i = 0; i < nested.length; i++) {
+      if (snapshot[nested[i]] && typeof snapshot[nested[i]] === 'object' && Object.prototype.hasOwnProperty.call(snapshot[nested[i]], key)) {
+        return valueOfField(snapshot[nested[i]][key]);
+      }
+    }
+    return '';
+  }
+
+  function stateName(value, fallback) {
+    var raw = String(value == null ? '' : value).replace(/!/g, '').trim();
+    if (!raw) return fallback || '標準';
+    var upper = raw.toUpperCase();
+    return STATE_NAMES[upper] || cleanPart(raw, fallback || '標準');
+  }
+
+  function originalToken(originalName, tokens) {
+    var base = String(originalName || '').replace(/\.[^.]+$/, '').toUpperCase();
+    for (var i = 0; i < tokens.length; i++) {
+      var token = tokens[i];
+      if (new RegExp('(?:^|[_-])' + token + '(?:[_-]|$)').test(base)) return token;
+    }
+    return '';
+  }
+
+  function selectedFileBase(id) {
+    if (id !== 'thumbnail-frame' || typeof document === 'undefined') return '';
+    var input = document.getElementById && document.getElementById('fileInput');
+    var file = input && input.files && input.files[0];
+    return file && file.name ? String(file.name).replace(/\.[^.]+$/, '') : '';
+  }
+
   function textFromObject(obj, keys) {
     if (!obj || typeof obj !== 'object') return '';
     for (var i = 0; i < keys.length; i++) {
       var key = keys[i];
       if (Object.prototype.hasOwnProperty.call(obj, key)) {
-        var value = obj[key];
+        var value = valueOfField(obj[key]);
         if (typeof value === 'string' && value.trim()) return value.trim();
       }
     }
@@ -101,9 +153,28 @@
         if (custom) return cleanPart(custom, '未命名');
       } catch (error) {}
     }
+    var id = instance && instance.id || '';
+    if (id === 'general-card') {
+      var mode = snapshot && snapshot.currentMode;
+      var draft = mode && snapshot.drafts && snapshot.drafts[mode];
+      if (draft && draft.title) return cleanPart(draft.title, '未命名');
+    }
+    if (id === 'challenge-card' && snapshot && snapshot.copy) {
+      var challengeTitle = [snapshot.copy.prefix, snapshot.copy.emphasis, snapshot.copy.suffix].join('');
+      if (challengeTitle.trim()) return cleanPart(challengeTitle, '未命名');
+    }
+    if (id === 'focus-card') {
+      var focusContent = snapshot && snapshot.content && snapshot.content[snapshot.mode];
+      if (focusContent && focusContent.title) return cleanPart(focusContent.title, '未命名');
+    }
+    if (id === 'thumbnail-frame') {
+      var uploadTitle = selectedFileBase(id);
+      if (uploadTitle) return cleanPart(uploadTitle, '未命名');
+    }
     var keys = [
       'title', 'main_title', 'mainTitle', 'headline', 'task_text', 'task', 'product_name', 'productName',
-      'product', 'question', 'prompt', 'dialogue', 'text', 'name', 'location', 'place'
+      'product', 'storeName', 'store_name', 'chapterTitle', 'chapter_title', 'question', 'prompt',
+      'dialogue', 'text', 'name', 'location', 'place'
     ];
     var value = textFromObject(snapshot, keys) || inferFromDom();
     return cleanPart(value, '未命名');
@@ -119,6 +190,99 @@
     return '';
   }
 
+  function dialogueStatus(snapshot) {
+    var parts = [];
+    ['left', 'right'].forEach(function (side) {
+      var item = snapshot && snapshot[side];
+      if (!item || item.character === 'NONE') return;
+      var name = CHARACTER_NAMES[item.character] || item.name || item.character;
+      var expression = item.character === 'NPC' ? '' : item.expression;
+      parts.push(cleanPart(String(name || '') + String(expression || ''), '角色'));
+    });
+    return parts.join('-') || '對話';
+  }
+
+  function choiceStatus(snapshot) {
+    var options = snapshot && Array.isArray(snapshot.options) ? snapshot.options : [];
+    var bright = options.filter(function (option) { return option && option.bright; });
+    if (bright.length === 1) return '高亮-' + cleanPart(bright[0].text, '選項');
+    if (bright.length > 1) return '高亮' + bright.length + '項';
+    return '未高亮';
+  }
+
+  function ratingStatus(snapshot) {
+    var ratings = snapshot && Array.isArray(snapshot.ratings) ? snapshot.ratings : [];
+    var scores = ratings.filter(function (item) { return item && item.type === 'score' && Number.isFinite(Number(item.value)); })
+      .map(function (item) { return Number(item.value); });
+    if (scores.length) {
+      var average = scores.reduce(function (sum, score) { return sum + score; }, 0) / scores.length;
+      return '評分' + average.toFixed(1);
+    }
+    return cleanPart(snapshotValue(snapshot, 'tagText'), '評分');
+  }
+
+  function focusStatus(snapshot, originalName) {
+    var label = snapshot && snapshot.label && snapshot.label.enabled && snapshot.label.text
+      ? cleanPart(String(snapshot.label.text).replace(/!/g, ''), '') : '';
+    var mode = stateName(snapshot && snapshot.mode, '內容');
+    var output = originalToken(originalName, ['FRAME', 'TEXT']);
+    var outputName = output === 'FRAME' ? '空框' : '含字';
+    return [label, mode, outputName].filter(Boolean).join('-') || '標準';
+  }
+
+  function statusFromSnapshot(id, snapshot, originalName) {
+    var token;
+    if (id === 'general-card') {
+      var generalMode = snapshot && snapshot.currentMode || snapshotValue(snapshot, 'mode');
+      if (generalMode === 'CUSTOM' && snapshot && snapshot.drafts && snapshot.drafts.CUSTOM && snapshot.drafts.CUSTOM.label) {
+        return cleanPart(snapshot.drafts.CUSTOM.label, '自訂');
+      }
+      return stateName(generalMode, '一般');
+    }
+    if (id === 'trigger-card') return stateName(snapshotValue(snapshot, 'state'), '事件');
+    if (id === 'persistent-card') return stateName(snapshot && snapshot.state, '任務中');
+    if (id === 'effect-card') return EFFECT_NAMES[snapshot && snapshot.current] || stateName(snapshot && snapshot.state, '效果');
+    if (id === 'move-card') {
+      token = originalToken(originalName, ['WHITE', 'ORANGE']);
+      return stateName(token || snapshot && snapshot.previewState, '白色');
+    }
+    if (id === 'choice-card') return choiceStatus(snapshot);
+    if (id === 'challenge-card') {
+      return stateName(snapshot && snapshot.mode, '挑戰') + '-' + stateName(snapshot && snapshot.selected, '選擇');
+    }
+    if (id === 'dialogue-card' || id === 'dialogue-card-v135') return dialogueStatus(snapshot);
+    if (id === 'rating-card') return ratingStatus(snapshot);
+    if (id === 'focus-card') return focusStatus(snapshot, originalName);
+    if (id === 'thumbnail-frame') {
+      if (/含底圖/.test(originalName || '')) return '含底圖';
+      if (/透明底/.test(originalName || '')) return '透明底';
+      return selectedFileBase(id) ? '含底圖' : '透明底';
+    }
+    if (id === 'settlement-card') {
+      var leftMode = snapshotValue(snapshot, 'leftMode');
+      return { question: '提問', thumbnail: '縮圖', empty: '空白' }[leftMode] || '結算';
+    }
+    return stateName(snapshotValue(snapshot, 'state'), '標準');
+  }
+
+  function buildBaseName(id, title, status) {
+    return [
+      cleanPart(toolName(id), '字卡'),
+      cleanPart(title, '未命名'),
+      cleanPart(status, '標準')
+    ].join('-');
+  }
+
+  function inferStatus(instance, snapshot, originalName) {
+    if (instance.config.getStatus) {
+      try {
+        var custom = instance.config.getStatus(clone(snapshot), originalName || '');
+        if (custom) return cleanPart(custom, '標準');
+      } catch (error) {}
+    }
+    return statusFromSnapshot(instance.id, snapshot, originalName);
+  }
+
   function smartName(instance, originalName) {
     var original = String(originalName || '');
     var match = original.match(/\.([A-Za-z0-9]+)$/);
@@ -128,9 +292,8 @@
     var snapshot;
     try { snapshot = instance.config.capture ? clone(instance.config.capture()) : {}; }
     catch (error) { snapshot = {}; }
-    var base = 'O-Ne_' + toolName(instance.id) + '_' + inferTitle(instance, snapshot);
-    if (ext === 'png') base += variantSuffix(original);
-    return cleanPart(base, 'O-Ne_' + toolName(instance.id) + '_未命名') + '.' + ext;
+    var base = buildBaseName(instance.id, inferTitle(instance, snapshot), inferStatus(instance, snapshot, original));
+    return base + '.' + ext;
   }
 
   function patchAnchorClick() {
@@ -401,7 +564,7 @@
         '<button type="button" data-action="import-package">載入專案包 ZIP</button>' +
       '</div>' +
       '<input type="file" accept=".zip,application/zip" hidden>' +
-      '<div class="one-project-package__note">ZIP 會一起保存目前 PNG、編輯設定 JSON 與已置入圖片；舊 JSON 仍可照原方式使用。</div>' +
+      '<div class="one-project-package__note">ZIP 會一起保存目前 PNG、編輯設定 JSON 與已置入圖片；檔名統一為「卡片分類-標題-狀態」，不加 O-Ne。舊 JSON 仍可照原方式使用。</div>' +
       '<div class="one-project-package__status" aria-live="polite"></div>';
     return panel;
   }
@@ -421,7 +584,8 @@
     try {
       var snapshot = instance.config.capture ? clone(instance.config.capture()) : {};
       var title = inferTitle(instance, snapshot);
-      var base = cleanPart('O-Ne_' + toolName(instance.id) + '_' + title, 'O-Ne_' + toolName(instance.id) + '_未命名');
+      var status = inferStatus(instance, snapshot, '');
+      var base = buildBaseName(instance.id, title, status);
       var assets = gatherAssets(instance);
       var assetManifest = [];
       var entries = [];
@@ -451,6 +615,7 @@
         generator_version: instance.config.generatorVersion || null,
         saved_at: new Date().toISOString(),
         title: title,
+        status: status,
         data: snapshot,
         assets: assetManifest
       };
@@ -594,6 +759,9 @@
       makeZip: makeZip,
       readZip: readZip,
       toolName: toolName,
+      stateName: stateName,
+      statusFromSnapshot: statusFromSnapshot,
+      buildBaseName: buildBaseName,
       assetKey: ensureAssetKey
     }
   };
@@ -601,18 +769,18 @@
   wrapEditBackup();
 
   if (typeof document !== 'undefined' && document.readyState === 'loading' && typeof document.write === 'function') {
-    document.write('<script src="./batch-render-v1.js?v=100"></' + 'script>');
+    document.write('<script src="./batch-render-v1.js?v=110"></' + 'script>');
   } else if (typeof document !== 'undefined' && document.createElement && document.head) {
     var batchScript = document.createElement('script');
-    batchScript.src = './batch-render-v1.js?v=100';
+    batchScript.src = './batch-render-v1.js?v=110';
     document.head.appendChild(batchScript);
   }
 
   if (typeof document !== 'undefined' && document.readyState === 'loading' && typeof document.write === 'function') {
-    document.write('<script src="./ai-json-guide-v1.js?v=101"></' + 'script>');
+    document.write('<script src="./ai-json-guide-v1.js?v=102"></' + 'script>');
   } else if (typeof document !== 'undefined' && document.createElement && document.head) {
     var aiGuideScript = document.createElement('script');
-    aiGuideScript.src = './ai-json-guide-v1.js?v=101';
+    aiGuideScript.src = './ai-json-guide-v1.js?v=102';
     aiGuideScript.onload = function () { if (global.ONEAIJsonGuide) global.ONEAIJsonGuide.wrapProjectPackage(); };
     document.head.appendChild(aiGuideScript);
   }

@@ -1,5 +1,5 @@
 {
-  "version": "V2.20_20260828",
+  "version": "V2.21_20260829",
   "principle": "one_function_one_entry",
   "total": 17,
   "ready": 12,
@@ -563,8 +563,22 @@
     "image_binary_embedded": false,
     "image_restore_policy": "text_and_settings_restore; uploaded_image_files_must_be_selected_again"
   },
+  "shared_project_package": {
+    "version": "V1.1.0_20260829",
+    "tool_count": 12,
+    "filename_pattern": "{card_category}-{title}-{state}.{ext}",
+    "brand_prefix_in_filename": false,
+    "state_source": "current_tool_variant_or_status",
+    "formats": [
+      "png",
+      "json",
+      "zip"
+    ],
+    "same_title_variant_safe": true,
+    "legacy_json_compatible": true
+  },
   "shared_batch_render": {
-    "version": "V1.0.0_20260828",
+    "version": "V1.1.0_20260829",
     "mode": "same_tool_json_zip_to_png_zip",
     "max_files": 20,
     "max_total_bytes": 209715200,
@@ -576,7 +590,7 @@
     "stop_supported": true
   },
   "shared_ai_json_guide": {
-    "version": "V1.0.1_20260828",
+    "version": "V1.0.2_20260829",
     "tool_count": 12,
     "placement": "same_right_column_directly_below_preview",
     "copy_full_ai_prompt": true,

@@ -1,13 +1,13 @@
-/* O-Ne shared AI JSON format guide — V1.0.1 */
+/* O-Ne shared AI JSON format guide — V1.0.2 */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.0.1';
+  var VERSION = '1.0.2';
   var mounted = Object.create(null);
 
   var GUIDES = {
     'general-card': {
-      name: '一般卡', code: 'GENERAL-CARD', version: 'V1.2.1', file: 'O-Ne_一般卡_卡片標題.json',
+      name: '一般卡', code: 'GENERAL-CARD', version: 'V1.2.1', file: '一般卡-卡片標題-HERE.json',
       values: ['mode：HERE／GET／COST／CUSTOM', 'HERE=地點定位；GET=獲得；COST=花費；CUSTOM=自訂標籤'],
       example: {
         component_id: 'HERE-01', mapping_status: 'MAPPED', generator_version: 'V1.2.1_20260826', panel_fill_opacity: 0.8,
@@ -16,7 +16,7 @@
       }
     },
     'trigger-card': {
-      name: '觸發卡', code: 'TRIGGER-CARD', version: 'V1.0.2', file: 'O-Ne_觸發卡_卡片標題.json',
+      name: '觸發卡', code: 'TRIGGER-CARD', version: 'V1.0.2', file: '觸發卡-卡片標題-事件.json',
       values: ['component_id 固定 TRIGGER-CARD', 'state：EVENT／DONE／FAIL', 'progress 例如 0/1、1/1'],
       example: {
         component_id: 'TRIGGER-CARD', master_psd_id: '10sd-QP_W3YqYksm1cVGYhaAqLbppjBJY', generator_version: 'V1.0.2_20260826', panel_fill_opacity: 0.8,
@@ -24,7 +24,7 @@
       }
     },
     'persistent-card': {
-      name: '常駐卡', code: 'PERSISTENT-MISSION', version: 'V1.1.2', file: 'O-Ne_常駐卡_任務標題.json',
+      name: '常駐卡', code: 'PERSISTENT-MISSION', version: 'V1.1.2', file: '常駐卡-任務標題-任務中.json',
       values: ['component_id 固定 PERSISTENT-MISSION', 'tool 固定 persistent-card', 'state：MISSION／DONE／FAIL', '字級為數字，font_size_mode 固定 manual'],
       example: {
         component_id: 'PERSISTENT-MISSION', tool: 'persistent-card', schema_version: '1.2', master_psd_id: '1VMBCecO8QLuwtSMxy-BplfUa2Ybr3YDU',
@@ -33,7 +33,7 @@
       }
     },
     'effect-card': {
-      name: '效果卡', code: 'STA-02', version: 'V0.3.1', file: 'O-Ne_效果卡_效果標題.json',
+      name: '效果卡', code: 'STA-02', version: 'V0.3.1', file: '效果卡-效果標題-可愛.json',
       values: [
         'schema 固定以 o-ne.effect-card.formal. 開頭', 'state 建議 BUFF／DEBUFF',
         'text_style：white／accent／gold；decoration_density：light／standard',
@@ -47,7 +47,7 @@
       }
     },
     'move-card': {
-      name: '移動卡', code: 'NAV-01', version: 'V1.0.7', file: 'O-Ne_移動卡_起點到終點.json',
+      name: '移動卡', code: 'NAV-01', version: 'V1.0.7', file: '移動卡-起點到終點-白色.json',
       values: ['component_id 固定 NAV-01', 'state：white／orange', 'stations 必須 2–8 站', 'segments 數量必須等於 stations 數量 − 1', 'segment.style：solid／dashed'],
       example: {
         component_id: 'NAV-01', generator_version: 'V1.0.7_20260826', panel_fill_opacity: 0.8, title: '一蘭 → 關西機場', state: 'white',
@@ -58,7 +58,7 @@
       }
     },
     'choice-card': {
-      name: '選項卡', code: 'SELECT-CARD', version: 'V1.0.1', file: 'O-Ne_選項卡_問題標題.json',
+      name: '選項卡', code: 'SELECT-CARD', version: 'V1.0.1', file: '選項卡-問題標題-高亮選項.json',
       values: ['component_id 固定 SELECT-CARD', 'options 每項要有 index、text、state', 'option.state：BRIGHT／DIM；可以同時多項 BRIGHT'],
       example: {
         component_id: 'SELECT-CARD', generator_version: 'V1.0.1_20260826', master_psd_id: '1wYnhZVvoQMl4hn1W7msw_oh3k-RqbHca',
@@ -67,7 +67,7 @@
       }
     },
     'challenge-card': {
-      name: '挑戰卡', code: 'CHALLENGE-CARD', version: 'V0.1.1', file: 'O-Ne_挑戰卡_挑戰標題.json',
+      name: '挑戰卡', code: 'CHALLENGE-CARD', version: 'V0.1.1', file: '挑戰卡-挑戰標題-接受-YES.json',
       values: ['schema 固定 o-ne.challenge-card.ready.v0.1.1', 'mode：accept／abandon', 'selected：yes／no', 'copy.prefix／emphasis／suffix 與 YES／NO 按鈕文字可替換'],
       example: {
         schema: 'o-ne.challenge-card.ready.v0.1.1', status: 'READY', generator_version: 'V0.1.1_20260826', approved_by: 'Omi', approved_on: '2026-08-21',
@@ -77,7 +77,7 @@
       }
     },
     'dialogue-card': {
-      name: '對話卡', code: 'DIALOGUE-CARD', version: 'V1.3.7', file: 'O-Ne_對話卡_對話摘要.json',
+      name: '對話卡', code: 'DIALOGUE-CARD', version: 'V1.3.7', file: '對話卡-對話摘要-Omi疑惑-涅特無奈.json',
       values: ['component_id 固定 DIALOGUE-CARD', 'character：NONE／Omi／NieTe／Kuma／Nomi／NPC', '表情：大笑／驚訝／生氣／委屈哭／疑惑／無奈（NPC 不使用頭像表情）', 'left／right 都要保留 character、expression、name'],
       example: {
         component_id: 'DIALOGUE-CARD', generator_version: 'V1.3.7_20260826',
@@ -86,7 +86,7 @@
       }
     },
     'rating-card': {
-      name: '評分卡', code: 'COL-02', version: 'V1.3.1', file: 'O-Ne_評分卡_店家或商品名稱.json', image: true,
+      name: '評分卡', code: 'COL-02', version: 'V1.3.1', file: '評分卡-店家或商品名稱-評分4.5.json', image: true,
       values: ['component_id 固定 COL-02；schema 以 o-ne.rating-card.ready. 開頭', 'ratings 1–8 項；type=score 時填 score，type=text 時填 result', 'layout.mode：left／right／both／none', 'JSON 不含圖片位元；要連商品圖／背景一起交付請使用 O-Ne 專案 ZIP'],
       example: {
         schema: 'o-ne.rating-card.ready.v1.3.1', status: 'READY', component_id: 'COL-02', generator_version: 'V1.3.1_20260826',
@@ -97,7 +97,7 @@
       }
     },
     'focus-card': {
-      name: '焦點／說明內容卡', code: 'FOCUS-CARD', version: 'V0.5.12', file: 'O-Ne_焦點卡_卡片標題.json', image: true,
+      name: '焦點／說明內容卡', code: 'FOCUS-CARD', version: 'V0.5.12', file: '焦點卡-卡片標題-步驟-含字.json', image: true,
       values: ['schema 固定 o-ne.focus-card.ready.v0.5.11', 'mode：body／list／steps', 'body 模式 content 使用 body；list／steps 模式改用 items 陣列', 'titleColor：highlight／light；itemFrameStates：none／focus／idle', 'JSON 不含圖片位元；有商品圖請用 O-Ne 專案 ZIP'],
       example: {
         schema: 'o-ne.focus-card.ready.v0.5.11', status: 'READY', mode: 'body', component: { placement: 'centerLower' },
@@ -108,7 +108,7 @@
       }
     },
     'thumbnail-frame': {
-      name: '縮圖品牌框', code: 'THUMBNAIL-FRAME', version: 'V1.2.6', file: 'O-Ne_縮圖品牌框_封面名稱.json', image: true,
+      name: '縮圖品牌框', code: 'THUMBNAIL-FRAME', version: 'V1.2.6', file: '縮圖品牌框-封面名稱-含底圖.json', image: true,
       values: ['component_id 固定 THUMBNAIL-FRAME；schema 以 o-ne.thumbnail-frame.ready. 開頭', 'source_image.mode：cover／contain', 'corner.content：logo／text／image／none', 'corner.position：top-left／top-right／bottom-left／bottom-right', 'JSON 不含底圖或自訂角標圖片；完整交付請用 O-Ne 專案 ZIP'],
       example: {
         schema: 'o-ne.thumbnail-frame.ready.v1.2.6', status: 'READY', component_id: 'THUMBNAIL-FRAME', generator_version: 'V1.2.6_20260826', canvas: [1920, 1080],
@@ -117,7 +117,7 @@
       }
     },
     'settlement-card': {
-      name: '片尾結算卡', code: 'QST-03', version: 'V0.1.3', file: 'O-Ne_片尾結算卡_章節標題.json', image: true,
+      name: '片尾結算卡', code: 'QST-03', version: 'V0.1.3', file: '片尾結算卡-章節標題-提問.json', image: true,
       values: ['component_id 固定 QST-03；schema 固定 o-ne.settlement-card.ready.v0.1.3', 'rows 支援 1–8 列', 'row.icon 可用 check／list／location／star／plus／money／count／time／question／heart／none／custom', 'left_panel.mode 可使用 question／image／empty（依工具當前選項）', 'JSON 不含使用者上傳圖片；完整交付請用 O-Ne 專案 ZIP'],
       example: {
         schema: 'o-ne.settlement-card.ready.v0.1.3', status: 'READY', generator_version: '0.1.3', component_id: 'QST-03', semantic_id: 'settlement_panel_16x9',

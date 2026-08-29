@@ -32,12 +32,14 @@ vm.runInContext(guideSource, context, { filename: 'ai-json-guide-v1.js' });
 
 const guide = context.ONEAIJsonGuide;
 assert(guide, 'AI JSON guide must load');
-assert.strictEqual(guide.version, '1.0.1');
+assert.strictEqual(guide.version, '1.0.2');
 const ids = ['general-card','trigger-card','persistent-card','effect-card','move-card','choice-card','challenge-card','dialogue-card','rating-card','focus-card','thumbnail-frame','settlement-card'];
 assert.deepStrictEqual(Object.keys(guide.guides), ids);
 for (const id of ids) {
   const item = guide.guides[id];
   assert(item.name && item.file && item.example && Array.isArray(item.values), id + ' guide is incomplete');
+  assert(!item.file.startsWith('O-Ne'), id + ' suggested filename must omit O-Ne prefix');
+  assert(item.file.split('-').length >= 3, id + ' suggested filename must use category-title-state pattern');
   assert.doesNotThrow(() => JSON.stringify(item.example));
   const prompt = guide.prompt(id);
   assert(prompt.includes('UTF-8 的 .json 檔'), id + ' prompt must request a JSON file');
@@ -69,6 +71,6 @@ assert(guideSource.includes('directPreviewPanel(host)'), 'placement must resolve
 assert(!guideSource.includes('one-ai-json-guide-row'), 'guide must not create a separate full-width row outside the preview column');
 assert(guideSource.includes('ONEEditBackup.__aiJsonGuideWrapped'), 'shared edit-backup tools must mount the AI guide');
 assert(guideSource.includes('ONEProjectPackage.__aiJsonGuideWrapped'), 'persistent/project-package path must mount the AI guide');
-assert(packageSource.includes('ai-json-guide-v1.js?v=101'), 'project package must synchronously load the cache-busted AI JSON guide');
+assert(packageSource.includes('ai-json-guide-v1.js?v=102'), 'project package must synchronously load the cache-busted AI JSON guide');
 new Function(guideSource);
 console.log('PASS: 12 AI JSON schemas, raw JSON handoff instructions, image ZIP notes, right-column placement contract and syntax.');

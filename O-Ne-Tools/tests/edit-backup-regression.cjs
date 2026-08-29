@@ -128,7 +128,7 @@ const tools = [
 
 for (const [file, id, version] of tools) {
   const html = fs.readFileSync(path.join(root, file), 'utf8');
-  assert(html.includes('edit-backup-v1.js?v=120'), file + ' must load the manual-by-default shared backup library');
+  assert(html.includes('edit-backup-v1.js?v=121'), file + ' must load the manual-by-default shared backup library');
   const implementation = file === 'settlement-card.html'
     ? fs.readFileSync(path.join(root, 'settlement-card-v011.js'), 'utf8')
     : html;
@@ -167,7 +167,7 @@ for (const file of ['edit-backup-v1.js', 'settlement-card-v011.js']) {
 assert.deepStrictEqual(syntaxFailures, []);
 
 const registry = JSON.parse(fs.readFileSync(path.join(root, 'one-tools-registry-v1.json'), 'utf8'));
-assert.strictEqual(registry.version, 'V2.20_20260828');
+assert.strictEqual(registry.version, 'V2.21_20260829');
 assert.strictEqual(registry.total, 17);
 assert.strictEqual(registry.ready, 12);
 assert.strictEqual(registry.candidate, 0);
@@ -179,14 +179,18 @@ for (const id of registryIds) {
     assert(entry.features.includes(feature), id + ' missing ' + feature);
   }
 }
-assert.strictEqual(registry.shared_ai_json_guide.version, 'V1.0.1_20260828');
+assert.strictEqual(registry.shared_ai_json_guide.version, 'V1.0.2_20260829');
 assert.strictEqual(registry.shared_ai_json_guide.tool_count, 12);
 assert.strictEqual(registry.shared_ai_json_guide.raw_json_only_instruction, true);
 assert.strictEqual(registry.shared_ai_json_guide.placement, 'same_right_column_directly_below_preview');
 assert.strictEqual(registry.shared_ai_json_guide.left_controls_untouched, true);
-assert.strictEqual(registry.shared_batch_render.version, 'V1.0.0_20260828');
+assert.strictEqual(registry.shared_batch_render.version, 'V1.1.0_20260829');
 assert.strictEqual(registry.shared_batch_render.max_files, 20);
 assert.strictEqual(registry.shared_batch_render.image_tool_json_policy, 'zip_project_package_required');
+assert.strictEqual(registry.shared_project_package.version, 'V1.1.0_20260829');
+assert.strictEqual(registry.shared_project_package.filename_pattern, '{card_category}-{title}-{state}.{ext}');
+assert.strictEqual(registry.shared_project_package.brand_prefix_in_filename, false);
+assert.strictEqual(registry.shared_project_package.same_title_variant_safe, true);
 assert.strictEqual(registry.shared_edit_backup.history_limit, 5);
 assert.strictEqual(registry.shared_edit_backup.max_json_bytes, 1048576);
 assert.strictEqual(registry.shared_edit_backup.version, 'V1.2.0_20260827');

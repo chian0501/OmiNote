@@ -1,8 +1,8 @@
-/* O-Ne shared same-tool batch renderer — V1.0.0 */
+/* O-Ne shared same-tool batch renderer — V1.1.0 */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.0.0';
+  var VERSION = '1.1.0';
   var MAX_BATCH_FILES = 20;
   var MAX_BATCH_BYTES = 200 * 1024 * 1024;
   var WORKER_PARAM = '__one_batch_worker';
@@ -57,18 +57,10 @@
     ]);
     return cleanPart(value || fallback || '未命名', '未命名');
   }
-  function variantFromSnapshot(id, snapshot) {
-    var value = '';
-    if (id === 'move-card') value = snapshot && snapshot.previewState;
-    else if (id === 'persistent-card') value = snapshot && snapshot.state;
-    else if (snapshot && typeof snapshot.state === 'string') value = snapshot.state;
-    else if (snapshot && snapshot.fields && snapshot.fields.state) value = snapshot.fields.state.value;
-    value = String(value || '').replace(/!/g, '').toUpperCase();
-    return ['WHITE','ORANGE','MISSION','DONE','FAIL','YES','NO','ACCEPT','ABANDON'].indexOf(value) >= 0 ? '_' + value : '';
-  }
-  function outputName(adapter, snapshot, title) {
-    var base = 'O-Ne_' + toolName(adapter.id) + '_' + cleanPart(title || inferTitle(adapter, snapshot), '未命名');
-    return cleanPart(base, 'O-Ne_' + toolName(adapter.id) + '_未命名') + variantFromSnapshot(adapter.id, snapshot) + '.png';
+  function outputName(adapter, snapshot, title, status) {
+    var resolvedTitle = cleanPart(title || inferTitle(adapter, snapshot), '未命名');
+    var resolvedStatus = cleanPart(status || helper().statusFromSnapshot(adapter.id, snapshot || {}, ''), '標準');
+    return helper().buildBaseName(adapter.id, resolvedTitle, resolvedStatus) + '.png';
   }
   function uniqueName(name, used) {
     if (!used[name]) { used[name] = 1; return name; }
@@ -76,8 +68,8 @@
     var base = dot >= 0 ? name.slice(0, dot) : name;
     var ext = dot >= 0 ? name.slice(dot) : '';
     var n = ++used[name];
-    var candidate = base + '_' + String(n).padStart(2, '0') + ext;
-    while (used[candidate]) { n++; candidate = base + '_' + String(n).padStart(2, '0') + ext; }
+    var candidate = base + '-' + String(n).padStart(2, '0') + ext;
+    while (used[candidate]) { n++; candidate = base + '-' + String(n).padStart(2, '0') + ext; }
     used[candidate] = 1;
     return candidate;
   }
@@ -288,6 +280,7 @@
     var ext = extension(file && file.name);
     var snapshot;
     var title;
+    var status;
     if (ext === 'json') {
       if (adapter.imageNote) throw new Error('圖片型工具請使用 ZIP 專案包批次輸出。');
       var parsed = JSON.parse(await file.text());
@@ -303,10 +296,11 @@
       if (!project || project.schema !== 'o-ne.project-package.v1' || project.tool_id !== adapter.id) throw new Error('專案包卡種不符。');
       snapshot = project.data;
       title = cleanPart(project.title || inferTitle(adapter, snapshot), '未命名');
+      status = cleanPart(project.status || helper().statusFromSnapshot(adapter.id, snapshot, ''), '標準');
       await applyProject(adapter, project, entries);
     } else throw new Error('只接受 JSON 或 ZIP。');
     var blob = await canvasBlob(adapter);
-    return { blob: blob, filename: outputName(adapter, snapshot, title) };
+    return { blob: blob, filename: outputName(adapter, snapshot, title, status) };
   }
 
   function ensureStyles() {
@@ -454,7 +448,7 @@
           var filename;
           var bytes;
           if (item.kind === 'zip' && item.directPngBytes) {
-            filename = outputName(instance.adapter, item.project.data, item.title);
+            filename = outputName(instance.adapter, item.project.data, item.title, item.project.status);
             bytes = item.directPngBytes;
           } else {
             var rendered = await renderViaWorker(instance, item.file);
@@ -473,7 +467,9 @@
       }
       if (!outputs.length) throw new Error(instance.abort ? '批次已停止，沒有完成的 PNG。' : '沒有成功產生 PNG。');
       var zip = await helper().makeZip(outputs);
-      var name = cleanPart('O-Ne_' + toolName(instance.adapter.id) + '_批次輸出_' + todayStamp(), 'O-Ne_批次輸出_' + todayStamp()) + '.zip';
+      var name = [toolName(instance.adapter.id), '批次輸出', todayStamp()].map(function (part) {
+        return cleanPart(part, '未命名');
+      }).join('-') + '.zip';
       var url = URL.createObjectURL(zip);
       var a = document.createElement('a');
       a.href = url;

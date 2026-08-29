@@ -91,6 +91,7 @@ function makeRuntime(script, sharedStorage = new Map()) {
   };
   const document = {
     getElementById(id) { return ids[id]; },
+    querySelectorAll() { return [null, null]; },
     createElement(tag) {
       const element = new FakeElement(tag);
       if (tag === 'a') element.click = () => downloads.push(element.download);
@@ -110,7 +111,8 @@ function makeRuntime(script, sharedStorage = new Map()) {
     setTimeout,
     clearTimeout,
     URL: { createObjectURL: () => 'blob:test', revokeObjectURL() {} },
-    confirm: () => true
+    confirm: () => true,
+    ONEProjectPackage: { mount() { return {}; } }
   };
   context.window = context;
   vm.createContext(context);
