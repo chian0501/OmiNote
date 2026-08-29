@@ -97,7 +97,7 @@
       }
     },
     'focus-card': {
-      name: '焦點／說明內容卡', code: 'FOCUS-CARD', version: 'V0.5.11', file: 'O-Ne_焦點卡_卡片標題.json', image: true,
+      name: '焦點／說明內容卡', code: 'FOCUS-CARD', version: 'V0.5.12', file: 'O-Ne_焦點卡_卡片標題.json', image: true,
       values: ['schema 固定 o-ne.focus-card.ready.v0.5.11', 'mode：body／list／steps', 'body 模式 content 使用 body；list／steps 模式改用 items 陣列', 'titleColor：highlight／light；itemFrameStates：none／focus／idle', 'JSON 不含圖片位元；有商品圖請用 O-Ne 專案 ZIP'],
       example: {
         schema: 'o-ne.focus-card.ready.v0.5.11', status: 'READY', mode: 'body', component: { placement: 'centerLower' },
