@@ -121,14 +121,14 @@ const tools = [
   ['challenge-card.html', 'challenge-card', 'V0.1.1'],
   ['dialogue-card-v135.html', 'dialogue-card', 'V1.3.7'],
   ['rating-card.html', 'rating-card', 'V1.3.1'],
-  ['focus-card.html', 'focus-card', 'V0.5.13'],
+  ['focus-card.html', 'focus-card', 'V0.5.14'],
   ['thumbnail-frame.html', 'thumbnail-frame', 'V1.2.6'],
   ['settlement-card.html', 'settlement-card', 'V0.1.3']
 ];
 
 for (const [file, id, version] of tools) {
   const html = fs.readFileSync(path.join(root, file), 'utf8');
-  assert(html.includes(file === 'focus-card.html' ? 'edit-backup-v1.js?v=1213' : 'edit-backup-v1.js?v=121'), file + ' must load the manual-by-default shared backup library');
+  assert(html.includes(file === 'focus-card.html' ? 'edit-backup-v1.js?v=1214' : 'edit-backup-v1.js?v=121'), file + ' must load the manual-by-default shared backup library');
   const implementation = file === 'settlement-card.html'
     ? fs.readFileSync(path.join(root, 'settlement-card-v011.js'), 'utf8')
     : html;
@@ -167,7 +167,7 @@ for (const file of ['edit-backup-v1.js', 'settlement-card-v011.js']) {
 assert.deepStrictEqual(syntaxFailures, []);
 
 const registry = JSON.parse(fs.readFileSync(path.join(root, 'one-tools-registry-v1.json'), 'utf8'));
-assert.strictEqual(registry.version, 'V2.21_20260829');
+assert.strictEqual(registry.version, 'V2.22_20260829');
 assert.strictEqual(registry.total, 17);
 assert.strictEqual(registry.ready, 12);
 assert.strictEqual(registry.candidate, 0);
@@ -179,7 +179,7 @@ for (const id of registryIds) {
     assert(entry.features.includes(feature), id + ' missing ' + feature);
   }
 }
-assert.strictEqual(registry.shared_ai_json_guide.version, 'V1.0.2_20260829');
+assert.strictEqual(registry.shared_ai_json_guide.version, 'V1.0.3_20260829');
 assert.strictEqual(registry.shared_ai_json_guide.tool_count, 12);
 assert.strictEqual(registry.shared_ai_json_guide.raw_json_only_instruction, true);
 assert.strictEqual(registry.shared_ai_json_guide.placement, 'same_right_column_directly_below_preview');

@@ -1,5 +1,5 @@
 {
-  "version": "V2.21_20260829",
+  "version": "V2.22_20260829",
   "principle": "one_function_one_entry",
   "total": 17,
   "ready": 12,
@@ -366,9 +366,9 @@
       "name": "焦點內容卡",
       "family": "READY｜焦點／說明共用",
       "group": "資訊／閱讀",
-      "desc": "一般內文／項目／步驟；圖片可完整顯示或 16:9 線上裁切，支援拖曳、100–300% 縮放與左右獨立定位",
+      "desc": "一般內文／項目／步驟；圖片可完整顯示、固定 16:9 或自由拉框裁切，支援拖邊角、移動選取範圍與左右獨立設定",
       "status": "ready",
-      "href": "./focus-card.html?v=0513&build=online-crop-v1",
+      "href": "./focus-card.html?v=0514&build=free-crop-v1",
       "features": [
         "body_list_steps_modes",
         "up_to_8_rows",
@@ -399,13 +399,16 @@
         "image_crop_contain_or_16_9_cover",
         "image_crop_drag_position",
         "image_crop_zoom_100_to_300_percent",
+        "image_free_crop_resizable_edges_and_corners",
+        "image_free_crop_move_selection",
+        "image_free_crop_variable_aspect_ratio",
         "independent_left_right_crop",
         "crop_settings_in_history_json_and_project_zip",
         "finite_list_and_steps_auto_height",
         "same_tool_batch_render",
         "ai_json_schema_guide"
       ],
-      "generator_version": "V0.5.13_20260829",
+      "generator_version": "V0.5.14_20260829",
       "visual_status": "READY",
       "formal_replacement": false,
       "panel_fill_opacity": 0.8,
@@ -595,7 +598,7 @@
     "stop_supported": true
   },
   "shared_ai_json_guide": {
-    "version": "V1.0.2_20260829",
+    "version": "V1.0.3_20260829",
     "tool_count": 12,
     "placement": "same_right_column_directly_below_preview",
     "copy_full_ai_prompt": true,

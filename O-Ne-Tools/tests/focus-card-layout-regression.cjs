@@ -16,9 +16,9 @@ vm.runInNewContext(
   'function Zh(value,min,max){return Math.min(max,Math.max(min,value))}' +
   source.slice(start, end) +
   ';this.__focusLayout={' +
-    'FOCUS_TEXT_LIMITS,FOCUS_LABEL_METRICS,FOCUS_TYPE_METRICS,FOCUS_CROP_ASPECT,' +
+    'FOCUS_TEXT_LIMITS,FOCUS_LABEL_METRICS,FOCUS_TYPE_METRICS,FOCUS_CROP_ASPECT,FOCUS_FREE_CROP_MIN,' +
     'focusTextLength,focusEstimatedLineCount,focusTypography,' +
-    'focusImageLayout,focusCrop,focusImageDisplayHeight,focusImageDrawRect,focusImageHeight,focusVerticalMetrics,focusImageTop,' +
+    'focusImageLayout,focusCrop,focusFreeCropEdit,focusFreeCropAction,focusImageDisplayHeight,focusImageDrawRect,focusImageHeight,focusVerticalMetrics,focusImageTop,' +
     'focusRowMetrics,focusAutoHeight' +
   '};',
   context,
@@ -31,6 +31,7 @@ assert.strictEqual(layout.FOCUS_LABEL_METRICS.regularHeight, 32);
 assert.strictEqual(layout.FOCUS_LABEL_METRICS.titleGap, 24);
 assert.strictEqual(layout.FOCUS_TYPE_METRICS.contentLineHeight, 1.45);
 assert.strictEqual(layout.FOCUS_CROP_ASPECT, 16 / 9);
+assert.strictEqual(layout.FOCUS_FREE_CROP_MIN, 12);
 assert.strictEqual(
   layout.focusEstimatedLineCount('第一行\n\n第二行', 50),
   3,
@@ -122,9 +123,40 @@ const containRect = layout.focusImageDrawRect({ ...cropAsset, fit: 'contain' }, 
 assert.strictEqual(containRect.y, 12, 'complete display must remain anchored to the title-aligned top');
 assert.deepStrictEqual(
   JSON.parse(JSON.stringify(layout.focusCrop({ fit: 'cover', zoom: 999, offsetX: -999, offsetY: 999 }))),
-  { fit: 'cover', zoom: 300, offsetX: -100, offsetY: 100 },
+  { fit: 'cover', zoom: 300, offsetX: -100, offsetY: 100, cropX: 0, cropY: 0, cropWidth: 100, cropHeight: 100 },
   'crop values must be clamped before render and restore'
 );
+
+const freeCropAsset = {
+  enabled: true,
+  element: { naturalWidth: 1600, naturalHeight: 900 },
+  fit: 'free',
+  cropX: 25,
+  cropY: 20,
+  cropWidth: 50,
+  cropHeight: 60
+};
+assert.strictEqual(
+  layout.focusImageDisplayHeight(freeCropAsset, 320),
+  216,
+  'free crop display height must follow the selected source rectangle ratio'
+);
+assert.deepStrictEqual(
+  JSON.parse(JSON.stringify(layout.focusImageDrawRect(freeCropAsset, 0, 12, 320, 216))),
+  { x: 0, y: 12, width: 320, height: 216, sourceX: 400, sourceY: 180, sourceWidth: 800, sourceHeight: 540 },
+  'free crop render must draw only the selected source rectangle'
+);
+assert.deepStrictEqual(
+  JSON.parse(JSON.stringify(layout.focusFreeCropEdit({ fit: 'free' }, 'se', -25, -40))),
+  { fit: 'free', zoom: 100, offsetX: 0, offsetY: 0, cropX: 0, cropY: 0, cropWidth: 75, cropHeight: 60 },
+  'dragging a corner must resize width and height without locking aspect ratio'
+);
+const movedFreeCrop = layout.focusFreeCropEdit({ ...freeCropAsset, element: undefined }, 'move', 40, 40);
+assert.strictEqual(movedFreeCrop.cropX, 50, 'free crop movement must clamp to the right image edge');
+assert.strictEqual(movedFreeCrop.cropY, 40, 'free crop movement must clamp to the bottom image edge');
+assert.strictEqual(layout.focusFreeCropAction(freeCropAsset, 25, 20), 'nw', 'corner hit testing must expose resize handles');
+assert.strictEqual(layout.focusFreeCropAction(freeCropAsset, 50, 50), 'move', 'crop interior must move the selection');
+assert.strictEqual(layout.focusFreeCropAction(freeCropAsset, 2, 2), '', 'outside pointers must not move the crop');
 
 const rows = layout.focusRowMetrics(
   'list',
@@ -172,7 +204,10 @@ assert(!source.includes('const p=f+ht.labelY'), 'renderer must not align the ima
 assert(source.includes('zl&&Kh(s,X.left'), 'renderer must pass the full left image crop state');
 assert(source.includes('cl&&Kh(s,X.right'), 'renderer must pass the full right image crop state');
 assert(source.includes('max:"45"'), 'image control must allow 45% width');
-assert(source.includes('children:"填滿裁切"'), 'image editor must expose fill crop mode');
+assert(source.includes('children:"16:9 裁切"'), 'image editor must keep the fixed 16:9 crop mode');
+assert(source.includes('children:"自由裁切"'), 'image editor must expose free crop mode');
+assert(source.includes('拖框移動・拉邊角縮放'), 'free crop editor must explain direct edge and corner manipulation');
+assert(source.includes('focusFreeCropEdit(H.crop,H.action'), 'free crop pointer movement must update the selected rectangle');
 assert(source.includes('拖曳圖片定位'), 'image editor must expose direct drag positioning');
 assert(source.includes('max:"300"'), 'crop zoom control must reach 300%');
 assert(source.includes('...focusCrop(fl.left)'), 'manual history must capture left crop settings');
@@ -183,6 +218,6 @@ assert(source.includes('q.scale??q.scalePercent'), 'legacy and exported JSON ima
 assert(source.includes('不再自動縮字'));
 assert(source.includes('放大只向下延伸'));
 assert(source.includes('上緣對齊大標題'));
-assert(source.includes('V0.5.13_20260829'));
+assert(source.includes('V0.5.14_20260829'));
 
-console.log('PASS: title-aligned crop, independent positioning, manual type, fixed rhythm, downward growth, and 45% image scaling work.');
+console.log('PASS: title-aligned fixed/free crop, resizable selection, independent positioning, manual type, fixed rhythm, downward growth, and 45% image scaling work.');
