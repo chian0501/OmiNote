@@ -16,9 +16,9 @@ vm.runInNewContext(
   'function Zh(value,min,max){return Math.min(max,Math.max(min,value))}' +
   source.slice(start, end) +
   ';this.__focusLayout={' +
-    'FOCUS_TEXT_LIMITS,FOCUS_LABEL_METRICS,FOCUS_TYPE_METRICS,' +
+    'FOCUS_TEXT_LIMITS,FOCUS_LABEL_METRICS,FOCUS_TYPE_METRICS,FOCUS_CROP_ASPECT,' +
     'focusTextLength,focusEstimatedLineCount,focusTypography,' +
-    'focusImageLayout,focusImageHeight,focusVerticalMetrics,focusImageTop,' +
+    'focusImageLayout,focusCrop,focusImageDisplayHeight,focusImageDrawRect,focusImageHeight,focusVerticalMetrics,focusImageTop,' +
     'focusRowMetrics,focusAutoHeight' +
   '};',
   context,
@@ -30,6 +30,7 @@ assert(layout, 'focus layout helpers must evaluate');
 assert.strictEqual(layout.FOCUS_LABEL_METRICS.regularHeight, 32);
 assert.strictEqual(layout.FOCUS_LABEL_METRICS.titleGap, 24);
 assert.strictEqual(layout.FOCUS_TYPE_METRICS.contentLineHeight, 1.45);
+assert.strictEqual(layout.FOCUS_CROP_ASPECT, 16 / 9);
 assert.strictEqual(
   layout.focusEstimatedLineCount('第一行\n\n第二行', 50),
   3,
@@ -94,6 +95,37 @@ const narrowHeight = layout.focusAutoHeight('body', shortContent, label, style, 
 const largeHeight = layout.focusAutoHeight('body', shortContent, label, style, largeImage, scale);
 assert(largeHeight > narrowHeight + 250, 'larger square images must extend the card downward');
 
+const cropAsset = {
+  enabled: true,
+  element: { naturalWidth: 800, naturalHeight: 800 },
+  fit: 'cover',
+  zoom: 100,
+  offsetX: 0,
+  offsetY: 0
+};
+assert.strictEqual(
+  layout.focusImageDisplayHeight(cropAsset, 320),
+  180,
+  'fill crop must use a stable 16:9 display frame'
+);
+const centeredCrop = layout.focusImageDrawRect(cropAsset, 0, 0, 320, 180);
+assert.deepStrictEqual(
+  JSON.parse(JSON.stringify(centeredCrop)),
+  { x: 0, y: -70, width: 320, height: 320 },
+  'square image must cover and center inside the 16:9 crop frame'
+);
+const bottomCrop = layout.focusImageDrawRect({ ...cropAsset, offsetY: 100 }, 0, 0, 320, 180);
+assert.strictEqual(bottomCrop.y, 0, 'positive vertical position must move the image down without exposing empty space');
+const zoomedCrop = layout.focusImageDrawRect({ ...cropAsset, zoom: 200 }, 0, 0, 320, 180);
+assert.strictEqual(zoomedCrop.width, 640, 'crop zoom must change the actual drawn image size');
+const containRect = layout.focusImageDrawRect({ ...cropAsset, fit: 'contain' }, 0, 12, 320, 320);
+assert.strictEqual(containRect.y, 12, 'complete display must remain anchored to the title-aligned top');
+assert.deepStrictEqual(
+  JSON.parse(JSON.stringify(layout.focusCrop({ fit: 'cover', zoom: 999, offsetX: -999, offsetY: 999 }))),
+  { fit: 'cover', zoom: 300, offsetX: -100, offsetY: 100 },
+  'crop values must be clamped before render and restore'
+);
+
 const rows = layout.focusRowMetrics(
   'list',
   ['短句', '這是一段比較長但不應該自動縮小的項目文字，必要時只需要換行'],
@@ -137,11 +169,20 @@ assert(!source.includes('Ph(s,B.title'), 'title renderer must not auto-shrink');
 assert(source.includes('const p=f+focusImageTop(B,ht)'), 'renderer must use the title-aligned image anchor');
 assert(source.includes('zl=ul?focusImageTop(j,W)+ul+'), 'auto height must use the same title-aligned image anchor');
 assert(!source.includes('const p=f+ht.labelY'), 'renderer must not align the image to the label top');
-assert(source.includes('W=f;s.save()'), 'image drawing must stay top-anchored instead of vertically centered');
+assert(source.includes('zl&&Kh(s,X.left'), 'renderer must pass the full left image crop state');
+assert(source.includes('cl&&Kh(s,X.right'), 'renderer must pass the full right image crop state');
 assert(source.includes('max:"45"'), 'image control must allow 45% width');
+assert(source.includes('children:"填滿裁切"'), 'image editor must expose fill crop mode');
+assert(source.includes('拖曳圖片定位'), 'image editor must expose direct drag positioning');
+assert(source.includes('max:"300"'), 'crop zoom control must reach 300%');
+assert(source.includes('...focusCrop(fl.left)'), 'manual history must capture left crop settings');
+assert(source.includes('...focusCrop(fl.right)'), 'manual history must capture right crop settings');
+assert(source.includes('...focusCrop(q),embeddedInPngOnly'), 'JSON export must include non-destructive crop settings');
+assert(source.includes('...focusCrop(rl[O]),enabled:!0'), 'reselecting an image after JSON import must keep its crop settings');
+assert(source.includes('q.scale??q.scalePercent'), 'legacy and exported JSON image width keys must both restore');
 assert(source.includes('不再自動縮字'));
 assert(source.includes('放大只向下延伸'));
 assert(source.includes('上緣對齊大標題'));
-assert(source.includes('V0.5.12_20260829'));
+assert(source.includes('V0.5.13_20260829'));
 
-console.log('PASS: title-aligned image top, manual type, fixed rhythm, downward growth, and 45% image scaling work.');
+console.log('PASS: title-aligned crop, independent positioning, manual type, fixed rhythm, downward growth, and 45% image scaling work.');

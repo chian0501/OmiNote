@@ -97,13 +97,13 @@
       }
     },
     'focus-card': {
-      name: '焦點／說明內容卡', code: 'FOCUS-CARD', version: 'V0.5.12', file: '焦點卡-卡片標題-步驟-含字.json', image: true,
-      values: ['schema 固定 o-ne.focus-card.ready.v0.5.11', 'mode：body／list／steps', 'body 模式 content 使用 body；list／steps 模式改用 items 陣列', 'titleColor：highlight／light；itemFrameStates：none／focus／idle', 'JSON 不含圖片位元；有商品圖請用 O-Ne 專案 ZIP'],
+      name: '焦點／說明內容卡', code: 'FOCUS-CARD', version: 'V0.5.13', file: '焦點卡-卡片標題-步驟-含字.json', image: true,
+      values: ['schema 固定 o-ne.focus-card.ready.v0.5.11', 'mode：body／list／steps', 'body 模式 content 使用 body；list／steps 模式改用 items 陣列', 'titleColor：highlight／light；itemFrameStates：none／focus／idle', '圖片 fit：contain／cover；cover 可設 zoom 100–300、offsetX／offsetY -100–100', 'JSON 不含圖片位元；有商品圖請用 O-Ne 專案 ZIP'],
       example: {
         schema: 'o-ne.focus-card.ready.v0.5.11', status: 'READY', mode: 'body', component: { placement: 'centerLower' },
         style: { accentColor: '#29A6A7', cardSize: 'large', customWidth: 882, titleSize: 56, contentSize: 36 },
         label: { enabled: false, text: '', position: 'above', background: '#29A6A7', color: '#FFFFFF' },
-        images: { placement: 'right', scale: 32, left: { enabled: false, name: '' }, right: { enabled: false, name: '' } },
+        images: { placement: 'right', scale: 32, left: { enabled: false, name: '', fit: 'contain', zoom: 100, offsetX: 0, offsetY: 0 }, right: { enabled: false, name: '', fit: 'cover', zoom: 125, offsetX: 0, offsetY: -10 } },
         content: { titleEnabled: true, title: '道頓堀觀光船', titleColor: 'highlight', divider: true, body: '從河面看道頓堀招牌，是另一種視角。', ctaEnabled: false, cta: '', sourceEnabled: false, source: '' }
       }
     },
