@@ -32,7 +32,7 @@ vm.runInContext(guideSource, context, { filename: 'ai-json-guide-v1.js' });
 
 const guide = context.ONEAIJsonGuide;
 assert(guide, 'AI JSON guide must load');
-assert.strictEqual(guide.version, '1.0.2');
+assert.strictEqual(guide.version, '1.0.3');
 const ids = ['general-card','trigger-card','persistent-card','effect-card','move-card','choice-card','challenge-card','dialogue-card','rating-card','focus-card','thumbnail-frame','settlement-card'];
 assert.deepStrictEqual(Object.keys(guide.guides), ids);
 for (const id of ids) {
@@ -53,6 +53,10 @@ assert.strictEqual(guide.example('move-card').component_id, 'NAV-01');
 assert.strictEqual(guide.example('choice-card').component_id, 'SELECT-CARD');
 assert.strictEqual(guide.example('dialogue-card').component_id, 'DIALOGUE-CARD');
 assert.strictEqual(guide.example('rating-card').component_id, 'COL-02');
+assert.strictEqual(guide.guides['focus-card'].version, 'V0.5.14');
+assert.strictEqual(guide.example('focus-card').images.right.fit, 'free');
+assert.strictEqual(guide.example('focus-card').images.right.cropWidth, 76);
+assert(guide.guides['focus-card'].values.some(value => value.includes('cropX／cropY／cropWidth／cropHeight')));
 assert.strictEqual(guide.example('thumbnail-frame').component_id, 'THUMBNAIL-FRAME');
 assert.strictEqual(guide.example('settlement-card').component_id, 'QST-03');
 assert.strictEqual(guide.example('move-card').segments.length, guide.example('move-card').stations.length - 1);
@@ -71,6 +75,6 @@ assert(guideSource.includes('directPreviewPanel(host)'), 'placement must resolve
 assert(!guideSource.includes('one-ai-json-guide-row'), 'guide must not create a separate full-width row outside the preview column');
 assert(guideSource.includes('ONEEditBackup.__aiJsonGuideWrapped'), 'shared edit-backup tools must mount the AI guide');
 assert(guideSource.includes('ONEProjectPackage.__aiJsonGuideWrapped'), 'persistent/project-package path must mount the AI guide');
-assert(packageSource.includes('ai-json-guide-v1.js?v=103'), 'project package must synchronously load the cache-busted AI JSON guide');
+assert(packageSource.includes('ai-json-guide-v1.js?v=104'), 'project package must synchronously load the cache-busted AI JSON guide');
 new Function(guideSource);
 console.log('PASS: 12 AI JSON schemas, raw JSON handoff instructions, image ZIP notes, right-column placement contract and syntax.');
