@@ -1,9 +1,9 @@
 {
-  "version": "V2.22_20260829",
+  "version": "V2.23_20260829",
   "principle": "one_function_one_entry",
-  "total": 17,
+  "total": 18,
   "ready": 12,
-  "candidate": 0,
+  "candidate": 1,
   "ai_bridge": {
     "version": "V1.2_20260807",
     "mode": "chatgpt_pro_manual_json_bridge",
@@ -364,11 +364,11 @@
     {
       "id": "focus",
       "name": "焦點內容卡",
-      "family": "READY｜焦點／說明共用",
+      "family": "READY｜焦點內容",
       "group": "資訊／閱讀",
       "desc": "一般內文／項目／步驟；圖片可完整顯示、固定 16:9 或自由拉框裁切，支援拖邊角、移動選取範圍與左右獨立設定",
       "status": "ready",
-      "href": "./focus-card.html?v=0514&build=free-crop-v1",
+      "href": "./focus-card.html?v=0515&build=measured-autoheight-v1",
       "features": [
         "body_list_steps_modes",
         "up_to_8_rows",
@@ -405,10 +405,12 @@
         "independent_left_right_crop",
         "crop_settings_in_history_json_and_project_zip",
         "finite_list_and_steps_auto_height",
+        "canvas_measured_title_and_row_wrap",
+        "component_preview_grows_with_canvas",
         "same_tool_batch_render",
         "ai_json_schema_guide"
       ],
-      "generator_version": "V0.5.14_20260829",
+      "generator_version": "V0.5.15_20260829",
       "visual_status": "READY",
       "formal_replacement": false,
       "panel_fill_opacity": 0.8,
@@ -418,6 +420,46 @@
         "browser_main_and_portable": "pass_candidate_component_preview",
         "console_errors": 0,
         "focus_layout_regression": "pass"
+      }
+    },
+    {
+      "id": "explanation",
+      "name": "說明卡",
+      "family": "CANDIDATE｜正式說明字卡母版",
+      "group": "資訊／閱讀",
+      "desc": "獨立左圖右文說明卡；標題與 1–8 列依實際換行自動向下加高",
+      "status": "candidate",
+      "href": "./explanation-card.html?v=010&build=official-autoheight-v1",
+      "features": [
+        "official_explanation_card_family",
+        "independent_from_focus_card",
+        "left_image_right_copy",
+        "editable_get_label",
+        "dynamic_rows_1_to_8",
+        "canvas_measured_title_and_row_wrap",
+        "content_driven_downward_auto_height",
+        "image_panel_grows_downward",
+        "image_crop_contain_cover_or_free",
+        "manual_title_and_body_sizes",
+        "transparent_png_and_json_export",
+        "local_edit_history_5",
+        "manual_edit_history_save",
+        "unsaved_edits_not_persisted",
+        "restore_latest_on_load",
+        "json_import_restore",
+        "uploaded_images_reselect_after_restore",
+        "same_tool_batch_render",
+        "ai_json_schema_guide"
+      ],
+      "formal_source_folder": "https://drive.google.com/drive/folders/1pGLi-eFqlS-rfXCUPzzwyVRr-6XrgLH4",
+      "formal_psd_id": "1iqnZcZeTJXfHNZ3S2l9e4bIZ_dmFALbd",
+      "generator_version": "V0.1.0_20260829",
+      "visual_status": "CANDIDATE",
+      "panel_fill_opacity": 0.8,
+      "qa": {
+        "static_parse": "pass",
+        "autoheight_regression": "pass_724_to_1312",
+        "browser_visual": "pass_public_candidate"
       }
     },
     {
@@ -561,6 +603,7 @@
       "dialogue-card",
       "rating-card",
       "focus-card",
+      "explanation-card",
       "thumbnail-frame",
       "settlement-card"
     ],
@@ -573,7 +616,7 @@
   },
   "shared_project_package": {
     "version": "V1.1.0_20260829",
-    "tool_count": 12,
+    "tool_count": 13,
     "filename_pattern": "{card_category}-{title}-{state}.{ext}",
     "brand_prefix_in_filename": false,
     "state_source": "current_tool_variant_or_status",
@@ -598,8 +641,8 @@
     "stop_supported": true
   },
   "shared_ai_json_guide": {
-    "version": "V1.0.3_20260829",
-    "tool_count": 12,
+    "version": "V1.0.4_20260829",
+    "tool_count": 13,
     "placement": "same_right_column_directly_below_preview",
     "copy_full_ai_prompt": true,
     "copy_json_example": true,
