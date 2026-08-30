@@ -6,14 +6,51 @@ const path = require('path');
 const vm = require('vm');
 
 const root = path.join(__dirname, '..');
-const source = fs.readFileSync(path.join(root, 'explanation-card.html'), 'utf8');
-const scriptMatch = source.match(/<script>\s*\(function\(\)\{([\s\S]*?)function drawImage/);
-assert(scriptMatch, 'explanation layout helpers must be present');
+const html = fs.readFileSync(path.join(root, 'explanation-card.html'), 'utf8');
+const css = fs.readFileSync(path.join(root, 'explanation-card-v039.css'), 'utf8');
+const parts = [1, 2, 3, 4, 5].map(number =>
+  fs.readFileSync(path.join(root, `explanation-card-v039-${number}.js`), 'utf8')
+);
+
+for (const [index, source] of parts.entries()) {
+  assert.doesNotThrow(() => new Function(source), `V0.3.9 script part ${index + 1} must parse`);
+}
+assert(html.includes('V0.3.9 READY'), 'page must identify the V0.3.9 ready bundle');
+for (let number = 1; number <= 5; number += 1) {
+  assert(html.includes(`explanation-card-v039-${number}.js?v=039`), `page must load V0.3.9 part ${number}`);
+}
+assert(html.includes('explanation-card-v039.css?v=039'), 'page must load the cache-busted V0.3.9 stylesheet');
+assert(css.includes('.template-btn.is-special'), 'special layout selector must be visually distinct');
+assert(css.includes('body[data-explanation-layout="image-below"]'), 'editor must expose the image-below mode');
+
+class FakeElement {
+  constructor(tagName = 'DIV') {
+    this.tagName = tagName.toUpperCase();
+    this.nodeType = 1;
+    this.childNodes = [];
+    this.children = [];
+    this.style = {};
+    this.attributes = [];
+    this.classList = { toggle() {}, add() {}, remove() {} };
+    this.dataset = {};
+  }
+  set innerHTML(value) {
+    this._innerHTML = String(value || '');
+    const text = this._innerHTML
+      .replace(/<br\s*\/?\s*>/gi, '\n')
+      .replace(/<[^>]*>/g, '')
+      .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
+    this.childNodes = [{ nodeType: 3, nodeValue: text }];
+  }
+  get innerHTML() { return this._innerHTML || ''; }
+  removeAttribute() {}
+  getContext() { return measureContext; }
+}
 
 const measureContext = {
   font: '',
   measureText(text) {
-    const size = Number((this.font.match(/(\d+(?:\.\d+)?)px/) || [0, 31])[1]);
+    const size = Number((this.font.match(/(\d+(?:\.\d+)?)px/) || [0, 29])[1]);
     const width = Array.from(String(text)).reduce((sum, ch) => {
       if (ch === ' ') return sum + size * 0.32;
       if (/[\u3400-\u9fff\u3000-\u303f\uff00-\uffef]/.test(ch)) return sum + size;
@@ -24,59 +61,80 @@ const measureContext = {
     return { width };
   }
 };
-const fakeCanvas = { getContext() { return measureContext; } };
-const context = {
-  document: { getElementById() { return fakeCanvas; } },
-  JSON,
-  Math,
-  Array,
-  String
+
+const fakeCanvas = new FakeElement('canvas');
+const document = {
+  createElement(tag) { return new FakeElement(tag); },
+  getElementById(id) { return /Canvas$/.test(id) ? fakeCanvas : new FakeElement(); }
 };
-vm.runInNewContext(
-  scriptMatch[1] + ';this.__test={CARD_WIDTH,MIN_HEIGHT,defaults,cleanState,wrapText,layoutCard,setState(value){state=value}};',
+const context = { document, window: {}, console, JSON, Math, Array, String, Date };
+vm.createContext(context);
+vm.runInContext(
+  `${parts[0]}\n${parts[2]}\nthis.__test={CARD_WIDTH,MIN_HEIGHT,TEMPLATES,defaults,clone,cleanState,layoutCard,setState(value){state=value},setImage(value){imageElement=value}};`,
   context,
-  { filename: 'explanation-card-layout.js' }
+  { filename: 'explanation-card-v039-layout.js' }
 );
 
 const api = context.__test;
-assert(api, 'explanation card helpers must evaluate');
+assert(api, 'layout test API must evaluate');
 assert.strictEqual(api.CARD_WIDTH, 1552);
 assert.strictEqual(api.MIN_HEIGHT, 724);
-assert.strictEqual(api.wrapText(measureContext, '梅田到 HARUKA｜跟著 5 步走', 360).length >= 2, true, 'mixed title must wrap by measured width');
+assert.strictEqual(Object.keys(api.TEMPLATES).length, 7, 'six existing layouts plus one special layout must be available');
+assert.strictEqual(api.TEMPLATES.imageTitle.layoutMode, 'image-below');
 
-const normal = api.cleanState(api.defaults);
-api.setState(normal);
-const normalLayout = api.layoutCard(measureContext);
-assert.strictEqual(normalLayout.height, 724, 'short official example should retain the formal minimum height');
+api.setImage(null);
+api.setState(api.clone(api.defaults));
+const normal = api.layoutCard(measureContext);
+assert.strictEqual(normal.layoutMode, 'side-by-side');
+assert.strictEqual(normal.imageX, 26);
+assert.strictEqual(normal.imageW, 655, 'existing left-image geometry must stay unchanged');
+assert.strictEqual(normal.textX, 724, 'existing text column must stay unchanged');
+assert.strictEqual(normal.height, 724, 'short existing layouts must retain the formal minimum height');
 
-const long = api.cleanState({
-  ...normal,
-  title: '梅田到 HARUKA｜跟著 5 步走：第一次搭乘也不迷路的完整說明',
-  rows: Array.from({ length: 8 }, (_, index) => ({
-    key: '重點 ' + String(index + 1).padStart(2, '0'),
-    text: '這是一段會依照實際字寬換行的長說明內容，卡片外框、左側圖片與預覽區都必須只向下延伸，不能裁掉最後一行。'
-  }))
-});
-api.setState(long);
-const longLayout = api.layoutCard(measureContext);
-assert(longLayout.height > normalLayout.height + 700, 'eight long rows must materially increase card height');
-const last = longLayout.rowLayouts.at(-1);
-assert(last.y + last.height + 32 <= longLayout.height, 'last explanation row must remain inside the lower border');
-assert.strictEqual(longLayout.imageH, longLayout.height - 60, 'left image panel must grow from its fixed top only toward the bottom');
+const specialState = api.clone(api.defaults);
+specialState.templateId = 'imageTitle';
+specialState.layoutMode = 'image-below';
+specialState.blocks = api.TEMPLATES.imageTitle.make();
+specialState.note = { enabled: true, text: '特殊版型不可輸出提醒框', size: 24, color: '#29A6A7' };
+api.setState(specialState);
+const special = api.layoutCard(measureContext);
+assert.strictEqual(special.layoutMode, 'image-below');
+assert.strictEqual(special.imageX, 26);
+assert.strictEqual(special.imageW, 1500, 'lower image must span the full inner card width');
+assert(special.imageY > special.titleY + special.titleLayout.height, 'lower image must begin after the title');
+assert.strictEqual(special.rows.length, 0, 'special layout must not render body rows');
+assert.strictEqual(special.noteY, null, 'special layout must not render the note box');
+assert.strictEqual(special.height, Math.ceil(special.imageY + special.imageH + 28), 'special layout must grow only from the bottom');
+assert.strictEqual(special.imageH, Math.ceil(special.imageW * 9 / 16), 'cover mode must use a stable 16:9 lower image');
 
-assert(source.includes("id:'explanation-card'"), 'manual history must use an independent tool id');
-assert(source.includes("saveMode:'manual'"), 'history must only save when the user presses the save button');
-assert(source.includes("schema:'o-ne.explanation-card.ready.v0.1.1'"), 'JSON must use the separate explanation-card schema');
-assert(source.includes("height_mode:'canvas-measured-auto'"), 'JSON must disclose measured automatic height');
-assert(source.includes("['contain','cover','free']"), 'image settings must support complete, fill and free crop modes');
-assert(source.includes('next.rows=next.rows.slice(0,MAX_ROWS)'), 'row count must stay bounded at eight');
-assert(source.includes('preview-canvas{display:block;width:94%;max-width:100%;height:auto}'), 'preview canvas must keep its natural auto height');
-assert(!source.includes('focus-card'), 'separate explanation tool must not reuse the focus-card storage or schema id');
+api.setImage({ naturalWidth: 1200, naturalHeight: 900 });
+specialState.image.fit = 'contain';
+api.setState(specialState);
+const fourThree = api.layoutCard(measureContext);
+assert.strictEqual(fourThree.imageH, 1125, 'complete image mode must use the source ratio at full width');
+assert.strictEqual(fourThree.height, Math.ceil(fourThree.imageY + 1125 + 28), 'source ratio must extend the bottom edge');
 
-const scripts = [...source.matchAll(/<script([^>]*)>([\s\S]*?)<\/script>/gi)];
-for (const match of scripts) {
-  if (/\bsrc\s*=/.test(match[1])) continue;
-  assert.doesNotThrow(() => new Function(match[2]), 'inline script must parse');
-}
+specialState.image.fit = 'free';
+specialState.image.cropWidth = 80;
+specialState.image.cropHeight = 40;
+api.setState(specialState);
+const freeCrop = api.layoutCard(measureContext);
+assert.strictEqual(freeCrop.imageH, 563, 'free crop ratio must control the lower image height');
+assert.strictEqual(freeCrop.height, Math.ceil(freeCrop.imageY + freeCrop.imageH + 28));
 
-console.log('PASS: independent official explanation card uses measured downward autoheight, manual history, JSON and three image-fit modes.');
+const restored = api.cleanState({ ...specialState, templateId: 'custom' });
+assert.strictEqual(restored.layoutMode, 'image-below', 'JSON, project and history restoration must retain the special layout');
+const legacy = api.cleanState({ ...api.defaults, templateId: 'imageTitle', layoutMode: undefined, blocks: api.TEMPLATES.imageTitle.make() });
+assert.strictEqual(legacy.layoutMode, 'image-below', 'imageTitle snapshots without an explicit mode must migrate safely');
+
+const exportSource = parts[3];
+assert(exportSource.includes("schema:'o-ne.explanation-card.formal.v0.3.9'"), 'JSON must use the V0.3.9 explanation schema');
+assert(exportSource.includes("layout_modes:['side-by-side','image-below']"), 'JSON metadata must disclose both layout modes');
+assert(exportSource.includes("state.layoutMode==='image-below'?'滿版圖':'RichText'"), 'filenames must distinguish the special layout state');
+assert(exportSource.includes('V0.3.9_20260831'), 'project and JSON metadata must use V0.3.9');
+assert(parts[4].includes("getStatus:s=>s&&s.layoutMode==='image-below'?'滿版圖':'RichText'"), 'shared project filenames must retain the layout state');
+assert(parts[4].includes('fromJSON:fromJSON'), 'shared manual history must retain legacy JSON import mapping');
+assert(parts[1].includes("state.templateId='custom'"), 'editing the title may become custom without changing layoutMode');
+assert(!parts.join('\n').includes('focus-card'), 'separate explanation tool must not reuse focus-card state');
+
+console.log('PASS: Explanation Card V0.3.9 keeps existing layouts and adds a persisted title + full-width lower-image layout with downward autoheight.');

@@ -427,18 +427,21 @@
       "name": "說明卡",
       "family": "正式說明字卡母版",
       "group": "資訊／閱讀",
-      "desc": "獨立左圖右文說明卡；標題與 1–8 列依實際換行自動向下加高",
+      "desc": "Word-lite 說明卡；新增標籤＋標題＋下方滿版圖特殊版型，圖片依比例自動向下加高",
       "status": "ready",
-      "href": "./explanation-card.html?v=011&build=official-autoheight-ready-v1",
+      "href": "./explanation-card.html?v=039&build=title-full-image-v1",
       "features": [
         "official_explanation_card_family",
         "independent_from_focus_card",
         "left_image_right_copy",
+        "label_title_full_width_image_layout",
+        "image_below_title",
         "editable_get_label",
         "dynamic_rows_1_to_8",
         "canvas_measured_title_and_row_wrap",
         "content_driven_downward_auto_height",
         "image_panel_grows_downward",
+        "full_width_image_grows_card_downward",
         "image_crop_contain_cover_or_free",
         "manual_title_and_body_sizes",
         "transparent_png_and_json_export",
@@ -453,13 +456,14 @@
       ],
       "formal_source_folder": "https://drive.google.com/drive/folders/1pGLi-eFqlS-rfXCUPzzwyVRr-6XrgLH4",
       "formal_psd_id": "1iqnZcZeTJXfHNZ3S2l9e4bIZ_dmFALbd",
-      "generator_version": "V0.1.1_20260830",
+      "generator_version": "V0.3.9_20260831",
       "visual_status": "READY",
       "panel_fill_opacity": 0.8,
       "qa": {
         "static_parse": "pass",
-        "autoheight_regression": "pass_724_to_1312",
-        "browser_visual": "pass_public_ready"
+        "autoheight_regression": "pass",
+        "image_below_layout_regression": "pass",
+        "browser_visual": "pending_public_release"
       }
     },
     {

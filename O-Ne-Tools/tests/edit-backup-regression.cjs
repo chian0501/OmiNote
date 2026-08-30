@@ -122,7 +122,7 @@ const tools = [
   ['dialogue-card-v135.html', 'dialogue-card', 'V1.3.7'],
   ['rating-card.html', 'rating-card', 'V1.3.1'],
   ['focus-card.html', 'focus-card', 'V0.5.15'],
-  ['explanation-card.html', 'explanation-card', 'V0.1.1'],
+  ['explanation-card.html', 'explanation-card', 'V0.3.9'],
   ['thumbnail-frame.html', 'thumbnail-frame', 'V1.2.6'],
   ['settlement-card.html', 'settlement-card', 'V0.1.3']
 ];
@@ -133,7 +133,9 @@ for (const [file, id, version] of tools) {
   assert(html.includes(backupVersion), file + ' must load the manual-by-default shared backup library');
   const implementation = file === 'settlement-card.html'
     ? fs.readFileSync(path.join(root, 'settlement-card-v011.js'), 'utf8')
-    : html;
+    : file === 'explanation-card.html'
+      ? html + fs.readFileSync(path.join(root, 'explanation-card-v039-5.js'), 'utf8')
+      : html;
   assert(implementation.includes(`id:'${id}'`) || implementation.includes(`id: '${id}'`) || implementation.includes(`id:"${id}"`), file + ' must mount the correct tool id');
   assert(html.includes(version), file + ' must show the expected version');
   assert(implementation.includes('fromJSON:'), file + ' must define legacy JSON import mapping');
@@ -147,8 +149,9 @@ for (const [file, id] of tools) {
 }
 
 for (const file of ['rating-card.html', 'focus-card.html', 'explanation-card.html', 'thumbnail-frame.html']) {
-  assert(fs.readFileSync(path.join(root, file), 'utf8').includes('imageNote:true') ||
-    fs.readFileSync(path.join(root, file), 'utf8').includes('imageNote:!0'));
+  const implementation = fs.readFileSync(path.join(root, file), 'utf8') +
+    (file === 'explanation-card.html' ? fs.readFileSync(path.join(root, 'explanation-card-v039-5.js'), 'utf8') : '');
+  assert(implementation.includes('imageNote:true') || implementation.includes('imageNote:!0'));
 }
 assert(fs.readFileSync(path.join(root, 'settlement-card-v011.js'), 'utf8').includes('imageNote: true'));
 

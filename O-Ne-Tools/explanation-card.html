@@ -3,19 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>O-Ne 說明卡生成器 V0.3.8 READY</title>
+<title>O-Ne 說明卡生成器 V0.3.9 READY</title>
 
-<link rel="stylesheet" href="./explanation-card-v038.css?v=038">
+<link rel="stylesheet" href="./explanation-card-v039.css?v=039">
 </head>
 <body>
 
 <main class="app-shell">
-<header class="app-header"><a class="back-link" href="./">← 回工具入口</a><div class="header-divider"></div><div class="title-block"><div class="title-line"><h1>O-Ne 說明卡生成器 <span>V0.3.8</span></h1><strong class="badge">READY</strong></div><p>Word-lite：圖片自動高度＋成品即時預覽＋可攜專案檔。專案檔會連同圖片本體與裁切設定一起保存。</p></div><div class="status">Rich Text｜圖片自動高度｜成品即時預覽｜專案檔含圖片</div></header>
+<header class="app-header"><a class="back-link" href="./">← 回工具入口</a><div class="header-divider"></div><div class="title-block"><div class="title-line"><h1>O-Ne 說明卡生成器 <span>V0.3.9</span></h1><strong class="badge">READY</strong></div><p>Word-lite：新增「標題＋滿版圖」特殊版型，圖片置於標題下方並依比例自動向下加高。</p></div><div class="status">Rich Text｜標題＋滿版圖｜圖片自動高度｜專案檔含圖片</div></header>
 <section class="workspace">
 <aside class="editor-panel panel">
 <div class="editor-head"><strong>文字編輯器</strong><small>使用順序只有 3 步：① 選整張內容版型 → ② 在深色成品感文件區改字、反白套格式 → ③ 暫存或下載存檔。圖片改從中央「圖片設定」視窗處理，不再壓縮文字區。</small></div>
 <section class="save-dock"><div class="save-dock-head"><div><strong>③ 暫存／存檔</strong><small>暫存留在這台瀏覽器，最多 5 次；下載 JSON 才是可帶走的存檔。</small></div><span class="save-badge">固定顯示</span></div><div id="quickSaveHost"></div><div class="save-file-actions project-actions"><button class="small-btn save-project-btn" id="exportProject" type="button">下載專案檔（含圖片）</button><button class="small-btn" id="importProjectBtn" type="button">載入專案檔</button><input id="projectInput" type="file" accept="application/json,.onecard,.json" hidden><button class="small-btn save-json-btn" id="exportJson" type="button">僅設定 JSON</button><button class="small-btn" id="resetAll" type="button">重設目前內容</button></div><div class="project-file-note">完整專案檔會保存文字、Rich Text、圖片本體、顯示模式、裁切／縮放／位置；最近 5 次暫存仍為輕量本機快照。</div></section><div class="editor-scroll" id="editorScroll">
-<section class="template-strip"><div class="step-heading"><span class="step-no">①</span><div><b>整張內容版型</b><small>點一下就直接套用。會替換整張文字內容，但圖片與卡片設定保留；需要保留目前版本請先暫存。</small></div><span class="impact-badge">點擊直接套用</span></div><div class="template-buttons" id="templateButtons"></div></section>
+<section class="template-strip"><div class="step-heading"><span class="step-no">①</span><div><b>整張內容版型</b><small>點一下就直接套用。特殊版型「標題＋滿版圖」只輸出標籤、標題與下方圖片；圖片與卡片設定保留，需要保留目前版本請先暫存。</small></div><span class="impact-badge">點擊直接套用</span></div><div class="template-buttons" id="templateButtons"></div></section>
 <div class="word-toolbar" id="wordToolbar"><div class="toolbar-heading"><span class="step-no">②</span><div><b>反白文字格式</b><small>只想改幾個字：先反白，再選常用格式、字級或品牌色。沒有反白時會套整個目前段落。</small></div><button class="image-trigger" id="openImageDrawer" type="button">🖼 圖片設定</button></div>
 <button class="tool-btn" data-cmd="undo" title="復原" type="button">↶</button><button class="tool-btn" data-cmd="redo" title="重做" type="button">↷</button><span class="tool-divider"></span>
 <select class="tool-select style-select" id="stylePreset" title="常用文字格式"><option value="">常用文字格式…</option></select>
@@ -30,18 +30,18 @@
 
 </section>
 </div></aside>
-<div class="preview-stack"><section class="preview-panel panel"><div class="preview-toolbar"><strong>說明卡預覽</strong><span id="dimensionText">1552 × 724px｜自動高度</span></div><div class="canvas-stage"><canvas class="preview-canvas" id="previewCanvas"></canvas></div><footer class="export-bar"><p>透明 PNG；自動高度依 Rich Text 實際字級／換行、段落標記與提醒框計算。</p><div class="export-actions single"><button class="export-button primary" id="exportPng" type="button">輸出說明卡 PNG</button></div></footer></section></div>
+<div class="preview-stack"><section class="preview-panel panel"><div class="preview-toolbar"><strong>說明卡預覽</strong><span id="dimensionText">1552 × 724px｜自動高度</span></div><div class="canvas-stage"><canvas class="preview-canvas" id="previewCanvas"></canvas></div><footer class="export-bar"><p>透明 PNG；一般版型依 Rich Text 與段落計算高度，「標題＋滿版圖」會再依圖片／裁切比例從底部向下加高。</p><div class="export-actions single"><button class="export-button primary" id="exportPng" type="button">輸出說明卡 PNG</button></div></footer></section></div>
 </section>
 <div class="drawer-backdrop" id="imageDrawerBackdrop" hidden></div>
-<aside class="image-drawer" id="imageDrawer" aria-hidden="true" aria-label="左側圖片設定">
-  <div class="drawer-head"><div><strong>左側圖片設定</strong><small>中央視窗處理圖片，不壓縮文字編輯區。自由裁切可直接拉四邊與四角，長寬完全不鎖比例。</small></div><button class="drawer-close" id="closeImageDrawer" type="button" aria-label="關閉圖片設定">×</button></div>
+<aside class="image-drawer" id="imageDrawer" aria-hidden="true" aria-label="圖片設定">
+  <div class="drawer-head"><div><strong id="imageDrawerTitle">左側圖片設定</strong><small id="imageDrawerDescription">中央視窗處理圖片，不壓縮文字編輯區。自由裁切可直接拉四邊與四角，長寬完全不鎖比例。</small></div><button class="drawer-close" id="closeImageDrawer" type="button" aria-label="關閉圖片設定">×</button></div>
   <div class="drawer-scroll">
     <section class="drawer-section"><h3>圖片來源</h3><div class="upload-row"><label class="upload-button">選擇圖片<input accept="image/png,image/jpeg,image/webp" id="explanationImage" type="file"></label><span class="file-name" id="fileName">尚未選擇圖片</span><button class="small-btn" id="removeImage" type="button">移除</button></div><div class="image-summary"><span>目前模式：</span><b id="imageModeLabel">填滿裁切</b></div></section>
     <section class="drawer-section"><h3>顯示方式</h3><div class="crop-tabs"><button data-fit="contain" type="button">完整顯示</button><button data-fit="cover" type="button">填滿裁切</button><button data-fit="free" type="button">自由裁切</button></div><div class="mode-status"><div><strong id="modeStatusTitle">目前已選：填滿裁切</strong><small id="modeStatusHint">可用下方滑桿調整圖片縮放與位置。完成後按右下角「套用圖片設定」。</small></div><span class="mode-badge" id="modeStatusBadge">已選取</span></div><p>自由裁切會顯示完整原圖；青綠裁切框可以自由拉寬、拉高與移動，不鎖成品比例。</p></section>
     <section class="drawer-section"><div class="image-live-wrap"><div class="image-live-head"><strong>成品即時預覽</strong><span id="imageLiveSize">1552 × 724px</span></div><div class="image-live-stage"><canvas class="image-live-canvas" id="imageLivePreview"></canvas></div></div><p>拖裁切框、改縮放或切換顯示方式時，這裡會立即更新；不用關閉圖片設定才看結果。</p></section>
     <section class="drawer-section" id="coverControls"><h3>填滿裁切</h3><label class="field"><span>裁切縮放</span><span class="range-row"><input id="zoom" max="300" min="100" step="1" type="range"><code id="zoomValue"></code></span></label><div class="field-row"><label class="field"><span>水平位置</span><span class="range-row"><input id="offsetX" max="100" min="-100" type="range"><code id="offsetXValue"></code></span></label><label class="field"><span>垂直位置</span><span class="range-row"><input id="offsetY" max="100" min="-100" type="range"><code id="offsetYValue"></code></span></label></div></section>
     <section class="drawer-section" id="freeControls"><h3>自由裁切｜完整原圖裁切框</h3><div id="freePendingGuide" class="placeholder-guide">目前還沒切到 <b>自由裁切</b>。請先點上方「自由裁切」，這裡就會出現裁切框與下方 X／Y／W／H 數值。</div><div id="freeCropActiveArea" hidden><div class="mode-note">青綠框＝最後選取的原圖範圍。拖框內部移動；拖四邊或四角自由改寬高。完全不鎖比例，也不再用「拖圖片＋縮放」模擬裁切。</div><div class="cropper-stage"><canvas class="cropper-canvas" id="cropperCanvas" width="900" height="600"></canvas></div><div class="cropper-status"><span>拖框內＝移動</span><span>拖四邊／四角＝改長寬</span></div></div><div class="crop-selection-readout"><span>X <b id="cropReadX">—</b></span><span>Y <b id="cropReadY">—</b></span><span>W <b id="cropReadW">—</b></span><span>H <b id="cropReadH">—</b></span></div><div class="cropper-actions"><button class="small-btn" id="resetFreeCrop" type="button">重設為整張原圖</button><button class="small-btn" id="centerFreeCrop" type="button">裁切框置中</button></div></section>
-    <section class="drawer-section"><p>完整顯示／自由裁切會依實際圖片比例自動調整左圖高度，必要時整張卡一起往下加長，不再補黑底留邊。只有「填滿裁切」會維持固定框並裁切圖片。JSON 會保存裁切框位置與長寬，但不包含圖片本體。</p></section>
+    <section class="drawer-section"><p>完整顯示／自由裁切會依實際圖片比例自動調整圖片高度，必要時整張卡一起往下加長，不再補黑底留邊。「標題＋滿版圖」會讓圖片橫跨標題下方；只有「填滿裁切」使用固定 16:9 圖框。JSON 會保存版型與裁切設定，但不包含圖片本體。</p></section>
   </div>
   <div class="drawer-footer"><button class="small-btn" id="closeImageFooter" type="button">先回編輯器</button><button class="primary-btn" id="applyImageSettings" type="button">套用圖片設定</button></div>
 </aside>
@@ -52,9 +52,10 @@
 
 
 
-<script src="./explanation-card-v038-1.js?v=038"></script>
-<script src="./explanation-card-v038-2.js?v=038"></script>
-<script src="./explanation-card-v038-3.js?v=038"></script>
-<script src="./explanation-card-v038-4.js?v=038"></script>
-<script src="./explanation-card-v038-5.js?v=038"></script>
+<script src="./edit-backup-v1.js?v=1216"></script>
+<script src="./explanation-card-v039-1.js?v=039"></script>
+<script src="./explanation-card-v039-2.js?v=039"></script>
+<script src="./explanation-card-v039-3.js?v=039"></script>
+<script src="./explanation-card-v039-4.js?v=039"></script>
+<script src="./explanation-card-v039-5.js?v=039"></script>
 </body></html>
