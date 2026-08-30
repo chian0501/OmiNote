@@ -3,367 +3,42 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>O-Ne 選項卡生成器 V1.0.1</title>
-<style>
-*{box-sizing:border-box}
-body{margin:0;min-height:100vh;background:#0e1117;color:#f3efe8;font-family:"Noto Sans TC","Noto Sans CJK TC","Microsoft JhengHei",sans-serif}
-.app{max-width:1420px;margin:auto;padding:26px}
-h1{margin:0 0 8px;font-size:24px}
-.sub{color:#9ea7b3;font-size:13px;line-height:1.7;margin-bottom:22px}
-.grid{display:grid;grid-template-columns:470px 1fr;gap:22px;align-items:start}
-.panel{background:#151a23;border:1px solid #2a3240;border-radius:16px;padding:18px;box-shadow:0 12px 30px rgba(0,0,0,.25)}
-.section-title{font-size:14px;font-weight:800;margin:0 0 12px;color:#f0a8cf}
-.note{font-size:12px;color:#c4cad3;background:#101620;border:1px solid #273244;border-radius:10px;padding:10px 12px;line-height:1.7;margin-bottom:12px}
-label{display:block;font-size:12px;font-weight:700;color:#b9c0ca;margin:12px 0 6px}
-input{width:100%;border:1px solid #394355;border-radius:9px;background:#101620;color:white;padding:10px 11px;font-size:14px;outline:none}
-input:focus{border-color:#29A6A7}
-input.bad{border-color:#FD4537;background:#241415}
-.preview-wrap{min-height:570px;max-height:800px;overflow:auto;display:flex;justify-content:center;align-items:flex-start;background:
-linear-gradient(45deg,#222832 25%,transparent 25%),
-linear-gradient(-45deg,#222832 25%,transparent 25%),
-linear-gradient(45deg,transparent 75%,#222832 75%),
-linear-gradient(-45deg,transparent 75%,#222832 75%);
-background-size:24px 24px;background-position:0 0,0 12px,12px -12px,-12px 0;border-radius:14px;padding:28px 18px}
-canvas{width:min(100%,882px);height:auto;filter:drop-shadow(0 8px 18px rgba(0,0,0,.26))}
-.buttons{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
-button{border:0;border-radius:9px;padding:10px 13px;font-weight:800;cursor:pointer;background:#29A6A7;color:white}
-button.secondary{background:#30394a}
-button.orange{background:#c8791a}
-button.danger{background:#5a3340}
-button.tiny{padding:7px 10px;font-size:12px}
-.status{min-height:22px;margin-top:12px;font-size:12px;color:#8fd4c8;line-height:1.6}
-.status.error{color:#ff7770}
-.listbox{border:1px solid #273244;background:#101620;border-radius:12px;padding:10px;margin-top:12px}
-.item{border:1px solid #2c3545;border-radius:10px;padding:10px;margin-bottom:10px;background:#121925}
-.item:last-child{margin-bottom:0}
-.item-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}
-.item-title{font-size:12px;font-weight:900;color:#dce3ed}
-.item-actions{display:flex;gap:6px}
-.toggle{min-width:68px}
-.toggle.dim{background:#4b443f;color:#fdf3e7}
-.toggle.bright{background:#ffbe37;color:#201914}
-.mini{margin-top:14px;padding:12px;border-radius:10px;background:#101620;color:#aeb7c3;font-size:12px;line-height:1.7}
-.lock{color:#ffcf6d}
-.count{color:#8f99a8;font-size:11px}
-@media(max-width:1050px){.grid{grid-template-columns:1fr}}
-</style>
+<title>O-Ne 選項卡生成器 V1.1.1 CANDIDATE</title>
+<link rel="stylesheet" href="./choice-card-v111.css?v=111">
 </head>
 <body>
-<div class="app"><a class="tool-home-link" href="./" style="min-width:118px;height:44px;display:inline-flex;align-items:center;color:#53ced0;font-size:14px;font-weight:800;text-decoration:none">回工具入口</a>
-<h1>O-Ne 選項卡生成器 <span style="font-size:12px;color:#8c96a5">V1.0.1</span></h1>
-<div class="sub">選項可自由增加／刪除；每一項都有獨立「亮／暗」開關。亮幾個都可以，編號與卡片高度自動調整。</div>
-
-<div class="grid">
-<div class="panel">
-  <div class="section-title">01｜內容輸入</div>
-  <div class="note">
-    <b>亮：</b>黃色底＋深色字。<br>
-    <b>暗：</b>灰咖底＋白字。<br>
-    每個選項獨立控制，不強制只能選中一個。
-  </div>
-
-  <label>主標題</label>
-  <input id="title" value="關西國際機場 (KIX) → 住宿飯店(ホテル京阪 淀屋橋)">
-
-  <label>問題／提示</label>
-  <input id="question" value="選擇的交通工具？">
-
-  <div class="buttons">
-    <button id="addOption">＋ 新增選項</button>
-    <button id="allDim" class="secondary">全部暗</button>
-    <button id="allBright" class="orange">全部亮</button>
-  </div>
-
-  <div class="listbox">
-    <div class="item-head">
-      <div class="item-title">選項設定</div>
-      <div class="count">目前 <span id="count">5</span> 項</div>
+<div class="app">
+  <div class="top"><a class="tool-home-link" href="./">← 回工具入口</a><div class="title-wrap"><h1>O-Ne 選項卡生成器 <span>V1.1.1 CANDIDATE</span></h1><div class="sub">一次輸出「全暗＋每個選項各自亮一次」；可選擇左側圖片，圖片設定沿用說明卡的完整顯示／填滿／自由裁切。</div></div></div>
+  <div class="grid">
+    <div class="panel">
+      <div class="section-title">01｜內容輸入</div>
+      <div class="note"><b>亮：</b>黃色底＋深色字。<br><b>暗：</b>灰咖底＋白字。<br>平常仍可自由亮多個；批次輸出時會自動生成「全暗＋單選亮」完整套圖。</div>
+      <label>主標題</label><input id="title" value="關西國際機場 (KIX) → 住宿飯店(ホテル京阪 淀屋橋)">
+      <label>問題／提示</label><input id="question" value="選擇的交通工具？">
+      <div class="image-summary"><div><strong>左側圖片（選填）</strong><small id="imageName">尚未選擇圖片｜不顯示左圖</small></div><button id="openImage" type="button">🖼 圖片設定</button></div>
+      <div class="buttons"><button id="addOption">＋ 新增選項</button><button id="allDim" class="secondary">全部暗</button><button id="allBright" class="orange">全部亮</button></div>
+      <div class="listbox"><div class="item-head"><div class="item-title">選項設定</div><div class="count">目前 <span id="count">5</span> 項</div></div><div id="optionList"></div></div>
+      <div id="status" class="status">READY｜可輸出透明 PNG</div>
+      <div class="batch-box"><b>一次輸出所有選項狀態</b><small>例如 5 個選項會輸出 6 張：00 全暗、01 選項1亮、02 選項2亮…05 選項5亮。會包成一個 ZIP 下載，不用逐張切換。</small><div class="buttons"><button id="downloadAll">下載全部狀態 ZIP</button><button id="download" class="secondary">只下載目前畫面 PNG</button></div></div>
+      <div class="buttons"><button id="jsonBtn" class="purple">輸出欄位 JSON</button><button id="reset" class="secondary">回復示例</button></div>
+      <div class="mini"><b class="lock">🔒 固定：</b>SELECT 標籤、外框、左紅條、正式亮／暗色。<br><b>可改：</b>主標、問題、選項數量／文字／亮暗、左圖及裁切設定。<br>加左圖時輸出會自動轉成寬版 SELECT；沒有圖時維持原本 882px 寬版。</div>
     </div>
-    <div id="optionList"></div>
-  </div>
-
-  <div id="status" class="status">READY｜可輸出透明 PNG</div>
-
-  <div class="buttons">
-    <button id="download">輸出透明 PNG</button>
-    <button id="jsonBtn" class="secondary">輸出欄位 JSON</button>
-    <button id="reset" class="secondary">回復示例</button>
-  </div>
-
-  <div class="mini">
-    <b class="lock">🔒 固定不改：</b>SELECT 標籤、外框、左紅條、選項框形狀、正式亮／暗色彩。<br>
-    <b>可改：</b>主標、問題、選項數量、每項文字、每項亮／暗。<br>
-    選項增減後會自動重新編號，輸出高度會跟著內容自動變化。
+    <div class="panel"><div class="section-title">02｜正式母版即時預覽</div><div class="preview-wrap"><canvas id="c" width="882" height="678"></canvas></div></div>
   </div>
 </div>
-
-<div class="panel">
-  <div class="section-title">02｜正式母版即時預覽</div>
-  <div class="preview-wrap">
-    <canvas id="c" width="882" height="678"></canvas>
+<div id="modalBackdrop" class="modal-backdrop" hidden></div>
+<div id="imageModal" class="image-modal" aria-hidden="true">
+  <div class="modal-head"><div><h2>左側圖片設定</h2><p>圖片會套進每一張批次輸出圖。自由裁切可直接拖框、拉四邊或四角。</p></div><button id="closeImage" class="secondary">×</button></div>
+  <div class="modal-body">
+    <section class="modal-section"><h3>圖片來源</h3><div class="image-source"><input id="imageInput" type="file" accept="image/png,image/jpeg,image/webp" hidden><button id="pickImage">選擇圖片</button><span id="modalFileName">尚未選擇圖片</span><button id="removeImage" class="danger">移除</button></div></section>
+    <section class="modal-section"><h3>顯示方式</h3><div class="mode-row"><button data-fit="contain">完整顯示</button><button data-fit="cover">填滿裁切</button><button data-fit="free">自由裁切</button></div></section>
+    <section id="coverControls" class="modal-section"><h3>填滿裁切</h3><div class="cover-controls"><label>縮放 <input id="zoom" type="range" min="100" max="300" value="100"></label><label>水平位置 <input id="offsetX" type="range" min="-100" max="100" value="0"></label><label>垂直位置 <input id="offsetY" type="range" min="-100" max="100" value="0"></label></div></section>
+    <section id="freeControls" class="modal-section"><h3>自由裁切｜原圖裁切框</h3><div class="crop-stage"><canvas id="cropCanvas" width="900" height="560"></canvas></div><div class="readout"><span>X <b id="rx">0%</b></span><span>Y <b id="ry">0%</b></span><span>W <b id="rw">100%</b></span><span>H <b id="rh">100%</b></span></div><div class="buttons"><button id="resetCrop" class="secondary">重設整張原圖</button></div></section>
   </div>
+  <div class="modal-foot"><button id="applyImage">套用並回編輯器</button></div>
 </div>
-</div>
-</div>
-
 <script src="./edit-backup-v1.js?v=121"></script>
-<script>
-const canvas=document.getElementById('c');
-const ctx=canvas.getContext('2d');
-const $=id=>document.getElementById(id);
-
-const C={
-  panel:'rgba(31,23,19,.80)',
-  red:'#FF4638',
-  cream:'#FDF3E7',
-  bright:'#FFBE37',
-  brightText:'#201914',
-  dim:'#4B443F',
-  dimText:'#FDF3E7',
-  outline:'#E6E1DC'
-};
-
-const defaults={
-  title:'關西國際機場 (KIX) → 住宿飯店(ホテル京阪 淀屋橋)',
-  question:'選擇的交通工具？',
-  options:[
-    {text:'關空特急 HARUKA關空特急 HARUKA關空特急 HARUKA',bright:false},
-    {text:'南海電鐵',bright:false},
-    {text:'利木津巴士',bright:false},
-    {text:'高速船',bright:false},
-    {text:'計程車',bright:false}
-  ]
-};
-
-let data=JSON.parse(JSON.stringify(defaults));
-
-function font(weight,px){
-  return `${weight} ${px}px "Noto Sans TC","Noto Sans CJK TC","Microsoft JhengHei",sans-serif`;
-}
-function roundedRect(x,y,w,h,r){
-  ctx.beginPath();
-  ctx.moveTo(x+r,y);
-  ctx.arcTo(x+w,y,x+w,y+h,r);
-  ctx.arcTo(x+w,y+h,x,y+h,r);
-  ctx.arcTo(x,y+h,x,y,r);
-  ctx.arcTo(x,y,x+w,y,r);
-  ctx.closePath();
-}
-function fitText(text,maxWidth,startSize,minSize,weight){
-  let s=startSize;
-  while(s>=minSize){
-    ctx.font=font(weight,s);
-    const width=ctx.measureText(text).width;
-    if(width<=maxWidth)return {size:s,width,ok:true};
-    s--;
-  }
-  ctx.font=font(weight,minSize);
-  return {size:minSize,width:ctx.measureText(text).width,ok:false};
-}
-function drawOuter(h){
-  ctx.save();
-  ctx.fillStyle=C.panel;
-  ctx.strokeStyle='rgba(255,255,255,.92)';
-  ctx.lineWidth=4;
-  ctx.lineJoin='miter';
-  ctx.beginPath();
-  ctx.moveTo(20,2);
-  ctx.lineTo(861,2);
-  ctx.lineTo(879,20);
-  ctx.lineTo(879,h-20);
-  ctx.lineTo(861,h-3);
-  ctx.lineTo(20,h-3);
-  ctx.lineTo(3,h-20);
-  ctx.lineTo(3,21);
-  ctx.closePath();
-  ctx.fill();
-  ctx.stroke();
-
-  ctx.fillStyle=C.red;
-  ctx.fillRect(3,22,10,h-47);
-  ctx.restore();
-}
-function drawSelectBadge(){
-  const x=33,y=20,w=193,h=40;
-  roundedRect(x,y,w,h,10);
-  ctx.fillStyle=C.red;ctx.fill();
-  ctx.fillStyle='#fff';
-  ctx.font=font(900,23);
-  ctx.textAlign='center';
-  ctx.textBaseline='middle';
-  ctx.fillText('SELECT',x+w/2,y+h/2+1);
-}
-function renderForm(){
-  $('count').textContent=data.options.length;
-  const list=$('optionList');
-  list.innerHTML='';
-  data.options.forEach((opt,i)=>{
-    const item=document.createElement('div');
-    item.className='item';
-    item.innerHTML=`
-      <div class="item-head">
-        <div class="item-title">選項 ${i+1}</div>
-        <div class="item-actions">
-          <button class="tiny toggle ${opt.bright?'bright':'dim'}" data-action="toggle" data-index="${i}">
-            ${opt.bright?'亮':'暗'}
-          </button>
-          <button class="tiny danger" data-action="delete" data-index="${i}">刪除</button>
-        </div>
-      </div>
-      <input data-action="text" data-index="${i}" value="${opt.text.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;')}">
-    `;
-    list.appendChild(item);
-  });
-
-  list.querySelectorAll('[data-action="text"]').forEach(el=>{
-    el.addEventListener('input',e=>{
-      data.options[Number(e.target.dataset.index)].text=e.target.value;
-      render();
-    });
-  });
-  list.querySelectorAll('[data-action="toggle"]').forEach(el=>{
-    el.addEventListener('click',e=>{
-      const i=Number(e.currentTarget.dataset.index);
-      data.options[i].bright=!data.options[i].bright;
-      renderForm();render();
-    });
-  });
-  list.querySelectorAll('[data-action="delete"]').forEach(el=>{
-    el.addEventListener('click',e=>{
-      if(data.options.length<=1)return;
-      data.options.splice(Number(e.currentTarget.dataset.index),1);
-      renderForm();render();
-    });
-  });
-}
-function render(){
-  const n=data.options.length;
-  const H=208+n*94;
-  canvas.width=882;
-  canvas.height=H;
-  ctx.clearRect(0,0,882,H);
-
-  drawOuter(H);
-  drawSelectBadge();
-
-  let blocked=false;
-
-  const title=$('title').value;
-  const titleFit=fitText(title,805,34,19,800);
-  $('title').classList.toggle('bad',!titleFit.ok);
-  ctx.font=font(800,titleFit.size);
-  ctx.fillStyle=C.cream;
-  ctx.textAlign='left';
-  ctx.textBaseline='alphabetic';
-  ctx.fillText(title,37,111);
-  blocked=blocked||!titleFit.ok;
-
-  const q=$('question').value;
-  const qFit=fitText(q,805,29,18,500);
-  $('question').classList.toggle('bad',!qFit.ok);
-  ctx.font=font(500,qFit.size);
-  ctx.fillStyle=C.cream;
-  ctx.fillText(q,37,171);
-  blocked=blocked||!qFit.ok;
-
-  const x=37,w=805,rowH=65,pitch=94,startY=210;
-  data.options.forEach((opt,i)=>{
-    const y=startY+i*pitch;
-    roundedRect(x,y,w,rowH,10);
-    ctx.fillStyle=opt.bright?C.bright:C.dim;
-    ctx.fill();
-    ctx.strokeStyle=C.outline;
-    ctx.lineWidth=1.4;
-    ctx.stroke();
-
-    const text=`${i+1}.${opt.text}`;
-    const fit=fitText(text,755,31,18,800);
-    blocked=blocked||!fit.ok;
-
-    ctx.font=font(800,fit.size);
-    ctx.fillStyle=opt.bright?C.brightText:C.dimText;
-    ctx.textAlign='left';
-    ctx.textBaseline='middle';
-    ctx.fillText(text,x+21,y+rowH/2+1);
-  });
-
-  const st=$('status');
-  $('download').disabled=blocked;
-  if(blocked){
-    st.textContent='BLOCKED｜有文字長到超出正式安全範圍，請縮短內容';
-    st.className='status error';
-  }else{
-    st.textContent=`READY｜${n} 項，可輸出透明 PNG`;
-    st.className='status';
-  }
-  return blocked;
-}
-
-$('title').addEventListener('input',render);
-$('question').addEventListener('input',render);
-
-$('addOption').onclick=()=>{
-  data.options.push({text:'新選項',bright:false});
-  renderForm();render();
-};
-$('allDim').onclick=()=>{
-  data.options.forEach(o=>o.bright=false);
-  renderForm();render();
-};
-$('allBright').onclick=()=>{
-  data.options.forEach(o=>o.bright=true);
-  renderForm();render();
-};
-$('download').onclick=()=>{
-  if(render())return;
-  canvas.toBlob(blob=>{
-    const a=document.createElement('a');
-    a.href=URL.createObjectURL(blob);
-    a.download='O-Ne_SELECT_選項卡.png';
-    a.click();
-    setTimeout(()=>URL.revokeObjectURL(a.href),1000);
-  },'image/png');
-};
-$('jsonBtn').onclick=()=>{
-  const payload={
-    component_id:'SELECT-CARD',
-    generator_version:'V1.0.1_20260826',
-    master_psd_id:'1wYnhZVvoQMl4hn1W7msw_oh3k-RqbHca',
-    title:$('title').value,
-    question:$('question').value,
-    options:data.options.map((o,i)=>({index:i+1,text:o.text,state:o.bright?'BRIGHT':'DIM'}))
-  };
-  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
-  a.download='O-Ne_選項卡_data.json';
-  a.click();
-  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
-};
-$('reset').onclick=()=>{
-  data=JSON.parse(JSON.stringify(defaults));
-  $('title').value=defaults.title;
-  $('question').value=defaults.question;
-  renderForm();render();
-};
-
-renderForm();
-render();
-function validateChoice(snapshot){
-  if(!snapshot||!Array.isArray(snapshot.options)||snapshot.options.length<1||snapshot.options.length>20)throw new Error('選項數量須為 1～20。');
-  snapshot.options=snapshot.options.map(option=>({text:String(option.text??''),bright:Boolean(option.bright)}));
-  return snapshot;
-}
-ONEEditBackup.mount({
-  id:'choice-card',generatorVersion:'V1.0.1_20260826',anchor:document.querySelectorAll('.buttons')[1],
-  capture:()=>({title:$('title').value,question:$('question').value,options:JSON.parse(JSON.stringify(data.options))}),
-  apply:snapshot=>{snapshot=validateChoice(snapshot);data.options=JSON.parse(JSON.stringify(snapshot.options));$('title').value=String(snapshot.title??'');$('question').value=String(snapshot.question??'');renderForm();render()},
-  fromJSON:payload=>{
-    if(!payload||payload.component_id!=='SELECT-CARD')throw new Error('component_id 必須是 SELECT-CARD。');
-    if(!Array.isArray(payload.options))throw new Error('JSON 缺少 options。');
-    return validateChoice({title:String(payload.title??''),question:String(payload.question??''),options:payload.options.map(option=>({text:option.text,bright:option.state==='BRIGHT'}))});
-  }
-});
-</script>
-</body>
-</html>
+<script src="./choice-card-v111-1.js?v=111"></script>
+<script src="./choice-card-v111-2.js?v=111"></script>
+<script src="./choice-card-v111-3.js?v=111"></script>
+</body></html>
