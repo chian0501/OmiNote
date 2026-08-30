@@ -1,8 +1,8 @@
-/* O-Ne shared AI JSON format guide — V1.0.3 */
+/* O-Ne shared AI JSON format guide — V1.0.4 */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.0.3';
+  var VERSION = '1.0.4';
   var mounted = Object.create(null);
 
   var GUIDES = {
@@ -97,7 +97,7 @@
       }
     },
     'focus-card': {
-      name: '焦點／說明內容卡', code: 'FOCUS-CARD', version: 'V0.5.14', file: '焦點卡-卡片標題-步驟-含字.json', image: true,
+      name: '焦點內容卡', code: 'FOCUS-CARD', version: 'V0.5.15', file: '焦點卡-卡片標題-步驟-含字.json', image: true,
       values: ['schema 固定 o-ne.focus-card.ready.v0.5.11', 'mode：body／list／steps', 'body 模式 content 使用 body；list／steps 模式改用 items 陣列', 'titleColor：highlight／light；itemFrameStates：none／focus／idle', '圖片 fit：contain／cover／free；cover 可設 zoom 100–300、offsetX／offsetY -100–100；free 使用 cropX／cropY／cropWidth／cropHeight 0–100 百分比', '舊 JSON 沒有自由裁切欄位時會預設整張圖片', 'JSON 不含圖片位元；有商品圖請用 O-Ne 專案 ZIP'],
       example: {
         schema: 'o-ne.focus-card.ready.v0.5.11', status: 'READY', mode: 'body', component: { placement: 'centerLower' },
@@ -105,6 +105,18 @@
         label: { enabled: false, text: '', position: 'above', background: '#29A6A7', color: '#FFFFFF' },
         images: { placement: 'right', scale: 32, left: { enabled: false, name: '', fit: 'contain', zoom: 100, offsetX: 0, offsetY: 0, cropX: 0, cropY: 0, cropWidth: 100, cropHeight: 100 }, right: { enabled: false, name: '', fit: 'free', zoom: 100, offsetX: 0, offsetY: 0, cropX: 12, cropY: 8, cropWidth: 76, cropHeight: 68 } },
         content: { titleEnabled: true, title: '道頓堀觀光船', titleColor: 'highlight', divider: true, body: '從河面看道頓堀招牌，是另一種視角。', ctaEnabled: false, cta: '', sourceEnabled: false, source: '' }
+      }
+    },
+    'explanation-card': {
+      name: '說明卡', code: 'EXPLANATION-CARD', version: 'V0.1.0', file: '說明卡-卡片標題-標準.json', image: true,
+      values: ['schema 固定以 o-ne.explanation-card. 開頭', 'rows 支援 1–8 列；每列包含 key 與 text', '卡片高度由標題與各列實際換行自動增加', '圖片 fit：contain／cover／free；JSON 不含圖片位元，完整搬移請用 O-Ne 專案 ZIP'],
+      example: {
+        schema: 'o-ne.explanation-card.candidate.v0.1.0', status: 'CANDIDATE', generator_version: 'V0.1.0_20260829',
+        data: {
+          label: 'GET!', labelColor: '#FFBE37', title: '這趟旅行，最值得記住的三件事', titleSize: 64, bodySize: 31, keySize: 30,
+          rows: [{ key: '重點 01', text: '先看現場動線，再決定最省力的移動方式。' }, { key: '重點 02', text: '把真正有用的資訊留在畫面上。' }],
+          image: { name: '', fit: 'cover', zoom: 100, offsetX: 0, offsetY: 0, cropX: 0, cropY: 0, cropWidth: 100, cropHeight: 100 }
+        }
       }
     },
     'thumbnail-frame': {

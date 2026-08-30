@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>O-Ne 說明卡生成器 V0.1.0 CANDIDATE</title>
+  <script src="./edit-backup-v1.js?v=1215"></script>
+  <style>
+    :root{color-scheme:dark;font-family:"Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;--bg:#0b1016;--panel:#111923;--field:#0f1721;--line:#2c3948;--line2:#3a4b5d;--text:#f5f1eb;--muted:#8f9aa8;--teal:#2cb7bc;--teal2:#70ded3;--yellow:#ffbe37;--purple:#8a4f96}
+    *{box-sizing:border-box}html,body{min-width:320px;min-height:100%;margin:0}body{background:var(--bg);color:var(--text)}button,input,textarea,select{font:inherit}button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--teal2);outline-offset:2px}
+    .app-shell{width:100%;min-height:100dvh;padding:20px 28px 30px}.app-header{display:flex;align-items:flex-start;gap:22px;min-height:76px;margin-bottom:17px}.back-link{min-width:118px;height:56px;display:inline-flex;align-items:center;gap:8px;color:#43c9cc;font-size:15px;font-weight:800;text-decoration:none}.header-divider{width:1px;height:56px;background:var(--line)}.title-block{min-width:0;flex:1}.title-line{display:flex;align-items:center;gap:12px}.title-line h1{margin:0;font-size:clamp(21px,1.75vw,28px);line-height:1.25}.title-line h1 span{font-size:.72em;font-weight:650}.badge{padding:5px 10px;border:1px solid #8b6b24;border-radius:7px;background:#3b2d12;color:#ffd978;font-size:12px;font-weight:900}.title-block p{margin:7px 0 0;color:var(--muted);font-size:13px}.status{padding-top:10px;color:#ffd978;font-size:12px;font-weight:800}
+    .workspace{display:grid;grid-template-columns:minmax(510px,.92fr) minmax(620px,1.08fr);align-items:start;gap:14px}.panel{min-width:0;overflow:hidden;border:1px solid var(--line2);border-radius:12px;background:var(--panel)}.editor-panel{position:sticky;top:20px;height:calc(100dvh - 40px);min-height:720px;display:flex;flex-direction:column}.editor-head{padding:19px 24px 13px;border-bottom:1px solid var(--line)}.editor-head strong{display:block;font-size:15px}.editor-head small{display:block;margin-top:5px;color:var(--muted);font-size:11px;line-height:1.55}.editor-scroll{flex:1;min-height:0;overflow-y:auto;padding-bottom:20px;scrollbar-width:thin;scrollbar-color:#344658 transparent}.editor-section{padding:14px 24px;border-bottom:1px solid var(--line)}.section-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:11px}.section-heading strong{font-size:14px}.section-heading small{color:var(--muted);font-size:11px;line-height:1.45}.field{display:flex;flex-direction:column;gap:7px;margin-top:11px}.field>span{color:#cfd4d9;font-size:12px;font-weight:750}.field small{color:var(--muted);font-size:10px}.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.range-row{height:42px;display:grid;grid-template-columns:minmax(0,1fr) 55px;align-items:center;gap:10px;padding:0 11px;border:1px solid var(--line2);border-radius:7px;background:var(--field)}.range-row code{color:var(--teal2);font-size:11px;text-align:right}.range-row input{height:auto;padding:0;border:0;background:transparent;accent-color:var(--teal2)}input,textarea,select{width:100%;border:1px solid var(--line2);border-radius:7px;background:var(--field);color:#eef0f2}input,select{height:42px;padding:0 12px}textarea{min-height:78px;padding:10px 12px;resize:vertical;line-height:1.5}input[type=color]{height:42px;padding:5px;cursor:pointer}
+    .row-list{display:grid;gap:8px}.copy-row{display:grid;grid-template-columns:92px minmax(0,1fr) auto;gap:7px;padding:8px;border:1px solid var(--line2);border-radius:9px;background:#101923}.copy-row input{height:38px}.copy-row textarea{min-height:58px}.row-actions{display:flex;flex-direction:column;gap:4px}.row-actions button,.remove-image,.crop-reset{min-width:38px;min-height:30px;border:1px solid var(--line2);border-radius:6px;background:#182332;color:#c8d0d8;cursor:pointer}.row-actions button:hover,.remove-image:hover,.crop-reset:hover{border-color:var(--teal)}.add-row{width:100%;height:38px;margin-top:9px;border:1px solid var(--teal);border-radius:7px;background:transparent;color:var(--teal2);font-weight:800;cursor:pointer}
+    .upload-row{display:flex;align-items:center;gap:9px}.upload-button{height:38px;display:inline-flex;align-items:center;padding:0 11px;border:1px solid var(--teal);border-radius:7px;color:var(--teal2);font-size:12px;font-weight:800;cursor:pointer}.upload-button input{position:absolute;width:1px;height:1px;clip-path:inset(50%)}.file-name{min-width:0;flex:1;overflow:hidden;color:var(--muted);font-size:11px;text-overflow:ellipsis;white-space:nowrap}.remove-image{padding:0 10px;font-size:11px}.crop-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:12px}.crop-tabs button{height:34px;border:1px solid var(--line2);border-radius:7px;background:#111c28;color:#aeb8c3;font-size:11px;font-weight:800;cursor:pointer}.crop-tabs button.is-active{border-color:var(--teal);background:#12383d;color:#8fe0d7}.crop-controls{display:grid;gap:8px;margin-top:10px}.crop-controls[hidden]{display:none}.crop-note{margin:9px 0 0;color:var(--muted);font-size:10px;line-height:1.55}.crop-reset{justify-self:start;padding:0 10px;font-size:10px}
+    .preview-stack{min-width:0;display:flex;flex-direction:column;gap:14px}.preview-panel{display:grid;grid-template-rows:auto auto auto}.preview-toolbar{min-height:68px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 20px;border-bottom:1px solid var(--line2)}.preview-toolbar strong{font-size:13px}.preview-toolbar span{color:var(--teal2);font:700 11px ui-monospace,monospace}.canvas-stage{display:flex;align-items:flex-start;justify-content:center;min-height:360px;padding:24px;overflow:hidden;background-color:#252b32;background-image:linear-gradient(45deg,#30363d 25%,transparent 25%),linear-gradient(-45deg,#30363d 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#30363d 75%),linear-gradient(-45deg,transparent 75%,#30363d 75%);background-size:30px 30px;background-position:0 0,0 15px,15px -15px,-15px 0}.preview-canvas{display:block;width:94%;max-width:100%;height:auto}.export-bar{padding:12px 20px 16px;border-top:1px solid var(--line2);background:#111923}.export-bar p{margin:0 0 10px;color:var(--muted);font-size:10px;text-align:center}.export-actions{display:grid;grid-template-columns:1fr 1fr;gap:12px}.export-button{min-height:66px;border:1px solid;border-radius:8px;font-weight:900;cursor:pointer}.export-button.primary{border-color:var(--teal2);background:var(--teal);color:#fff}.export-button.secondary{border-color:var(--purple);background:#34203d;color:#e1b7e8}.toast{position:fixed;right:28px;bottom:24px;z-index:30;padding:11px 15px;border:1px solid #267b80;border-radius:8px;background:#10373b;color:#dffafa;font-size:13px;font-weight:800}.toast.error{border-color:#8b4b22;background:#372315;color:#ffc08a}
+    @media(max-width:1120px){.workspace{grid-template-columns:1fr}.editor-panel{position:static;height:auto;min-height:760px}.canvas-stage{min-height:420px}}@media(max-width:680px){.app-shell{padding:16px}.app-header{flex-wrap:wrap}.header-divider{display:none}.status{width:100%}.field-row,.export-actions{grid-template-columns:1fr}.copy-row{grid-template-columns:76px minmax(0,1fr)}.row-actions{grid-column:1/-1;flex-direction:row}.preview-toolbar{align-items:flex-start;flex-direction:column;padding:14px 16px}.canvas-stage{padding:12px}}
+  </style>
+</head>
+<body>
+<main class="app-shell">
+  <header class="app-header">
+    <a class="back-link" href="./">← 回工具入口</a>
+    <div class="header-divider"></div>
+    <div class="title-block">
+      <div class="title-line"><h1>O-Ne 說明卡生成器 <span>V0.1.0</span></h1><strong class="badge">CANDIDATE</strong></div>
+      <p>獨立依正式「00_說明字卡」母版製作；左圖右文、GET! 標籤與說明列不再和焦點卡共用資料。</p>
+    </div>
+    <div class="status">自動高度｜內容只往下延伸</div>
+  </header>
+
+  <section class="workspace">
+    <aside class="editor-panel panel">
+      <div class="editor-head"><strong>說明卡內容</strong><small>實際換行由 Canvas 量字；標題或說明列變長時，卡體與預覽區會一起往下長。</small></div>
+      <div class="editor-scroll" id="editorScroll">
+        <section class="editor-section">
+          <div class="section-heading"><strong>標籤與標題</strong><small>正式母版預設 GET!</small></div>
+          <div class="field-row">
+            <label class="field"><span>標籤文字</span><input id="labelText" maxlength="12"></label>
+            <label class="field"><span>標籤底色</span><input id="labelColor" type="color"></label>
+          </div>
+          <label class="field"><span>大標題</span><textarea id="titleText" maxlength="80"></textarea></label>
+          <div class="field-row">
+            <label class="field"><span>標題字級</span><span class="range-row"><input id="titleSize" type="range" min="44" max="84" step="1"><code id="titleSizeValue"></code></span></label>
+            <label class="field"><span>說明字級</span><span class="range-row"><input id="bodySize" type="range" min="24" max="44" step="1"><code id="bodySizeValue"></code></span></label>
+          </div>
+        </section>
+
+        <section class="editor-section">
+          <div class="section-heading"><strong>說明列</strong><small>1–8 列；左欄可填年份、編號或重點詞</small></div>
+          <div id="rowList" class="row-list"></div>
+          <button id="addRow" class="add-row" type="button">＋ 新增說明列</button>
+        </section>
+
+        <section class="editor-section image-slot">
+          <div class="section-heading"><strong>左側圖片</strong><small>圖片會固定從卡片上方開始；卡體增加高度時只往底部延伸</small></div>
+          <div class="upload-row">
+            <label class="upload-button">選擇圖片<input id="explanationImage" type="file" accept="image/png,image/jpeg,image/webp"></label>
+            <span id="fileName" class="file-name">尚未選擇圖片</span>
+            <button id="removeImage" class="remove-image" type="button">移除</button>
+          </div>
+          <div class="crop-tabs" role="group" aria-label="圖片顯示方式">
+            <button type="button" data-fit="contain">完整顯示</button>
+            <button type="button" data-fit="cover">填滿裁切</button>
+            <button type="button" data-fit="free">自由裁切</button>
+          </div>
+          <div id="coverControls" class="crop-controls">
+            <label class="field"><span>裁切縮放</span><span class="range-row"><input id="zoom" type="range" min="100" max="300" step="1"><code id="zoomValue"></code></span></label>
+            <label class="field"><span>水平位置</span><span class="range-row"><input id="offsetX" type="range" min="-100" max="100" step="1"><code id="offsetXValue"></code></span></label>
+            <label class="field"><span>垂直位置</span><span class="range-row"><input id="offsetY" type="range" min="-100" max="100" step="1"><code id="offsetYValue"></code></span></label>
+          </div>
+          <div id="freeControls" class="crop-controls" hidden>
+            <label class="field"><span>裁切框左緣</span><span class="range-row"><input id="cropX" type="range" min="0" max="88" step="1"><code id="cropXValue"></code></span></label>
+            <label class="field"><span>裁切框上緣</span><span class="range-row"><input id="cropY" type="range" min="0" max="88" step="1"><code id="cropYValue"></code></span></label>
+            <label class="field"><span>裁切框寬度</span><span class="range-row"><input id="cropWidth" type="range" min="12" max="100" step="1"><code id="cropWidthValue"></code></span></label>
+            <label class="field"><span>裁切框高度</span><span class="range-row"><input id="cropHeight" type="range" min="12" max="100" step="1"><code id="cropHeightValue"></code></span></label>
+            <button id="resetCrop" class="crop-reset" type="button">重設整張裁切框</button>
+          </div>
+          <p class="crop-note">「自由裁切」可分別調整左、上、寬、高，比例不鎖定；輸出會保留選取範圍。單獨 JSON 不包含圖片本體，完整搬移請用 ZIP 專案包。</p>
+        </section>
+      </div>
+    </aside>
+
+    <div class="preview-stack">
+      <section class="preview-panel panel">
+        <div class="preview-toolbar"><strong>獨立說明卡預覽</strong><span id="dimensionText">1552 × 724px</span></div>
+        <div class="canvas-stage"><canvas id="previewCanvas" class="preview-canvas"></canvas></div>
+        <footer class="export-bar">
+          <p>PNG 為透明元件；高度依標題換行與說明列實際內容自動增加。</p>
+          <div class="export-actions">
+            <button id="exportPng" class="export-button primary" type="button">輸出說明卡 PNG</button>
+            <button id="exportJson" class="export-button secondary" type="button">匯出 JSON</button>
+          </div>
+        </footer>
+      </section>
+    </div>
+  </section>
+  <div id="toast" class="toast" hidden></div>
+</main>
+
+<script>
+(function(){
+  'use strict';
+  const CARD_WIDTH=1552,MIN_HEIGHT=724,MAX_ROWS=8,CREAM='#F5EEE4',COFFEE='rgba(31,23,19,.82)',TEAL='#29A6A7';
+  const defaults={
+    label:'GET!',labelColor:'#FFBE37',title:'韓國人為何愛九份?',titleSize:68,bodySize:38,keySize:38,
+    rows:[
+      {key:'2001年',text:'網傳九份為《神隱少女》取景地因此聞名'}
+    ],
+    image:{name:'',fit:'cover',zoom:100,offsetX:0,offsetY:0,cropX:0,cropY:0,cropWidth:100,cropHeight:100}
+  };
+  let state=clone(defaults),imageElement=null,toastTimer=null,lastLayout=null;
+  const $=id=>document.getElementById(id),canvas=$('previewCanvas'),ctx=canvas.getContext('2d');
+
+  function clone(value){return JSON.parse(JSON.stringify(value))}
+  function clamp(value,min,max){return Math.min(max,Math.max(min,Number(value)||0))}
+  function cleanState(raw){
+    if(!raw||typeof raw!=='object')throw new Error('說明卡資料格式不完整。');
+    const next={...clone(defaults),...clone(raw)};
+    next.label=String(next.label??'GET!').slice(0,12);
+    next.title=String(next.title??'').slice(0,80);
+    next.titleSize=Math.round(clamp(next.titleSize,44,84));
+    next.bodySize=Math.round(clamp(next.bodySize,24,44));
+    next.keySize=Math.round(clamp(next.keySize||next.bodySize,22,42));
+    if(!Array.isArray(next.rows)||!next.rows.length)throw new Error('說明卡至少需要一列說明。');
+    next.rows=next.rows.slice(0,MAX_ROWS).map(row=>({key:String(row&&row.key||'').slice(0,24),text:String(row&&row.text||'').slice(0,240)}));
+    const image={...clone(defaults.image),...(raw.image||{})};
+    image.fit=['contain','cover','free'].includes(image.fit)?image.fit:'cover';
+    image.zoom=Math.round(clamp(image.zoom,100,300));image.offsetX=clamp(image.offsetX,-100,100);image.offsetY=clamp(image.offsetY,-100,100);
+    image.cropWidth=clamp(image.cropWidth,12,100);image.cropHeight=clamp(image.cropHeight,12,100);
+    image.cropX=clamp(image.cropX,0,100-image.cropWidth);image.cropY=clamp(image.cropY,0,100-image.cropHeight);
+    image.name=String(image.name||'');next.image=image;return next;
+  }
+  function wrapText(context,text,maxWidth,maxLines=999){
+    const lines=[];let line='';
+    for(const ch of Array.from(String(text??''))){
+      if(ch==='\n'){lines.push(line);line='';if(lines.length>=maxLines)break;continue}
+      const test=line+ch;
+      if(line&&context.measureText(test).width>maxWidth){lines.push(line);line=ch;if(lines.length>=maxLines)break}else line=test;
+    }
+    if(lines.length<maxLines&&(line||!lines.length))lines.push(line);
+    return lines.length?lines:[''];
+  }
+  function cutCornerPath(context,x,y,w,h,corner=28){context.beginPath();context.moveTo(x+corner,y);context.lineTo(x+w-corner,y);context.lineTo(x+w,y+corner);context.lineTo(x+w,y+h-corner);context.lineTo(x+w-corner,y+h);context.lineTo(x+corner,y+h);context.lineTo(x,y+h-corner);context.lineTo(x,y+corner);context.closePath()}
+  function layoutCard(context){
+    const imageX=26,imageY=32,imageW=655,textX=724,textRight=1518,textW=textRight-textX;
+    context.font=`800 ${state.titleSize}px "Noto Sans TC","Microsoft JhengHei",sans-serif`;
+    const labelY=42,labelH=48,titleY=labelY+labelH+28,titleLines=wrapText(context,state.title,textW,8),titleLineH=state.titleSize*1.18;
+    const dividerY=titleY+titleLines.length*titleLineH+15;
+    let rowY=dividerY+34;
+    context.font=`500 ${state.bodySize}px "Noto Sans TC","Microsoft JhengHei",sans-serif`;
+    const rowLayouts=state.rows.map(row=>{
+      context.font=`800 ${state.keySize}px "Noto Sans TC","Microsoft JhengHei",sans-serif`;
+      const keyLines=wrapText(context,row.key,142,4);
+      context.font=`500 ${state.bodySize}px "Noto Sans TC","Microsoft JhengHei",sans-serif`;
+      const bodyLines=wrapText(context,row.text,textRight-(textX+175),20);
+      const keyLineH=state.keySize*1.28,bodyLineH=state.bodySize*1.52;
+      const height=Math.max(48,keyLines.length*keyLineH,bodyLines.length*bodyLineH)+18;
+      const item={y:rowY,height,keyLines,bodyLines,keyLineH,bodyLineH};rowY+=height+16;return item;
+    });
+    const cardHeight=Math.ceil(Math.max(MIN_HEIGHT,rowY+32));
+    return{width:CARD_WIDTH,height:cardHeight,imageX,imageY,imageW,imageH:cardHeight-60,textX,textRight,textW,labelY,labelH,titleY,titleLines,titleLineH,dividerY,rowLayouts};
+  }
+  function drawImage(context,layout){
+    const{x:imageX,y:imageY,w:imageW,h:imageH}={x:layout.imageX,y:layout.imageY,w:layout.imageW,h:layout.imageH};
+    context.save();context.beginPath();context.rect(imageX,imageY,imageW,imageH);context.clip();context.fillStyle='#151a18';context.fillRect(imageX,imageY,imageW,imageH);
+    if(!imageElement){
+      context.strokeStyle='rgba(112,222,211,.58)';context.lineWidth=3;context.setLineDash([14,10]);context.strokeRect(imageX+4,imageY+4,imageW-8,imageH-8);context.setLineDash([]);context.fillStyle='rgba(245,238,228,.72)';context.font='700 28px "Noto Sans TC",sans-serif';context.textAlign='center';context.fillText('選擇左側圖片',imageX+imageW/2,imageY+imageH/2);context.restore();return;
+    }
+    const iw=imageElement.naturalWidth||imageElement.width,ih=imageElement.naturalHeight||imageElement.height,fit=state.image.fit;
+    if(fit==='free'){
+      const sx=iw*state.image.cropX/100,sy=ih*state.image.cropY/100,sw=iw*state.image.cropWidth/100,sh=ih*state.image.cropHeight/100;
+      const scale=Math.max(imageW/sw,imageH/sh),dw=sw*scale,dh=sh*scale;
+      context.drawImage(imageElement,sx,sy,sw,sh,imageX+(imageW-dw)/2,imageY+(imageH-dh)/2,dw,dh);
+    }else{
+      const base=fit==='contain'?Math.min(imageW/iw,imageH/ih):Math.max(imageW/iw,imageH/ih),scale=base*(fit==='cover'?state.image.zoom/100:1),dw=iw*scale,dh=ih*scale;
+      const overflowX=Math.max(0,dw-imageW),overflowY=Math.max(0,dh-imageH);
+      const dx=imageX+(imageW-dw)/2+state.image.offsetX/100*overflowX/2,dy=imageY+(imageH-dh)/2+state.image.offsetY/100*overflowY/2;
+      context.drawImage(imageElement,dx,dy,dw,dh);
+    }
+    context.restore();
+  }
+  function render(target=canvas){
+    const context=target.getContext('2d'),layout=layoutCard(context);lastLayout=layout;target.width=layout.width;target.height=layout.height;context.clearRect(0,0,target.width,target.height);
+    cutCornerPath(context,3,3,layout.width-6,layout.height-6,30);context.fillStyle=COFFEE;context.fill();context.lineWidth=3;context.strokeStyle=CREAM;context.stroke();
+    drawImage(context,layout);
+    context.font='800 32px "Noto Sans TC","Microsoft JhengHei",sans-serif';const labelW=Math.max(150,context.measureText(state.label||'GET!').width+40);context.fillStyle=state.labelColor;context.beginPath();context.roundRect(layout.textX,layout.labelY,labelW,layout.labelH,8);context.fill();context.fillStyle='#1F1713';context.textBaseline='middle';context.fillText(state.label||'GET!',layout.textX+20,layout.labelY+layout.labelH/2);
+    context.textBaseline='alphabetic';context.font=`800 ${state.titleSize}px "Noto Sans TC","Microsoft JhengHei",sans-serif`;context.fillStyle=CREAM;layout.titleLines.forEach((line,index)=>context.fillText(line,layout.textX,layout.titleY+state.titleSize+index*layout.titleLineH));
+    context.strokeStyle=TEAL;context.lineWidth=4;context.beginPath();context.moveTo(layout.textX,layout.dividerY);context.lineTo(layout.textRight,layout.dividerY);context.stroke();
+    layout.rowLayouts.forEach((item,index)=>{
+      const row=state.rows[index],keyBase=item.y+state.keySize;
+      context.font=`600 ${state.keySize}px "Noto Sans TC","Microsoft JhengHei",sans-serif`;context.fillStyle=state.labelColor;item.keyLines.forEach((line,lineIndex)=>context.fillText(line,layout.textX,keyBase+lineIndex*item.keyLineH));
+      context.font=`500 ${state.bodySize}px "Noto Sans TC","Microsoft JhengHei",sans-serif`;context.fillStyle=CREAM;const bodyBase=item.y+state.bodySize;item.bodyLines.forEach((line,lineIndex)=>context.fillText(line,layout.textX+175,bodyBase+lineIndex*item.bodyLineH));
+    });
+    $('dimensionText').textContent=`${layout.width} × ${layout.height}px｜自動高度`;return layout;
+  }
+  function renderRows(){
+    const host=$('rowList');host.innerHTML='';
+    state.rows.forEach((row,index)=>{
+      const item=document.createElement('div');item.className='copy-row';item.innerHTML=`<input aria-label="第 ${index+1} 列重點詞" maxlength="24"><textarea aria-label="第 ${index+1} 列說明" maxlength="240"></textarea><span class="row-actions"><button type="button" data-action="up" title="上移">↑</button><button type="button" data-action="down" title="下移">↓</button><button type="button" data-action="delete" title="刪除">×</button></span>`;
+      const key=item.querySelector('input'),text=item.querySelector('textarea');key.value=row.key;text.value=row.text;
+      key.addEventListener('input',event=>{state.rows[index].key=event.target.value;render()});text.addEventListener('input',event=>{state.rows[index].text=event.target.value;render()});
+      item.querySelector('[data-action="up"]').disabled=index===0;item.querySelector('[data-action="down"]').disabled=index===state.rows.length-1;
+      item.querySelector('[data-action="up"]').onclick=()=>moveRow(index,-1);item.querySelector('[data-action="down"]').onclick=()=>moveRow(index,1);item.querySelector('[data-action="delete"]').onclick=()=>removeRow(index);host.appendChild(item);
+    });
+    $('addRow').disabled=state.rows.length>=MAX_ROWS;
+  }
+  function moveRow(index,delta){const next=index+delta;if(next<0||next>=state.rows.length)return;[state.rows[index],state.rows[next]]=[state.rows[next],state.rows[index]];renderRows();render()}
+  function removeRow(index){if(state.rows.length<=1){toast('至少保留一列說明。',true);return}state.rows.splice(index,1);renderRows();render()}
+  function syncControls(){
+    $('labelText').value=state.label;$('labelColor').value=state.labelColor;$('titleText').value=state.title;$('titleSize').value=state.titleSize;$('bodySize').value=state.bodySize;
+    $('titleSizeValue').textContent=state.titleSize+'px';$('bodySizeValue').textContent=state.bodySize+'px';$('fileName').textContent=state.image.name||'尚未選擇圖片';
+    for(const key of ['zoom','offsetX','offsetY','cropX','cropY','cropWidth','cropHeight']){$(key).value=state.image[key];$(key+'Value').textContent=(key==='zoom'||key.startsWith('crop')?Math.round(state.image[key])+'%':Math.round(state.image[key]));}
+    document.querySelectorAll('[data-fit]').forEach(button=>button.classList.toggle('is-active',button.dataset.fit===state.image.fit));$('coverControls').hidden=state.image.fit!=='cover';$('freeControls').hidden=state.image.fit!=='free';renderRows();render();
+  }
+  function bindText(id,key){$(id).addEventListener('input',event=>{state[key]=event.target.value;render()})}
+  function bindNumber(id,key,min,max){$(id).addEventListener('input',event=>{state[key]=Math.round(clamp(event.target.value,min,max));$(id+'Value').textContent=state[key]+'px';render()})}
+  function bindImageNumber(id,key,min,max,suffix=''){$(id).addEventListener('input',event=>{state.image[key]=clamp(event.target.value,min,max);if(key==='cropWidth')state.image.cropX=clamp(state.image.cropX,0,100-state.image.cropWidth);if(key==='cropHeight')state.image.cropY=clamp(state.image.cropY,0,100-state.image.cropHeight);if(key==='cropX')state.image.cropX=clamp(state.image.cropX,0,100-state.image.cropWidth);if(key==='cropY')state.image.cropY=clamp(state.image.cropY,0,100-state.image.cropHeight);syncCropReadouts();render()})}
+  function syncCropReadouts(){for(const key of ['zoom','offsetX','offsetY','cropX','cropY','cropWidth','cropHeight']){$(key).value=state.image[key];$(key+'Value').textContent=(key==='zoom'||key.startsWith('crop')?Math.round(state.image[key])+'%':Math.round(state.image[key]));}}
+  function capture(){return clone(state)}
+  function applySnapshot(snapshot){const next=cleanState(snapshot),keepImage=imageElement&&next.image.name&&next.image.name===state.image.name;state=next;if(!keepImage)imageElement=null;syncControls()}
+  function fromJSON(payload){if(!payload||typeof payload!=='object')throw new Error('JSON 最外層必須是物件。');if(payload.schema&&String(payload.schema).startsWith('o-ne.explanation-card.'))return cleanState(payload.data||payload);if(payload.tool_id==='explanation-card'&&payload.data)return cleanState(payload.data);throw new Error('這不是說明卡 JSON。')}
+  function download(blob,name){const url=URL.createObjectURL(blob),anchor=document.createElement('a');anchor.href=url;anchor.download=name;document.body.appendChild(anchor);anchor.click();anchor.remove();setTimeout(()=>URL.revokeObjectURL(url),1200)}
+  function exportPng(){const out=document.createElement('canvas');render(out);out.toBlob(blob=>{if(!blob)return;download(blob,`說明卡-${state.title||'未命名'}-標準.png`);toast('說明卡 PNG 已輸出。')},'image/png')}
+  function exportJson(){const payload={schema:'o-ne.explanation-card.candidate.v0.1.0',status:'CANDIDATE',generator_version:'V0.1.0_20260829',component:{width:CARD_WIDTH,height:lastLayout&&lastLayout.height||MIN_HEIGHT,height_mode:'canvas-measured-auto'},data:capture(),generated_at:new Date().toISOString()};download(new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}),`說明卡-${state.title||'未命名'}-標準.json`);toast('說明卡 JSON 已匯出。')}
+  function toast(message,error=false){const node=$('toast');node.textContent=message;node.classList.toggle('error',error);node.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>node.hidden=true,2600)}
+  function loadImage(file){if(!file)return;if(!/^image\//.test(file.type)){toast('請選擇 PNG、JPG 或 WebP 圖片。',true);return}const reader=new FileReader();reader.onerror=()=>toast('圖片讀取失敗。',true);reader.onload=()=>{const image=new Image();image.onload=()=>{imageElement=image;state.image.name=file.name;$('fileName').textContent=file.name;render()};image.onerror=()=>toast('圖片格式無法開啟。',true);image.src=String(reader.result)};reader.readAsDataURL(file)}
+
+  bindText('labelText','label');bindText('titleText','title');$('labelColor').addEventListener('input',event=>{state.labelColor=event.target.value;render()});bindNumber('titleSize','titleSize',44,84);bindNumber('bodySize','bodySize',24,44);
+  for(const config of [['zoom','zoom',100,300],['offsetX','offsetX',-100,100],['offsetY','offsetY',-100,100],['cropX','cropX',0,88],['cropY','cropY',0,88],['cropWidth','cropWidth',12,100],['cropHeight','cropHeight',12,100]])bindImageNumber(...config);
+  document.querySelectorAll('[data-fit]').forEach(button=>button.onclick=()=>{state.image.fit=button.dataset.fit;syncControls()});
+  $('addRow').onclick=()=>{if(state.rows.length>=MAX_ROWS)return;state.rows.push({key:'重點 '+String(state.rows.length+1).padStart(2,'0'),text:'新增一段說明內容'});renderRows();render()};
+  $('explanationImage').addEventListener('change',event=>loadImage(event.target.files&&event.target.files[0]));$('removeImage').onclick=()=>{imageElement=null;state.image.name='';$('explanationImage').value='';$('fileName').textContent='尚未選擇圖片';render()};
+  $('resetCrop').onclick=()=>{Object.assign(state.image,{cropX:0,cropY:0,cropWidth:100,cropHeight:100});syncCropReadouts();render()};$('exportPng').onclick=exportPng;$('exportJson').onclick=exportJson;
+  syncControls();
+  if(window.ONEEditBackup)window.ONEEditBackup.mount({id:'explanation-card',saveMode:'manual',generatorVersion:'V0.1.0_20260829',host:$('editorScroll'),imageNote:true,getCanvas:()=>canvas,getTitle:snapshot=>snapshot&&snapshot.title,getStatus:()=> '標準',capture,apply:applySnapshot,fromJSON:fromJSON});
+})();
+</script>
+</body>
+</html>

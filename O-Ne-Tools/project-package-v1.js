@@ -23,6 +23,7 @@
     'dialogue-card-v135': '對話卡',
     'rating-card': '評分卡',
     'focus-card': '焦點卡',
+    'explanation-card': '說明卡',
     'thumbnail-frame': '縮圖品牌框',
     'settlement-card': '片尾結算卡'
   };
@@ -780,7 +781,7 @@
     document.write('<script src="./ai-json-guide-v1.js?v=104"></' + 'script>');
   } else if (typeof document !== 'undefined' && document.createElement && document.head) {
     var aiGuideScript = document.createElement('script');
-    aiGuideScript.src = './ai-json-guide-v1.js?v=104';
+    aiGuideScript.src = './ai-json-guide-v1.js?v=105';
     aiGuideScript.onload = function () { if (global.ONEAIJsonGuide) global.ONEAIJsonGuide.wrapProjectPackage(); };
     document.head.appendChild(aiGuideScript);
   }

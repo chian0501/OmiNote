@@ -17,7 +17,7 @@ vm.runInNewContext(
   source.slice(start, end) +
   ';this.__focusLayout={' +
     'FOCUS_TEXT_LIMITS,FOCUS_LABEL_METRICS,FOCUS_TYPE_METRICS,FOCUS_CROP_ASPECT,FOCUS_FREE_CROP_MIN,' +
-    'focusTextLength,focusEstimatedLineCount,focusTypography,' +
+    'focusTextLength,focusEstimatedLineCount,focusMeasuredLineCount,focusTypography,' +
     'focusImageLayout,focusCrop,focusFreeCropEdit,focusFreeCropAction,focusImageDisplayHeight,focusImageDrawRect,focusImageHeight,focusVerticalMetrics,focusImageTop,' +
     'focusRowMetrics,focusAutoHeight' +
   '};',
@@ -36,6 +36,11 @@ assert.strictEqual(
   layout.focusEstimatedLineCount('第一行\n\n第二行', 50),
   3,
   'blank paragraphs must consume a rendered line'
+);
+assert.strictEqual(
+  layout.focusMeasuredLineCount('梅田到 HARUKA｜跟著 5 步走', 713, 56, 6, 800),
+  2,
+  'mixed CJK, Latin and digits must use measured-width wrapping instead of optimistic character counts'
 );
 
 const style = { titleSize: 58, contentSize: 37 };
@@ -180,6 +185,27 @@ for (const mode of ['list', 'steps']) {
   assert(Number.isFinite(height) && height >= 220, `${mode} auto height must remain finite`);
 }
 
+const mixedTitleContent = {
+  ...content,
+  title: '梅田到 HARUKA｜跟著 5 步走',
+  items: [
+    '01｜梅田站 M16：北側 → 出口 3A',
+    '02｜跟著「JR線／大阪駅」走到 JR 大阪站',
+    '03｜進 JR 後找「うめきた地下口」',
+    '04｜下到 B2 地下月台區',
+    '05｜依照現場標示找到 HARUKA 月台'
+  ]
+};
+const mixedTitleLayout = layout.focusImageLayout('steps', largeImage);
+const mixedTitleVertical = layout.focusVerticalMetrics('steps', mixedTitleContent, label, style, scale, false, false, mixedTitleLayout.textWidth);
+const mixedTitleRows = layout.focusRowMetrics('steps', mixedTitleContent.items, style, scale, mixedTitleLayout.textWidth);
+const mixedTitleHeight = layout.focusAutoHeight('steps', mixedTitleContent, label, style, largeImage, scale);
+assert(mixedTitleVertical.titleLines >= 2, 'user example title must reserve both rendered lines');
+assert(
+  mixedTitleHeight >= mixedTitleVertical.contentTop + mixedTitleRows.totalHeight,
+  'mixed-language title and all five rows must remain inside the auto-height border'
+);
+
 const vertical = layout.focusVerticalMetrics('body', content, label, style, scale, false, false, 520);
 const labelBottom = vertical.labelY + vertical.labelHeight;
 const titleTop = vertical.titleBaseline - vertical.titleFont * 0.8;
@@ -218,6 +244,8 @@ assert(source.includes('q.scale??q.scalePercent'), 'legacy and exported JSON ima
 assert(source.includes('不再自動縮字'));
 assert(source.includes('放大只向下延伸'));
 assert(source.includes('上緣對齊大標題'));
-assert(source.includes('V0.5.14_20260829'));
+assert(source.includes('canvas-measured-content-driven'));
+assert(source.includes('.app-shell:has(.canvas-stage.is-component)'));
+assert(source.includes('V0.5.15_20260829'));
 
-console.log('PASS: title-aligned fixed/free crop, resizable selection, independent positioning, manual type, fixed rhythm, downward growth, and 45% image scaling work.');
+console.log('PASS: measured mixed-language wrapping, title-aligned fixed/free crop, manual type, fixed rhythm, downward growth, and 45% image scaling work.');
