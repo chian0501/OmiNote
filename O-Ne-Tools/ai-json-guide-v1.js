@@ -1,8 +1,8 @@
-/* O-Ne shared AI JSON format guide — V1.0.4 */
+/* O-Ne shared AI JSON format guide — V1.0.5 */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.0.4';
+  var VERSION = '1.0.5';
   var mounted = Object.create(null);
 
   var GUIDES = {
@@ -108,10 +108,10 @@
       }
     },
     'explanation-card': {
-      name: '說明卡', code: 'EXPLANATION-CARD', version: 'V0.1.0', file: '說明卡-卡片標題-標準.json', image: true,
+      name: '說明卡', code: 'EXPLANATION-CARD', version: 'V0.1.1', file: '說明卡-卡片標題-標準.json', image: true,
       values: ['schema 固定以 o-ne.explanation-card. 開頭', 'rows 支援 1–8 列；每列包含 key 與 text', '卡片高度由標題與各列實際換行自動增加', '圖片 fit：contain／cover／free；JSON 不含圖片位元，完整搬移請用 O-Ne 專案 ZIP'],
       example: {
-        schema: 'o-ne.explanation-card.candidate.v0.1.0', status: 'CANDIDATE', generator_version: 'V0.1.0_20260829',
+        schema: 'o-ne.explanation-card.ready.v0.1.1', status: 'READY', generator_version: 'V0.1.1_20260830',
         data: {
           label: 'GET!', labelColor: '#FFBE37', title: '這趟旅行，最值得記住的三件事', titleSize: 64, bodySize: 31, keySize: 30,
           rows: [{ key: '重點 01', text: '先看現場動線，再決定最省力的移動方式。' }, { key: '重點 02', text: '把真正有用的資訊留在畫面上。' }],
