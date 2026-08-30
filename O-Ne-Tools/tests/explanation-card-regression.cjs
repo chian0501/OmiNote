@@ -66,7 +66,7 @@ assert.strictEqual(longLayout.imageH, longLayout.height - 60, 'left image panel 
 
 assert(source.includes("id:'explanation-card'"), 'manual history must use an independent tool id');
 assert(source.includes("saveMode:'manual'"), 'history must only save when the user presses the save button');
-assert(source.includes("schema:'o-ne.explanation-card.candidate.v0.1.0'"), 'JSON must use the separate explanation-card schema');
+assert(source.includes("schema:'o-ne.explanation-card.ready.v0.1.1'"), 'JSON must use the separate explanation-card schema');
 assert(source.includes("height_mode:'canvas-measured-auto'"), 'JSON must disclose measured automatic height');
 assert(source.includes("['contain','cover','free']"), 'image settings must support complete, fill and free crop modes');
 assert(source.includes('next.rows=next.rows.slice(0,MAX_ROWS)'), 'row count must stay bounded at eight');
