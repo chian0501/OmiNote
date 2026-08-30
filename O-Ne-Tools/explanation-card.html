@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>O-Ne 說明卡生成器 V0.1.0 CANDIDATE</title>
-  <script src="./edit-backup-v1.js?v=1215"></script>
+  <title>O-Ne 說明卡生成器 V0.1.1 READY</title>
+  <script src="./edit-backup-v1.js?v=1216"></script>
   <style>
     :root{color-scheme:dark;font-family:"Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;--bg:#0b1016;--panel:#111923;--field:#0f1721;--line:#2c3948;--line2:#3a4b5d;--text:#f5f1eb;--muted:#8f9aa8;--teal:#2cb7bc;--teal2:#70ded3;--yellow:#ffbe37;--purple:#8a4f96}
     *{box-sizing:border-box}html,body{min-width:320px;min-height:100%;margin:0}body{background:var(--bg);color:var(--text)}button,input,textarea,select{font:inherit}button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--teal2);outline-offset:2px}
@@ -22,7 +22,7 @@
     <a class="back-link" href="./">← 回工具入口</a>
     <div class="header-divider"></div>
     <div class="title-block">
-      <div class="title-line"><h1>O-Ne 說明卡生成器 <span>V0.1.0</span></h1><strong class="badge">CANDIDATE</strong></div>
+      <div class="title-line"><h1>O-Ne 說明卡生成器 <span>V0.1.1</span></h1><strong class="badge">READY</strong></div>
       <p>獨立依正式「00_說明字卡」母版製作；左圖右文、GET! 標籤與說明列不再和焦點卡共用資料。</p>
     </div>
     <div class="status">自動高度｜內容只往下延伸</div>
@@ -221,7 +221,7 @@
   function fromJSON(payload){if(!payload||typeof payload!=='object')throw new Error('JSON 最外層必須是物件。');if(payload.schema&&String(payload.schema).startsWith('o-ne.explanation-card.'))return cleanState(payload.data||payload);if(payload.tool_id==='explanation-card'&&payload.data)return cleanState(payload.data);throw new Error('這不是說明卡 JSON。')}
   function download(blob,name){const url=URL.createObjectURL(blob),anchor=document.createElement('a');anchor.href=url;anchor.download=name;document.body.appendChild(anchor);anchor.click();anchor.remove();setTimeout(()=>URL.revokeObjectURL(url),1200)}
   function exportPng(){const out=document.createElement('canvas');render(out);out.toBlob(blob=>{if(!blob)return;download(blob,`說明卡-${state.title||'未命名'}-標準.png`);toast('說明卡 PNG 已輸出。')},'image/png')}
-  function exportJson(){const payload={schema:'o-ne.explanation-card.candidate.v0.1.0',status:'CANDIDATE',generator_version:'V0.1.0_20260829',component:{width:CARD_WIDTH,height:lastLayout&&lastLayout.height||MIN_HEIGHT,height_mode:'canvas-measured-auto'},data:capture(),generated_at:new Date().toISOString()};download(new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}),`說明卡-${state.title||'未命名'}-標準.json`);toast('說明卡 JSON 已匯出。')}
+  function exportJson(){const payload={schema:'o-ne.explanation-card.ready.v0.1.1',status:'READY',generator_version:'V0.1.1_20260830',component:{width:CARD_WIDTH,height:lastLayout&&lastLayout.height||MIN_HEIGHT,height_mode:'canvas-measured-auto'},data:capture(),generated_at:new Date().toISOString()};download(new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}),`說明卡-${state.title||'未命名'}-標準.json`);toast('說明卡 JSON 已匯出。')}
   function toast(message,error=false){const node=$('toast');node.textContent=message;node.classList.toggle('error',error);node.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>node.hidden=true,2600)}
   function loadImage(file){if(!file)return;if(!/^image\//.test(file.type)){toast('請選擇 PNG、JPG 或 WebP 圖片。',true);return}const reader=new FileReader();reader.onerror=()=>toast('圖片讀取失敗。',true);reader.onload=()=>{const image=new Image();image.onload=()=>{imageElement=image;state.image.name=file.name;$('fileName').textContent=file.name;render()};image.onerror=()=>toast('圖片格式無法開啟。',true);image.src=String(reader.result)};reader.readAsDataURL(file)}
 
@@ -232,7 +232,7 @@
   $('explanationImage').addEventListener('change',event=>loadImage(event.target.files&&event.target.files[0]));$('removeImage').onclick=()=>{imageElement=null;state.image.name='';$('explanationImage').value='';$('fileName').textContent='尚未選擇圖片';render()};
   $('resetCrop').onclick=()=>{Object.assign(state.image,{cropX:0,cropY:0,cropWidth:100,cropHeight:100});syncCropReadouts();render()};$('exportPng').onclick=exportPng;$('exportJson').onclick=exportJson;
   syncControls();
-  if(window.ONEEditBackup)window.ONEEditBackup.mount({id:'explanation-card',saveMode:'manual',generatorVersion:'V0.1.0_20260829',host:$('editorScroll'),imageNote:true,getCanvas:()=>canvas,getTitle:snapshot=>snapshot&&snapshot.title,getStatus:()=> '標準',capture,apply:applySnapshot,fromJSON:fromJSON});
+  if(window.ONEEditBackup)window.ONEEditBackup.mount({id:'explanation-card',saveMode:'manual',generatorVersion:'V0.1.1_20260830',host:$('editorScroll'),imageNote:true,getCanvas:()=>canvas,getTitle:snapshot=>snapshot&&snapshot.title,getStatus:()=> '標準',capture,apply:applySnapshot,fromJSON:fromJSON});
 })();
 </script>
 </body>
