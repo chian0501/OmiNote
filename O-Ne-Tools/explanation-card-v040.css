@@ -1,4 +1,4 @@
-.badge.is-candidate{border-color:#2b686d;background:#12383d;color:#9ff1e7}
+.badge.is-ready{border-color:#2b686d;background:#12383d;color:#9ff1e7}
 
 .gallery-editor{margin:0 16px 16px;padding:14px;border:1px solid #35505a;border-radius:10px;background:#0d171f}
 .gallery-editor[hidden]{display:none}

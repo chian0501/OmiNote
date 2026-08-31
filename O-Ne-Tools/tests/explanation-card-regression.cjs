@@ -17,7 +17,7 @@ for (const [file, source] of Object.entries(sources)) {
   assert.doesNotThrow(() => new Function(source), `${file} must parse`);
 }
 
-assert(html.includes('<title>O-Ne 說明卡生成器 V0.4.1 CANDIDATE</title>'), 'candidate version must be visible');
+assert(html.includes('<title>O-Ne 說明卡生成器 V0.4.1 READY</title>'), 'ready version must be visible');
 assert(html.includes('edit-backup-v1.js?v=1218'), 'shared manual backup library must load');
 assert(html.includes('explanation-card-v040.css?v=041'), 'gallery CSS must load');
 assert(html.includes('explanation-card-v040.js?v=041'), 'gallery runtime must load');
@@ -38,7 +38,7 @@ assert(gallerySource.includes('gallery_images_max:4'), 'gallery must stay bounde
 assert(gallerySource.includes('gallery_per_image_free_crop:true'), 'JSON metadata must declare independent free crop');
 assert(gallerySource.includes('gallery_free_crop_unlocked_aspect:true'), 'JSON metadata must declare unlocked crop aspect');
 assert(gallerySource.includes('payload.assets.gallery=galleryAssets.map(galleryAssetPayload)'), 'project file must embed gallery assets');
-assert(gallerySource.includes("schema:'o-ne.explanation-card.candidate.v0.4.1'"), 'candidate JSON schema must be versioned');
+assert(gallerySource.includes("schema:'o-ne.explanation-card.formal.v0.4.1'"), 'formal JSON schema must be versioned');
 assert(gallerySource.includes("context.fillStyle='rgba(31,23,19,.80)'"), 'gallery card body must keep the formal 80% fill opacity');
 assert(gallerySource.includes('missingGallerySlots()'), 'PNG export must reject missing active images');
 assert(gallerySource.includes("fit:['contain','cover','free'].includes(item.fit)"), 'each gallery image must support true free crop mode');
@@ -105,4 +105,4 @@ assert(css.includes('.layout-mini.triple'), 'three-across layout preview must be
 assert(css.includes('.gallery-free-crop canvas'), 'per-image crop canvas must be styled');
 assert(css.includes('.gallery-mode .image-trigger'), 'left-image control must be hidden in gallery mode');
 
-console.log('PASS: explanation-card V0.4.1 candidate adds three-across layout and independent true free crop with portable project settings.');
+console.log('PASS: explanation-card V0.4.1 READY adds three-across layout and independent true free crop with portable project settings.');
