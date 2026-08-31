@@ -1,9 +1,9 @@
 {
-  "version": "V2.26_20260831",
+  "version": "V2.27_20260831",
   "principle": "one_function_one_entry",
   "total": 18,
-  "ready": 13,
-  "candidate": 0,
+  "ready": 12,
+  "candidate": 1,
   "ai_bridge": {
     "version": "V1.2_20260807",
     "mode": "chatgpt_pro_manual_json_bridge",
@@ -427,9 +427,9 @@
       "name": "說明卡",
       "family": "正式說明字卡母版",
       "group": "資訊／閱讀",
-      "desc": "保留左圖右文 Word-lite；六種標籤＋標題＋1–4 張純圖片拼圖，每張可獨立自由裁切",
-      "status": "ready",
-      "href": "./explanation-card.html?v=041&build=gallery-triple-freecrop-ready-v1",
+      "desc": "保留六種純圖片拼圖與每張獨立自由裁切；放大編輯區、對齊標籤標題、圖片貼齊底框",
+      "status": "candidate",
+      "href": "./explanation-card.html?v=042&build=gallery-layout-fixes-candidate-v1",
       "features": [
         "official_explanation_card_family",
         "independent_from_focus_card",
@@ -451,6 +451,9 @@
         "gallery_free_crop_unlocked_aspect",
         "gallery_crop_box_persisted_per_image",
         "gallery_project_file_embeds_images",
+        "gallery_editor_min_height_260",
+        "gallery_header_vertical_center_alignment",
+        "gallery_images_flush_to_bottom_border",
         "manual_title_and_body_sizes",
         "transparent_png_and_json_export",
         "local_edit_history_5",
@@ -464,8 +467,8 @@
       ],
       "formal_source_folder": "https://drive.google.com/drive/folders/1pGLi-eFqlS-rfXCUPzzwyVRr-6XrgLH4",
       "formal_psd_id": "1iqnZcZeTJXfHNZ3S2l9e4bIZ_dmFALbd",
-      "generator_version": "V0.4.1_20260831",
-      "visual_status": "READY",
+      "generator_version": "V0.4.2_20260831",
+      "visual_status": "CANDIDATE",
       "panel_fill_opacity": 0.8,
       "qa": {
         "static_parse": "pass",
@@ -473,9 +476,12 @@
         "gallery_layout_regression": "pass_1_2_3_3_3_4",
         "gallery_independent_free_crop_regression": "pass",
         "project_asset_regression": "pass_up_to_4_images",
-        "browser_visual": "pass_public_ready",
-        "browser_interaction": "pass_triple_three_independent_free_modes",
-        "public_pages_run": "274_success"
+        "editor_height_regression": "pass_min_260_and_desktop_save_dock_cap",
+        "gallery_header_alignment_regression": "pass_shared_vertical_center",
+        "gallery_bottom_band_regression": "pass_3px_border_only",
+        "browser_visual": "blocked_local_preview_url_policy_pending_deploy",
+        "browser_interaction": "blocked_local_preview_url_policy_pending_deploy",
+        "public_pages_run": "not_deployed_candidate"
       }
     },
     {
