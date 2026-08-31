@@ -12,7 +12,7 @@
 <body>
 <div class="app">
   <div class="hero"><div><h1>O-Ne 字卡工具入口</h1><div class="sub">原工具是主入口；需要 AI 時才使用 AI 幫填。不同狀態、數量或變體仍在同一編輯器內切換。</div></div><div class="stat"><b id="statNum">—</b><span>可使用／測試</span></div></div>
-  <div class="ai-banner"><b>🕘 所有可用卡片都改為手動保留最近 5 次</b><br>只有按「暫存目前內容」才會保存；未暫存就重開時會回到最後一筆。PNG、JSON 與專案 ZIP 檔名統一為「卡片分類-標題-狀態」，不加 O-Ne，成功／失敗／可愛等同標題版本也能直接分辨。一般含圖片工具載入 JSON 後仍需重新選圖；<b>說明卡 V0.4.3 CANDIDATE</b> 把暫存、專案包與批次工具移到編輯區最底部，打開頁面直接保留完整編輯空間。</div>
+  <div class="ai-banner"><b>🕘 所有可用卡片都改為手動保留最近 5 次</b><br>只有按「暫存目前內容」才會保存；未暫存就重開時會回到最後一筆。PNG、JSON 與專案 ZIP 檔名統一為「卡片分類-標題-狀態」，不加 O-Ne，成功／失敗／可愛等同標題版本也能直接分辨。一般含圖片工具載入 JSON 後仍需重新選圖；<b>說明卡 V0.4.3 READY</b> 把暫存、專案包與批次工具移到編輯區最底部，打開頁面直接保留完整編輯空間。</div>
   <div class="toolbar"><input id="search" class="search" placeholder="搜尋：移動、選項、挑戰、對話、評分…"><button class="filter active" data-group="全部">全部</button><button class="filter" data-group="任務／事件">任務／事件</button><button class="filter" data-group="路線／導航">路線／導航</button><button class="filter" data-group="選擇／確認">選擇／確認</button><button class="filter" data-group="對話／角色">對話／角色</button><button class="filter" data-group="資訊／閱讀">資訊／閱讀</button><button class="filter" data-group="縮圖／品牌">縮圖／品牌</button><button class="filter" data-group="效果／狀態">效果／狀態</button><button class="filter" data-group="結算／結果">結算／結果</button></div>
   <div id="grid" class="grid"></div>
   <div class="footer"><b>規則：</b>AI 只作輔助填欄位，不取代原工具、不改版型。每個工具只有按「暫存目前內容」才會保存，最多保留同一瀏覽器最近 5 次，並可載入該工具輸出的 JSON。下載檔名固定使用「卡片分類-標題-狀態」。所有卡體主底色固定 80% 透明，其他元件維持正式透明度。</div>
@@ -29,7 +29,7 @@ const tools=[
 {id:'dialogue',name:'對話卡',family:'對話卡',group:'對話／角色',desc:'正式框＋完整獨立透明頭像；左右角色／表情／名稱獨立',status:'ready',direct:'./dialogue-card.html?v=141&build=manual-history-v2',ai:''},
 {id:'rating',name:'評分卡',family:'說明／評分',group:'資訊／閱讀',desc:'正式 16:9 品鑑卡；1–8 列、分數／文字；商品圖可左／右／雙圖／不顯示',status:'ready',direct:'./rating-card.html?v=131&build=manual-history-v2',ai:''},
 {id:'focus',name:'焦點內容卡',family:'READY｜焦點內容',group:'資訊／閱讀',desc:'混合中英標題、長說明與多步驟會依 Canvas 實際換行自動向下加高',status:'ready',direct:'./focus-card.html?v=0515&build=measured-autoheight-v1',ai:''},
-{id:'explanation',name:'說明卡',family:'正式說明字卡母版',group:'資訊／閱讀',desc:'V0.4.3 CANDIDATE｜存檔工具移至底部、完整編輯空間',status:'candidate',direct:'./explanation-card.html?v=043&build=save-tools-below-editor-candidate-v1',ai:''},
+{id:'explanation',name:'說明卡',family:'正式說明字卡母版',group:'資訊／閱讀',desc:'V0.4.3 READY｜存檔工具移至底部、完整編輯空間',status:'ready',direct:'./explanation-card.html?v=043&build=save-tools-below-editor-ready-v1',ai:''},
 {id:'thumbnail-frame',name:'縮圖品牌框',family:'首頁框｜1920×1080',group:'縮圖／品牌',desc:'底圖可選填；可輸出品牌框透明版，角標可移動與替換',status:'ready',direct:'./thumbnail-frame.html?v=126&build=manual-history-v2',ai:''},
 {id:'settlement',name:'片尾結算',family:'QST-03｜FORMAL V1.1＋OMI APPROVED EXTENSION',group:'結算／結果',desc:'READY｜1–8 列自由增減，Icon 與欄位名稱可換，左框可打觀眾問題或放下一影片',status:'ready',direct:'./settlement-card.html?v=013&ready=1&build=manual-history-v2',ai:''}
 ];

@@ -715,7 +715,7 @@
   exportJson=function(){
     const payload={
       schema:'o-ne.explanation-card.formal.v0.4.3',
-      status:'CANDIDATE',
+      status:'READY',
       generator_version:VERSION,
       component:{
         width:CARD_WIDTH,
@@ -737,15 +737,15 @@
   };
 
   function installVersionUi(){
-    document.title='O-Ne 說明卡生成器 V0.4.3 CANDIDATE';
+    document.title='O-Ne 說明卡生成器 V0.4.3 READY';
     const version=document.querySelector('.title-line h1 span');
     if(version)version.textContent='V0.4.3';
     const badge=document.querySelector('.title-line .badge');
-    if(badge){badge.textContent='CANDIDATE';badge.classList.remove('is-ready');badge.classList.add('is-candidate');}
+    if(badge){badge.textContent='READY';badge.classList.remove('is-candidate');badge.classList.add('is-ready');}
     const description=document.querySelector('.title-block p');
-    if(description)description.textContent='介面修正候選：把暫存、專案包與批次工具移到編輯區最底部，打開頁面直接保留完整編輯空間。';
+    if(description)description.textContent='正式版：把暫存、專案包與批次工具移到編輯區最底部，打開頁面直接保留完整編輯空間。';
     const status=document.querySelector('.status');
-    if(status)status.textContent='V0.4.3 候選｜存檔工具移至底部｜完整編輯空間';
+    if(status)status.textContent='V0.4.3 READY｜存檔工具移至底部｜完整編輯空間';
   }
 
   function runGalleryQa(){
