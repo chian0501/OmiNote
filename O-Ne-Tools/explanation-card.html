@@ -3,19 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>O-Ne 說明卡生成器 V0.4.2 CANDIDATE</title>
+<title>O-Ne 說明卡生成器 V0.4.3 CANDIDATE</title>
 
 <link rel="stylesheet" href="./explanation-card-v038.css?v=038">
-<link rel="stylesheet" href="./explanation-card-v040.css?v=042">
+<link rel="stylesheet" href="./explanation-card-v040.css?v=043">
 </head>
 <body>
 
 <main class="app-shell">
-<header class="app-header"><a class="back-link" href="./">← 回工具入口</a><div class="header-divider"></div><div class="title-block"><div class="title-line"><h1>O-Ne 說明卡生成器 <span>V0.4.2</span></h1><strong class="badge is-candidate">CANDIDATE</strong></div><p>版面修正候選：放大純圖片編輯區、標籤與標題垂直對齊，並移除圖片下方黑底留邊。</p></div><div class="status">V0.4.2 候選｜大編輯區｜標題對齊｜圖片貼齊底框</div></header>
+<header class="app-header"><a class="back-link" href="./">← 回工具入口</a><div class="header-divider"></div><div class="title-block"><div class="title-line"><h1>O-Ne 說明卡生成器 <span>V0.4.3</span></h1><strong class="badge is-candidate">CANDIDATE</strong></div><p>介面修正候選：把暫存、專案包與批次工具移到編輯區最底部，打開頁面直接保留完整編輯空間。</p></div><div class="status">V0.4.3 候選｜存檔工具移至底部｜完整編輯空間</div></header>
 <section class="workspace">
 <aside class="editor-panel panel">
 <div class="editor-head"><strong>文字／圖片編輯器</strong><small>一般說明沿用 Word-lite；選「純圖片拼圖」時只保留標籤＋標題，再選單張大圖、左右雙圖、三張並排、左大右二、上大下二或四格拼圖。每張圖可各自自由裁切。</small></div>
-<section class="save-dock"><div class="save-dock-head"><div><strong>③ 暫存／存檔</strong><small>暫存留在這台瀏覽器，最多 5 次；下載 JSON 才是可帶走的存檔。</small></div><span class="save-badge">固定顯示</span></div><div id="quickSaveHost"></div><div class="save-file-actions project-actions"><button class="small-btn save-project-btn" id="exportProject" type="button">下載專案檔（含圖片）</button><button class="small-btn" id="importProjectBtn" type="button">載入專案檔</button><input id="projectInput" type="file" accept="application/json,.onecard,.json" hidden><button class="small-btn save-json-btn" id="exportJson" type="button">僅設定 JSON</button><button class="small-btn" id="resetAll" type="button">重設目前內容</button></div><div class="project-file-note">完整專案檔會保存文字、Rich Text、圖片本體、顯示模式、裁切／縮放／位置；最近 5 次暫存仍為輕量本機快照。</div></section><div class="editor-scroll" id="editorScroll">
+<div class="editor-scroll" id="editorScroll">
 <section class="template-strip"><div class="step-heading"><span class="step-no">①</span><div><b>整張內容版型</b><small>點一下就直接套用。會替換整張文字內容，但圖片與卡片設定保留；需要保留目前版本請先暫存。</small></div><span class="impact-badge">點擊直接套用</span></div><div class="template-buttons" id="templateButtons"></div></section>
 <div class="word-toolbar" id="wordToolbar"><div class="toolbar-heading"><span class="step-no">②</span><div><b>反白文字格式</b><small>只想改幾個字：先反白，再選常用格式、字級或品牌色。沒有反白時會套整個目前段落。</small></div><button class="image-trigger" id="openImageDrawer" type="button">🖼 圖片設定</button></div>
 <button class="tool-btn" data-cmd="undo" title="復原" type="button">↶</button><button class="tool-btn" data-cmd="redo" title="重做" type="button">↷</button><span class="tool-divider"></span>
@@ -30,6 +30,7 @@
 <details class="setting"><summary>卡片設定</summary><div class="setting-body"><div class="field-row"><label class="field"><span>標籤文字</span><input id="labelText" maxlength="12"/></label><label class="field"><span>標籤顏色</span><select id="labelColor"></select></label></div><label class="toggle-row"><input id="noteEnabled" type="checkbox"/><span>顯示底部提醒框</span></label><label class="field"><span>提醒文字</span><textarea id="noteText" maxlength="260"></textarea></label><div class="field-row"><label class="field"><span>提醒色</span><select id="noteColor"></select></label><label class="field"><span>提醒字級</span><select id="noteSize"><option>22</option><option selected="">24</option><option>26</option><option>28</option><option>30</option></select></label></div></div></details>
 
 </section>
+<section class="save-dock"><div class="save-dock-head"><div><strong>③ 完成後暫存／存檔</strong><small>工具集中在編輯區最底部；暫存留在這台瀏覽器，最多 5 次，完整搬移請下載專案檔。</small></div><span class="save-badge">底部工具區</span></div><div id="quickSaveHost"></div><div class="save-file-actions project-actions"><button class="small-btn save-project-btn" id="exportProject" type="button">下載專案檔（含圖片）</button><button class="small-btn" id="importProjectBtn" type="button">載入專案檔</button><input id="projectInput" type="file" accept="application/json,.onecard,.json" hidden><button class="small-btn save-json-btn" id="exportJson" type="button">僅設定 JSON</button><button class="small-btn" id="resetAll" type="button">重設目前內容</button></div><div class="project-file-note">完整專案檔會保存文字、Rich Text、圖片本體、顯示模式、裁切／縮放／位置；最近 5 次暫存仍為輕量本機快照。</div></section>
 </div></aside>
 <div class="preview-stack"><section class="preview-panel panel"><div class="preview-toolbar"><strong>說明卡預覽</strong><span id="dimensionText">1552 × 724px｜自動高度</span></div><div class="canvas-stage"><canvas class="preview-canvas" id="previewCanvas"></canvas></div><footer class="export-bar"><p>透明 PNG；自動高度依 Rich Text 實際字級／換行、段落標記與提醒框計算。</p><div class="export-actions single"><button class="export-button primary" id="exportPng" type="button">輸出說明卡 PNG</button></div></footer></section></div>
 </section>
@@ -53,11 +54,11 @@
 
 
 
-<script src="./edit-backup-v1.js?v=1218"></script>
+<script src="./edit-backup-v1.js?v=1219"></script>
 <script src="./explanation-card-v038-1.js?v=040"></script>
 <script src="./explanation-card-v038-2.js?v=040"></script>
 <script src="./explanation-card-v038-3.js?v=040"></script>
 <script src="./explanation-card-v038-4.js?v=040"></script>
 <script src="./explanation-card-v038-5.js?v=040"></script>
-<script src="./explanation-card-v040.js?v=042"></script>
+<script src="./explanation-card-v040.js?v=043"></script>
 </body></html>

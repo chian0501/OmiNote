@@ -60,7 +60,7 @@ assert(guide.guides['focus-card'].values.some(value => value.includes('cropX／c
 assert.strictEqual(guide.example('thumbnail-frame').component_id, 'THUMBNAIL-FRAME');
 assert.strictEqual(guide.example('settlement-card').component_id, 'QST-03');
 assert.strictEqual(guide.example('move-card').segments.length, guide.example('move-card').stations.length - 1);
-assert.strictEqual(guide.guides['explanation-card'].version, 'V0.4.2');
+assert.strictEqual(guide.guides['explanation-card'].version, 'V0.4.3');
 assert.strictEqual(guide.example('explanation-card').data.mode, 'gallery');
 assert.strictEqual(guide.example('explanation-card').data.gallery.layout, 'triple');
 assert.strictEqual(guide.example('explanation-card').data.gallery.slots.length, 4);
@@ -84,6 +84,6 @@ assert(guideSource.includes('directPreviewPanel(host)'), 'placement must resolve
 assert(!guideSource.includes('one-ai-json-guide-row'), 'guide must not create a separate full-width row outside the preview column');
 assert(guideSource.includes('ONEEditBackup.__aiJsonGuideWrapped'), 'shared edit-backup tools must mount the AI guide');
 assert(guideSource.includes('ONEProjectPackage.__aiJsonGuideWrapped'), 'persistent/project-package path must mount the AI guide');
-assert(packageSource.includes('ai-json-guide-v1.js?v=108'), 'project package must synchronously load the cache-busted AI JSON guide');
+assert(packageSource.includes('ai-json-guide-v1.js?v=109'), 'project package must synchronously load the cache-busted AI JSON guide');
 new Function(guideSource);
 console.log('PASS: 13 AI JSON schemas, raw JSON handoff instructions, image ZIP notes, right-column placement contract and syntax.');

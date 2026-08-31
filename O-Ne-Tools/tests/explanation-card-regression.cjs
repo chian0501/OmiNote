@@ -17,10 +17,16 @@ for (const [file, source] of Object.entries(sources)) {
   assert.doesNotThrow(() => new Function(source), `${file} must parse`);
 }
 
-assert(html.includes('<title>O-Ne 說明卡生成器 V0.4.2 CANDIDATE</title>'), 'candidate version must be visible');
-assert(html.includes('edit-backup-v1.js?v=1218'), 'shared manual backup library must load');
-assert(html.includes('explanation-card-v040.css?v=042'), 'gallery CSS must load');
-assert(html.includes('explanation-card-v040.js?v=042'), 'gallery runtime must load');
+assert(html.includes('<title>O-Ne 說明卡生成器 V0.4.3 CANDIDATE</title>'), 'candidate version must be visible');
+assert(html.includes('edit-backup-v1.js?v=1219'), 'shared manual backup library must load');
+assert(html.includes('explanation-card-v040.css?v=043'), 'gallery CSS must load');
+assert(html.includes('explanation-card-v040.js?v=043'), 'gallery runtime must load');
+const editorScrollStart = html.indexOf('<div class="editor-scroll" id="editorScroll">');
+const editorScrollEnd = html.indexOf('</div></aside>', editorScrollStart);
+const saveDockIndex = html.indexOf('<section class="save-dock">');
+assert(editorScrollStart >= 0 && editorScrollEnd > editorScrollStart, 'editor scroll region must exist');
+assert(saveDockIndex > html.indexOf('<section class="settings">') && saveDockIndex < editorScrollEnd, 'save tools must live at the bottom of the editor scroll region');
+assert(html.includes('<span class="save-badge">底部工具區</span>'), 'save tools must explain their new bottom placement');
 
 assert(combined.includes('const CARD_WIDTH=1552,MIN_HEIGHT=724'), 'formal explanation card dimensions must remain available');
 assert(combined.includes("['contain','cover','free']"), 'content mode must preserve complete, fill and free crop modes');
@@ -38,7 +44,7 @@ assert(gallerySource.includes('gallery_images_max:4'), 'gallery must stay bounde
 assert(gallerySource.includes('gallery_per_image_free_crop:true'), 'JSON metadata must declare independent free crop');
 assert(gallerySource.includes('gallery_free_crop_unlocked_aspect:true'), 'JSON metadata must declare unlocked crop aspect');
 assert(gallerySource.includes('payload.assets.gallery=galleryAssets.map(galleryAssetPayload)'), 'project file must embed gallery assets');
-assert(gallerySource.includes("schema:'o-ne.explanation-card.formal.v0.4.2'"), 'formal JSON schema must be versioned');
+assert(gallerySource.includes("schema:'o-ne.explanation-card.formal.v0.4.3'"), 'formal JSON schema must be versioned');
 assert(gallerySource.includes("status:'CANDIDATE'"), 'unreleased formal JSON must stay candidate');
 assert(gallerySource.includes("context.fillStyle='rgba(31,23,19,.80)'"), 'gallery card body must keep the formal 80% fill opacity');
 assert(gallerySource.includes('missingGallerySlots()'), 'PNG export must reject missing active images');
@@ -126,6 +132,7 @@ assert(css.includes('.layout-mini.triple'), 'three-across layout preview must be
 assert(css.includes('.gallery-free-crop canvas'), 'per-image crop canvas must be styled');
 assert(css.includes('.gallery-mode .image-trigger'), 'left-image control must be hidden in gallery mode');
 assert(css.includes('.gallery-mode .word-page{min-height:260px}'), 'gallery title editor must keep a useful editing height');
-assert(css.includes('.gallery-mode .save-dock{max-height:min(340px,35dvh);overflow-y:auto'), 'desktop save tools must stop squeezing the gallery editor');
+assert(css.includes('.editor-scroll>.save-dock{margin:6px 16px 18px'), 'bottom save tools must be styled as the last editor card');
+assert(!css.includes('.gallery-mode .save-dock{max-height:'), 'save tools must no longer reserve a fixed block above the editor');
 
-console.log('PASS: explanation-card V0.4.2 CANDIDATE keeps gallery features and fixes editor height, header alignment and the bottom band.');
+console.log('PASS: explanation-card V0.4.3 CANDIDATE keeps the full editor viewport by moving save tools below the editor content.');
