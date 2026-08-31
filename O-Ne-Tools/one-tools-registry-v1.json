@@ -465,7 +465,9 @@
         "static_parse": "pass",
         "autoheight_regression": "pass",
         "image_below_layout_regression": "pass",
-        "browser_visual": "pending_candidate_retest"
+        "browser_visual": "pass_public_candidate_shell_mode_and_ai_guide",
+        "browser_image_upload": "blocked_cloud_filechooser_timeout; contain_and_free_crop_ratios_covered_by_regression",
+        "console_errors": 0
       }
     },
     {
