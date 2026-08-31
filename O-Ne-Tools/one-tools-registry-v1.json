@@ -427,9 +427,9 @@
       "name": "說明卡",
       "family": "正式說明字卡母版",
       "group": "資訊／閱讀",
-      "desc": "保留左圖右文 Word-lite；新增標籤＋標題＋1–4 張純圖片拼圖",
+      "desc": "保留左圖右文 Word-lite；六種標籤＋標題＋1–4 張純圖片拼圖，每張可獨立自由裁切",
       "status": "candidate",
-      "href": "./explanation-card.html?v=040&build=gallery-candidate-v1",
+      "href": "./explanation-card.html?v=041&build=gallery-triple-freecrop-candidate-v2",
       "features": [
         "official_explanation_card_family",
         "independent_from_focus_card",
@@ -443,10 +443,13 @@
         "image_only_gallery_mode",
         "gallery_single_large_image",
         "gallery_split_two_images",
+        "gallery_triple_side_by_side",
         "gallery_hero_right_three_images",
         "gallery_hero_bottom_three_images",
         "gallery_grid_four_images",
-        "gallery_per_image_fit_and_focus",
+        "gallery_per_image_fit_focus_and_free_crop",
+        "gallery_free_crop_unlocked_aspect",
+        "gallery_crop_box_persisted_per_image",
         "gallery_project_file_embeds_images",
         "manual_title_and_body_sizes",
         "transparent_png_and_json_export",
@@ -461,13 +464,14 @@
       ],
       "formal_source_folder": "https://drive.google.com/drive/folders/1pGLi-eFqlS-rfXCUPzzwyVRr-6XrgLH4",
       "formal_psd_id": "1iqnZcZeTJXfHNZ3S2l9e4bIZ_dmFALbd",
-      "generator_version": "V0.4.0_20260831",
+      "generator_version": "V0.4.1_20260831",
       "visual_status": "CANDIDATE",
       "panel_fill_opacity": 0.8,
       "qa": {
         "static_parse": "pass",
         "autoheight_regression": "preserved_from_v0.3.8",
-        "gallery_layout_regression": "pass_1_2_3_3_4",
+        "gallery_layout_regression": "pass_1_2_3_3_3_4",
+        "gallery_independent_free_crop_regression": "pass",
         "project_asset_regression": "pass_up_to_4_images",
         "browser_visual": "pending_after_deploy"
       }
@@ -651,7 +655,7 @@
     "stop_supported": true
   },
   "shared_ai_json_guide": {
-    "version": "V1.0.6_20260831",
+    "version": "V1.0.7_20260831",
     "tool_count": 13,
     "placement": "same_right_column_directly_below_preview",
     "copy_full_ai_prompt": true,

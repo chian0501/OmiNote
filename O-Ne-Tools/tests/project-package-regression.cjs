@@ -89,7 +89,7 @@ assert(helperSource.indexOf('instance.config.apply(clone(project.data));') < hel
   assert.strictEqual(new TextDecoder().decode(entries['焦點卡_道頓堀.json']), '{"ok":true}');
   assert.deepStrictEqual(Array.from(entries['assets/route.png']), [137, 80, 78, 71]);
 
-  assert(backupSource.includes('project-package-v1.js?v=1107'), 'shared backup must synchronously bridge to the cache-busted project package helper');
+  assert(backupSource.includes('project-package-v1.js?v=1108'), 'shared backup must synchronously bridge to the cache-busted project package helper');
   assert(backupSource.includes("version: '1.2.0'"), 'existing shared backup public version must stay compatible');
 
   const sharedEditors = [
@@ -99,7 +99,7 @@ assert(helperSource.indexOf('instance.config.apply(clone(project.data));') < hel
   ];
   for (const file of sharedEditors) {
     const html = fs.readFileSync(path.join(root, file), 'utf8');
-    const backupVersion = file === 'explanation-card.html' ? 'edit-backup-v1.js?v=1217' : file === 'focus-card.html' ? 'edit-backup-v1.js?v=1215' : 'edit-backup-v1.js?v=121';
+    const backupVersion = file === 'explanation-card.html' ? 'edit-backup-v1.js?v=1218' : file === 'focus-card.html' ? 'edit-backup-v1.js?v=1215' : 'edit-backup-v1.js?v=121';
     assert(html.includes(backupVersion), file + ' must still load the shared backup bridge');
   }
 

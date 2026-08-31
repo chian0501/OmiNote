@@ -122,14 +122,14 @@ const tools = [
   ['dialogue-card-v135.html', 'dialogue-card', 'V1.3.7'],
   ['rating-card.html', 'rating-card', 'V1.3.1'],
   ['focus-card.html', 'focus-card', 'V0.5.15'],
-  ['explanation-card.html', 'explanation-card', 'V0.4.0'],
+  ['explanation-card.html', 'explanation-card', 'V0.4.1'],
   ['thumbnail-frame.html', 'thumbnail-frame', 'V1.2.6'],
   ['settlement-card.html', 'settlement-card', 'V0.1.3']
 ];
 
 for (const [file, id, version] of tools) {
   const html = fs.readFileSync(path.join(root, file), 'utf8');
-  const backupVersion = file === 'explanation-card.html' ? 'edit-backup-v1.js?v=1217' : file === 'focus-card.html' ? 'edit-backup-v1.js?v=1215' : 'edit-backup-v1.js?v=121';
+  const backupVersion = file === 'explanation-card.html' ? 'edit-backup-v1.js?v=1218' : file === 'focus-card.html' ? 'edit-backup-v1.js?v=1215' : 'edit-backup-v1.js?v=121';
   assert(html.includes(backupVersion), file + ' must load the manual-by-default shared backup library');
   const implementation = file === 'settlement-card.html'
     ? fs.readFileSync(path.join(root, 'settlement-card-v011.js'), 'utf8')
@@ -186,7 +186,7 @@ for (const id of registryIds) {
     assert(entry.features.includes(feature), id + ' missing ' + feature);
   }
 }
-assert.strictEqual(registry.shared_ai_json_guide.version, 'V1.0.6_20260831');
+assert.strictEqual(registry.shared_ai_json_guide.version, 'V1.0.7_20260831');
 assert.strictEqual(registry.shared_ai_json_guide.tool_count, 13);
 assert.strictEqual(registry.shared_ai_json_guide.raw_json_only_instruction, true);
 assert.strictEqual(registry.shared_ai_json_guide.placement, 'same_right_column_directly_below_preview');

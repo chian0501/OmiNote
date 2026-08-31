@@ -1,18 +1,20 @@
 'use strict';
 
 (function installGalleryMode(){
-  const VERSION='V0.4.0_20260831';
+  const VERSION='V0.4.1_20260831';
   const GALLERY_LAYOUTS={
     single:{label:'單張大圖',count:1,hint:'一張圖放滿圖片區；可搭配「大圖 820px」接近 16:9。'},
     split:{label:'左右雙圖',count:2,hint:'兩張圖左右等寬，適合前後、A／B 或台日對照。'},
+    triple:{label:'三張並排',count:3,hint:'三張圖片等寬並排；每張都可獨立完整顯示、填滿裁切或自由拉框裁切。'},
     'hero-right':{label:'左大右二',count:3,hint:'主圖放左側，右側上下各一張補充細節。'},
     'hero-bottom':{label:'上大下二',count:3,hint:'主圖橫跨上方，下方兩張補充步驟或局部。'},
     grid:{label:'四格拼圖',count:4,hint:'四張圖等分，適合流程、商品或多角度整理。'}
   };
   const GALLERY_HEIGHTS=[520,650,820];
-  const slotDefault=()=>({name:'',fit:'cover',focusX:0,focusY:0});
+  const slotDefault=()=>({name:'',fit:'cover',focusX:0,focusY:0,cropX:0,cropY:0,cropWidth:100,cropHeight:100});
   const galleryDefault=()=>({layout:'single',height:650,gap:16,slots:Array.from({length:4},slotDefault)});
   const galleryAssets=Array(4).fill(null);
+  const galleryCropDrags=Array(4).fill(null);
 
   function normalizeGallery(raw){
     const source=raw&&typeof raw==='object'?raw:{};
@@ -21,11 +23,17 @@
     const gap=Math.round(clamp(source.gap??16,8,28));
     const slots=Array.from({length:4},(_,index)=>{
       const item=Array.isArray(source.slots)&&source.slots[index]&&typeof source.slots[index]==='object'?source.slots[index]:{};
+      const cropWidth=clamp(item.cropWidth??100,4,100);
+      const cropHeight=clamp(item.cropHeight??100,4,100);
       return{
         name:String(item.name||''),
-        fit:item.fit==='contain'?'contain':'cover',
+        fit:['contain','cover','free'].includes(item.fit)?item.fit:'cover',
         focusX:clamp(item.focusX??0,-100,100),
-        focusY:clamp(item.focusY??0,-100,100)
+        focusY:clamp(item.focusY??0,-100,100),
+        cropX:clamp(item.cropX??0,0,100-cropWidth),
+        cropY:clamp(item.cropY??0,0,100-cropHeight),
+        cropWidth,
+        cropHeight
       };
     });
     return{layout,height,gap,slots};
@@ -123,6 +131,14 @@
         state.gallery.slots[index]=slotDefault();
         renderGalleryEditor();
         renderCanvas();
+        return;
+      }
+      const resetCropButton=event.target.closest('[data-gallery-crop-reset]');
+      if(resetCropButton){
+        const index=Number(resetCropButton.dataset.galleryCropReset);
+        Object.assign(state.gallery.slots[index],{cropX:0,cropY:0,cropWidth:100,cropHeight:100});
+        renderGalleryEditor();
+        renderCanvas();
       }
     });
 
@@ -140,7 +156,7 @@
       }
       if(target.matches('[data-gallery-fit]')){
         const index=Number(target.dataset.galleryFit);
-        state.gallery.slots[index].fit=target.value==='contain'?'contain':'cover';
+        state.gallery.slots[index].fit=['contain','cover','free'].includes(target.value)?target.value:'cover';
         renderGalleryEditor();
         renderCanvas();
       }
@@ -164,6 +180,177 @@
     return asset&&slot&&asset.name===slot.name?asset:null;
   }
 
+  function galleryCropGeometry(index,target){
+    const asset=activeAsset(index);
+    if(!asset)return null;
+    const image=asset.element;
+    const sourceWidth=image.naturalWidth||image.width;
+    const sourceHeight=image.naturalHeight||image.height;
+    const canvasWidth=target.width||640;
+    const canvasHeight=target.height||360;
+    const scale=Math.min((canvasWidth-36)/sourceWidth,(canvasHeight-36)/sourceHeight);
+    const imageWidth=sourceWidth*scale;
+    const imageHeight=sourceHeight*scale;
+    const imageX=(canvasWidth-imageWidth)/2;
+    const imageY=(canvasHeight-imageHeight)/2;
+    const slot=state.gallery.slots[index];
+    const crop={
+      x:imageX+imageWidth*slot.cropX/100,
+      y:imageY+imageHeight*slot.cropY/100,
+      w:imageWidth*slot.cropWidth/100,
+      h:imageHeight*slot.cropHeight/100
+    };
+    return{asset,image,sourceWidth,sourceHeight,canvasWidth,canvasHeight,imageX,imageY,imageWidth,imageHeight,crop};
+  }
+
+  function galleryCropHandlePoints(rect){
+    return{
+      nw:[rect.x,rect.y],n:[rect.x+rect.w/2,rect.y],ne:[rect.x+rect.w,rect.y],
+      e:[rect.x+rect.w,rect.y+rect.h/2],se:[rect.x+rect.w,rect.y+rect.h],
+      s:[rect.x+rect.w/2,rect.y+rect.h],sw:[rect.x,rect.y+rect.h],w:[rect.x,rect.y+rect.h/2]
+    };
+  }
+
+  function galleryCropCursor(target){
+    return{nw:'nwse-resize',se:'nwse-resize',ne:'nesw-resize',sw:'nesw-resize',n:'ns-resize',s:'ns-resize',e:'ew-resize',w:'ew-resize',move:'move'}[target]||'crosshair';
+  }
+
+  function galleryCropHit(index,target,point){
+    const geometry=galleryCropGeometry(index,target);
+    if(!geometry)return null;
+    const handles=galleryCropHandlePoints(geometry.crop);
+    const radius=18;
+    for(const [name,[x,y]] of Object.entries(handles)){
+      if(Math.abs(point.x-x)<=radius&&Math.abs(point.y-y)<=radius)return name;
+    }
+    const rect=geometry.crop;
+    return point.x>=rect.x&&point.x<=rect.x+rect.w&&point.y>=rect.y&&point.y<=rect.y+rect.h?'move':null;
+  }
+
+  function galleryCropPoint(event,target){
+    const bounds=target.getBoundingClientRect();
+    return{
+      x:(event.clientX-bounds.left)*target.width/bounds.width,
+      y:(event.clientY-bounds.top)*target.height/bounds.height
+    };
+  }
+
+  function galleryCropAfterDrag(targetName,start,px,py){
+    const minimum=4;
+    let{x,y,w,h}=start;
+    if(targetName==='move'){
+      x=clamp(x+px,0,100-w);
+      y=clamp(y+py,0,100-h);
+    }else{
+      if(targetName.includes('w')){
+        const nextX=clamp(x+px,0,x+w-minimum);
+        w=w+(x-nextX);
+        x=nextX;
+      }
+      if(targetName.includes('e'))w=clamp(w+px,minimum,100-x);
+      if(targetName.includes('n')){
+        const nextY=clamp(y+py,0,y+h-minimum);
+        h=h+(y-nextY);
+        y=nextY;
+      }
+      if(targetName.includes('s'))h=clamp(h+py,minimum,100-y);
+    }
+    return{x,y,w,h};
+  }
+
+  function updateGalleryCropFromDrag(index,targetName,start,deltaX,deltaY,target){
+    const geometry=galleryCropGeometry(index,target);
+    if(!geometry)return;
+    const next=galleryCropAfterDrag(targetName,start,deltaX/geometry.imageWidth*100,deltaY/geometry.imageHeight*100);
+    Object.assign(state.gallery.slots[index],{cropX:next.x,cropY:next.y,cropWidth:next.w,cropHeight:next.h});
+    renderGalleryCropper(index,target);
+    renderCanvas();
+  }
+
+  function renderGalleryCropper(index,target){
+    const context=target.getContext('2d');
+    const geometry=galleryCropGeometry(index,target);
+    context.clearRect(0,0,target.width,target.height);
+    context.fillStyle='#090d12';
+    context.fillRect(0,0,target.width,target.height);
+    const readout=target.closest('.gallery-free-crop')?.querySelector('[data-gallery-crop-readout]');
+    if(!geometry){
+      context.fillStyle='#9aa7b3';
+      context.font='700 22px "Noto Sans TC",sans-serif';
+      context.textAlign='center';
+      context.textBaseline='middle';
+      context.fillText('先選擇圖片，再調整裁切框',target.width/2,target.height/2);
+      if(readout)readout.textContent='尚未選圖';
+      return;
+    }
+    const{image,sourceWidth,sourceHeight,imageX,imageY,imageWidth,imageHeight,crop}=geometry;
+    context.globalAlpha=.34;
+    context.drawImage(image,0,0,sourceWidth,sourceHeight,imageX,imageY,imageWidth,imageHeight);
+    context.globalAlpha=1;
+    context.save();
+    context.beginPath();
+    context.rect(crop.x,crop.y,crop.w,crop.h);
+    context.clip();
+    context.drawImage(image,0,0,sourceWidth,sourceHeight,imageX,imageY,imageWidth,imageHeight);
+    context.restore();
+    context.strokeStyle=BRAND.teal;
+    context.lineWidth=4;
+    context.strokeRect(crop.x,crop.y,crop.w,crop.h);
+    context.strokeStyle='rgba(253,243,231,.34)';
+    context.lineWidth=1;
+    context.beginPath();
+    context.moveTo(crop.x+crop.w/3,crop.y);
+    context.lineTo(crop.x+crop.w/3,crop.y+crop.h);
+    context.moveTo(crop.x+crop.w*2/3,crop.y);
+    context.lineTo(crop.x+crop.w*2/3,crop.y+crop.h);
+    context.moveTo(crop.x,crop.y+crop.h/3);
+    context.lineTo(crop.x+crop.w,crop.y+crop.h/3);
+    context.moveTo(crop.x,crop.y+crop.h*2/3);
+    context.lineTo(crop.x+crop.w,crop.y+crop.h*2/3);
+    context.stroke();
+    for(const [name,[x,y]] of Object.entries(galleryCropHandlePoints(crop))){
+      const size=name.length===2?15:13;
+      context.fillStyle=BRAND.cream;
+      context.fillRect(x-size/2,y-size/2,size,size);
+      context.strokeStyle=BRAND.teal;
+      context.lineWidth=2;
+      context.strokeRect(x-size/2,y-size/2,size,size);
+    }
+    const slot=state.gallery.slots[index];
+    if(readout)readout.textContent=`X ${Math.round(slot.cropX)}%｜Y ${Math.round(slot.cropY)}%｜W ${Math.round(slot.cropWidth)}%｜H ${Math.round(slot.cropHeight)}%`;
+  }
+
+  function bindGalleryCropper(index,target){
+    target.addEventListener('pointerdown',event=>{
+      if(!activeAsset(index)||state.gallery.slots[index].fit!=='free')return;
+      const point=galleryCropPoint(event,target);
+      const hit=galleryCropHit(index,target,point);
+      if(!hit)return;
+      const slot=state.gallery.slots[index];
+      galleryCropDrags[index]={target:hit,point,start:{x:slot.cropX,y:slot.cropY,w:slot.cropWidth,h:slot.cropHeight}};
+      target.setPointerCapture?.(event.pointerId);
+      target.style.cursor=galleryCropCursor(hit);
+      event.preventDefault();
+    });
+    target.addEventListener('pointermove',event=>{
+      const point=galleryCropPoint(event,target);
+      const drag=galleryCropDrags[index];
+      if(!drag){
+        target.style.cursor=galleryCropCursor(galleryCropHit(index,target,point));
+        return;
+      }
+      updateGalleryCropFromDrag(index,drag.target,drag.start,point.x-drag.point.x,point.y-drag.point.y,target);
+      event.preventDefault();
+    });
+    const end=event=>{
+      galleryCropDrags[index]=null;
+      target.style.cursor='crosshair';
+      if(event&&target.hasPointerCapture?.(event.pointerId))target.releasePointerCapture(event.pointerId);
+    };
+    target.addEventListener('pointerup',end);
+    target.addEventListener('pointercancel',end);
+  }
+
   function renderGalleryEditor(){
     const host=$('galleryEditor');
     if(!host)return;
@@ -179,6 +366,7 @@
     const filled=Array.from({length:meta.count},(_,index)=>Boolean(activeAsset(index))).filter(Boolean).length;
     $('galleryCount').textContent=`${filled}／${meta.count} 張`;
     const slots=$('gallerySlots');
+    galleryCropDrags.fill(null);
     slots.innerHTML='';
     for(let index=0;index<meta.count;index++){
       const item=state.gallery.slots[index];
@@ -193,12 +381,18 @@
           <button class="small-btn" type="button" data-gallery-remove="${index}" ${asset?'':'disabled'}>移除</button>
           <input hidden type="file" accept="image/png,image/jpeg,image/webp" data-gallery-file="${index}">
         </div>
-        <div class="gallery-slot-controls ${item.fit==='contain'?'is-contain':''}">
-          <label><span>顯示方式</span><select class="fit-select" data-gallery-fit="${index}"><option value="cover" ${item.fit==='cover'?'selected':''}>填滿裁切</option><option value="contain" ${item.fit==='contain'?'selected':''}>完整顯示</option></select></label>
+        <div class="gallery-slot-controls is-${item.fit}">
+          <label><span>顯示方式</span><select class="fit-select" data-gallery-fit="${index}"><option value="cover" ${item.fit==='cover'?'selected':''}>填滿裁切</option><option value="contain" ${item.fit==='contain'?'selected':''}>完整顯示</option><option value="free" ${item.fit==='free'?'selected':''}>自由裁切</option></select></label>
           <label class="focus-control"><span>水平焦點</span><input type="range" min="-100" max="100" value="${item.focusX}" data-gallery-focus-x="${index}"></label>
           <label class="focus-control"><span>垂直焦點</span><input type="range" min="-100" max="100" value="${item.focusY}" data-gallery-focus-y="${index}"></label>
-        </div>`;
+        </div>
+        ${item.fit==='free'?`<div class="gallery-free-crop"><div class="gallery-free-crop-head"><span>拖框內移動；拖四邊或四角改範圍</span><button type="button" data-gallery-crop-reset="${index}">重設</button></div><canvas width="640" height="360" data-gallery-crop-canvas="${index}" aria-label="圖片 ${index+1} 自由裁切框"></canvas><small data-gallery-crop-readout></small><small>選取範圍會完整顯示且不變形；若比例不同，成品圖片格內會保留留邊。</small></div>`:''}`;
       slots.appendChild(card);
+      const cropper=card.querySelector('[data-gallery-crop-canvas]');
+      if(cropper){
+        bindGalleryCropper(index,cropper);
+        renderGalleryCropper(index,cropper);
+      }
     }
   }
 
@@ -250,6 +444,14 @@
       const half=(w-gap)/2;
       return[{x,y,w:half,h},{x:x+half+gap,y,w:half,h}];
     }
+    if(layout==='triple'){
+      const third=(w-gap*2)/3;
+      return[
+        {x,y,w:third,h},
+        {x:x+third+gap,y,w:third,h},
+        {x:x+(third+gap)*2,y,w:third,h}
+      ];
+    }
     if(layout==='hero-right'){
       const left=Math.round((w-gap)*.66),right=w-gap-left,half=(h-gap)/2;
       return[{x,y,w:left,h},{x:x+left+gap,y,w:right,h:half},{x:x+left+gap,y:y+half+gap,w:right,h:half}];
@@ -266,6 +468,19 @@
       ];
     }
     return[{x,y,w,h}];
+  }
+
+  function galleryCropSource(slot,imageWidth,imageHeight){
+    const cropWidth=clamp(slot.cropWidth??100,4,100);
+    const cropHeight=clamp(slot.cropHeight??100,4,100);
+    const cropX=clamp(slot.cropX??0,0,100-cropWidth);
+    const cropY=clamp(slot.cropY??0,0,100-cropHeight);
+    return{
+      sx:imageWidth*cropX/100,
+      sy:imageHeight*cropY/100,
+      sw:imageWidth*cropWidth/100,
+      sh:imageHeight*cropHeight/100
+    };
   }
 
   function layoutGalleryCard(context){
@@ -305,6 +520,11 @@
         const scale=Math.min(rect.w/iw,rect.h/ih);
         const dw=iw*scale,dh=ih*scale;
         context.drawImage(image,0,0,iw,ih,rect.x+(rect.w-dw)/2,rect.y+(rect.h-dh)/2,dw,dh);
+      }else if(slot.fit==='free'){
+        const source=galleryCropSource(slot,iw,ih);
+        const scale=Math.min(rect.w/source.sw,rect.h/source.sh);
+        const dw=source.sw*scale,dh=source.sh*scale;
+        context.drawImage(image,source.sx,source.sy,source.sw,source.sh,rect.x+(rect.w-dw)/2,rect.y+(rect.h-dh)/2,dw,dh);
       }else{
         const scale=Math.max(rect.w/iw,rect.h/ih);
         const dw=iw*scale,dh=ih*scale;
@@ -492,7 +712,7 @@
 
   exportJson=function(){
     const payload={
-      schema:'o-ne.explanation-card.candidate.v0.4.0',
+      schema:'o-ne.explanation-card.candidate.v0.4.1',
       status:'CANDIDATE',
       generator_version:VERSION,
       component:{
@@ -503,6 +723,8 @@
         modes:['content','gallery'],
         gallery_layouts:Object.keys(GALLERY_LAYOUTS),
         gallery_images_max:4,
+        gallery_per_image_free_crop:true,
+        gallery_free_crop_unlocked_aspect:true,
         project_file_embeds_images:true
       },
       data:capture(),
@@ -513,15 +735,15 @@
   };
 
   function installVersionUi(){
-    document.title='O-Ne 說明卡生成器 V0.4.0 CANDIDATE';
+    document.title='O-Ne 說明卡生成器 V0.4.1 CANDIDATE';
     const version=document.querySelector('.title-line h1 span');
-    if(version)version.textContent='V0.4.0';
+    if(version)version.textContent='V0.4.1';
     const badge=document.querySelector('.title-line .badge');
     if(badge){badge.textContent='CANDIDATE';badge.classList.add('is-candidate');}
     const description=document.querySelector('.title-block p');
-    if(description)description.textContent='新增純圖片拼圖：保留標籤＋標題，下方可放單張大圖或 2–4 張圖片。';
+    if(description)description.textContent='純圖片拼圖新增三張並排；每張圖片都可獨立自由拉框裁切。';
     const status=document.querySelector('.status');
-    if(status)status.textContent='Rich Text｜純圖片拼圖｜單張大圖｜專案檔含圖片';
+    if(status)status.textContent='Rich Text｜三張並排｜每張獨立自由裁切｜專案檔含圖片';
   }
 
   function runGalleryQa(){
@@ -545,13 +767,20 @@
       renderEditor();
       const single=renderCanvas();
       if(single.rects.length!==1||single.height<900)throw new Error('single gallery layout');
+      state.gallery.layout='triple';
+      state.gallery.slots[0]={...state.gallery.slots[0],fit:'free',cropX:10,cropY:12,cropWidth:64,cropHeight:70};
+      const triple=renderCanvas();
+      if(triple.rects.length!==3)throw new Error('triple gallery layout');
+      const crop=galleryCropSource(state.gallery.slots[0],1600,900);
+      if(crop.sx!==160||crop.sy!==108||crop.sw!==1024||crop.sh!==630)throw new Error('independent free crop source');
       state.gallery.layout='grid';
       const grid=renderCanvas();
       if(grid.rects.length!==4)throw new Error('grid gallery layout');
       const project=projectPayload();
       if(!project.assets.gallery||project.assets.gallery.filter(Boolean).length!==4)throw new Error('gallery project assets');
+      if(project.data.gallery.slots[0].fit!=='free'||project.data.gallery.slots[0].cropWidth!==64)throw new Error('gallery crop project settings');
       if(!document.body.classList.contains('gallery-mode'))throw new Error('gallery editor mode');
-      $('qaResult').textContent='PASS｜gallery single｜split｜hero-right｜hero-bottom｜grid｜project assets';
+      $('qaResult').textContent='PASS｜gallery single｜split｜triple｜hero-right｜hero-bottom｜grid｜free crop｜project assets';
       document.body.dataset.qa='pass';
     }catch(error){
       $('qaResult').textContent='FAIL｜'+error.message;
