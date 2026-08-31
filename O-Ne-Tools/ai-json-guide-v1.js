@@ -1,8 +1,8 @@
-/* O-Ne shared AI JSON format guide — V1.0.5 */
+/* O-Ne shared AI JSON format guide — V1.0.6 */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.0.5';
+  var VERSION = '1.0.6';
   var mounted = Object.create(null);
 
   var GUIDES = {
@@ -108,14 +108,23 @@
       }
     },
     'explanation-card': {
-      name: '說明卡', code: 'EXPLANATION-CARD', version: 'V0.1.1', file: '說明卡-卡片標題-標準.json', image: true,
-      values: ['schema 固定以 o-ne.explanation-card. 開頭', 'rows 支援 1–8 列；每列包含 key 與 text', '卡片高度由標題與各列實際換行自動增加', '圖片 fit：contain／cover／free；JSON 不含圖片位元，完整搬移請用 O-Ne 專案 ZIP'],
+      name: '說明卡', code: 'EXPLANATION-CARD', version: 'V0.4.0 CANDIDATE', file: '說明卡-卡片標題-純圖片拼圖.json', image: true, projectFile: '說明卡 .onecard 專案檔',
+      values: ['schema 固定以 o-ne.explanation-card. 開頭', 'mode：content／gallery；content 保留 Word-lite 與左圖右文', 'gallery.layout：single／split／hero-right／hero-bottom／grid，依序使用 1／2／3／3／4 張圖', 'gallery.slots 固定最多 4 筆；每筆包含 name、fit（contain／cover）、focusX、focusY', '純設定 JSON 不含圖片位元；需完整搬移 1–4 張圖片時使用說明卡 .onecard 專案檔'],
       example: {
-        schema: 'o-ne.explanation-card.ready.v0.1.1', status: 'READY', generator_version: 'V0.1.1_20260830',
+        schema: 'o-ne.explanation-card.candidate.v0.4.0', status: 'CANDIDATE', generator_version: 'V0.4.0_20260831',
         data: {
-          label: 'GET!', labelColor: '#FFBE37', title: '這趟旅行，最值得記住的三件事', titleSize: 64, bodySize: 31, keySize: 30,
-          rows: [{ key: '重點 01', text: '先看現場動線，再決定最省力的移動方式。' }, { key: '重點 02', text: '把真正有用的資訊留在畫面上。' }],
-          image: { name: '', fit: 'cover', zoom: 100, offsetX: 0, offsetY: 0, cropX: 0, cropY: 0, cropWidth: 100, cropHeight: 100 }
+          mode: 'gallery', templateId: 'gallery',
+          label: { text: 'GET!', color: '#FFBE37', textColor: '#1F1713' },
+          blocks: [{ id: 'title-1', kind: 'title', marker: { enabled: false, text: '' }, align: 'left', html: '三個畫面快速看懂' }],
+          gallery: {
+            layout: 'hero-right', height: 650, gap: 16,
+            slots: [
+              { name: '主圖.jpg', fit: 'cover', focusX: 0, focusY: 0 },
+              { name: '細節一.jpg', fit: 'cover', focusX: 0, focusY: -20 },
+              { name: '細節二.jpg', fit: 'contain', focusX: 0, focusY: 0 },
+              { name: '', fit: 'cover', focusX: 0, focusY: 0 }
+            ]
+          }
         }
       }
     },
@@ -165,7 +174,7 @@
       '4. 不知道的內容不要猜；保留原值、空字串或先詢問我。',
       '5. JSON 必須可被 JSON.parse() 直接解析；不可有 trailing comma。'
     ];
-    if (guide.image) lines.push('6. 這是圖片型工具：JSON 不包含圖片本體；若需要把圖片一起搬移，應由 O-Ne Tools 另存「專案 ZIP」。');
+    if (guide.image) lines.push('6. 這是圖片型工具：JSON 不包含圖片本體；若需要把圖片一起搬移，請使用' + (guide.projectFile || ' O-Ne Tools「專案 ZIP」') + '。');
     lines.push('', '欄位規則：');
     guide.values.forEach(function (item) { lines.push('- ' + item); });
     lines.push('', '請使用這個 JSON 結構：', exampleJson(guide));
@@ -228,7 +237,7 @@
     panel.innerHTML =
       '<div class="one-ai-json-guide__head"><strong>給 AI 的 JSON 格式｜' + escapeHtml(guide.name) + '</strong><span class="one-ai-json-guide__badge">' + escapeHtml(guide.code + ' · ' + guide.version) + '</span></div>' +
       '<p class="one-ai-json-guide__note">把「完整 AI 指令」貼給 AI，就會知道這張卡要回什麼欄位與怎麼交檔。AI 應回傳 .json 檔；不能建立附件時，只回純 JSON，不要加 Markdown。</p>' +
-      '<div class="one-ai-json-guide__file">建議檔名：' + escapeHtml(guide.file) + (guide.image ? ' ｜ 有圖片時完整搬移請用 O-Ne 專案 ZIP' : '') + '</div>' +
+      '<div class="one-ai-json-guide__file">建議檔名：' + escapeHtml(guide.file) + (guide.image ? ' ｜ 有圖片時完整搬移請用' + escapeHtml(guide.projectFile || ' O-Ne 專案 ZIP') : '') + '</div>' +
       '<ul class="one-ai-json-guide__rules">' + guide.values.map(function (item) { return '<li>' + escapeHtml(item) + '</li>'; }).join('') + '</ul>' +
       '<div class="one-ai-json-guide__buttons">' +
         '<button type="button" data-action="copy-prompt">複製完整 AI 指令</button>' +
