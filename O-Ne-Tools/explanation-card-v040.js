@@ -1,7 +1,7 @@
 'use strict';
 
 (function installGalleryMode(){
-  const VERSION='V0.4.2_20260831';
+  const VERSION='V0.4.3_20260831';
   const GALLERY_LAYOUTS={
     single:{label:'單張大圖',count:1,hint:'一張圖放滿圖片區；可搭配「大圖 820px」接近 16:9。'},
     split:{label:'左右雙圖',count:2,hint:'兩張圖左右等寬，適合前後、A／B 或台日對照。'},
@@ -714,7 +714,7 @@
 
   exportJson=function(){
     const payload={
-      schema:'o-ne.explanation-card.formal.v0.4.2',
+      schema:'o-ne.explanation-card.formal.v0.4.3',
       status:'CANDIDATE',
       generator_version:VERSION,
       component:{
@@ -737,15 +737,15 @@
   };
 
   function installVersionUi(){
-    document.title='O-Ne 說明卡生成器 V0.4.2 CANDIDATE';
+    document.title='O-Ne 說明卡生成器 V0.4.3 CANDIDATE';
     const version=document.querySelector('.title-line h1 span');
-    if(version)version.textContent='V0.4.2';
+    if(version)version.textContent='V0.4.3';
     const badge=document.querySelector('.title-line .badge');
     if(badge){badge.textContent='CANDIDATE';badge.classList.remove('is-ready');badge.classList.add('is-candidate');}
     const description=document.querySelector('.title-block p');
-    if(description)description.textContent='版面修正候選：放大純圖片編輯區、標籤與標題垂直對齊，並移除圖片下方黑底留邊。';
+    if(description)description.textContent='介面修正候選：把暫存、專案包與批次工具移到編輯區最底部，打開頁面直接保留完整編輯空間。';
     const status=document.querySelector('.status');
-    if(status)status.textContent='V0.4.2 候選｜大編輯區｜標題對齊｜圖片貼齊底框';
+    if(status)status.textContent='V0.4.3 候選｜存檔工具移至底部｜完整編輯空間';
   }
 
   function runGalleryQa(){
@@ -784,7 +784,9 @@
       if(!project.assets.gallery||project.assets.gallery.filter(Boolean).length!==4)throw new Error('gallery project assets');
       if(project.data.gallery.slots[0].fit!=='free'||project.data.gallery.slots[0].cropWidth!==64)throw new Error('gallery crop project settings');
       if(!document.body.classList.contains('gallery-mode'))throw new Error('gallery editor mode');
-      $('qaResult').textContent='PASS｜gallery layouts｜free crop｜large editor｜header alignment｜no bottom band｜project assets';
+      const saveDock=document.querySelector('.save-dock');
+      if(!saveDock||saveDock.parentElement!==$('editorScroll')||saveDock!==$('editorScroll').lastElementChild)throw new Error('save tools below editor');
+      $('qaResult').textContent='PASS｜gallery layouts｜free crop｜full editor viewport｜save tools below editor｜header alignment｜no bottom band｜project assets';
       document.body.dataset.qa='pass';
     }catch(error){
       $('qaResult').textContent='FAIL｜'+error.message;
