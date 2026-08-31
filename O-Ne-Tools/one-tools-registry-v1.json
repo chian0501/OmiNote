@@ -1,5 +1,5 @@
 {
-  "version": "V2.25_20260831",
+  "version": "V2.26_20260831",
   "principle": "one_function_one_entry",
   "total": 18,
   "ready": 13,
@@ -473,7 +473,9 @@
         "gallery_layout_regression": "pass_1_2_3_3_3_4",
         "gallery_independent_free_crop_regression": "pass",
         "project_asset_regression": "pass_up_to_4_images",
-        "browser_visual": "pending_after_deploy"
+        "browser_visual": "pass_public_ready",
+        "browser_interaction": "pass_triple_three_independent_free_modes",
+        "public_pages_run": "274_success"
       }
     },
     {
