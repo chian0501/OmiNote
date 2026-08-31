@@ -15,7 +15,8 @@ const parts = [1, 2, 3, 4, 5].map(number =>
 for (const [index, source] of parts.entries()) {
   assert.doesNotThrow(() => new Function(source), `V0.3.9 script part ${index + 1} must parse`);
 }
-assert(html.includes('V0.3.9 READY'), 'page must identify the V0.3.9 ready bundle');
+assert(html.includes('V0.3.9 CANDIDATE'), 'page must identify the V0.3.9 candidate bundle');
+assert(html.includes('edit-backup-v1.js?v=1217'), 'page must load the cache-busted project and AI guide bridge');
 for (let number = 1; number <= 5; number += 1) {
   assert(html.includes(`explanation-card-v039-${number}.js?v=039`), `page must load V0.3.9 part ${number}`);
 }
@@ -128,13 +129,16 @@ const legacy = api.cleanState({ ...api.defaults, templateId: 'imageTitle', layou
 assert.strictEqual(legacy.layoutMode, 'image-below', 'imageTitle snapshots without an explicit mode must migrate safely');
 
 const exportSource = parts[3];
-assert(exportSource.includes("schema:'o-ne.explanation-card.formal.v0.3.9'"), 'JSON must use the V0.3.9 explanation schema');
+assert(exportSource.includes("schema:'o-ne.explanation-card.candidate.v0.3.9'"), 'JSON must use the V0.3.9 candidate schema');
+assert(exportSource.includes("status:'CANDIDATE'"), 'JSON and project files must remain candidate until Omi approves deployment');
 assert(exportSource.includes("layout_modes:['side-by-side','image-below']"), 'JSON metadata must disclose both layout modes');
 assert(exportSource.includes("state.layoutMode==='image-below'?'滿版圖':'RichText'"), 'filenames must distinguish the special layout state');
 assert(exportSource.includes('V0.3.9_20260831'), 'project and JSON metadata must use V0.3.9');
 assert(parts[4].includes("getStatus:s=>s&&s.layoutMode==='image-below'?'滿版圖':'RichText'"), 'shared project filenames must retain the layout state');
 assert(parts[4].includes('fromJSON:fromJSON'), 'shared manual history must retain legacy JSON import mapping');
 assert(parts[1].includes("state.templateId='custom'"), 'editing the title may become custom without changing layoutMode');
+assert(exportSource.includes("state.layoutMode==='image-below'?'imageTitle':'standard'"), 'reset must preserve the special layout after title edits');
+assert(exportSource.includes('imageElement=null;imageDataUrl=null;imageMimeType=null'), 'removing an image must clear the embedded project payload too');
 assert(!parts.join('\n').includes('focus-card'), 'separate explanation tool must not reuse focus-card state');
 
 console.log('PASS: Explanation Card V0.3.9 keeps existing layouts and adds a persisted title + full-width lower-image layout with downward autoheight.');

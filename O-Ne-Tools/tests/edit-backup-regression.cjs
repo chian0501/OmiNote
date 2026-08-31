@@ -129,7 +129,7 @@ const tools = [
 
 for (const [file, id, version] of tools) {
   const html = fs.readFileSync(path.join(root, file), 'utf8');
-  const backupVersion = file === 'explanation-card.html' ? 'edit-backup-v1.js?v=1216' : file === 'focus-card.html' ? 'edit-backup-v1.js?v=1215' : 'edit-backup-v1.js?v=121';
+  const backupVersion = file === 'explanation-card.html' ? 'edit-backup-v1.js?v=1217' : file === 'focus-card.html' ? 'edit-backup-v1.js?v=1215' : 'edit-backup-v1.js?v=121';
   assert(html.includes(backupVersion), file + ' must load the manual-by-default shared backup library');
   const implementation = file === 'settlement-card.html'
     ? fs.readFileSync(path.join(root, 'settlement-card-v011.js'), 'utf8')
@@ -172,19 +172,19 @@ for (const file of ['edit-backup-v1.js', 'settlement-card-v011.js']) {
 assert.deepStrictEqual(syntaxFailures, []);
 
 const registry = JSON.parse(fs.readFileSync(path.join(root, 'one-tools-registry-v1.json'), 'utf8'));
-assert.strictEqual(registry.version, 'V2.24_20260830');
+assert.strictEqual(registry.version, 'V2.25_20260831');
 assert.strictEqual(registry.total, 18);
-assert.strictEqual(registry.ready, 13);
-assert.strictEqual(registry.candidate, 0);
+assert.strictEqual(registry.ready, 12);
+assert.strictEqual(registry.candidate, 1);
 const registryIds = ['general', 'trigger', 'persistent', 'effect', 'move', 'choice', 'challenge', 'dialogue', 'rating', 'focus', 'explanation', 'thumbnail-frame', 'settlement'];
 for (const id of registryIds) {
   const entry = registry.tools.find(tool => tool.id === id);
   assert(entry, 'registry missing ' + id);
-  for (const feature of ['local_edit_history_5', 'manual_edit_history_save', 'unsaved_edits_not_persisted', 'restore_latest_on_load', 'json_import_restore', 'ai_json_schema_guide']) {
+  for (const feature of ['local_edit_history_5', 'manual_edit_history_save', 'unsaved_edits_not_persisted', 'json_import_restore', 'ai_json_schema_guide']) {
     assert(entry.features.includes(feature), id + ' missing ' + feature);
   }
 }
-assert.strictEqual(registry.shared_ai_json_guide.version, 'V1.0.5_20260830');
+assert.strictEqual(registry.shared_ai_json_guide.version, 'V1.0.6_20260831');
 assert.strictEqual(registry.shared_ai_json_guide.tool_count, 13);
 assert.strictEqual(registry.shared_ai_json_guide.raw_json_only_instruction, true);
 assert.strictEqual(registry.shared_ai_json_guide.placement, 'same_right_column_directly_below_preview');

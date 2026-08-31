@@ -1,8 +1,8 @@
-/* O-Ne shared AI JSON format guide — V1.0.5 */
+/* O-Ne shared AI JSON format guide — V1.0.6 */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.0.5';
+  var VERSION = '1.0.6';
   var mounted = Object.create(null);
 
   var GUIDES = {
@@ -108,13 +108,15 @@
       }
     },
     'explanation-card': {
-      name: '說明卡', code: 'EXPLANATION-CARD', version: 'V0.1.1', file: '說明卡-卡片標題-標準.json', image: true,
-      values: ['schema 固定以 o-ne.explanation-card. 開頭', 'rows 支援 1–8 列；每列包含 key 與 text', '卡片高度由標題與各列實際換行自動增加', '圖片 fit：contain／cover／free；JSON 不含圖片位元，完整搬移請用 O-Ne 專案 ZIP'],
+      name: '說明卡', code: 'EXPLANATION-CARD', version: 'V0.3.9', file: '說明卡-卡片標題-滿版圖.json', image: true,
+      values: ['schema 固定以 o-ne.explanation-card. 開頭', 'layoutMode：side-by-side／image-below', 'image-below 只保留標籤＋主標題；標題以下整區為圖片，不顯示副標、段落、年份或提醒框', 'blocks 為 Rich Text 區塊；image-below 只需一個 kind=title 區塊', '卡片高度由主標換行與圖片／自由裁切比例自動增加', '圖片 fit：contain／cover／free；JSON 不含圖片位元，完整搬移請用 .onecard 或 O-Ne 專案 ZIP'],
       example: {
-        schema: 'o-ne.explanation-card.ready.v0.1.1', status: 'READY', generator_version: 'V0.1.1_20260830',
+        schema: 'o-ne.explanation-card.candidate.v0.3.9', status: 'CANDIDATE', generator_version: 'V0.3.9_20260831',
         data: {
-          label: 'GET!', labelColor: '#FFBE37', title: '這趟旅行，最值得記住的三件事', titleSize: 64, bodySize: 31, keySize: 30,
-          rows: [{ key: '重點 01', text: '先看現場動線，再決定最省力的移動方式。' }, { key: '重點 02', text: '把真正有用的資訊留在畫面上。' }],
+          templateId: 'imageTitle', layoutMode: 'image-below',
+          label: { text: 'GET!', color: '#FFBE37', textColor: '#1F1713' },
+          blocks: [{ id: 'title-1', kind: 'title', marker: { enabled: false, text: '' }, align: 'left', html: '三張圖看懂這趟任務' }],
+          note: { enabled: false, text: '', size: 24, color: '#29A6A7' },
           image: { name: '', fit: 'cover', zoom: 100, offsetX: 0, offsetY: 0, cropX: 0, cropY: 0, cropWidth: 100, cropHeight: 100 }
         }
       }
