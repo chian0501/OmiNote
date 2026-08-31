@@ -1,7 +1,7 @@
 'use strict';
 
 (function installGalleryMode(){
-  const VERSION='V0.4.1_20260831';
+  const VERSION='V0.4.2_20260831';
   const GALLERY_LAYOUTS={
     single:{label:'單張大圖',count:1,hint:'一張圖放滿圖片區；可搭配「大圖 820px」接近 16:9。'},
     split:{label:'左右雙圖',count:2,hint:'兩張圖左右等寬，適合前後、A／B 或台日對照。'},
@@ -484,7 +484,7 @@
   }
 
   function layoutGalleryCard(context){
-    const outer=28,labelY=30,labelH=48;
+    const outer=28,headerTop=30,labelH=48,bottomEdge=3;
     context.font='800 32px "Noto Sans TC","Microsoft JhengHei",sans-serif';
     const labelW=Math.max(150,context.measureText(state.label.text||'GET!').width+40);
     const title=state.blocks.find(item=>item.kind==='title')||block('title','');
@@ -492,15 +492,16 @@
     const titleW=CARD_WIDTH-outer-titleX;
     const titleLayout=layoutRich(context,htmlToParagraphs(title.html,'title'),titleW);
     const headerH=Math.max(labelH,titleLayout.height);
-    const titleY=labelY+Math.max(0,(labelH-titleLayout.height)/2);
-    const dividerY=labelY+headerH+18;
+    const labelY=headerTop+(headerH-labelH)/2;
+    const titleY=headerTop+Math.max(0,(labelH-titleLayout.height)/2);
+    const dividerY=headerTop+headerH+18;
     const galleryY=dividerY+20;
     const galleryX=outer;
     const galleryW=CARD_WIDTH-outer*2;
     const galleryH=state.gallery.height;
-    const height=Math.ceil(galleryY+galleryH+outer);
+    const height=Math.ceil(galleryY+galleryH+bottomEdge);
     const rects=galleryRects(state.gallery.layout,galleryX,galleryY,galleryW,galleryH,state.gallery.gap);
-    return{width:CARD_WIDTH,height,labelX:outer,labelY,labelW,labelH,title,titleX,titleY,titleW,titleLayout,dividerY,galleryX,galleryY,galleryW,galleryH,rects};
+    return{width:CARD_WIDTH,height,labelX:outer,labelY,labelW,labelH,title,titleX,titleY,titleW,titleLayout,dividerY,galleryX,galleryY,galleryW,galleryH,bottomEdge,rects};
   }
 
   function drawGallerySlot(context,rect,index){
@@ -564,9 +565,6 @@
     cutCornerPath(context,3,3,layout.width-6,layout.height-6,30);
     context.fillStyle='rgba(31,23,19,.80)';
     context.fill();
-    context.lineWidth=3;
-    context.strokeStyle=BRAND.cream;
-    context.stroke();
 
     context.font='800 32px "Noto Sans TC","Microsoft JhengHei",sans-serif';
     context.fillStyle=state.label.color;
@@ -586,6 +584,10 @@
     context.lineTo(layout.galleryX+layout.galleryW,layout.dividerY);
     context.stroke();
     layout.rects.forEach((rect,index)=>drawGallerySlot(context,rect,index));
+    cutCornerPath(context,3,3,layout.width-6,layout.height-6,30);
+    context.lineWidth=3;
+    context.strokeStyle=BRAND.cream;
+    context.stroke();
 
     if(target===canvas){
       $('dimensionText').textContent=`${layout.width} × ${layout.height}px｜純圖片・${GALLERY_LAYOUTS[state.gallery.layout].label}`;
@@ -712,8 +714,8 @@
 
   exportJson=function(){
     const payload={
-      schema:'o-ne.explanation-card.formal.v0.4.1',
-      status:'READY',
+      schema:'o-ne.explanation-card.formal.v0.4.2',
+      status:'CANDIDATE',
       generator_version:VERSION,
       component:{
         width:CARD_WIDTH,
@@ -735,15 +737,15 @@
   };
 
   function installVersionUi(){
-    document.title='O-Ne 說明卡生成器 V0.4.1 READY';
+    document.title='O-Ne 說明卡生成器 V0.4.2 CANDIDATE';
     const version=document.querySelector('.title-line h1 span');
-    if(version)version.textContent='V0.4.1';
+    if(version)version.textContent='V0.4.2';
     const badge=document.querySelector('.title-line .badge');
-    if(badge){badge.textContent='READY';badge.classList.remove('is-candidate');badge.classList.add('is-ready');}
+    if(badge){badge.textContent='CANDIDATE';badge.classList.remove('is-ready');badge.classList.add('is-candidate');}
     const description=document.querySelector('.title-block p');
-    if(description)description.textContent='純圖片拼圖新增三張並排；每張圖片都可獨立自由拉框裁切。';
+    if(description)description.textContent='版面修正候選：放大純圖片編輯區、標籤與標題垂直對齊，並移除圖片下方黑底留邊。';
     const status=document.querySelector('.status');
-    if(status)status.textContent='Rich Text｜三張並排｜每張獨立自由裁切｜專案檔含圖片';
+    if(status)status.textContent='V0.4.2 候選｜大編輯區｜標題對齊｜圖片貼齊底框';
   }
 
   function runGalleryQa(){
@@ -771,6 +773,8 @@
       state.gallery.slots[0]={...state.gallery.slots[0],fit:'free',cropX:10,cropY:12,cropWidth:64,cropHeight:70};
       const triple=renderCanvas();
       if(triple.rects.length!==3)throw new Error('triple gallery layout');
+      if(Math.abs((triple.labelY+triple.labelH/2)-(triple.titleY+triple.titleLayout.height/2))>.01)throw new Error('gallery header alignment');
+      if(triple.height-(triple.galleryY+triple.galleryH)>4)throw new Error('gallery bottom band');
       const crop=galleryCropSource(state.gallery.slots[0],1600,900);
       if(crop.sx!==160||crop.sy!==108||crop.sw!==1024||crop.sh!==630)throw new Error('independent free crop source');
       state.gallery.layout='grid';
@@ -780,7 +784,7 @@
       if(!project.assets.gallery||project.assets.gallery.filter(Boolean).length!==4)throw new Error('gallery project assets');
       if(project.data.gallery.slots[0].fit!=='free'||project.data.gallery.slots[0].cropWidth!==64)throw new Error('gallery crop project settings');
       if(!document.body.classList.contains('gallery-mode'))throw new Error('gallery editor mode');
-      $('qaResult').textContent='PASS｜gallery single｜split｜triple｜hero-right｜hero-bottom｜grid｜free crop｜project assets';
+      $('qaResult').textContent='PASS｜gallery layouts｜free crop｜large editor｜header alignment｜no bottom band｜project assets';
       document.body.dataset.qa='pass';
     }catch(error){
       $('qaResult').textContent='FAIL｜'+error.message;
