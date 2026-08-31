@@ -122,21 +122,23 @@ const tools = [
   ['dialogue-card-v135.html', 'dialogue-card', 'V1.3.7'],
   ['rating-card.html', 'rating-card', 'V1.3.1'],
   ['focus-card.html', 'focus-card', 'V0.5.15'],
-  ['explanation-card.html', 'explanation-card', 'V0.1.1'],
+  ['explanation-card.html', 'explanation-card', 'V0.4.1'],
   ['thumbnail-frame.html', 'thumbnail-frame', 'V1.2.6'],
   ['settlement-card.html', 'settlement-card', 'V0.1.3']
 ];
 
 for (const [file, id, version] of tools) {
   const html = fs.readFileSync(path.join(root, file), 'utf8');
-  const backupVersion = file === 'explanation-card.html' ? 'edit-backup-v1.js?v=1216' : file === 'focus-card.html' ? 'edit-backup-v1.js?v=1215' : 'edit-backup-v1.js?v=121';
+  const backupVersion = file === 'explanation-card.html' ? 'edit-backup-v1.js?v=1218' : file === 'focus-card.html' ? 'edit-backup-v1.js?v=1215' : 'edit-backup-v1.js?v=121';
   assert(html.includes(backupVersion), file + ' must load the manual-by-default shared backup library');
   const implementation = file === 'settlement-card.html'
     ? fs.readFileSync(path.join(root, 'settlement-card-v011.js'), 'utf8')
-    : html;
+    : file === 'explanation-card.html'
+      ? html + [1, 2, 3, 4, 5].map(number => fs.readFileSync(path.join(root, `explanation-card-v038-${number}.js`), 'utf8')).join('\n') + fs.readFileSync(path.join(root, 'explanation-card-v040.js'), 'utf8')
+      : html;
   assert(implementation.includes(`id:'${id}'`) || implementation.includes(`id: '${id}'`) || implementation.includes(`id:"${id}"`), file + ' must mount the correct tool id');
   assert(html.includes(version), file + ' must show the expected version');
-  assert(implementation.includes('fromJSON:'), file + ' must define legacy JSON import mapping');
+  assert(implementation.includes('fromJSON:') || (file === 'explanation-card.html' && implementation.includes('fromJSON});')), file + ' must define legacy JSON import mapping');
 }
 
 for (const [file, id] of tools) {
@@ -147,7 +149,10 @@ for (const [file, id] of tools) {
 }
 
 for (const file of ['rating-card.html', 'focus-card.html', 'explanation-card.html', 'thumbnail-frame.html']) {
-  assert(fs.readFileSync(path.join(root, file), 'utf8').includes('imageNote:true') ||
+  const implementation = file === 'explanation-card.html'
+    ? [file, ...[1, 2, 3, 4, 5].map(number => `explanation-card-v038-${number}.js`), 'explanation-card-v040.js'].map(name => fs.readFileSync(path.join(root, name), 'utf8')).join('\n')
+    : fs.readFileSync(path.join(root, file), 'utf8');
+  assert(implementation.includes('imageNote:true') ||
     fs.readFileSync(path.join(root, file), 'utf8').includes('imageNote:!0'));
 }
 assert(fs.readFileSync(path.join(root, 'settlement-card-v011.js'), 'utf8').includes('imageNote: true'));
@@ -169,7 +174,7 @@ for (const file of ['edit-backup-v1.js', 'settlement-card-v011.js']) {
 assert.deepStrictEqual(syntaxFailures, []);
 
 const registry = JSON.parse(fs.readFileSync(path.join(root, 'one-tools-registry-v1.json'), 'utf8'));
-assert.strictEqual(registry.version, 'V2.24_20260830');
+assert.strictEqual(registry.version, 'V2.25_20260831');
 assert.strictEqual(registry.total, 18);
 assert.strictEqual(registry.ready, 13);
 assert.strictEqual(registry.candidate, 0);
@@ -181,7 +186,7 @@ for (const id of registryIds) {
     assert(entry.features.includes(feature), id + ' missing ' + feature);
   }
 }
-assert.strictEqual(registry.shared_ai_json_guide.version, 'V1.0.5_20260830');
+assert.strictEqual(registry.shared_ai_json_guide.version, 'V1.0.7_20260831');
 assert.strictEqual(registry.shared_ai_json_guide.tool_count, 13);
 assert.strictEqual(registry.shared_ai_json_guide.raw_json_only_instruction, true);
 assert.strictEqual(registry.shared_ai_json_guide.placement, 'same_right_column_directly_below_preview');

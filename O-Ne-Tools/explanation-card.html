@@ -3,17 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>O-Ne 說明卡生成器 V0.3.8 READY</title>
+<title>O-Ne 說明卡生成器 V0.4.1 READY</title>
 
 <link rel="stylesheet" href="./explanation-card-v038.css?v=038">
+<link rel="stylesheet" href="./explanation-card-v040.css?v=041">
 </head>
 <body>
 
 <main class="app-shell">
-<header class="app-header"><a class="back-link" href="./">← 回工具入口</a><div class="header-divider"></div><div class="title-block"><div class="title-line"><h1>O-Ne 說明卡生成器 <span>V0.3.8</span></h1><strong class="badge">READY</strong></div><p>Word-lite：圖片自動高度＋成品即時預覽＋可攜專案檔。專案檔會連同圖片本體與裁切設定一起保存。</p></div><div class="status">Rich Text｜圖片自動高度｜成品即時預覽｜專案檔含圖片</div></header>
+<header class="app-header"><a class="back-link" href="./">← 回工具入口</a><div class="header-divider"></div><div class="title-block"><div class="title-line"><h1>O-Ne 說明卡生成器 <span>V0.4.1</span></h1><strong class="badge is-ready">READY</strong></div><p>純圖片拼圖新增三張並排；每張圖片都可獨立自由拉框裁切。</p></div><div class="status">Rich Text｜三張並排｜每張獨立自由裁切｜專案檔含圖片</div></header>
 <section class="workspace">
 <aside class="editor-panel panel">
-<div class="editor-head"><strong>文字編輯器</strong><small>使用順序只有 3 步：① 選整張內容版型 → ② 在深色成品感文件區改字、反白套格式 → ③ 暫存或下載存檔。圖片改從中央「圖片設定」視窗處理，不再壓縮文字區。</small></div>
+<div class="editor-head"><strong>文字／圖片編輯器</strong><small>一般說明沿用 Word-lite；選「純圖片拼圖」時只保留標籤＋標題，再選單張大圖、左右雙圖、三張並排、左大右二、上大下二或四格拼圖。每張圖可各自自由裁切。</small></div>
 <section class="save-dock"><div class="save-dock-head"><div><strong>③ 暫存／存檔</strong><small>暫存留在這台瀏覽器，最多 5 次；下載 JSON 才是可帶走的存檔。</small></div><span class="save-badge">固定顯示</span></div><div id="quickSaveHost"></div><div class="save-file-actions project-actions"><button class="small-btn save-project-btn" id="exportProject" type="button">下載專案檔（含圖片）</button><button class="small-btn" id="importProjectBtn" type="button">載入專案檔</button><input id="projectInput" type="file" accept="application/json,.onecard,.json" hidden><button class="small-btn save-json-btn" id="exportJson" type="button">僅設定 JSON</button><button class="small-btn" id="resetAll" type="button">重設目前內容</button></div><div class="project-file-note">完整專案檔會保存文字、Rich Text、圖片本體、顯示模式、裁切／縮放／位置；最近 5 次暫存仍為輕量本機快照。</div></section><div class="editor-scroll" id="editorScroll">
 <section class="template-strip"><div class="step-heading"><span class="step-no">①</span><div><b>整張內容版型</b><small>點一下就直接套用。會替換整張文字內容，但圖片與卡片設定保留；需要保留目前版本請先暫存。</small></div><span class="impact-badge">點擊直接套用</span></div><div class="template-buttons" id="templateButtons"></div></section>
 <div class="word-toolbar" id="wordToolbar"><div class="toolbar-heading"><span class="step-no">②</span><div><b>反白文字格式</b><small>只想改幾個字：先反白，再選常用格式、字級或品牌色。沒有反白時會套整個目前段落。</small></div><button class="image-trigger" id="openImageDrawer" type="button">🖼 圖片設定</button></div>
@@ -52,9 +53,11 @@
 
 
 
-<script src="./explanation-card-v038-1.js?v=038"></script>
-<script src="./explanation-card-v038-2.js?v=038"></script>
-<script src="./explanation-card-v038-3.js?v=038"></script>
-<script src="./explanation-card-v038-4.js?v=038"></script>
-<script src="./explanation-card-v038-5.js?v=038"></script>
+<script src="./edit-backup-v1.js?v=1218"></script>
+<script src="./explanation-card-v038-1.js?v=040"></script>
+<script src="./explanation-card-v038-2.js?v=040"></script>
+<script src="./explanation-card-v038-3.js?v=040"></script>
+<script src="./explanation-card-v038-4.js?v=040"></script>
+<script src="./explanation-card-v038-5.js?v=040"></script>
+<script src="./explanation-card-v040.js?v=041"></script>
 </body></html>
