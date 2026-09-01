@@ -1,6 +1,8 @@
 .project-item small{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .project-link-state{font-weight:800;color:#647284}
 .project-link-state.ready{color:#79e2d4}
+#projectLinkCount{font-size:11px;padding:5px 9px}
+#projectPanel{scroll-margin-top:16px}
 .project-empty-state{min-height:220px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;text-align:center;color:#8d9aaa}
 .project-empty-state b{font-size:20px;color:#f5f1e9}
 .project-summary{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
@@ -28,4 +30,4 @@
 .place-direct-link:hover,.place-direct-link:focus-visible{background:#1d5651}
 .place-missing-link{margin-top:12px;color:#8d9aaa;font-size:12px}
 @media(max-width:900px){.project-link-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:620px){.project-link-grid{grid-template-columns:1fr}.project-summary .title{font-size:20px}}
+@media(max-width:620px){.project-link-grid{grid-template-columns:1fr}.project-summary .title{font-size:20px}.project-link{min-height:62px;font-size:16px}}
