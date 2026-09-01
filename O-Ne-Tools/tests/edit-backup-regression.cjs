@@ -174,7 +174,7 @@ for (const file of ['edit-backup-v1.js', 'settlement-card-v011.js']) {
 assert.deepStrictEqual(syntaxFailures, []);
 
 const registry = JSON.parse(fs.readFileSync(path.join(root, 'one-tools-registry-v1.json'), 'utf8'));
-assert.strictEqual(registry.version, 'V2.35_20260901');
+assert.strictEqual(registry.version, 'V2.36_20260901');
 assert.strictEqual(registry.total, 18);
 assert.strictEqual(registry.ready, 13);
 assert.strictEqual(registry.candidate, 0);
@@ -211,7 +211,7 @@ assert.deepStrictEqual(registry.shared_edit_backup.manual_save_tools, [
 ]);
 
 const index = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
-assert(index.includes("fetch('./one-tools-registry-v1.json?v=2350'"), 'index must read the canonical registry');
+assert(index.includes("fetch('./one-tools-registry-v1.json?v=2360'"), 'index must read the canonical registry');
 assert(!index.includes('const tools=['), 'index must not keep a second hardcoded registry');
 assert(index.includes('command-center.html'), 'index must expose the Command Center entry');
 

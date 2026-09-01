@@ -1,5 +1,5 @@
 {
-  "version": "V2.35_20260901",
+  "version": "V2.36_20260901",
   "ui_shell_version": "V1.3.1_20260901",
   "public_boundary": "semantic_references_only",
   "principle": "one_function_one_entry",
@@ -250,7 +250,7 @@
       "group": "對話／角色",
       "desc": "正式框與完整獨立透明頭像分離；左右角色／表情／名稱獨立；24／24 表情已驗證；NPC 無頭像；單人／雙人同一工具",
       "status": "ready",
-      "href": "./dialogue-card.html?v=141&build=manual-history-v2&ui=131",
+      "href": "./dialogue-card.html?v=141&build=manual-history-v2&ui=131&redirect=131",
       "features": [
         "left_right_independent",
         "character_select",
