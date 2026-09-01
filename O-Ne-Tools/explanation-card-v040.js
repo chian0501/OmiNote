@@ -637,7 +637,7 @@
   const projectPayloadV038=projectPayload;
   projectPayload=function(){
     const payload=projectPayloadV038();
-    payload.status='CANDIDATE';
+    payload.status='READY';
     payload.generator_version=VERSION;
     payload.data=capture();
     payload.assets=payload.assets||{};
@@ -724,7 +724,7 @@
   exportJson=function(){
     const payload={
       schema:'o-ne.explanation-card.formal.v0.4.4',
-      status:'CANDIDATE',
+      status:'READY',
       generator_version:VERSION,
       component:{
         width:CARD_WIDTH,
@@ -803,15 +803,15 @@
   }
 
   function installVersionUi(){
-    document.title='O-Ne 說明卡生成器 V0.4.4 CANDIDATE';
+    document.title='O-Ne 說明卡生成器 V0.4.4 READY';
     const version=document.querySelector('.title-line h1 span');
     if(version)version.textContent='V0.4.4';
     const badge=document.querySelector('.title-line .badge');
-    if(badge){badge.textContent='CANDIDATE';badge.classList.remove('is-ready');badge.classList.add('is-candidate');}
+    if(badge){badge.textContent='READY';badge.classList.remove('is-candidate');badge.classList.add('is-ready');}
     const description=document.querySelector('.title-block p');
-    if(description)description.textContent='候選版：純圖片直接鋪滿字卡下半部，並把模式、編輯與輸出整理成單一路徑。';
+    if(description)description.textContent='正式版：純圖片直接鋪滿字卡下半部，並把模式、編輯與輸出整理成單一路徑。';
     const status=document.querySelector('.status');
-    if(status)status.textContent='V0.4.4 CANDIDATE｜滿版圖片字卡｜UI 整併';
+    if(status)status.textContent='V0.4.4 READY｜滿版圖片字卡｜UI 整併';
   }
 
   function runGalleryQa(){

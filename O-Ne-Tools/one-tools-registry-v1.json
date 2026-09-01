@@ -1,9 +1,9 @@
 {
-  "version": "V2.29_20260901",
+  "version": "V2.30_20260901",
   "principle": "one_function_one_entry",
   "total": 18,
-  "ready": 12,
-  "candidate": 1,
+  "ready": 13,
+  "candidate": 0,
   "ai_bridge": {
     "version": "V1.2_20260807",
     "mode": "chatgpt_pro_manual_json_bridge",
@@ -428,8 +428,8 @@
       "family": "正式說明字卡母版",
       "group": "資訊／閱讀",
       "desc": "純圖片直接鋪滿標題下方，不使用第二層圖片框；模式、編輯與輸出整併為單一路徑",
-      "status": "candidate",
-      "href": "./explanation-card.html?v=044&build=fullbleed-ui-candidate-v1",
+      "status": "ready",
+      "href": "./explanation-card.html?v=044&build=fullbleed-ui-ready-v1",
       "features": [
         "official_explanation_card_family",
         "independent_from_focus_card",
@@ -474,7 +474,7 @@
       "formal_source_folder": "https://drive.google.com/drive/folders/1pGLi-eFqlS-rfXCUPzzwyVRr-6XrgLH4",
       "formal_psd_id": "1iqnZcZeTJXfHNZ3S2l9e4bIZ_dmFALbd",
       "generator_version": "V0.4.4_20260901",
-      "visual_status": "CANDIDATE",
+      "visual_status": "READY",
       "panel_fill_opacity": 0.8,
       "qa": {
         "static_parse": "pass",
@@ -488,13 +488,13 @@
         "gallery_inner_frame_regression": "pass_no_slot_roundrect_or_stroke",
         "gallery_bottom_band_regression": "pass_3px_border_only",
         "ui_hierarchy_regression": "pass_mode_edit_export_and_collapsed_batch_legacy_tools",
-        "browser_visual": "pending_candidate_deploy; v0.4.3_ready_baseline_pass",
-        "browser_interaction": "pending_candidate_deploy; v0.4.3_ready_baseline_pass",
-        "editor_viewport_px": null,
+        "browser_visual": "pass_public_v0.4.4_fullbleed_single_outer_frame",
+        "browser_interaction": "pass_mode_switch_six_layouts_collapsed_tools_and_save_dock",
+        "editor_viewport_px": "1363x936",
         "save_dock_parent": "editorScroll_last_child",
         "save_dock_visible_at_initial_scroll": false,
-        "public_pages_run": "pending_candidate_deploy",
-        "release_gate": "omi_or_niete_merge_and_deploy_approval_then_public_browser_qa"
+        "public_pages_run": "pass_candidate_run_281_and_ready_deploy",
+        "release_gate": "complete_omi_approved_merge_deploy_and_public_browser_qa"
       }
     },
     {
