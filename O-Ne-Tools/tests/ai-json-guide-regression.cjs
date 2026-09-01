@@ -60,7 +60,7 @@ assert(guide.guides['focus-card'].values.some(value => value.includes('cropX／c
 assert.strictEqual(guide.example('thumbnail-frame').component_id, 'THUMBNAIL-FRAME');
 assert.strictEqual(guide.example('settlement-card').component_id, 'QST-03');
 assert.strictEqual(guide.example('move-card').segments.length, guide.example('move-card').stations.length - 1);
-assert.strictEqual(guide.guides['explanation-card'].version, 'V0.4.3');
+assert.strictEqual(guide.guides['explanation-card'].version, 'V0.4.4');
 assert.strictEqual(guide.example('explanation-card').data.mode, 'gallery');
 assert.strictEqual(guide.example('explanation-card').data.gallery.layout, 'triple');
 assert.strictEqual(guide.example('explanation-card').data.gallery.slots.length, 4);
@@ -68,9 +68,10 @@ assert.strictEqual(guide.example('explanation-card').data.gallery.slots[0].fit, 
 assert.strictEqual(guide.example('explanation-card').data.gallery.slots[0].cropWidth, 70);
 assert(guide.guides['explanation-card'].values.some(value => value.includes('single／split／triple／hero-right／hero-bottom／grid')));
 assert(guide.guides['explanation-card'].values.some(value => value.includes('cropX／cropY／cropWidth／cropHeight')));
+assert(guide.guides['explanation-card'].values.some(value => value.includes('不使用第二層圖片框')));
 for (const id of ['rating-card','focus-card','explanation-card','thumbnail-frame','settlement-card']) {
   assert.strictEqual(guide.guides[id].image, true, id + ' must warn that image binaries require project ZIP');
-  if (id === 'explanation-card') assert(guide.prompt(id).includes('.onecard'), id + ' must mention its portable project file');
+  if (id === 'explanation-card') assert(guide.prompt(id).includes('完整專案 ZIP') && guide.prompt(id).includes('.onecard'), id + ' must mention the primary ZIP and compatible .onecard formats');
   else assert(guide.prompt(id).includes('專案 ZIP'), id + ' must mention project ZIP for image handoff');
 }
 assert(guideSource.includes('給 AI 的 JSON 格式'));
