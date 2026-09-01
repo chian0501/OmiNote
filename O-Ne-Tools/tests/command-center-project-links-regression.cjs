@@ -10,7 +10,7 @@ const css=fs.readFileSync(path.join(root,'command-center-project-links-v1.css'),
 function assert(value,message){if(!value)throw new Error(message)}
 
 assert(html.includes('O-Ne Command Center V0.9.3'),'HTML version is not V0.9.3');
-assert(html.includes('command-center-project-links-v1.js?v=0930'),'project-link script is not loaded');
+assert(html.includes('command-center-project-links-v1.js?v=0931'),'project-link script is not loaded');
 assert(html.includes('command-center-project-links-v1.css?v=0930'),'project-link stylesheet is not loaded');
 assert(html.includes('data-tab="projects">專案連結'),'project navigation label is unclear');
 assert(script.includes("new Set(['drive.google.com','docs.google.com'])"),'Google host allowlist is missing');
