@@ -38,7 +38,7 @@
     const custom=readCustomLinks();
     const merged={};
     for(const project of PROJECTS){
-      const row={...(DIRECT_LINKS[project.id]||{}),...(custom[project.id]||{})};
+      const row={...(custom[project.id]||{}),...(DIRECT_LINKS[project.id]||{})};
       if(Object.keys(row).length)merged[project.id]=row;
     }
     return merged;
@@ -46,7 +46,7 @@
   function linkCount(all=readSafeLinks()){return Object.values(all).reduce((sum,row)=>sum+Object.keys(row).length,0)}
   function updateLinkCount(all=readSafeLinks()){
     const badge=$('#projectLinkCount');
-    if(badge)badge.textContent=`${linkCount(all)} PROJECT LINKS`;
+    if(badge)badge.textContent=`${linkCount(DIRECT_LINKS)} PROJECT LINKS`;
   }
 
   function downloadLinks(){
@@ -125,13 +125,15 @@
     }
     const all=readSafeLinks();
     const links=all[selectedProject.id]||{};
+    const official=DIRECT_LINKS[selectedProject.id]||{};
     const configured=Object.keys(links).length;
-    panel.innerHTML=`<div class="project-summary"><div><div class="meta"><span class="group">PROJECT LINKS</span><span class="badge">${esc(selectedProject.stage)}</span></div><div class="title">${esc(selectedProject.name)}</div><div class="path">VIDEO ID：${selectedProject.id}</div></div><div class="chips">${selectedProject.keywords.map(keyword=>`<span class="chip">${esc(keyword)}</span>`).join('')}</div></div><div class="project-link-section"><h3>直接開啟</h3><div class="small">已提供 ${configured}／${PRIVATE_FIELDS.length} 個入口；需登入有權限的 Google 帳號。</div><div class="project-link-grid">${PRIVATE_FIELDS.map(([key,label])=>links[key]?`<a class="project-link" href="${esc(links[key])}" target="_blank" rel="noopener noreferrer">${esc(label)}</a>`:`<span class="project-link missing">${esc(label)}</span>`).join('')}</div></div><details class="project-link-editor"><summary>自訂／備份連結（選用）</summary><div class="project-link-editor-body"><div class="project-link-help">上方正式入口已可直接使用。只有需要在這台裝置暫時覆蓋連結時才編輯；自訂值只存本機，不會改動公開正式入口。</div><div class="private-grid">${PRIVATE_FIELDS.map(([key,label])=>`<div><label>${esc(label)}</label><input class="field" data-priv="${key}" value="${esc(links[key]||'')}" placeholder="貼上 Google Drive／Docs 連結"></div>`).join('')}</div><div class="actions"><button class="btn ai" id="privSave">儲存本機自訂</button><button class="btn" id="privExport">匯出備份 JSON</button><button class="btn" id="privImport">載入備份 JSON</button><input id="privFile" type="file" accept="application/json,.json" hidden><button class="btn" id="privClear">恢復正式入口</button></div><div class="small" id="privMsg"></div></div></details>`;
+    panel.innerHTML=`<div class="project-summary"><div><div class="meta"><span class="group">PROJECT LINKS</span><span class="badge">${esc(selectedProject.stage)}</span></div><div class="title">${esc(selectedProject.name)}</div><div class="path">VIDEO ID：${selectedProject.id}</div></div><div class="chips">${selectedProject.keywords.map(keyword=>`<span class="chip">${esc(keyword)}</span>`).join('')}</div></div><div class="project-link-section"><h3>直接開啟</h3><div class="small">已提供 ${configured}／${PRIVATE_FIELDS.length} 個入口；需登入有權限的 Google 帳號。</div><div class="project-link-grid">${PRIVATE_FIELDS.map(([key,label])=>links[key]?`<a class="project-link" href="${esc(links[key])}" target="_blank" rel="noopener noreferrer">${esc(label)}</a>`:`<span class="project-link missing">${esc(label)}</span>`).join('')}</div></div><details class="project-link-editor"><summary>補充／備份連結（選用）</summary><div class="project-link-editor-body"><div class="project-link-help">正式入口以公開白名單為準，不能被舊暫存覆蓋。這裡只用來補尚未提供的欄位；補充值只存本機。</div><div class="private-grid">${PRIVATE_FIELDS.map(([key,label])=>`<div><label>${esc(label)}${official[key]?'｜正式':''}</label><input class="field" data-priv="${key}" value="${esc(links[key]||'')}" placeholder="貼上 Google Drive／Docs 連結" ${official[key]?'readonly aria-readonly="true"':''}></div>`).join('')}</div><div class="actions"><button class="btn ai" id="privSave">儲存本機補充</button><button class="btn" id="privExport">匯出備份 JSON</button><button class="btn" id="privImport">載入備份 JSON</button><input id="privFile" type="file" accept="application/json,.json" hidden><button class="btn" id="privClear">清除本機補充</button></div><div class="small" id="privMsg"></div></div></details>`;
 
     $('#privSave').onclick=()=>{
       const next={};
       const invalid=[];
       $$('[data-priv]').forEach(input=>{
+        if(official[input.dataset.priv])return;
         const raw=input.value.trim();
         const url=safeUrl(raw);
         if(raw&&!url)invalid.push(FIELD_LABELS[input.dataset.priv]);
@@ -143,7 +145,7 @@
       saveLinks(merged);
       renderProjects();
       renderProjectPanel();
-      toast('專案連結已儲存');
+      toast('本機補充連結已儲存');
     };
     $('#privClear').onclick=()=>{
       const merged=readCustomLinks();
@@ -151,7 +153,7 @@
       saveLinks(merged);
       renderProjects();
       renderProjectPanel();
-      toast('已恢復本案正式入口');
+      toast('本案本機補充已清除');
     };
     $('#privExport').onclick=downloadLinks;
     $('#privImport').onclick=()=>$('#privFile').click();
