@@ -20,7 +20,7 @@ for (const [file, source] of Object.entries(sources)) {
 assert(html.includes('<title>O-Ne 說明卡生成器 V0.4.4 READY</title>'), 'ready version must be visible');
 assert(html.includes('edit-backup-v1.js?v=1219'), 'shared manual backup library must load');
 assert(html.includes('explanation-card-v040.css?v=044'), 'gallery CSS must load');
-assert(html.includes('explanation-card-v040.js?v=0441'), 'gallery runtime must load with the seam-fix cache key');
+assert(html.includes('explanation-card-v040.js?v=0442'), 'gallery runtime must load with the READY cache key');
 const editorScrollStart = html.indexOf('<div class="editor-scroll" id="editorScroll">');
 const editorScrollEnd = html.indexOf('</div></aside>', editorScrollStart);
 const saveDockIndex = html.indexOf('<section class="save-dock">');
