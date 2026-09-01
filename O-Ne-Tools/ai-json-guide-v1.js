@@ -108,10 +108,10 @@
       }
     },
     'explanation-card': {
-      name: '說明卡', code: 'EXPLANATION-CARD', version: 'V0.4.4', file: '說明卡-卡片標題-純圖片字卡.json', image: true, projectFile: '完整專案 ZIP（相容 .onecard）',
-      values: ['schema 固定以 o-ne.explanation-card. 開頭', 'mode：content／gallery；content 保留 Word-lite 與左圖右文', 'gallery 模式的圖片區從標題分隔線下直接鋪到外卡邊線，不使用第二層圖片框', 'gallery.layout：single／split／triple／hero-right／hero-bottom／grid，依序使用 1／2／3／3／3／4 張圖', 'gallery.slots 固定最多 4 筆；每筆包含 name、fit（contain／cover／free）、focusX、focusY、cropX、cropY、cropWidth、cropHeight', 'fit=free 時 cropX／cropY／cropWidth／cropHeight 是原圖百分比；每張圖片獨立保存且裁切框不鎖比例', '純設定 JSON 不含圖片位元；需完整搬移 1–4 張圖片時優先使用完整專案 ZIP，舊 .onecard 仍可載入'],
+      name: '說明卡', code: 'EXPLANATION-CARD', version: 'V0.4.5', file: '說明卡-卡片標題-純圖片字卡.json', image: true, projectFile: '完整專案 ZIP（相容 .onecard）',
+      values: ['schema 固定以 o-ne.explanation-card. 開頭', 'mode：content／gallery；content 保留 Word-lite 與左圖右文', 'gallery 模式從標題到圖片區都延續同一張 80% 咖啡色卡底；透明圖片區與間距不另鋪第二種底色，且不使用第二層圖片框', 'gallery.layout：single／split／triple／hero-right／hero-bottom／grid，依序使用 1／2／3／3／3／4 張圖', 'gallery.slots 固定最多 4 筆；每筆包含 name、fit（contain／cover／free）、focusX、focusY、cropX、cropY、cropWidth、cropHeight', 'fit=free 時 cropX／cropY／cropWidth／cropHeight 是原圖百分比；每張圖片獨立保存且裁切框不鎖比例', '純設定 JSON 不含圖片位元；需完整搬移 1–4 張圖片時優先使用完整專案 ZIP，舊 .onecard 仍可載入'],
       example: {
-        schema: 'o-ne.explanation-card.formal.v0.4.4', status: 'READY', generator_version: 'V0.4.4_20260901',
+        schema: 'o-ne.explanation-card.formal.v0.4.5', status: 'CANDIDATE', generator_version: 'V0.4.5_20260901',
         data: {
           mode: 'gallery', templateId: 'gallery',
           label: { text: 'GET!', color: '#FFBE37', textColor: '#1F1713' },

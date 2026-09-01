@@ -1,7 +1,7 @@
 'use strict';
 
 (function installGalleryMode(){
-  const VERSION='V0.4.4_20260901';
+  const VERSION='V0.4.5_20260901';
   const GALLERY_LAYOUTS={
     single:{label:'單張大圖',count:1,hint:'一張圖放滿圖片區；可搭配「大圖 820px」接近 16:9。'},
     split:{label:'左右雙圖',count:2,hint:'兩張圖左右等寬，適合前後、A／B 或台日對照。'},
@@ -88,7 +88,7 @@
     section.hidden=true;
     section.innerHTML=`
       <div class="gallery-editor-head">
-        <div><strong>圖片排版</strong><small>圖片直接鋪滿字卡下半部；切換排版不會刪除已選圖片。</small></div>
+        <div><strong>圖片排版</strong><small>圖片直接放在同一張 80% 咖啡色卡底；透明處與間距不另鋪其他底色。</small></div>
         <span class="gallery-count" id="galleryCount">0／1 張</span>
       </div>
       <div class="gallery-layouts" id="galleryLayouts"></div>
@@ -526,8 +526,6 @@
     context.beginPath();
     context.rect(rect.x,rect.y,rect.w,rect.h);
     context.clip();
-    context.fillStyle='#151a18';
-    context.fillRect(rect.x,rect.y,rect.w,rect.h);
     if(asset){
       const image=asset.element;
       const iw=image.naturalWidth||image.width;
@@ -723,8 +721,8 @@
 
   exportJson=function(){
     const payload={
-      schema:'o-ne.explanation-card.formal.v0.4.4',
-      status:'READY',
+      schema:'o-ne.explanation-card.formal.v0.4.5',
+      status:'CANDIDATE',
       generator_version:VERSION,
       component:{
         width:CARD_WIDTH,
@@ -738,6 +736,7 @@
         gallery_free_crop_unlocked_aspect:true,
         gallery_full_bleed_below_header:true,
         gallery_inner_frame:false,
+        gallery_continuous_coffee_background:true,
         project_file_embeds_images:true
       },
       data:capture(),
@@ -803,15 +802,15 @@
   }
 
   function installVersionUi(){
-    document.title='O-Ne 說明卡生成器 V0.4.4 READY';
+    document.title='O-Ne 說明卡生成器 V0.4.5 CANDIDATE';
     const version=document.querySelector('.title-line h1 span');
-    if(version)version.textContent='V0.4.4';
+    if(version)version.textContent='V0.4.5';
     const badge=document.querySelector('.title-line .badge');
-    if(badge){badge.textContent='READY';badge.classList.remove('is-candidate');badge.classList.add('is-ready');}
+    if(badge){badge.textContent='CANDIDATE';badge.classList.remove('is-ready');badge.classList.add('is-candidate');}
     const description=document.querySelector('.title-block p');
-    if(description)description.textContent='正式版：純圖片直接鋪滿字卡下半部，並把模式、編輯與輸出整理成單一路徑。';
+    if(description)description.textContent='候選版：範本常駐、關鍵指示放大；純圖片區直接延續同一張 80% 咖啡色卡底。';
     const status=document.querySelector('.status');
-    if(status)status.textContent='V0.4.4 READY｜滿版圖片字卡｜UI 整併';
+    if(status)status.textContent='V0.4.5 CANDIDATE｜範本常駐｜80% 咖啡底';
   }
 
   function runGalleryQa(){
@@ -822,8 +821,21 @@
       fake.width=1600;
       fake.height=900;
       const fakeContext=fake.getContext('2d');
+      fakeContext.clearRect(0,0,fake.width,fake.height);
       fakeContext.fillStyle='#3F8FB7';
-      fakeContext.fillRect(0,0,fake.width,fake.height);
+      fakeContext.fillRect(0,0,100,100);
+      state=cleanState({
+        ...clone(defaults),
+        mode:'content',
+        templateId:'standard',
+        blocks:TEMPLATES.standard.make()
+      });
+      renderEditor();
+      const templatePicker=$('contentTemplatePicker');
+      if(templatePicker.hidden||templatePicker.tagName==='DETAILS'||$('templateButtons').children.length<6)throw new Error('visible content template picker');
+      const templateHeading=templatePicker.querySelector('strong');
+      const templateButton=$('templateButtons').querySelector('.template-btn');
+      if(parseFloat(getComputedStyle(templateHeading).fontSize)<14||parseFloat(getComputedStyle(templateButton).fontSize)<12)throw new Error('readable template guidance');
       state=cleanState({
         ...clone(defaults),
         mode:'gallery',
@@ -837,6 +849,8 @@
       if(single.rects.length!==1||single.height<900)throw new Error('single gallery layout');
       if(single.galleryX!==3||single.galleryW!==CARD_WIDTH-6)throw new Error('gallery full bleed width');
       if(single.galleryY-single.dividerY>3)throw new Error('gallery header seam');
+      const bodyPixel=canvas.getContext('2d').getImageData(Math.floor(single.galleryX+single.galleryW/2),Math.floor(single.galleryY+single.galleryH/2),1,1).data;
+      if(Math.abs(bodyPixel[0]-31)>1||Math.abs(bodyPixel[1]-23)>1||Math.abs(bodyPixel[2]-19)>1||Math.abs(bodyPixel[3]-204)>1)throw new Error('continuous 80% coffee background');
       state.gallery.layout='triple';
       state.gallery.slots[0]={...state.gallery.slots[0],fit:'free',cropX:10,cropY:12,cropWidth:64,cropHeight:70};
       const triple=renderCanvas();
@@ -856,7 +870,7 @@
       const saveDock=document.querySelector('.save-dock');
       if(!saveDock||saveDock.parentElement!==$('editorScroll')||saveDock!==$('editorScroll').lastElementChild)throw new Error('save tools below editor');
       organizeUi();
-      $('qaResult').textContent='PASS｜gallery layouts｜full bleed image body｜no inner frame｜free crop｜compact mode UI｜save tools below editor｜header alignment｜project assets';
+      $('qaResult').textContent='PASS｜visible readable templates｜continuous 80% coffee background｜gallery layouts｜full bleed image body｜no inner frame｜free crop｜save tools below editor｜header alignment｜project assets';
       document.body.dataset.qa='pass';
     }catch(error){
       $('qaResult').textContent='FAIL｜'+error.message;
