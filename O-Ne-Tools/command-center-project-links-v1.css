@@ -25,6 +25,7 @@
 .project-link-editor .private-grid{margin-top:14px}
 .project-link-editor label{display:block;margin-bottom:6px;font-size:13px;font-weight:800;color:#c3cecf}
 .project-link-editor .field{font-size:14px;min-height:45px}
+.project-link-editor .field[readonly]{color:#8fa19f;background:#101820;border-color:#273849;cursor:not-allowed}
 .project-link-help{margin-top:12px;color:#87a19d;font-size:12px;line-height:1.6}
 .place-direct-link{display:inline-flex;margin-top:14px;align-items:center;justify-content:center;min-height:45px;padding:0 18px;border:1px solid #4fcfc1;border-radius:10px;background:#164440;color:#ecfffc;font-weight:900;text-decoration:none}
 .place-direct-link:hover,.place-direct-link:focus-visible{background:#1d5651}
