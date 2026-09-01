@@ -1,0 +1,31 @@
+.project-item small{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.project-link-state{font-weight:800;color:#647284}
+.project-link-state.ready{color:#79e2d4}
+.project-empty-state{min-height:220px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;text-align:center;color:#8d9aaa}
+.project-empty-state b{font-size:20px;color:#f5f1e9}
+.project-summary{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.project-summary .title{font-size:24px}
+.project-link-section{margin-top:18px;padding-top:18px;border-top:1px solid #273849}
+.project-link-section h3{margin:0 0 5px;font-size:17px;color:#f5f1e9}
+.project-link-section .small{font-size:13px;line-height:1.6}
+.project-link-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:13px}
+.project-link{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:58px;padding:13px 15px;border:1px solid #2b7777;border-radius:11px;background:#103331;color:#eafffb;text-decoration:none;font-size:15px;font-weight:900;transition:.16s ease}
+.project-link::after{content:'↗';font-size:18px;color:#66e1d2}
+.project-link:hover,.project-link:focus-visible{border-color:#57d8ca;background:#164440;transform:translateY(-1px)}
+.project-link.missing{border-color:#273849;background:#101820;color:#687789;pointer-events:none}
+.project-link.missing::after{content:'未設定';font-size:11px;color:#687789}
+.project-link-editor{margin-top:18px;border:1px solid #273849;border-radius:12px;background:#0c141d;overflow:hidden}
+.project-link-editor summary{cursor:pointer;list-style:none;padding:15px 17px;font-size:15px;font-weight:900;color:#dce9e6}
+.project-link-editor summary::-webkit-details-marker{display:none}
+.project-link-editor summary::after{content:'＋';float:right;color:#79e2d4}
+.project-link-editor[open] summary::after{content:'－'}
+.project-link-editor-body{padding:0 17px 17px;border-top:1px solid #273849}
+.project-link-editor .private-grid{margin-top:14px}
+.project-link-editor label{display:block;margin-bottom:6px;font-size:13px;font-weight:800;color:#c3cecf}
+.project-link-editor .field{font-size:14px;min-height:45px}
+.project-link-help{margin-top:12px;color:#87a19d;font-size:12px;line-height:1.6}
+.place-direct-link{display:inline-flex;margin-top:14px;align-items:center;justify-content:center;min-height:45px;padding:0 18px;border:1px solid #4fcfc1;border-radius:10px;background:#164440;color:#ecfffc;font-weight:900;text-decoration:none}
+.place-direct-link:hover,.place-direct-link:focus-visible{background:#1d5651}
+.place-missing-link{margin-top:12px;color:#8d9aaa;font-size:12px}
+@media(max-width:900px){.project-link-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:620px){.project-link-grid{grid-template-columns:1fr}.project-summary .title{font-size:20px}}
