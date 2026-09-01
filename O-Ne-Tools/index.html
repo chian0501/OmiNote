@@ -68,7 +68,7 @@
       card.append(meta,title,family,desc,actions);grid.appendChild(card);
     });
   }
-  fetch('./one-tools-registry-v1.json?v=2340',{cache:'no-store'}).then(function(response){if(!response.ok)throw new Error('HTTP '+response.status);return response.json()}).then(function(registry){
+  fetch('./one-tools-registry-v1.json?v=2350',{cache:'no-store'}).then(function(response){if(!response.ok)throw new Error('HTTP '+response.status);return response.json()}).then(function(registry){
     tools=(registry.tools||[]).filter(function(tool){return (tool.status==='ready'||tool.status==='candidate')&&tool.href});
     document.getElementById('statNum').textContent=tools.length+' 個';
     document.documentElement.setAttribute('data-registry-version',registry.version||'unknown');

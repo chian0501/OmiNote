@@ -1,5 +1,5 @@
 {
-  "version": "V2.34_20260901",
+  "version": "V2.35_20260901",
   "ui_shell_version": "V1.3.1_20260901",
   "public_boundary": "semantic_references_only",
   "principle": "one_function_one_entry",
@@ -40,7 +40,7 @@
       "group": "任務／事件",
       "desc": "HERE｜目前位置、場景定位、畫面主題",
       "status": "ready",
-      "href": "./general-card.html?v=121&build=manual-history-v2",
+      "href": "./general-card.html?v=121&build=manual-history-v2&ui=131",
       "ai_href": "./ai-card.html?tool=general&v=12",
       "features": [
         "title",
@@ -66,7 +66,7 @@
       "group": "任務／事件",
       "desc": "EVENT／DONE!／FAIL｜事件觸發、成功、失敗",
       "status": "ready",
-      "href": "./trigger-card.html?v=102&build=manual-history-v2",
+      "href": "./trigger-card.html?v=102&build=manual-history-v2&ui=131",
       "ai_href": "./ai-card.html?tool=trigger&v=12",
       "features": [
         "state_switch",
@@ -97,7 +97,7 @@
       "group": "任務／事件",
       "desc": "MISSION／DONE!／FAIL｜手動字級／最近 5 次暫存／JSON 還原",
       "status": "ready",
-      "href": "./persistent-card.html?v=112&build=manual-history-v2",
+      "href": "./persistent-card.html?v=112&build=manual-history-v2&ui=131",
       "ai_href": "./ai-card.html?tool=persistent&v=12",
       "features": [
         "state_switch",
@@ -130,7 +130,7 @@
       "group": "效果／狀態",
       "desc": "8 組效果、6 款滿版氛圍；文字、色票、裝飾與氛圍可還原",
       "status": "ready",
-      "href": "./effect-card.html?v=031&build=manual-history-v2",
+      "href": "./effect-card.html?v=031&build=manual-history-v2&ui=131",
       "features": [
         "preset_effects",
         "editable_copy",
@@ -158,7 +158,7 @@
       "group": "路線／導航",
       "desc": "MOVE｜增減站點、實線／虛線、白色／橘色版",
       "status": "ready",
-      "href": "./move-card.html?v=107&build=manual-history-v2",
+      "href": "./move-card.html?v=107&build=manual-history-v2&ui=131",
       "ai_href": "./ai-card.html?tool=move&v=12",
       "features": [
         "dynamic_stations",
@@ -183,7 +183,7 @@
       "group": "選擇／確認",
       "desc": "SELECT｜自由增減選項，每項獨立亮／暗",
       "status": "ready",
-      "href": "./choice-card.html?v=101&build=manual-history-v2",
+      "href": "./choice-card.html?v=101&build=manual-history-v2&ui=131",
       "ai_href": "./ai-card.html?tool=choice&v=12",
       "features": [
         "dynamic_options",
@@ -213,7 +213,7 @@
       "group": "選擇／確認",
       "desc": "接受／放棄＋YES／NO；主句與左右按鈕文字可自訂",
       "status": "ready",
-      "href": "./challenge-card.html?v=011&build=manual-history-v2",
+      "href": "./challenge-card.html?v=011&build=manual-history-v2&ui=131",
       "features": [
         "accept_or_abandon_mode",
         "yes_or_no_selected_state",
@@ -250,7 +250,7 @@
       "group": "對話／角色",
       "desc": "正式框與完整獨立透明頭像分離；左右角色／表情／名稱獨立；24／24 表情已驗證；NPC 無頭像；單人／雙人同一工具",
       "status": "ready",
-      "href": "./dialogue-card.html?v=141&build=manual-history-v2",
+      "href": "./dialogue-card.html?v=141&build=manual-history-v2&ui=131",
       "features": [
         "left_right_independent",
         "character_select",
@@ -321,7 +321,7 @@
       "group": "資訊／閱讀",
       "desc": "COL-02｜正式 1920×1080 品鑑卡；分數列、文字結果、價格／心得、背景與店家資訊影像",
       "status": "ready",
-      "href": "./rating-card.html?v=131&build=manual-history-v2",
+      "href": "./rating-card.html?v=131&build=manual-history-v2&ui=131",
       "features": [
         "formal_1920x1080_canvas",
         "two_numeric_segmented_ratings",
@@ -359,7 +359,7 @@
       "group": "資訊／閱讀",
       "desc": "一般內文／項目／步驟；圖片可完整顯示、固定 16:9 或自由拉框裁切，支援拖邊角、移動選取範圍與左右獨立設定",
       "status": "ready",
-      "href": "./focus-card.html?v=0515&build=measured-autoheight-v1",
+      "href": "./focus-card.html?v=0515&build=measured-autoheight-v1&ui=131",
       "features": [
         "body_list_steps_modes",
         "up_to_8_rows",
@@ -420,7 +420,7 @@
       "group": "資訊／閱讀",
       "desc": "一般說明範本常駐且指示放大；純圖片區延續整張 80% 咖啡色卡底，透明處與間距不另鋪其他底色",
       "status": "ready",
-      "href": "./explanation-card.html?v=045&build=continuous-coffee-bg-ready-v1",
+      "href": "./explanation-card.html?v=045&build=continuous-coffee-bg-ready-v1&ui=131",
       "features": [
         "official_explanation_card_family",
         "independent_from_focus_card",
@@ -500,7 +500,7 @@
       "group": "縮圖／品牌",
       "desc": "透明品牌框、底圖調整與可替換角標；圖片檔需在還原後重新選取",
       "status": "ready",
-      "href": "./thumbnail-frame.html?v=126&build=manual-history-v2",
+      "href": "./thumbnail-frame.html?v=126&build=manual-history-v2&ui=131",
       "features": [
         "formal_brand_frame",
         "optional_background",
@@ -527,7 +527,7 @@
       "group": "結算／結果",
       "desc": "1–8 列自由增減、Icon 與欄位名稱預設／自訂、觀眾互動問題／下一影片模式；訂閱圓框預設關閉",
       "status": "ready",
-      "href": "./settlement-card.html?v=013&ready=1&build=manual-history-v2",
+      "href": "./settlement-card.html?v=013&ready=1&build=manual-history-v2&ui=131",
       "features": [
         "formal_1920x1080_canvas",
         "dynamic_result_rows_1_to_8",

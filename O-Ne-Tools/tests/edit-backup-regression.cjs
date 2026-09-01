@@ -129,7 +129,7 @@ const tools = [
 
 for (const [file, id, version] of tools) {
   const html = fs.readFileSync(path.join(root, file), 'utf8');
-  const backupVersion = file === 'explanation-card.html' ? 'edit-backup-v1.js?v=1219' : file === 'focus-card.html' ? 'edit-backup-v1.js?v=1215' : 'edit-backup-v1.js?v=121';
+  const backupVersion = 'edit-backup-v1.js?v=1310';
   assert(html.includes(backupVersion), file + ' must load the manual-by-default shared backup library');
   const implementation = file === 'settlement-card.html'
     ? fs.readFileSync(path.join(root, 'settlement-card-v011.js'), 'utf8')
@@ -174,7 +174,7 @@ for (const file of ['edit-backup-v1.js', 'settlement-card-v011.js']) {
 assert.deepStrictEqual(syntaxFailures, []);
 
 const registry = JSON.parse(fs.readFileSync(path.join(root, 'one-tools-registry-v1.json'), 'utf8'));
-assert.strictEqual(registry.version, 'V2.34_20260901');
+assert.strictEqual(registry.version, 'V2.35_20260901');
 assert.strictEqual(registry.total, 18);
 assert.strictEqual(registry.ready, 13);
 assert.strictEqual(registry.candidate, 0);
@@ -211,17 +211,17 @@ assert.deepStrictEqual(registry.shared_edit_backup.manual_save_tools, [
 ]);
 
 const index = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
-assert(index.includes("fetch('./one-tools-registry-v1.json?v=2340'"), 'index must read the canonical registry');
+assert(index.includes("fetch('./one-tools-registry-v1.json?v=2350'"), 'index must read the canonical registry');
 assert(!index.includes('const tools=['), 'index must not keep a second hardcoded registry');
 assert(index.includes('command-center.html'), 'index must expose the Command Center entry');
 
 const aiBridge = fs.readFileSync(path.join(root, 'ai-card.html'), 'utf8');
 for (const href of [
-  'general-card.html?v=121&build=ui-shell-v13',
-  'trigger-card.html?v=102&build=ui-shell-v13',
-  'persistent-card.html?v=112&build=ui-shell-v13',
-  'move-card.html?v=107&build=ui-shell-v13',
-  'choice-card.html?v=101&build=ui-shell-v13'
+  'general-card.html?v=121&build=ui-shell-v131',
+  'trigger-card.html?v=102&build=ui-shell-v131',
+  'persistent-card.html?v=112&build=ui-shell-v131',
+  'move-card.html?v=107&build=ui-shell-v131',
+  'choice-card.html?v=101&build=ui-shell-v131'
 ]) assert(aiBridge.includes(href), 'AI Bridge missing current editor link ' + href);
 
 const persistentMapping = JSON.parse(fs.readFileSync(path.join(root, 'persistent-card-mapping.json'), 'utf8'));

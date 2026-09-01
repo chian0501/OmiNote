@@ -99,7 +99,7 @@ assert(helperSource.indexOf('instance.config.apply(clone(project.data));') < hel
   ];
   for (const file of sharedEditors) {
     const html = fs.readFileSync(path.join(root, file), 'utf8');
-    const backupVersion = file === 'explanation-card.html' ? 'edit-backup-v1.js?v=1219' : file === 'focus-card.html' ? 'edit-backup-v1.js?v=1215' : 'edit-backup-v1.js?v=121';
+    const backupVersion = 'edit-backup-v1.js?v=1310';
     assert(html.includes(backupVersion), file + ' must still load the shared backup bridge');
   }
 

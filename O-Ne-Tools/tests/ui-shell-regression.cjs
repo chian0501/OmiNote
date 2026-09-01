@@ -27,7 +27,7 @@ assert(project.includes('ONEAfterEditDock.place'));
 assert(batch.includes('ONEAfterEditDock.place'));
 assert(guide.includes('ONEAfterEditDock.place'));
 assert(!guide.includes('<details open>'));
-assert(commandSync.includes("fetch('./one-tools-registry-v1.json?v=2340'"));
+assert(commandSync.includes("fetch('./one-tools-registry-v1.json?v=2350'"));
 assert(commandSync.includes("tool.id === 'explanation'"));
 
 const persistent = fs.readFileSync(path.join(root, 'persistent-card.html'), 'utf8');
@@ -45,7 +45,7 @@ assert(effect.includes('V0.3.1 已載入'));
 const index = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 assert(index.includes('one-tools-ui-v1.css?v=1310'));
 assert(index.includes('one-tools-ui-v1.js?v=1310'));
-assert(index.includes("fetch('./one-tools-registry-v1.json?v=2340'"));
+assert(index.includes("fetch('./one-tools-registry-v1.json?v=2350'"));
 
 const bridge = fs.readFileSync(path.join(root, 'ai-card.html'), 'utf8');
 assert(bridge.includes("+'&embed=1'"));
@@ -53,7 +53,11 @@ assert(bridge.includes('O-Ne AI 字卡助手 V1.3'));
 
 const commandCenter = fs.readFileSync(path.join(root, 'command-center.html'), 'utf8');
 assert(commandCenter.includes('13 個可用 UI'));
-assert(commandCenter.includes('command-center-registry-sync-v1.js?v=1001'));
+assert(commandCenter.includes('command-center-registry-sync-v1.js?v=1002'));
+
+for (const file of ['general-card.html', 'trigger-card.html', 'effect-card.html', 'move-card.html', 'choice-card.html', 'challenge-card.html', 'dialogue-card-v135.html', 'rating-card.html', 'focus-card.html', 'explanation-card.html', 'thumbnail-frame.html', 'settlement-card.html']) {
+  assert(fs.readFileSync(path.join(root, file), 'utf8').includes('edit-backup-v1.js?v=1310'), file + ' must cache-bust the shared UI bundle');
+}
 
 function assertClassicScriptsParse(file) {
   const html = fs.readFileSync(path.join(root, file), 'utf8');
