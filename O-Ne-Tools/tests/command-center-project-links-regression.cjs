@@ -12,8 +12,8 @@ const css=fs.readFileSync(path.join(root,'command-center-project-links-v1.css'),
 function assert(value,message){if(!value)throw new Error(message)}
 
 assert(html.includes('O-Ne Command Center V0.9.4'),'HTML version is not V0.9.4');
-assert(html.includes('command-center-project-links-direct-v1.js?v=0940'),'direct project-link map is not loaded');
-assert(html.includes('command-center-project-links-v1.js?v=0940'),'project-link script is not loaded');
+assert(html.includes('command-center-project-links-direct-v1.js?v=0941'),'direct project-link map is not loaded');
+assert(html.includes('command-center-project-links-v1.js?v=0941'),'project-link script is not loaded');
 assert(html.includes('command-center-project-links-v1.css?v=0940'),'project-link stylesheet is not loaded');
 assert(html.indexOf('command-center-project-links-direct-v1.js')<html.indexOf('command-center-project-links-v1.js'),'direct map must load before the project-link controller');
 assert(html.includes('data-tab="projects">專案連結'),'project navigation label is unclear');
@@ -21,6 +21,8 @@ assert(html.includes('47 PROJECT LINKS'),'direct-link count is not visible in HT
 assert(script.includes("new Set(['drive.google.com','docs.google.com'])"),'Google host allowlist is missing');
 assert(script.includes("url.protocol==='https:'"),'HTTPS validation is missing');
 assert(script.includes('window.ONECommandCenterDirectLinks||{}'),'direct project map is not consumed');
+assert(script.includes("const row={...(custom[project.id]||{}),...(DIRECT_LINKS[project.id]||{})}"),'official links must override stale localStorage values');
+assert(script.includes('if(official[input.dataset.priv])return'),'official links must stay read-only in the local supplement editor');
 assert(script.includes("const HASH_PREFIX='#one-private-links='"),'legacy one-click local bootstrap is missing');
 assert(script.includes("history.replaceState(null,'',location.pathname+location.search)"),'private hash is not stripped');
 assert(script.includes('rel="noopener noreferrer"'),'direct links are missing opener protection');
