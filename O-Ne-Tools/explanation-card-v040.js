@@ -722,7 +722,7 @@
   exportJson=function(){
     const payload={
       schema:'o-ne.explanation-card.formal.v0.4.5',
-      status:'CANDIDATE',
+      status:'READY',
       generator_version:VERSION,
       component:{
         width:CARD_WIDTH,
@@ -802,15 +802,15 @@
   }
 
   function installVersionUi(){
-    document.title='O-Ne 說明卡生成器 V0.4.5 CANDIDATE';
+    document.title='O-Ne 說明卡生成器 V0.4.5 READY';
     const version=document.querySelector('.title-line h1 span');
     if(version)version.textContent='V0.4.5';
     const badge=document.querySelector('.title-line .badge');
-    if(badge){badge.textContent='CANDIDATE';badge.classList.remove('is-ready');badge.classList.add('is-candidate');}
+    if(badge){badge.textContent='READY';badge.classList.remove('is-candidate');badge.classList.add('is-ready');}
     const description=document.querySelector('.title-block p');
-    if(description)description.textContent='候選版：範本常駐、關鍵指示放大；純圖片區直接延續同一張 80% 咖啡色卡底。';
+    if(description)description.textContent='正式版：範本常駐、關鍵指示放大；純圖片區直接延續同一張 80% 咖啡色卡底。';
     const status=document.querySelector('.status');
-    if(status)status.textContent='V0.4.5 CANDIDATE｜範本常駐｜80% 咖啡底';
+    if(status)status.textContent='V0.4.5 READY｜範本常駐｜80% 咖啡底';
   }
 
   function runGalleryQa(){

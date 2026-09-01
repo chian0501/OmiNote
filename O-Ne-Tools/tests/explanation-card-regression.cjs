@@ -17,10 +17,10 @@ for (const [file, source] of Object.entries(sources)) {
   assert.doesNotThrow(() => new Function(source), `${file} must parse`);
 }
 
-assert(html.includes('<title>O-Ne 說明卡生成器 V0.4.5 CANDIDATE</title>'), 'candidate version must be visible');
+assert(html.includes('<title>O-Ne 說明卡生成器 V0.4.5 READY</title>'), 'ready version must be visible');
 assert(html.includes('edit-backup-v1.js?v=1219'), 'shared manual backup library must load');
 assert(html.includes('explanation-card-v040.css?v=0451'), 'gallery CSS must load with the legibility cache key');
-assert(html.includes('explanation-card-v040.js?v=0453'), 'gallery runtime must load with the continuous-background QA cache key');
+assert(html.includes('explanation-card-v040.js?v=0454'), 'gallery runtime must load with the READY cache key');
 const editorScrollStart = html.indexOf('<div class="editor-scroll" id="editorScroll">');
 const editorScrollEnd = html.indexOf('</div></aside>', editorScrollStart);
 const saveDockIndex = html.indexOf('<section class="save-dock">');
@@ -51,7 +51,7 @@ assert(gallerySource.includes('gallery_per_image_free_crop:true'), 'JSON metadat
 assert(gallerySource.includes('gallery_free_crop_unlocked_aspect:true'), 'JSON metadata must declare unlocked crop aspect');
 assert(gallerySource.includes('payload.assets.gallery=galleryAssets.map(galleryAssetPayload)'), 'project file must embed gallery assets');
 assert(gallerySource.includes("schema:'o-ne.explanation-card.formal.v0.4.5'"), 'formal JSON schema must be versioned');
-assert(gallerySource.includes("status:'CANDIDATE'"), 'candidate formal JSON must be marked candidate');
+assert(gallerySource.includes("status:'READY'"), 'formal JSON must be marked ready');
 assert(gallerySource.includes("context.fillStyle='rgba(31,23,19,.80)'"), 'gallery card body must keep the formal 80% fill opacity');
 assert(gallerySource.includes('gallery_full_bleed_below_header:true'), 'JSON metadata must declare the full-bleed image body');
 assert(gallerySource.includes('gallery_inner_frame:false'), 'JSON metadata must declare that the inner gallery frame is removed');
@@ -160,4 +160,4 @@ assert(css.includes('.save-tool-details'), 'batch output must be collapsible');
 assert(css.includes('.editor-scroll>.save-dock{margin:4px 16px 18px'), 'bottom save tools must be styled as the last editor card');
 assert(!css.includes('.gallery-mode .save-dock{max-height:'), 'save tools must no longer reserve a fixed block above the editor');
 
-console.log('PASS: explanation-card V0.4.5 CANDIDATE keeps templates readable and continues the 80% coffee background through the full-bleed gallery.');
+console.log('PASS: explanation-card V0.4.5 READY keeps templates readable and continues the 80% coffee background through the full-bleed gallery.');
