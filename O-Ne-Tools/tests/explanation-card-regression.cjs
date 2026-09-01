@@ -17,7 +17,7 @@ for (const [file, source] of Object.entries(sources)) {
   assert.doesNotThrow(() => new Function(source), `${file} must parse`);
 }
 
-assert(html.includes('<title>O-Ne 說明卡生成器 V0.4.4 CANDIDATE</title>'), 'candidate version must be visible');
+assert(html.includes('<title>O-Ne 說明卡生成器 V0.4.4 READY</title>'), 'ready version must be visible');
 assert(html.includes('edit-backup-v1.js?v=1219'), 'shared manual backup library must load');
 assert(html.includes('explanation-card-v040.css?v=044'), 'gallery CSS must load');
 assert(html.includes('explanation-card-v040.js?v=0441'), 'gallery runtime must load with the seam-fix cache key');
@@ -47,7 +47,7 @@ assert(gallerySource.includes('gallery_per_image_free_crop:true'), 'JSON metadat
 assert(gallerySource.includes('gallery_free_crop_unlocked_aspect:true'), 'JSON metadata must declare unlocked crop aspect');
 assert(gallerySource.includes('payload.assets.gallery=galleryAssets.map(galleryAssetPayload)'), 'project file must embed gallery assets');
 assert(gallerySource.includes("schema:'o-ne.explanation-card.formal.v0.4.4'"), 'formal JSON schema must be versioned');
-assert(gallerySource.includes("status:'CANDIDATE'"), 'unreleased formal JSON must stay candidate');
+assert(gallerySource.includes("status:'READY'"), 'released formal JSON must be ready');
 assert(gallerySource.includes("context.fillStyle='rgba(31,23,19,.80)'"), 'gallery card body must keep the formal 80% fill opacity');
 assert(gallerySource.includes('gallery_full_bleed_below_header:true'), 'JSON metadata must declare the full-bleed image body');
 assert(gallerySource.includes('gallery_inner_frame:false'), 'JSON metadata must declare that the inner gallery frame is removed');
@@ -149,4 +149,4 @@ assert(css.includes('.save-tool-details'), 'batch output must be collapsible');
 assert(css.includes('.editor-scroll>.save-dock{margin:4px 16px 18px'), 'bottom save tools must be styled as the last editor card');
 assert(!css.includes('.gallery-mode .save-dock{max-height:'), 'save tools must no longer reserve a fixed block above the editor');
 
-console.log('PASS: explanation-card V0.4.4 candidate removes the inner gallery frame and consolidates the editing UI.');
+console.log('PASS: explanation-card V0.4.4 READY removes the inner gallery frame and consolidates the editing UI.');
