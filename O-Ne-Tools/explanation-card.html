@@ -6,18 +6,18 @@
 <title>O-Ne 說明卡生成器 V0.4.5 CANDIDATE</title>
 
 <link rel="stylesheet" href="./explanation-card-v038.css?v=038">
-<link rel="stylesheet" href="./explanation-card-v040.css?v=045">
+<link rel="stylesheet" href="./explanation-card-v040.css?v=0451">
 </head>
 <body>
 
 <main class="app-shell">
-<header class="app-header"><a class="back-link" href="./">← 回工具入口</a><div class="header-divider"></div><div class="title-block"><div class="title-line"><h1>O-Ne 說明卡生成器 <span>V0.4.5</span></h1><strong class="badge is-candidate">CANDIDATE</strong></div><p>候選版：恢復原有一般說明範本為常駐入口；滿版圖片字卡與精簡工具流程維持不變。</p></div><div class="status">V0.4.5 CANDIDATE｜一般範本直接可見</div></header>
+<header class="app-header"><a class="back-link" href="./">← 回工具入口</a><div class="header-divider"></div><div class="title-block"><div class="title-line"><h1>O-Ne 說明卡生成器 <span>V0.4.5</span></h1><strong class="badge is-candidate">CANDIDATE</strong></div><p>候選版：原有一般說明範本常駐顯示，並放大關鍵操作與使用提示；滿版圖片字卡維持不變。</p></div><div class="status">V0.4.5 CANDIDATE｜範本常駐｜指示放大</div></header>
 <section class="workspace">
 <aside class="editor-panel panel">
-<div class="editor-head"><strong>說明卡編輯器</strong><small>先選模式與版型，再編輯內容、輸出成品；一般說明範本直接顯示，批次與舊檔工具留在下方進階區。</small></div>
+<div class="editor-head"><strong>說明卡編輯器</strong><small>使用順序只有 3 步：① 先選模式與範本　② 編輯文字／圖片　③ 到最下方儲存與輸出。</small></div>
 <div class="editor-scroll" id="editorScroll">
-<section class="template-strip mode-strip"><div class="step-heading"><span class="step-no">①</span><div><b>選製作模式</b><small>一般說明可直接套用下方原有範本；純圖片字卡只留標籤、標題與滿版圖片區。</small></div></div><div class="mode-buttons" role="group" aria-label="製作模式"><button class="mode-btn" id="contentMode" type="button" data-card-mode="content"><b>一般說明</b><span>左圖右文</span></button><button class="mode-btn" id="galleryMode" type="button" data-card-mode="gallery"><b>純圖片字卡</b><span>標題＋滿版圖片</span></button></div><div class="template-presets" id="contentTemplatePicker" aria-labelledby="contentTemplateHeading"><div class="template-presets-head"><div><strong id="contentTemplateHeading">選擇一般說明版型</strong><small>原本可套用的設計範本都保留在這裡，點一下立即套用。</small></div><span>直接套用</span></div><div class="template-buttons" id="templateButtons"></div></div></section>
-<section class="settings"><div class="label-controls"><div class="label-controls-copy"><strong>卡片標籤</strong><small>標籤與標題會共用同一條水平中線。</small></div><label class="field"><span>文字</span><input id="labelText" maxlength="12"/></label><label class="field"><span>顏色</span><select id="labelColor"></select></label></div><details class="setting" id="contentCardSettings"><summary>一般說明進階設定</summary><div class="setting-body"><label class="toggle-row"><input id="noteEnabled" type="checkbox"/><span>顯示底部提醒框</span></label><label class="field"><span>提醒文字</span><textarea id="noteText" maxlength="260"></textarea></label><div class="field-row"><label class="field"><span>提醒色</span><select id="noteColor"></select></label><label class="field"><span>提醒字級</span><select id="noteSize"><option>22</option><option selected="">24</option><option>26</option><option>28</option><option>30</option></select></label></div></div></details></section>
+<section class="template-strip mode-strip"><div class="step-heading"><span class="step-no">①</span><div><b>選模式與範本</b><small>先選「一般說明」或「純圖片字卡」；一般說明的 6 種設計範本會直接顯示在下方。</small></div></div><div class="mode-buttons" role="group" aria-label="製作模式"><button class="mode-btn" id="contentMode" type="button" data-card-mode="content"><b>一般說明</b><span>6 種範本＋圖文段落</span></button><button class="mode-btn" id="galleryMode" type="button" data-card-mode="gallery"><b>純圖片字卡</b><span>標籤＋標題＋滿版圖片</span></button></div><div class="template-presets" id="contentTemplatePicker" aria-labelledby="contentTemplateHeading"><div class="template-presets-head"><div><strong id="contentTemplateHeading">一般說明｜套用設計範本</strong><small>建議先選範本再改字；之後更換範本會重設文字內容。</small></div><span>6 種範本</span></div><div class="template-buttons" id="templateButtons"></div></div></section>
+<section class="settings"><div class="label-controls"><div class="label-controls-copy"><strong>卡片標籤</strong><small>標籤與標題會共用同一條水平中線。</small></div><label class="field"><span>文字</span><input id="labelText" maxlength="12"/></label><label class="field"><span>顏色</span><select id="labelColor"></select></label></div><details class="setting" id="contentCardSettings"><summary><span>進階設定</span><small>提醒框與提示樣式</small></summary><div class="setting-body"><label class="toggle-row"><input id="noteEnabled" type="checkbox"/><span>顯示底部提醒框</span></label><label class="field"><span>提醒文字</span><textarea id="noteText" maxlength="260"></textarea></label><div class="field-row"><label class="field"><span>提醒色</span><select id="noteColor"></select></label><label class="field"><span>提醒字級</span><select id="noteSize"><option>22</option><option selected="">24</option><option>26</option><option>28</option><option>30</option></select></label></div></div></details></section>
 <div class="word-toolbar" id="wordToolbar"><div class="toolbar-heading"><span class="step-no">②</span><div><b id="toolbarTitle">編輯文字</b><small id="toolbarHelp">先反白要修改的文字，再選格式；沒有反白時會套用目前段落。</small></div><button class="image-trigger" id="openImageDrawer" type="button">🖼 左側圖片</button></div>
 <button class="tool-btn" data-cmd="undo" title="復原" type="button">↶</button><button class="tool-btn" data-cmd="redo" title="重做" type="button">↷</button><span class="tool-divider"></span>
 <select class="tool-select style-select" id="stylePreset" title="常用文字格式"><option value="">常用文字格式…</option></select>
@@ -56,5 +56,5 @@
 <script src="./explanation-card-v038-3.js?v=040"></script>
 <script src="./explanation-card-v038-4.js?v=040"></script>
 <script src="./explanation-card-v038-5.js?v=045"></script>
-<script src="./explanation-card-v040.js?v=0451"></script>
+<script src="./explanation-card-v040.js?v=0452"></script>
 </body></html>

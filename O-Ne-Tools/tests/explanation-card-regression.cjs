@@ -19,8 +19,8 @@ for (const [file, source] of Object.entries(sources)) {
 
 assert(html.includes('<title>O-Ne 說明卡生成器 V0.4.5 CANDIDATE</title>'), 'candidate version must be visible');
 assert(html.includes('edit-backup-v1.js?v=1219'), 'shared manual backup library must load');
-assert(html.includes('explanation-card-v040.css?v=045'), 'gallery CSS must load');
-assert(html.includes('explanation-card-v040.js?v=0451'), 'gallery runtime must load with the candidate cache key');
+assert(html.includes('explanation-card-v040.css?v=0451'), 'gallery CSS must load with the legibility cache key');
+assert(html.includes('explanation-card-v040.js?v=0452'), 'gallery runtime must load with the legibility QA cache key');
 const editorScrollStart = html.indexOf('<div class="editor-scroll" id="editorScroll">');
 const editorScrollEnd = html.indexOf('</div></aside>', editorScrollStart);
 const saveDockIndex = html.indexOf('<section class="save-dock">');
@@ -29,8 +29,9 @@ assert(saveDockIndex > html.indexOf('<section class="word-page-wrap">') && saveD
 assert(html.includes('<span class="save-badge">最後一步</span>'), 'save tools must be presented as the last step');
 assert(html.includes('data-card-mode="content"') && html.includes('data-card-mode="gallery"'), 'content and gallery must be separate mode choices');
 assert(html.includes('<div class="template-presets" id="contentTemplatePicker"'), 'content templates must be visible without opening a details control');
-assert(html.includes('選擇一般說明版型') && html.includes('點一下立即套用'), 'the original content template picker must explain direct application');
+assert(html.includes('一般說明｜套用設計範本') && html.includes('更換範本會重設文字內容'), 'the original content template picker must explain its action and reset effect');
 assert(!html.includes('<details class="template-presets"'), 'content templates must not be hidden in a collapsed control');
+assert(html.includes('<summary><span>進階設定</span><small>提醒框與提示樣式</small></summary>'), 'advanced content settings must have an explicit readable purpose');
 assert(html.includes('<details class="legacy-save-tools">'), 'legacy project formats and reset must be collapsed');
 
 assert(combined.includes('const CARD_WIDTH=1552,MIN_HEIGHT=724'), 'formal explanation card dimensions must remain available');
@@ -148,9 +149,12 @@ assert(css.includes('.gallery-mode .image-trigger'), 'left-image control must be
 assert(css.includes('.gallery-mode .word-page{min-height:0'), 'gallery title editor must stay compact');
 assert(css.includes('.mode-buttons'), 'mode picker must be styled as the primary entry');
 assert(css.includes('.template-presets-head'), 'visible content template guidance must be styled');
+assert(css.includes('.template-presets-head strong{color:#f3f0ea;font-size:14px}'), 'template heading must remain readable');
+assert(css.includes('.template-presets .template-btn{min-height:44px;padding:0 10px;font-size:12px}'), 'template choices must remain readable and easy to click');
+assert(css.includes('#contentCardSettings>summary>span{font-size:13px'), 'advanced settings heading must remain readable');
 assert(css.includes('.gallery-slot-adjust'), 'per-image adjustment controls must be collapsible');
 assert(css.includes('.save-tool-details'), 'batch output must be collapsible');
 assert(css.includes('.editor-scroll>.save-dock{margin:4px 16px 18px'), 'bottom save tools must be styled as the last editor card');
 assert(!css.includes('.gallery-mode .save-dock{max-height:'), 'save tools must no longer reserve a fixed block above the editor');
 
-console.log('PASS: explanation-card V0.4.5 CANDIDATE restores the visible content template picker without changing the full-bleed gallery.');
+console.log('PASS: explanation-card V0.4.5 CANDIDATE keeps templates visible and makes the primary instructions readable without changing the full-bleed gallery.');

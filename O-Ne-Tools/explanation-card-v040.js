@@ -809,9 +809,9 @@
     const badge=document.querySelector('.title-line .badge');
     if(badge){badge.textContent='CANDIDATE';badge.classList.remove('is-ready');badge.classList.add('is-candidate');}
     const description=document.querySelector('.title-block p');
-    if(description)description.textContent='候選版：恢復原有一般說明範本為常駐入口；滿版圖片字卡與精簡工具流程維持不變。';
+    if(description)description.textContent='候選版：原有一般說明範本常駐顯示，並放大關鍵操作與使用提示；滿版圖片字卡維持不變。';
     const status=document.querySelector('.status');
-    if(status)status.textContent='V0.4.5 CANDIDATE｜一般範本直接可見';
+    if(status)status.textContent='V0.4.5 CANDIDATE｜範本常駐｜指示放大';
   }
 
   function runGalleryQa(){
@@ -833,6 +833,9 @@
       renderEditor();
       const templatePicker=$('contentTemplatePicker');
       if(templatePicker.hidden||templatePicker.tagName==='DETAILS'||$('templateButtons').children.length<6)throw new Error('visible content template picker');
+      const templateHeading=templatePicker.querySelector('strong');
+      const templateButton=$('templateButtons').querySelector('.template-btn');
+      if(parseFloat(getComputedStyle(templateHeading).fontSize)<14||parseFloat(getComputedStyle(templateButton).fontSize)<12)throw new Error('readable template guidance');
       state=cleanState({
         ...clone(defaults),
         mode:'gallery',
@@ -865,7 +868,7 @@
       const saveDock=document.querySelector('.save-dock');
       if(!saveDock||saveDock.parentElement!==$('editorScroll')||saveDock!==$('editorScroll').lastElementChild)throw new Error('save tools below editor');
       organizeUi();
-      $('qaResult').textContent='PASS｜visible content templates｜gallery layouts｜full bleed image body｜no inner frame｜free crop｜compact mode UI｜save tools below editor｜header alignment｜project assets';
+      $('qaResult').textContent='PASS｜visible readable templates｜clear advanced settings｜gallery layouts｜full bleed image body｜no inner frame｜free crop｜save tools below editor｜header alignment｜project assets';
       document.body.dataset.qa='pass';
     }catch(error){
       $('qaResult').textContent='FAIL｜'+error.message;
