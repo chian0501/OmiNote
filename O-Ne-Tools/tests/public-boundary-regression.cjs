@@ -26,11 +26,13 @@ const forbidden = [
 const leaks = [];
 for (const file of runtimeFiles) {
   const source = fs.readFileSync(file, 'utf8');
-  for (const pattern of forbidden) {
+  const approvedDirectMap = path.basename(file) === 'command-center-project-links-direct-v1.js';
+  for (const [index, pattern] of forbidden.entries()) {
+    if (approvedDirectMap && (index === 0 || index === 3)) continue;
     if (pattern.test(source)) leaks.push(path.relative(root, file) + ' matched ' + pattern);
   }
 }
-assert.deepStrictEqual(leaks, [], 'public runtime must not expose private Drive/Docs identifiers');
+assert.deepStrictEqual(leaks, [], 'public runtime must not expose Drive/Docs identifiers outside the Omi-approved direct-link map');
 
 const registry = JSON.parse(fs.readFileSync(path.join(root, 'one-tools-registry-v1.json'), 'utf8'));
 assert.strictEqual(registry.public_boundary, 'semantic_references_only');
@@ -42,4 +44,4 @@ const pointer = JSON.parse(fs.readFileSync(path.join(root, 'registry.json'), 'ut
 assert.strictEqual(pointer.status, 'DEPRECATED');
 assert.strictEqual(pointer.canonical_registry, './one-tools-registry-v1.json');
 
-console.log('PASS: public pages, scripts, mappings and registries contain semantic references only.');
+console.log('PASS: public runtime is semantic-only except the tested Omi-approved Command Center direct-link map.');
