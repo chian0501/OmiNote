@@ -104,6 +104,7 @@ assert.strictEqual(galleryLayout.height - (galleryLayout.galleryY + galleryLayou
 assert.strictEqual(galleryLayout.galleryX, 3, 'gallery image body must start at the outer card border');
 assert.strictEqual(galleryLayout.galleryW, 1546, 'gallery image body must span the full card width inside the outer stroke');
 assert.strictEqual(galleryLayout.galleryY - galleryLayout.dividerY, 3, 'gallery image body must meet the header divider without an inner top frame');
+assert(!gallerySource.includes('Math.ceil(dividerY+3)'), 'gallery top edge must not gain a fractional browser seam');
 
 const renderGallerySource = extractFunction(gallerySource, 'renderGalleryCanvas');
 assert(renderGallerySource.lastIndexOf('cutCornerPath(context,3,3') > renderGallerySource.indexOf('layout.rects.forEach'), 'outer border must be redrawn over the flush image edge');
