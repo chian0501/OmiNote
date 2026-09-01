@@ -60,7 +60,7 @@ vm.runInContext(batchSource, context, { filename:'batch-render-v1.js' });
 
 const batch = context.ONEBatchRender;
 assert(batch, 'batch renderer must load');
-assert.strictEqual(batch.version, '1.3.0');
+assert.strictEqual(batch.version, '1.3.1');
 assert.strictEqual(batch.__test.constants.maxFiles, 20);
 assert.strictEqual(batch.__test.constants.maxBytes, 200 * 1024 * 1024);
 assert.strictEqual(batch.__test.constants.workerParam, '__one_batch_worker');
@@ -88,6 +88,7 @@ assert(batchSource.includes('同卡種最多 20 份'));
 assert(batchSource.includes('圖片型工具請使用 ZIP 專案包批次輸出'));
 assert(batchSource.includes('directPngBytes'));
 assert(batchSource.includes('__one_batch_worker'));
-assert(packageSource.includes('batch-render-v1.js?v=1300'), 'project package must synchronously load batch renderer');
+assert(packageSource.includes('batch-render-v1.js?v=1310'), 'project package must synchronously load batch renderer');
+assert(batchSource.includes('place(instance.adapter.id, instance.panel'), 'batch UI must use the adapter tool id and must not create a generic nested dock');
 new Function(batchSource);
 console.log('PASS: batch limits, naming, persistent JSON adapter, UI contract, image ZIP safety policy and worker bridge.');

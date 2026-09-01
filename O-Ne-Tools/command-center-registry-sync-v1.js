@@ -47,7 +47,7 @@
     if (typeof renderUI === 'function') renderUI();
   }
 
-  fetch('./one-tools-registry-v1.json?v=2330', { cache: 'no-store' })
+  fetch('./one-tools-registry-v1.json?v=2340', { cache: 'no-store' })
     .then(function (response) {
       if (!response.ok) throw new Error('HTTP ' + response.status);
       return response.json();

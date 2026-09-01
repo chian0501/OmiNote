@@ -1,4 +1,4 @@
-/* O-Ne shared edit backup / JSON import — V1.2.0 + project package bridge */
+/* O-Ne shared edit backup / JSON import — V1.3.1 */
 (function (global) {
   'use strict';
 
@@ -6,12 +6,12 @@
     if (typeof document === 'undefined' || !document.getElementById || !document.createElement) return;
     if (!document.getElementById('one-tools-ui-css')) {
       var link = document.createElement('link');
-      link.id = 'one-tools-ui-css'; link.rel = 'stylesheet'; link.href = './one-tools-ui-v1.css?v=1300';
+      link.id = 'one-tools-ui-css'; link.rel = 'stylesheet'; link.href = './one-tools-ui-v1.css?v=1310';
       (document.head || document.documentElement).appendChild(link);
     }
     if (!global.ONEAfterEditDock && !document.getElementById('one-tools-ui-js')) {
       var script = document.createElement('script');
-      script.id = 'one-tools-ui-js'; script.src = './one-tools-ui-v1.js?v=1300'; script.async = false;
+      script.id = 'one-tools-ui-js'; script.src = './one-tools-ui-v1.js?v=1310'; script.async = false;
       (document.head || document.documentElement).appendChild(script);
     }
   }
@@ -307,7 +307,7 @@
   global.ONEEditBackup = {
     mount: mount,
     schema: SCHEMA,
-    version: '1.3.0',
+    version: '1.3.1',
     captureFields: function (root) { return collectFields(root || document); },
     applyFields: function (fields, root) { return applyFields(fields, root || document); },
     __test: {
@@ -325,10 +325,10 @@
   };
 
   if (typeof document !== 'undefined' && document.readyState === 'loading' && typeof document.write === 'function') {
-    document.write('<script src="./project-package-v1.js?v=1300"></' + 'script>');
+    document.write('<script src="./project-package-v1.js?v=1310"></' + 'script>');
   } else if (typeof document !== 'undefined' && document.createElement && document.head) {
     var packageScript = document.createElement('script');
-    packageScript.src = './project-package-v1.js?v=1300';
+    packageScript.src = './project-package-v1.js?v=1310';
     packageScript.onload = function () { if (global.ONEProjectPackage) global.ONEProjectPackage.wrapEditBackup(); };
     document.head.appendChild(packageScript);
   }

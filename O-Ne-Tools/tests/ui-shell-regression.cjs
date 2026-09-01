@@ -13,7 +13,8 @@ const batch = fs.readFileSync(path.join(root, 'batch-render-v1.js'), 'utf8');
 const guide = fs.readFileSync(path.join(root, 'ai-json-guide-v1.js'), 'utf8');
 const commandSync = fs.readFileSync(path.join(root, 'command-center-registry-sync-v1.js'), 'utf8');
 
-assert(shell.includes("var VERSION = '1.3.0'"));
+assert(shell.includes("var VERSION = '1.3.1'"));
+assert(shell.includes('mergeDuplicateDocks'));
 assert(shell.includes('完成後：儲存與輸出'));
 assert(shell.includes('enhanceLabels'));
 assert(shell.includes('enhanceLongEditors'));
@@ -26,12 +27,12 @@ assert(project.includes('ONEAfterEditDock.place'));
 assert(batch.includes('ONEAfterEditDock.place'));
 assert(guide.includes('ONEAfterEditDock.place'));
 assert(!guide.includes('<details open>'));
-assert(commandSync.includes("fetch('./one-tools-registry-v1.json?v=2330'"));
+assert(commandSync.includes("fetch('./one-tools-registry-v1.json?v=2340'"));
 assert(commandSync.includes("tool.id === 'explanation'"));
 
 const persistent = fs.readFileSync(path.join(root, 'persistent-card.html'), 'utf8');
 assert(persistent.includes('id="persistentHistory" data-one-backup-ui'));
-assert(persistent.includes('project-package-v1.js?v=1300'));
+assert(persistent.includes('project-package-v1.js?v=1310'));
 
 const thumbnail = fs.readFileSync(path.join(root, 'thumbnail-frame.html'), 'utf8');
 assert(thumbnail.includes('<div class="candidate-status">READY</div>'));
@@ -42,9 +43,9 @@ assert(!effect.includes('V0.3.0'));
 assert(effect.includes('V0.3.1 已載入'));
 
 const index = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
-assert(index.includes('one-tools-ui-v1.css?v=1300'));
-assert(index.includes('one-tools-ui-v1.js?v=1300'));
-assert(index.includes("fetch('./one-tools-registry-v1.json?v=2330'"));
+assert(index.includes('one-tools-ui-v1.css?v=1310'));
+assert(index.includes('one-tools-ui-v1.js?v=1310'));
+assert(index.includes("fetch('./one-tools-registry-v1.json?v=2340'"));
 
 const bridge = fs.readFileSync(path.join(root, 'ai-card.html'), 'utf8');
 assert(bridge.includes("+'&embed=1'"));
@@ -52,7 +53,7 @@ assert(bridge.includes('O-Ne AI 字卡助手 V1.3'));
 
 const commandCenter = fs.readFileSync(path.join(root, 'command-center.html'), 'utf8');
 assert(commandCenter.includes('13 個可用 UI'));
-assert(commandCenter.includes('command-center-registry-sync-v1.js?v=1000'));
+assert(commandCenter.includes('command-center-registry-sync-v1.js?v=1001'));
 
 function assertClassicScriptsParse(file) {
   const html = fs.readFileSync(path.join(root, file), 'utf8');

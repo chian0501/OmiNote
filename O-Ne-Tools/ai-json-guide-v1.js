@@ -1,8 +1,8 @@
-/* O-Ne shared AI JSON format guide — V1.3.0 */
+/* O-Ne shared AI JSON format guide — V1.3.1 */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.3.0';
+  var VERSION = '1.3.1';
   var mounted = Object.create(null);
 
   var GUIDES = {

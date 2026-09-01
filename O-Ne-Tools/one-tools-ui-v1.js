@@ -1,8 +1,8 @@
-/* O-Ne Tools shared application shell — V1.3.0 */
+/* O-Ne Tools shared application shell — V1.3.1 */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.3.0';
+  var VERSION = '1.3.1';
   var observed = false;
 
   function escapeId(value) {
@@ -17,10 +17,24 @@
     return Boolean(node && node.closest && node.closest('.save-dock,#quickSaveHost'));
   }
 
+  function mergeDuplicateDocks(preferred) {
+    if (!preferred) return null;
+    var target = preferred.querySelector('.one-after-edit-dock__content');
+    if (!target) return preferred;
+    Array.prototype.slice.call(document.querySelectorAll('.one-after-edit-dock')).forEach(function (dock) {
+      if (dock === preferred) return;
+      var content = dock.querySelector('.one-after-edit-dock__content');
+      if (content) while (content.firstChild) target.appendChild(content.firstChild);
+      if (dock.open) preferred.open = true;
+      dock.remove();
+    });
+    return preferred;
+  }
+
   function dockFor(toolId, anchor, host) {
     var selector = '[data-one-after-edit-dock="' + String(toolId || 'tool').replace(/"/g, '') + '"]';
-    var dock = document.querySelector(selector);
-    if (dock) return dock;
+    var dock = document.querySelector(selector) || document.querySelector('.one-after-edit-dock');
+    if (dock) return mergeDuplicateDocks(dock);
     dock = document.createElement('details');
     dock.className = 'one-after-edit-dock';
     dock.setAttribute('data-one-after-edit-dock', toolId || 'tool');
@@ -32,7 +46,7 @@
     if (host) host.appendChild(dock);
     else if (anchor && anchor.parentNode) anchor.parentNode.insertBefore(dock, anchor.nextSibling);
     else (document.querySelector('.panel,.editor,.controls,.app') || document.body).appendChild(dock);
-    return dock;
+    return mergeDuplicateDocks(dock);
   }
 
   function place(toolId, panel, options) {
@@ -139,6 +153,7 @@
   }
 
   function refresh(root) {
+    mergeDuplicateDocks(document.querySelector('.one-after-edit-dock'));
     enhanceLabels(root || document);
     enhanceLongEditors(root || document);
     consolidate(root || document);

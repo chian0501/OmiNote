@@ -1,6 +1,6 @@
 {
-  "version": "V2.33_20260901",
-  "ui_shell_version": "V1.3.0_20260901",
+  "version": "V2.34_20260901",
+  "ui_shell_version": "V1.3.1_20260901",
   "public_boundary": "semantic_references_only",
   "principle": "one_function_one_entry",
   "total": 18,
@@ -614,7 +614,7 @@
     ]
   },
   "shared_edit_backup": {
-    "version": "V1.3.0_20260901",
+    "version": "V1.3.1_20260901",
     "history_limit": 5,
     "storage": "browser_localStorage",
     "default_save_mode": "manual",
@@ -642,7 +642,7 @@
     "image_restore_policy": "text_and_settings_restore; uploaded_image_files_must_be_selected_again"
   },
   "shared_project_package": {
-    "version": "V1.3.0_20260901",
+    "version": "V1.3.1_20260901",
     "tool_count": 13,
     "filename_pattern": "{card_category}-{title}-{state}.{ext}",
     "brand_prefix_in_filename": false,
@@ -656,7 +656,7 @@
     "legacy_json_compatible": true
   },
   "shared_batch_render": {
-    "version": "V1.3.0_20260901",
+    "version": "V1.3.1_20260901",
     "mode": "same_tool_json_zip_to_png_zip",
     "max_files": 20,
     "max_total_bytes": 209715200,
@@ -668,7 +668,7 @@
     "stop_supported": true
   },
   "shared_ai_json_guide": {
-    "version": "V1.3.0_20260901",
+    "version": "V1.3.1_20260901",
     "tool_count": 13,
     "placement": "collapsed_completion_dock_below_editor",
     "copy_full_ai_prompt": true,
@@ -681,10 +681,11 @@
     "left_controls_untouched": true
   },
   "shared_ui_shell": {
-    "version": "V1.3.0_20260901",
+    "version": "V1.3.1_20260901",
     "minimum_helper_text_px": 13,
     "minimum_control_height_px": 42,
     "after_edit_tools_collapsed": true,
+    "single_completion_dock_per_page": true,
     "long_repeated_editors_collapsible": true,
     "accessible_label_enhancement": true,
     "embedded_editor_completion_tools_hidden": true

@@ -44,7 +44,7 @@ vm.runInContext(helperSource, context, { filename: 'project-package-v1.js' });
 
 const helper = context.ONEProjectPackage;
 assert(helper, 'project package helper must load');
-assert.strictEqual(helper.version, '1.3.0');
+assert.strictEqual(helper.version, '1.3.1');
 assert.strictEqual(helper.schema, 'o-ne.project-package.v1');
 assert.strictEqual(helper.__test.cleanPart('道頓堀/觀光船:晚班'), '道頓堀 觀光船 晚班');
 assert.strictEqual(helper.__test.toolName('focus-card'), '焦點卡');
@@ -89,8 +89,8 @@ assert(helperSource.indexOf('instance.config.apply(clone(project.data));') < hel
   assert.strictEqual(new TextDecoder().decode(entries['焦點卡_道頓堀.json']), '{"ok":true}');
   assert.deepStrictEqual(Array.from(entries['assets/route.png']), [137, 80, 78, 71]);
 
-  assert(backupSource.includes('project-package-v1.js?v=1300'), 'shared backup must synchronously bridge to the cache-busted project package helper');
-  assert(backupSource.includes("version: '1.3.0'"), 'shared backup must expose the current UI-shell version');
+  assert(backupSource.includes('project-package-v1.js?v=1310'), 'shared backup must synchronously bridge to the cache-busted project package helper');
+  assert(backupSource.includes("version: '1.3.1'"), 'shared backup must expose the current UI-shell version');
 
   const sharedEditors = [
     'general-card.html', 'trigger-card.html', 'effect-card.html', 'move-card.html', 'choice-card.html',
@@ -104,7 +104,7 @@ assert(helperSource.indexOf('instance.config.apply(clone(project.data));') < hel
   }
 
   const persistent = fs.readFileSync(path.join(root, 'persistent-card.html'), 'utf8');
-  assert(persistent.includes('project-package-v1.js?v=1300'), 'persistent card must load project package helper directly');
+  assert(persistent.includes('project-package-v1.js?v=1310'), 'persistent card must load project package helper directly');
   assert(persistent.includes("id:'persistent-card'"), 'persistent card must mount its project package adapter');
   assert(persistent.includes('getTitle:snapshot=>snapshot&&snapshot.task'), 'persistent filename title must use task text');
 

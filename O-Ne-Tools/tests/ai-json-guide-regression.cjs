@@ -32,7 +32,7 @@ vm.runInContext(guideSource, context, { filename: 'ai-json-guide-v1.js' });
 
 const guide = context.ONEAIJsonGuide;
 assert(guide, 'AI JSON guide must load');
-assert.strictEqual(guide.version, '1.3.0');
+assert.strictEqual(guide.version, '1.3.1');
 const ids = ['general-card','trigger-card','persistent-card','effect-card','move-card','choice-card','challenge-card','dialogue-card','rating-card','focus-card','explanation-card','thumbnail-frame','settlement-card'];
 assert.deepStrictEqual(Object.keys(guide.guides), ids);
 for (const id of ids) {
@@ -85,6 +85,6 @@ assert(guideSource.includes('<details><summary>JSON 範例｜需要時再展開'
 assert(!guideSource.includes('<details open>'), 'large JSON preview must not consume initial editor space');
 assert(guideSource.includes('ONEEditBackup.__aiJsonGuideWrapped'), 'shared edit-backup tools must mount the AI guide');
 assert(guideSource.includes('ONEProjectPackage.__aiJsonGuideWrapped'), 'persistent/project-package path must mount the AI guide');
-assert(packageSource.includes('ai-json-guide-v1.js?v=1300'), 'project package must synchronously load the cache-busted AI JSON guide');
+assert(packageSource.includes('ai-json-guide-v1.js?v=1310'), 'project package must synchronously load the cache-busted AI JSON guide');
 new Function(guideSource);
 console.log('PASS: 13 AI JSON schemas, raw JSON handoff instructions, image ZIP notes, completion-dock placement and syntax.');

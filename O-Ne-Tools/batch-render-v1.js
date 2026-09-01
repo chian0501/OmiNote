@@ -1,8 +1,8 @@
-/* O-Ne shared same-tool batch renderer — V1.1.0 */
+/* O-Ne shared same-tool batch renderer — V1.3.1 */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.3.0';
+  var VERSION = '1.3.1';
   var MAX_BATCH_FILES = 20;
   var MAX_BATCH_BYTES = 200 * 1024 * 1024;
   var WORKER_PARAM = '__one_batch_worker';
@@ -349,7 +349,7 @@
   function placePanel(instance) {
     var packages = document.querySelectorAll('[data-one-project-package-ui]');
     var pkg = packages.length ? packages[packages.length - 1] : null;
-    if (global.ONEAfterEditDock) global.ONEAfterEditDock.place(instance.id, instance.panel, { anchor: pkg });
+    if (global.ONEAfterEditDock) global.ONEAfterEditDock.place(instance.adapter.id, instance.panel, { anchor: pkg });
     else if (pkg && pkg.parentNode) pkg.parentNode.insertBefore(instance.panel, pkg.nextSibling);
     else (document.querySelector('.panel') || document.body).appendChild(instance.panel);
   }
