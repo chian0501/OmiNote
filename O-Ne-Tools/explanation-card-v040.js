@@ -510,7 +510,7 @@
     const labelY=headerTop+(headerH-labelH)/2;
     const titleY=headerTop+Math.max(0,(labelH-titleLayout.height)/2);
     const dividerY=headerTop+headerH+18;
-    const galleryY=Math.ceil(dividerY+3);
+    const galleryY=dividerY+3;
     const galleryX=3;
     const galleryW=CARD_WIDTH-6;
     const galleryH=state.gallery.height;
