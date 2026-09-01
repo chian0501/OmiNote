@@ -1,7 +1,7 @@
 'use strict';
 
 (function installGalleryMode(){
-  const VERSION='V0.4.3_20260831';
+  const VERSION='V0.4.4_20260901';
   const GALLERY_LAYOUTS={
     single:{label:'單張大圖',count:1,hint:'一張圖放滿圖片區；可搭配「大圖 820px」接近 16:9。'},
     split:{label:'左右雙圖',count:2,hint:'兩張圖左右等寬，適合前後、A／B 或台日對照。'},
@@ -12,15 +12,16 @@
   };
   const GALLERY_HEIGHTS=[520,650,820];
   const slotDefault=()=>({name:'',fit:'cover',focusX:0,focusY:0,cropX:0,cropY:0,cropWidth:100,cropHeight:100});
-  const galleryDefault=()=>({layout:'single',height:650,gap:16,slots:Array.from({length:4},slotDefault)});
+  const galleryDefault=()=>({layout:'single',height:650,gap:12,slots:Array.from({length:4},slotDefault)});
   const galleryAssets=Array(4).fill(null);
   const galleryCropDrags=Array(4).fill(null);
+  let lastContentTemplateId='standard';
 
   function normalizeGallery(raw){
     const source=raw&&typeof raw==='object'?raw:{};
     const layout=Object.prototype.hasOwnProperty.call(GALLERY_LAYOUTS,source.layout)?source.layout:'single';
     const height=GALLERY_HEIGHTS.includes(Number(source.height))?Number(source.height):650;
-    const gap=Math.round(clamp(source.gap??16,8,28));
+    const gap=Math.round(clamp(source.gap??12,0,28));
     const slots=Array.from({length:4},(_,index)=>{
       const item=Array.isArray(source.slots)&&source.slots[index]&&typeof source.slots[index]==='object'?source.slots[index]:{};
       const cropWidth=clamp(item.cropWidth??100,4,100);
@@ -42,7 +43,7 @@
   defaults.mode='content';
   defaults.gallery=galleryDefault();
   TEMPLATES.gallery={
-    label:'純圖片拼圖',
+    label:'純圖片字卡',
     make:()=>[block('title','圖片重點一次看懂')]
   };
 
@@ -58,6 +59,7 @@
   const applyTemplateV038=applyTemplate;
   applyTemplate=function(id,force=false){
     if(!TEMPLATES[id])return applyTemplateV038(id,force);
+    if(id!=='gallery')lastContentTemplateId=id;
     const keep={
       label:clone(state.label),
       note:clone(state.note),
@@ -86,7 +88,7 @@
     section.hidden=true;
     section.innerHTML=`
       <div class="gallery-editor-head">
-        <div><strong>純圖片拼圖設定</strong><small>成品只保留標籤＋標題，下面全部是圖片。切換拼圖版型不會刪掉已選圖片。</small></div>
+        <div><strong>圖片排版</strong><small>圖片直接鋪滿字卡下半部；切換排版不會刪除已選圖片。</small></div>
         <span class="gallery-count" id="galleryCount">0／1 張</span>
       </div>
       <div class="gallery-layouts" id="galleryLayouts"></div>
@@ -95,8 +97,8 @@
         <div class="gallery-layout-hint" id="galleryLayoutHint"></div>
       </div>
       <div class="gallery-slots" id="gallerySlots"></div>`;
-    const settings=document.querySelector('.settings');
-    if(settings)settings.insertAdjacentElement('beforebegin',section);
+    const pageWrap=document.querySelector('.word-page-wrap');
+    if(pageWrap)pageWrap.insertAdjacentElement('afterend',section);
     else $('editorScroll').appendChild(section);
 
     const layoutHost=$('galleryLayouts');
@@ -373,20 +375,21 @@
       const asset=activeAsset(index);
       const card=document.createElement('section');
       card.className='gallery-slot';
+      const adjustment=item.fit==='free'?'調整自由裁切':item.fit==='cover'?'調整圖片焦點':'';
       card.innerHTML=`
         <div class="gallery-slot-head"><strong>圖片 ${index+1}</strong><span title="${esc(item.name||'尚未選圖')}">${esc(item.name||'尚未選圖')}</span></div>
-        <div class="gallery-thumb">${asset?`<img alt="" src="${asset.dataUrl}">`:'<div class="gallery-thumb-empty">尚未選圖</div>'}</div>
-        <div class="gallery-slot-actions">
-          <button class="small-btn" type="button" data-gallery-upload="${index}">${asset?'替換圖片':'選擇圖片'}</button>
-          <button class="small-btn" type="button" data-gallery-remove="${index}" ${asset?'':'disabled'}>移除</button>
-          <input hidden type="file" accept="image/png,image/jpeg,image/webp" data-gallery-file="${index}">
+        <div class="gallery-slot-main">
+          <div class="gallery-thumb">${asset?`<img alt="" src="${asset.dataUrl}">`:'<div class="gallery-thumb-empty">尚未選圖</div>'}</div>
+          <div class="gallery-slot-body">
+            <div class="gallery-slot-actions">
+              <button class="small-btn" type="button" data-gallery-upload="${index}">${asset?'替換圖片':'選擇圖片'}</button>
+              <button class="small-btn" type="button" data-gallery-remove="${index}" ${asset?'':'disabled'}>移除</button>
+              <input hidden type="file" accept="image/png,image/jpeg,image/webp" data-gallery-file="${index}">
+            </div>
+            <label class="gallery-fit-control"><span>顯示方式</span><select class="fit-select" data-gallery-fit="${index}" ${asset?'':'disabled'}><option value="cover" ${item.fit==='cover'?'selected':''}>填滿裁切</option><option value="contain" ${item.fit==='contain'?'selected':''}>完整顯示（可能留邊）</option><option value="free" ${item.fit==='free'?'selected':''}>自由裁切</option></select></label>
+          </div>
         </div>
-        <div class="gallery-slot-controls is-${item.fit}">
-          <label><span>顯示方式</span><select class="fit-select" data-gallery-fit="${index}"><option value="cover" ${item.fit==='cover'?'selected':''}>填滿裁切</option><option value="contain" ${item.fit==='contain'?'selected':''}>完整顯示</option><option value="free" ${item.fit==='free'?'selected':''}>自由裁切</option></select></label>
-          <label class="focus-control"><span>水平焦點</span><input type="range" min="-100" max="100" value="${item.focusX}" data-gallery-focus-x="${index}"></label>
-          <label class="focus-control"><span>垂直焦點</span><input type="range" min="-100" max="100" value="${item.focusY}" data-gallery-focus-y="${index}"></label>
-        </div>
-        ${item.fit==='free'?`<div class="gallery-free-crop"><div class="gallery-free-crop-head"><span>拖框內移動；拖四邊或四角改範圍</span><button type="button" data-gallery-crop-reset="${index}">重設</button></div><canvas width="640" height="360" data-gallery-crop-canvas="${index}" aria-label="圖片 ${index+1} 自由裁切框"></canvas><small data-gallery-crop-readout></small><small>選取範圍會完整顯示且不變形；若比例不同，成品圖片格內會保留留邊。</small></div>`:''}`;
+        ${adjustment?`<details class="gallery-slot-adjust" ${item.fit==='free'?'open':''}><summary>${adjustment}</summary>${item.fit==='cover'?`<div class="gallery-focus-controls"><label><span>水平焦點</span><input type="range" min="-100" max="100" value="${item.focusX}" data-gallery-focus-x="${index}"></label><label><span>垂直焦點</span><input type="range" min="-100" max="100" value="${item.focusY}" data-gallery-focus-y="${index}"></label></div>`:`<div class="gallery-free-crop"><div class="gallery-free-crop-head"><span>拖框移動；拖四邊或四角改範圍</span><button type="button" data-gallery-crop-reset="${index}">重設</button></div><canvas width="640" height="360" data-gallery-crop-canvas="${index}" aria-label="圖片 ${index+1} 自由裁切框"></canvas><small data-gallery-crop-readout></small><small>裁切範圍會完整顯示且不變形。</small></div>`}</details>`:''}`;
       slots.appendChild(card);
       const cropper=card.querySelector('[data-gallery-crop-canvas]');
       if(cropper){
@@ -398,9 +401,21 @@
 
   function updateModeUi(){
     const galleryMode=state.mode==='gallery';
+    if(!galleryMode&&state.templateId!=='custom'&&state.templateId!=='gallery')lastContentTemplateId=state.templateId;
     document.body.classList.toggle('gallery-mode',galleryMode);
     if($('galleryEditor'))$('galleryEditor').hidden=!galleryMode;
-    if($('openImageDrawer'))$('openImageDrawer').textContent=galleryMode?'🖼 拼圖設定':'🖼 左側圖片設定';
+    document.querySelectorAll('[data-card-mode]').forEach(button=>{
+      const active=button.dataset.cardMode===(galleryMode?'gallery':'content');
+      button.classList.toggle('is-active',active);
+      button.setAttribute('aria-pressed',active?'true':'false');
+    });
+    if($('contentTemplatePicker'))$('contentTemplatePicker').hidden=galleryMode;
+    if($('contentCardSettings'))$('contentCardSettings').hidden=galleryMode;
+    if($('toolbarTitle'))$('toolbarTitle').textContent=galleryMode?'編輯標題':'編輯文字';
+    if($('toolbarHelp'))$('toolbarHelp').textContent=galleryMode?'只保留標題需要的字級、顏色與對齊工具。':'先反白要修改的文字，再選格式；沒有反白時會套用目前段落。';
+    if($('openImageDrawer'))$('openImageDrawer').textContent='🖼 左側圖片';
+    const exportNote=document.querySelector('.export-bar p');
+    if(exportNote)exportNote.textContent=galleryMode?'透明 PNG；圖片直接鋪滿標題下方，不另加內框。':'透明 PNG；高度依文字換行、段落與提醒框自動計算。';
     if(galleryMode)renderGalleryEditor();
   }
 
@@ -495,13 +510,13 @@
     const labelY=headerTop+(headerH-labelH)/2;
     const titleY=headerTop+Math.max(0,(labelH-titleLayout.height)/2);
     const dividerY=headerTop+headerH+18;
-    const galleryY=dividerY+20;
-    const galleryX=outer;
-    const galleryW=CARD_WIDTH-outer*2;
+    const galleryY=Math.ceil(dividerY+3);
+    const galleryX=3;
+    const galleryW=CARD_WIDTH-6;
     const galleryH=state.gallery.height;
     const height=Math.ceil(galleryY+galleryH+bottomEdge);
     const rects=galleryRects(state.gallery.layout,galleryX,galleryY,galleryW,galleryH,state.gallery.gap);
-    return{width:CARD_WIDTH,height,labelX:outer,labelY,labelW,labelH,title,titleX,titleY,titleW,titleLayout,dividerY,galleryX,galleryY,galleryW,galleryH,bottomEdge,rects};
+    return{width:CARD_WIDTH,height,labelX:outer,labelY,labelW,labelH,title,titleX,titleY,titleW,titleLayout,dividerX:outer,dividerW:CARD_WIDTH-outer*2,dividerY,galleryX,galleryY,galleryW,galleryH,bottomEdge,rects};
   }
 
   function drawGallerySlot(context,rect,index){
@@ -509,7 +524,7 @@
     const asset=activeAsset(index);
     context.save();
     context.beginPath();
-    context.roundRect(rect.x,rect.y,rect.w,rect.h,12);
+    context.rect(rect.x,rect.y,rect.w,rect.h);
     context.clip();
     context.fillStyle='#151a18';
     context.fillRect(rect.x,rect.y,rect.w,rect.h);
@@ -534,24 +549,12 @@
         context.drawImage(image,0,0,iw,ih,dx,dy,dw,dh);
       }
     }else{
-      context.strokeStyle='rgba(112,222,211,.58)';
-      context.lineWidth=3;
-      context.setLineDash([14,10]);
-      context.strokeRect(rect.x+4,rect.y+4,rect.w-8,rect.h-8);
-      context.setLineDash([]);
-      context.fillStyle='rgba(245,238,228,.72)';
+      context.fillStyle='rgba(245,238,228,.62)';
       context.font='700 24px "Noto Sans TC",sans-serif';
       context.textAlign='center';
       context.textBaseline='middle';
       context.fillText(`選擇圖片 ${index+1}`,rect.x+rect.w/2,rect.y+rect.h/2);
     }
-    context.restore();
-    context.save();
-    context.strokeStyle='rgba(253,243,231,.72)';
-    context.lineWidth=2;
-    context.beginPath();
-    context.roundRect(rect.x,rect.y,rect.w,rect.h,12);
-    context.stroke();
     context.restore();
   }
 
@@ -565,6 +568,12 @@
     cutCornerPath(context,3,3,layout.width-6,layout.height-6,30);
     context.fillStyle='rgba(31,23,19,.80)';
     context.fill();
+
+    context.save();
+    cutCornerPath(context,3,3,layout.width-6,layout.height-6,30);
+    context.clip();
+    layout.rects.forEach((rect,index)=>drawGallerySlot(context,rect,index));
+    context.restore();
 
     context.font='800 32px "Noto Sans TC","Microsoft JhengHei",sans-serif';
     context.fillStyle=state.label.color;
@@ -580,10 +589,9 @@
     context.strokeStyle=BRAND.teal;
     context.lineWidth=3;
     context.beginPath();
-    context.moveTo(layout.galleryX,layout.dividerY);
-    context.lineTo(layout.galleryX+layout.galleryW,layout.dividerY);
+    context.moveTo(layout.dividerX,layout.dividerY);
+    context.lineTo(layout.dividerX+layout.dividerW,layout.dividerY);
     context.stroke();
-    layout.rects.forEach((rect,index)=>drawGallerySlot(context,rect,index));
     cutCornerPath(context,3,3,layout.width-6,layout.height-6,30);
     context.lineWidth=3;
     context.strokeStyle=BRAND.cream;
@@ -629,6 +637,7 @@
   const projectPayloadV038=projectPayload;
   projectPayload=function(){
     const payload=projectPayloadV038();
+    payload.status='CANDIDATE';
     payload.generator_version=VERSION;
     payload.data=capture();
     payload.assets=payload.assets||{};
@@ -700,7 +709,7 @@
     renderCanvas(out);
     out.toBlob(blob=>{
       if(!blob)return;
-      download(blob,`說明卡-${titlePlain()}-${state.mode==='gallery'?'純圖片拼圖':'RichText'}.png`);
+      download(blob,`說明卡-${titlePlain()}-${state.mode==='gallery'?'純圖片字卡':'RichText'}.png`);
       toast('PNG 已輸出。');
     },'image/png');
   };
@@ -714,8 +723,8 @@
 
   exportJson=function(){
     const payload={
-      schema:'o-ne.explanation-card.formal.v0.4.3',
-      status:'READY',
+      schema:'o-ne.explanation-card.formal.v0.4.4',
+      status:'CANDIDATE',
       generator_version:VERSION,
       component:{
         width:CARD_WIDTH,
@@ -727,25 +736,82 @@
         gallery_images_max:4,
         gallery_per_image_free_crop:true,
         gallery_free_crop_unlocked_aspect:true,
+        gallery_full_bleed_below_header:true,
+        gallery_inner_frame:false,
         project_file_embeds_images:true
       },
       data:capture(),
       generated_at:new Date().toISOString()
     };
-    download(new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}),`說明卡-${titlePlain()}-${state.mode==='gallery'?'純圖片拼圖':'RichText'}.json`);
+    download(new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}),`說明卡-${titlePlain()}-${state.mode==='gallery'?'純圖片字卡':'RichText'}.json`);
     toast('純設定 JSON 已匯出；圖片本體請使用 .onecard 專案檔。');
   };
 
+  function organizeSaveTools(){
+    const host=$('quickSaveHost');
+    if(!host)return false;
+    const backup=host.querySelector('[data-one-backup-ui]');
+    if(backup){
+      const title=backup.querySelector('.one-edit-backup__title span:first-child');
+      const badge=backup.querySelector('.one-edit-backup__badge');
+      const load=backup.querySelector('[data-action="load"]');
+      if(title)title.textContent='快速暫存';
+      if(badge)badge.textContent='本機 5 次';
+      if(load)load.textContent='載入舊 JSON';
+    }
+    const pkg=host.querySelector('[data-one-project-package-ui]');
+    if(pkg){
+      const title=pkg.querySelector('.one-project-package__title');
+      if(title)title.textContent='完整專案 ZIP';
+      const note=pkg.querySelector('.one-project-package__note');
+      if(note)note.textContent='包含目前 PNG、編輯設定與已置入圖片，適合跨裝置搬移。';
+    }
+    const batch=host.querySelector('[data-one-batch-render-ui]');
+    if(batch&&!batch.closest('.save-tool-details')){
+      const details=document.createElement('details');
+      details.className='save-tool-details batch-tools';
+      const summary=document.createElement('summary');
+      summary.textContent='批次出圖（最多 20 份）';
+      batch.parentNode.insertBefore(details,batch);
+      details.append(summary,batch);
+    }
+    return Boolean(backup&&pkg&&batch);
+  }
+
+  function organizeAiGuide(){
+    const guide=document.querySelector('[data-one-ai-json-guide="explanation-card"]');
+    if(!guide||guide.classList.contains('is-compact'))return Boolean(guide);
+    const head=guide.querySelector('.one-ai-json-guide__head');
+    if(!head)return false;
+    const details=document.createElement('details');
+    details.className='ai-guide-details';
+    const summary=document.createElement('summary');
+    const title=head.querySelector('strong');
+    const badge=head.querySelector('.one-ai-json-guide__badge');
+    summary.innerHTML=`<strong>${esc(title?title.textContent:'AI JSON 格式')}</strong><span>${esc(badge?badge.textContent:'進階')}</span>`;
+    head.remove();
+    while(guide.firstChild)details.appendChild(guide.firstChild);
+    details.insertBefore(summary,details.firstChild);
+    guide.appendChild(details);
+    guide.classList.add('is-compact');
+    return true;
+  }
+
+  function organizeUi(){
+    organizeSaveTools();
+    organizeAiGuide();
+  }
+
   function installVersionUi(){
-    document.title='O-Ne 說明卡生成器 V0.4.3 READY';
+    document.title='O-Ne 說明卡生成器 V0.4.4 CANDIDATE';
     const version=document.querySelector('.title-line h1 span');
-    if(version)version.textContent='V0.4.3';
+    if(version)version.textContent='V0.4.4';
     const badge=document.querySelector('.title-line .badge');
-    if(badge){badge.textContent='READY';badge.classList.remove('is-candidate');badge.classList.add('is-ready');}
+    if(badge){badge.textContent='CANDIDATE';badge.classList.remove('is-ready');badge.classList.add('is-candidate');}
     const description=document.querySelector('.title-block p');
-    if(description)description.textContent='正式版：把暫存、專案包與批次工具移到編輯區最底部，打開頁面直接保留完整編輯空間。';
+    if(description)description.textContent='候選版：純圖片直接鋪滿字卡下半部，並把模式、編輯與輸出整理成單一路徑。';
     const status=document.querySelector('.status');
-    if(status)status.textContent='V0.4.3 READY｜存檔工具移至底部｜完整編輯空間';
+    if(status)status.textContent='V0.4.4 CANDIDATE｜滿版圖片字卡｜UI 整併';
   }
 
   function runGalleryQa(){
@@ -769,6 +835,8 @@
       renderEditor();
       const single=renderCanvas();
       if(single.rects.length!==1||single.height<900)throw new Error('single gallery layout');
+      if(single.galleryX!==3||single.galleryW!==CARD_WIDTH-6)throw new Error('gallery full bleed width');
+      if(single.galleryY-single.dividerY>3)throw new Error('gallery header seam');
       state.gallery.layout='triple';
       state.gallery.slots[0]={...state.gallery.slots[0],fit:'free',cropX:10,cropY:12,cropWidth:64,cropHeight:70};
       const triple=renderCanvas();
@@ -784,9 +852,11 @@
       if(!project.assets.gallery||project.assets.gallery.filter(Boolean).length!==4)throw new Error('gallery project assets');
       if(project.data.gallery.slots[0].fit!=='free'||project.data.gallery.slots[0].cropWidth!==64)throw new Error('gallery crop project settings');
       if(!document.body.classList.contains('gallery-mode'))throw new Error('gallery editor mode');
+      if(!$('galleryMode').classList.contains('is-active')||!$('contentTemplatePicker').hidden)throw new Error('mode picker hierarchy');
       const saveDock=document.querySelector('.save-dock');
       if(!saveDock||saveDock.parentElement!==$('editorScroll')||saveDock!==$('editorScroll').lastElementChild)throw new Error('save tools below editor');
-      $('qaResult').textContent='PASS｜gallery layouts｜free crop｜full editor viewport｜save tools below editor｜header alignment｜no bottom band｜project assets';
+      organizeUi();
+      $('qaResult').textContent='PASS｜gallery layouts｜full bleed image body｜no inner frame｜free crop｜compact mode UI｜save tools below editor｜header alignment｜project assets';
       document.body.dataset.qa='pass';
     }catch(error){
       $('qaResult').textContent='FAIL｜'+error.message;
@@ -802,8 +872,13 @@
   createGalleryEditor();
   state=cleanState(state);
   installVersionUi();
+  $('contentMode').onclick=()=>{if(state.mode==='gallery')applyTemplate(lastContentTemplateId||'standard',true);};
+  $('galleryMode').onclick=()=>{if(state.mode!=='gallery')applyTemplate('gallery',true);};
   renderEditor();
   renderCanvas();
+  organizeUi();
+  setTimeout(organizeUi,80);
+  setTimeout(organizeUi,260);
 
   $('exportPng').onclick=exportPng;
   $('exportJson').onclick=exportJson;

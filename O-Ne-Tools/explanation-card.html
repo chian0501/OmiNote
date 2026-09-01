@@ -3,21 +3,22 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>O-Ne 說明卡生成器 V0.4.3 READY</title>
+<title>O-Ne 說明卡生成器 V0.4.4 CANDIDATE</title>
 
 <link rel="stylesheet" href="./explanation-card-v038.css?v=038">
-<link rel="stylesheet" href="./explanation-card-v040.css?v=043">
+<link rel="stylesheet" href="./explanation-card-v040.css?v=044">
 </head>
 <body>
 
 <main class="app-shell">
-<header class="app-header"><a class="back-link" href="./">← 回工具入口</a><div class="header-divider"></div><div class="title-block"><div class="title-line"><h1>O-Ne 說明卡生成器 <span>V0.4.3</span></h1><strong class="badge is-ready">READY</strong></div><p>正式版：把暫存、專案包與批次工具移到編輯區最底部，打開頁面直接保留完整編輯空間。</p></div><div class="status">V0.4.3 READY｜存檔工具移至底部｜完整編輯空間</div></header>
+<header class="app-header"><a class="back-link" href="./">← 回工具入口</a><div class="header-divider"></div><div class="title-block"><div class="title-line"><h1>O-Ne 說明卡生成器 <span>V0.4.4</span></h1><strong class="badge is-candidate">CANDIDATE</strong></div><p>候選版：純圖片直接鋪滿字卡下半部，並把模式、編輯與輸出整理成單一路徑。</p></div><div class="status">V0.4.4 CANDIDATE｜滿版圖片字卡｜UI 整併</div></header>
 <section class="workspace">
 <aside class="editor-panel panel">
-<div class="editor-head"><strong>文字／圖片編輯器</strong><small>一般說明沿用 Word-lite；選「純圖片拼圖」時只保留標籤＋標題，再選單張大圖、左右雙圖、三張並排、左大右二、上大下二或四格拼圖。每張圖可各自自由裁切。</small></div>
+<div class="editor-head"><strong>說明卡編輯器</strong><small>依序選模式、編輯內容、輸出成品；不常用的批次與舊檔工具已收進進階區。</small></div>
 <div class="editor-scroll" id="editorScroll">
-<section class="template-strip"><div class="step-heading"><span class="step-no">①</span><div><b>整張內容版型</b><small>點一下就直接套用。會替換整張文字內容，但圖片與卡片設定保留；需要保留目前版本請先暫存。</small></div><span class="impact-badge">點擊直接套用</span></div><div class="template-buttons" id="templateButtons"></div></section>
-<div class="word-toolbar" id="wordToolbar"><div class="toolbar-heading"><span class="step-no">②</span><div><b>反白文字格式</b><small>只想改幾個字：先反白，再選常用格式、字級或品牌色。沒有反白時會套整個目前段落。</small></div><button class="image-trigger" id="openImageDrawer" type="button">🖼 圖片設定</button></div>
+<section class="template-strip mode-strip"><div class="step-heading"><span class="step-no">①</span><div><b>選製作模式</b><small>一般說明保留左圖右文；純圖片字卡只留標籤、標題與滿版圖片區。</small></div></div><div class="mode-buttons" role="group" aria-label="製作模式"><button class="mode-btn" id="contentMode" type="button" data-card-mode="content"><b>一般說明</b><span>左圖右文</span></button><button class="mode-btn" id="galleryMode" type="button" data-card-mode="gallery"><b>純圖片字卡</b><span>標題＋滿版圖片</span></button></div><details class="template-presets" id="contentTemplatePicker"><summary>更換一般說明版型</summary><div class="template-buttons" id="templateButtons"></div></details></section>
+<section class="settings"><div class="label-controls"><div class="label-controls-copy"><strong>卡片標籤</strong><small>標籤與標題會共用同一條水平中線。</small></div><label class="field"><span>文字</span><input id="labelText" maxlength="12"/></label><label class="field"><span>顏色</span><select id="labelColor"></select></label></div><details class="setting" id="contentCardSettings"><summary>一般說明進階設定</summary><div class="setting-body"><label class="toggle-row"><input id="noteEnabled" type="checkbox"/><span>顯示底部提醒框</span></label><label class="field"><span>提醒文字</span><textarea id="noteText" maxlength="260"></textarea></label><div class="field-row"><label class="field"><span>提醒色</span><select id="noteColor"></select></label><label class="field"><span>提醒字級</span><select id="noteSize"><option>22</option><option selected="">24</option><option>26</option><option>28</option><option>30</option></select></label></div></div></details></section>
+<div class="word-toolbar" id="wordToolbar"><div class="toolbar-heading"><span class="step-no">②</span><div><b id="toolbarTitle">編輯文字</b><small id="toolbarHelp">先反白要修改的文字，再選格式；沒有反白時會套用目前段落。</small></div><button class="image-trigger" id="openImageDrawer" type="button">🖼 左側圖片</button></div>
 <button class="tool-btn" data-cmd="undo" title="復原" type="button">↶</button><button class="tool-btn" data-cmd="redo" title="重做" type="button">↷</button><span class="tool-divider"></span>
 <select class="tool-select style-select" id="stylePreset" title="常用文字格式"><option value="">常用文字格式…</option></select>
 <button class="tool-btn" id="boldBtn" title="粗體" type="button"><b>B</b></button><button class="tool-btn" id="italicBtn" title="斜體" type="button"><i>I</i></button><button class="tool-btn" id="underlineBtn" title="底線" type="button"><span style="text-decoration:underline">U</span></button><button class="tool-btn" id="strikeBtn" title="刪除線" type="button"><span style="text-decoration:line-through">S</span></button>
@@ -26,26 +27,21 @@
 <button class="tool-btn" data-align="left" title="靠左" type="button">≡</button><button class="tool-btn" data-align="center" title="置中" type="button">≣</button><button class="tool-btn" data-align="right" title="靠右" type="button">≡›</button><button class="tool-btn" id="bulletBtn" title="項目符號" type="button">•</button><button class="tool-btn" id="clearBtn" title="清除格式" type="button">Tx</button><span class="toolbar-note" id="selectionHint">先反白文字，再套格式</span>
 </div>
 <section class="word-page-wrap"><div class="word-page" id="wordPage"></div><button class="add-block" id="addBlock" type="button">＋ 新增一般段落</button><p class="word-tip">左側標記是段落結構，不是空白欄：關掉某段標記後，年份／字母、直線與預留空間會一起消失，正文直接補到左側。標記永遠單行。</p></section>
-<section class="settings">
-<details class="setting"><summary>卡片設定</summary><div class="setting-body"><div class="field-row"><label class="field"><span>標籤文字</span><input id="labelText" maxlength="12"/></label><label class="field"><span>標籤顏色</span><select id="labelColor"></select></label></div><label class="toggle-row"><input id="noteEnabled" type="checkbox"/><span>顯示底部提醒框</span></label><label class="field"><span>提醒文字</span><textarea id="noteText" maxlength="260"></textarea></label><div class="field-row"><label class="field"><span>提醒色</span><select id="noteColor"></select></label><label class="field"><span>提醒字級</span><select id="noteSize"><option>22</option><option selected="">24</option><option>26</option><option>28</option><option>30</option></select></label></div></div></details>
-
-</section>
-<section class="save-dock"><div class="save-dock-head"><div><strong>③ 完成後暫存／存檔</strong><small>工具集中在編輯區最底部；暫存留在這台瀏覽器，最多 5 次，完整搬移請下載專案檔。</small></div><span class="save-badge">底部工具區</span></div><div id="quickSaveHost"></div><div class="save-file-actions project-actions"><button class="small-btn save-project-btn" id="exportProject" type="button">下載專案檔（含圖片）</button><button class="small-btn" id="importProjectBtn" type="button">載入專案檔</button><input id="projectInput" type="file" accept="application/json,.onecard,.json" hidden><button class="small-btn save-json-btn" id="exportJson" type="button">僅設定 JSON</button><button class="small-btn" id="resetAll" type="button">重設目前內容</button></div><div class="project-file-note">完整專案檔會保存文字、Rich Text、圖片本體、顯示模式、裁切／縮放／位置；最近 5 次暫存仍為輕量本機快照。</div></section>
+<section class="save-dock"><div class="save-dock-head"><div><strong>③ 儲存與輸出</strong><small>快速暫存留在本機；跨裝置搬移請下載完整專案 ZIP。</small></div><span class="save-badge">最後一步</span></div><div id="quickSaveHost"></div><details class="legacy-save-tools"><summary>進階檔案與重設</summary><div class="save-file-actions project-actions"><button class="small-btn save-project-btn" id="exportProject" type="button">下載 .onecard</button><button class="small-btn" id="importProjectBtn" type="button">載入 .onecard</button><input id="projectInput" type="file" accept="application/json,.onecard,.json" hidden><button class="small-btn save-json-btn" id="exportJson" type="button">僅設定 JSON</button><button class="small-btn" id="resetAll" type="button">重設目前內容</button></div><div class="project-file-note">.onecard 與舊 JSON 保留相容性；日常完整搬移請優先使用上方專案 ZIP。</div></details></section>
 </div></aside>
 <div class="preview-stack"><section class="preview-panel panel"><div class="preview-toolbar"><strong>說明卡預覽</strong><span id="dimensionText">1552 × 724px｜自動高度</span></div><div class="canvas-stage"><canvas class="preview-canvas" id="previewCanvas"></canvas></div><footer class="export-bar"><p>透明 PNG；自動高度依 Rich Text 實際字級／換行、段落標記與提醒框計算。</p><div class="export-actions single"><button class="export-button primary" id="exportPng" type="button">輸出說明卡 PNG</button></div></footer></section></div>
 </section>
 <div class="drawer-backdrop" id="imageDrawerBackdrop" hidden></div>
 <aside class="image-drawer" id="imageDrawer" aria-hidden="true" aria-label="左側圖片設定">
-  <div class="drawer-head"><div><strong>左側圖片設定</strong><small>中央視窗處理圖片，不壓縮文字編輯區。自由裁切可直接拉四邊與四角，長寬完全不鎖比例。</small></div><button class="drawer-close" id="closeImageDrawer" type="button" aria-label="關閉圖片設定">×</button></div>
+  <div class="drawer-head"><div><strong>左側圖片</strong><small>選圖、顯示方式與裁切集中在這裡；右側成品預覽會同步更新。</small></div><button class="drawer-close" id="closeImageDrawer" type="button" aria-label="關閉圖片設定">×</button></div>
   <div class="drawer-scroll">
     <section class="drawer-section"><h3>圖片來源</h3><div class="upload-row"><label class="upload-button">選擇圖片<input accept="image/png,image/jpeg,image/webp" id="explanationImage" type="file"></label><span class="file-name" id="fileName">尚未選擇圖片</span><button class="small-btn" id="removeImage" type="button">移除</button></div><div class="image-summary"><span>目前模式：</span><b id="imageModeLabel">填滿裁切</b></div></section>
-    <section class="drawer-section"><h3>顯示方式</h3><div class="crop-tabs"><button data-fit="contain" type="button">完整顯示</button><button data-fit="cover" type="button">填滿裁切</button><button data-fit="free" type="button">自由裁切</button></div><div class="mode-status"><div><strong id="modeStatusTitle">目前已選：填滿裁切</strong><small id="modeStatusHint">可用下方滑桿調整圖片縮放與位置。完成後按右下角「套用圖片設定」。</small></div><span class="mode-badge" id="modeStatusBadge">已選取</span></div><p>自由裁切會顯示完整原圖；青綠裁切框可以自由拉寬、拉高與移動，不鎖成品比例。</p></section>
+    <section class="drawer-section"><h3>顯示方式</h3><div class="crop-tabs"><button data-fit="contain" type="button">完整顯示</button><button data-fit="cover" type="button">填滿裁切</button><button data-fit="free" type="button">自由裁切</button></div><div class="mode-status"><div><strong id="modeStatusTitle">目前已選：填滿裁切</strong><small id="modeStatusHint">下方只會顯示目前模式需要的控制。</small></div><span class="mode-badge" id="modeStatusBadge">已選取</span></div></section>
     <section class="drawer-section"><div class="image-live-wrap"><div class="image-live-head"><strong>成品即時預覽</strong><span id="imageLiveSize">1552 × 724px</span></div><div class="image-live-stage"><canvas class="image-live-canvas" id="imageLivePreview"></canvas></div></div><p>拖裁切框、改縮放或切換顯示方式時，這裡會立即更新；不用關閉圖片設定才看結果。</p></section>
     <section class="drawer-section" id="coverControls"><h3>填滿裁切</h3><label class="field"><span>裁切縮放</span><span class="range-row"><input id="zoom" max="300" min="100" step="1" type="range"><code id="zoomValue"></code></span></label><div class="field-row"><label class="field"><span>水平位置</span><span class="range-row"><input id="offsetX" max="100" min="-100" type="range"><code id="offsetXValue"></code></span></label><label class="field"><span>垂直位置</span><span class="range-row"><input id="offsetY" max="100" min="-100" type="range"><code id="offsetYValue"></code></span></label></div></section>
     <section class="drawer-section" id="freeControls"><h3>自由裁切｜完整原圖裁切框</h3><div id="freePendingGuide" class="placeholder-guide">目前還沒切到 <b>自由裁切</b>。請先點上方「自由裁切」，這裡就會出現裁切框與下方 X／Y／W／H 數值。</div><div id="freeCropActiveArea" hidden><div class="mode-note">青綠框＝最後選取的原圖範圍。拖框內部移動；拖四邊或四角自由改寬高。完全不鎖比例，也不再用「拖圖片＋縮放」模擬裁切。</div><div class="cropper-stage"><canvas class="cropper-canvas" id="cropperCanvas" width="900" height="600"></canvas></div><div class="cropper-status"><span>拖框內＝移動</span><span>拖四邊／四角＝改長寬</span></div></div><div class="crop-selection-readout"><span>X <b id="cropReadX">—</b></span><span>Y <b id="cropReadY">—</b></span><span>W <b id="cropReadW">—</b></span><span>H <b id="cropReadH">—</b></span></div><div class="cropper-actions"><button class="small-btn" id="resetFreeCrop" type="button">重設為整張原圖</button><button class="small-btn" id="centerFreeCrop" type="button">裁切框置中</button></div></section>
-    <section class="drawer-section"><p>完整顯示／自由裁切會依實際圖片比例自動調整左圖高度，必要時整張卡一起往下加長，不再補黑底留邊。只有「填滿裁切」會維持固定框並裁切圖片。JSON 會保存裁切框位置與長寬，但不包含圖片本體。</p></section>
   </div>
-  <div class="drawer-footer"><button class="small-btn" id="closeImageFooter" type="button">先回編輯器</button><button class="primary-btn" id="applyImageSettings" type="button">套用圖片設定</button></div>
+  <div class="drawer-footer"><button class="small-btn drawer-secondary-close" id="closeImageFooter" type="button">關閉</button><button class="primary-btn" id="applyImageSettings" type="button">完成</button></div>
 </aside>
 <pre class="qa" id="qaResult"></pre><div class="toast" hidden id="toast"></div>
 </main>
@@ -60,5 +56,5 @@
 <script src="./explanation-card-v038-3.js?v=040"></script>
 <script src="./explanation-card-v038-4.js?v=040"></script>
 <script src="./explanation-card-v038-5.js?v=040"></script>
-<script src="./explanation-card-v040.js?v=043"></script>
+<script src="./explanation-card-v040.js?v=044"></script>
 </body></html>
