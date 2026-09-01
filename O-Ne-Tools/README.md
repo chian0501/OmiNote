@@ -24,7 +24,7 @@ O-Ne 字卡工具入口與編輯器集合。
 4. 暫存、專案搬移、批次輸出與 AI JSON 格式統一收在頁面最下方「完成後：儲存與輸出」。
 
 入口頁只讀 `one-tools-registry-v1.json`；`registry.json` 僅保留相容指標，不再複製一份舊工具清單。
-Command Center V0.9.3 也會讀取同一份 canonical registry，並顯示全部 13 個可用工具，避免入口數量與導覽內容不同步。專案頁會把本機已設定的母專案、企劃卡與 01～04 資料夾顯示成直接入口；私人網址只存 localStorage，也可透過一次性網址片段載入，公開原始碼不含 Drive／Docs ID。
+Command Center V0.9.4 也會讀取同一份 canonical registry，並顯示全部 13 個可用工具，避免入口數量與導覽內容不同步。依 Omi 明確核准的例外，專案頁直接提供 8 個專案共 47 個母專案、企劃卡與 01～04 Drive／Docs 入口，不再要求每台瀏覽器匯入；Google 權限仍是內容存取的唯一判定。USJ 尚無已核對的唯一企劃卡入口，因此目前提供 5 個，其餘每案 6 個。localStorage 僅保留選用的本機覆蓋與備份相容。
 
 ## 最近 5 次編輯與載入 JSON
 
@@ -92,6 +92,6 @@ Command Center V0.9.3 也會讀取同一份 canonical registry，並顯示全部
 ## 維護規則
 - 後續新工具或版本更新，直接更新 `O-Ne-Tools/` 內對應檔案。
 - 新增工具時只更新 canonical `one-tools-registry-v1.json`；入口頁會自動讀取。
-- 公開 HTML／JS／JSON 只能使用 HERE-01、COL-02、QST-03 等語意代號，不得寫入 Drive／Docs URL 或檔案 ID；`tests/public-boundary-regression.cjs` 會阻擋洩漏。
+- 公開 HTML／JS／JSON 原則上只能使用 HERE-01、COL-02、QST-03 等語意代號，不得寫入 Drive／Docs URL 或檔案 ID。唯一例外為 Omi 已核准的 `command-center-project-links-direct-v1.js` 專案快捷白名單；它只可包含已核對的母專案、唯一企劃卡與 01～04 入口，不得包含正文、權限資料、憑證或自動化設定。`tests/public-boundary-regression.cjs` 會鎖定這個窄例外並阻擋其他檔案洩漏。
 - 不另建平行工具包。
 - `assets/NotoSansTC-O-Ne.woff` 依 SIL Open Font License 1.1 使用；授權文字見 `assets/OFL-NotoSansTC.txt`。
