@@ -63,7 +63,7 @@ button.tiny{padding:7px 10px;font-size:12px}
   </div>
 
   <label>主標題</label>
-  <input id="title" value="關西國際機場 (KIX) → 住宿飯店(ホテル京阪 淀屋橋)">
+  <input id="title" value="關西機場 → 大阪市區">
 
   <label>問題／提示</label>
   <input id="question" value="選擇的交通工具？">
@@ -124,10 +124,10 @@ const C={
 };
 
 const defaults={
-  title:'關西國際機場 (KIX) → 住宿飯店(ホテル京阪 淀屋橋)',
+  title:'關西機場 → 大阪市區',
   question:'選擇的交通工具？',
   options:[
-    {text:'關空特急 HARUKA關空特急 HARUKA關空特急 HARUKA',bright:false},
+    {text:'關空特急 HARUKA',bright:false},
     {text:'南海電鐵',bright:false},
     {text:'利木津巴士',bright:false},
     {text:'高速船',bright:false},
@@ -328,7 +328,7 @@ $('jsonBtn').onclick=()=>{
   const payload={
     component_id:'SELECT-CARD',
     generator_version:'V1.0.1_20260826',
-    master_psd_id:'1wYnhZVvoQMl4hn1W7msw_oh3k-RqbHca',
+    formal_ref:'SELECT-CARD',
     title:$('title').value,
     question:$('question').value,
     options:data.options.map((o,i)=>({index:i+1,text:o.text,state:o.bright?'BRIGHT':'DIM'}))

@@ -2,6 +2,21 @@
 (function (global) {
   'use strict';
 
+  function ensureSharedUi() {
+    if (typeof document === 'undefined' || !document.getElementById || !document.createElement) return;
+    if (!document.getElementById('one-tools-ui-css')) {
+      var link = document.createElement('link');
+      link.id = 'one-tools-ui-css'; link.rel = 'stylesheet'; link.href = './one-tools-ui-v1.css?v=1300';
+      (document.head || document.documentElement).appendChild(link);
+    }
+    if (!global.ONEAfterEditDock && !document.getElementById('one-tools-ui-js')) {
+      var script = document.createElement('script');
+      script.id = 'one-tools-ui-js'; script.src = './one-tools-ui-v1.js?v=1300'; script.async = false;
+      (document.head || document.documentElement).appendChild(script);
+    }
+  }
+  ensureSharedUi();
+
   var SCHEMA = 'o-ne.edit-backup.v1';
   var HISTORY_LIMIT = 5;
   var MAX_JSON_BYTES = 1024 * 1024;
@@ -226,7 +241,8 @@
     var config = instance.config;
     var anchor = typeof config.anchor === 'string' ? document.querySelector(config.anchor) : config.anchor;
     var host = typeof config.host === 'string' ? document.querySelector(config.host) : config.host;
-    if (host) host.appendChild(instance.panel);
+    if (global.ONEAfterEditDock) global.ONEAfterEditDock.place(instance.id, instance.panel, { anchor: anchor, host: host });
+    else if (host) host.appendChild(instance.panel);
     else if (anchor && anchor.parentNode) anchor.parentNode.insertBefore(instance.panel, anchor.nextSibling);
     else (document.querySelector('.panel') || document.body).appendChild(instance.panel);
   }
@@ -291,7 +307,7 @@
   global.ONEEditBackup = {
     mount: mount,
     schema: SCHEMA,
-    version: '1.2.0',
+    version: '1.3.0',
     captureFields: function (root) { return collectFields(root || document); },
     applyFields: function (fields, root) { return applyFields(fields, root || document); },
     __test: {
@@ -309,10 +325,10 @@
   };
 
   if (typeof document !== 'undefined' && document.readyState === 'loading' && typeof document.write === 'function') {
-    document.write('<script src="./project-package-v1.js?v=1109"></' + 'script>');
+    document.write('<script src="./project-package-v1.js?v=1300"></' + 'script>');
   } else if (typeof document !== 'undefined' && document.createElement && document.head) {
     var packageScript = document.createElement('script');
-    packageScript.src = './project-package-v1.js?v=1109';
+    packageScript.src = './project-package-v1.js?v=1300';
     packageScript.onload = function () { if (global.ONEProjectPackage) global.ONEProjectPackage.wrapEditBackup(); };
     document.head.appendChild(packageScript);
   }

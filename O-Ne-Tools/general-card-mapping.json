@@ -1,12 +1,9 @@
 {
   "generator_version": "V1.0_20260807",
   "component_id": "HERE-01",
+  "formal_ref": "HERE-01",
   "template": {
     "name": "00_一般卡.psd",
-    "drive_id": "1K-Xc7oNcWEoLrHviGhVmeygYISa4j6Q4",
-    "reference_png_id": "15qjO8JR5-cFBPU089HmGR_7Z6RDB0fzD",
-    "frame_psd_id": "1uKffp2XXIanewlo01ZtDokZan-iyaeGg",
-    "label_psd_id": "11x3td3hV7fBO8t0WSlpYeOHWCogcP216",
     "canvas": {
       "width": 653,
       "height": 127

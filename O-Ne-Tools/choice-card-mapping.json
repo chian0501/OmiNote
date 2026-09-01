@@ -2,18 +2,9 @@
   "generator_version": "V1.0_20260807",
   "component_id": "SELECT-CARD",
   "family": "選項卡",
-  "formal_source_folder": "https://drive.google.com/drive/folders/1NLJaPk0AlZk0lt1U9crqbD_GyePyGbvc",
+  "formal_ref": "SELECT-CARD",
   "master_psd": {
-    "name": "00_選項卡.psd",
-    "drive_id": "1wYnhZVvoQMl4hn1W7msw_oh3k-RqbHca"
-  },
-  "reference_png_ids": {
-    "all_dim": "1hhVUvfxbhzAA-ZLlWjECOjfG0UUzDz4X",
-    "option_1_bright": "1jgZgULbR73XmEJ-D5G-KGeMOvEl_liqG",
-    "option_2_bright": "1EFxHT9BNlsIaiEmVn0A2i-8BCkHZpZr1",
-    "option_3_bright": "1U1OEgaJ4FqEBAN5pvjuxAGHPM1i0ek88",
-    "option_4_bright": "1kZ6vsjydYjDvsBSPKUEj8NQHqVtbP8Po",
-    "option_5_bright": "1iaVjw4COWun_qGbNKpY49jPSM0bOqHFq"
+    "name": "00_選項卡.psd"
   },
   "behavior": {
     "dynamic_option_count": true,

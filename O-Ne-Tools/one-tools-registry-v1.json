@@ -1,5 +1,7 @@
 {
-  "version": "V2.32_20260901",
+  "version": "V2.33_20260901",
+  "ui_shell_version": "V1.3.0_20260901",
+  "public_boundary": "semantic_references_only",
   "principle": "one_function_one_entry",
   "total": 18,
   "ready": 13,
@@ -54,8 +56,7 @@
         "same_tool_batch_render",
         "ai_json_schema_guide"
       ],
-      "formal_source_folder": "https://drive.google.com/drive/folders/1P-05OvWiq9gcc75btZJYOEyL5FYZWSro",
-      "formal_psd_id": "1K-Xc7oNcWEoLrHviGhVmeygYISa4j6Q4",
+      "formal_ref": "HERE-01",
       "generator_version": "V1.2.1_20260826"
     },
     {
@@ -86,8 +87,7 @@
         "same_tool_batch_render",
         "ai_json_schema_guide"
       ],
-      "formal_source_folder": "https://drive.google.com/drive/folders/1EEoUn-U_zkxNgYtfsJynvw8dbvp_LV7c",
-      "formal_psd_id": "10sd-QP_W3YqYksm1cVGYhaAqLbppjBJY",
+      "formal_ref": "TRIGGER-CARD",
       "generator_version": "V1.0.2_20260826"
     },
     {
@@ -119,8 +119,7 @@
         "same_tool_batch_render",
         "ai_json_schema_guide"
       ],
-      "formal_source_folder": "https://drive.google.com/drive/folders/1p8U9F7OwLlKkUZNFdwsXS1jFN8ue-fub",
-      "formal_psd_id": "1VMBCecO8QLuwtSMxy-BplfUa2Ybr3YDU",
+      "formal_ref": "PERSISTENT-MISSION",
       "generator_version": "V1.1.2_20260827",
       "mapping": "./persistent-card-mapping.json"
     },
@@ -203,8 +202,7 @@
         "same_tool_batch_render",
         "ai_json_schema_guide"
       ],
-      "formal_source_folder": "https://drive.google.com/drive/folders/1NLJaPk0AlZk0lt1U9crqbD_GyePyGbvc",
-      "formal_psd_id": "1wYnhZVvoQMl4hn1W7msw_oh3k-RqbHca",
+      "formal_ref": "SELECT-CARD",
       "panel_fill_opacity": 0.8,
       "generator_version": "V1.0.1_20260826"
     },
@@ -233,9 +231,7 @@
         "same_tool_batch_render",
         "ai_json_schema_guide"
       ],
-      "formal_source_folder": "https://drive.google.com/drive/folders/11-mXINBGZX8UyDGElik7hgSa-0yAJRcT",
-      "formal_accept_psd_id": "1SqUYmbv5VfVWei1Gp4hoUFPDiynwoIPU",
-      "formal_abandon_psd_id": "1eNgO2nsgtK9A4h6Ieak6WkYv6J232gWd",
+      "formal_ref": "CHALLENGE-CARD",
       "mapping": "./challenge-card-mapping.json",
       "generator_version": "V0.1.1_20260826",
       "visual_status": "READY",
@@ -277,8 +273,7 @@
         "same_tool_batch_render",
         "ai_json_schema_guide"
       ],
-      "formal_source_folder": "https://drive.google.com/drive/folders/18ddBMdVUEW6WvNyYF1gmuPSJ_eqYG8ad",
-      "formal_psd_id": "16AzfHUXuznSj8adbA9lKDcEYbUZ5iL6U",
+      "formal_ref": "DIALOGUE-CARD",
       "panel_fill_opacity": 0.8,
       "generator_version": "V1.3.7_20260826",
       "portrait_source": {
@@ -348,11 +343,7 @@
         "same_tool_batch_render",
         "ai_json_schema_guide"
       ],
-      "formal_source_folder": "https://drive.google.com/drive/folders/1AGPXawwx3lBzAyZZl7X56BlAUUHM5ZBg",
-      "formal_psd_id": "1RVtZOmq4pMNViGBRnj-qHPtd3NwsuhJU",
-      "formal_preview_id": "11m7iZnxgOMuqfBvVNL80PD_koN9E8gCG",
-      "formal_record_id": "1R6FIOKn1iWiXrFUuNICbxbFBJctzTu3Ky2pysaElFMc",
-      "formal_sha256": "70b0a621e0593d037fe99bc9cf492f70a3ee0342cc60ffbf80dd8103878ef9a7",
+      "formal_ref": "COL-02",
       "panel_fill_opacity": 0.8,
       "generator_version": "V1.3.1_20260826",
       "layout_modes": [
@@ -474,8 +465,7 @@
         "same_tool_batch_render",
         "ai_json_schema_guide"
       ],
-      "formal_source_folder": "https://drive.google.com/drive/folders/1pGLi-eFqlS-rfXCUPzzwyVRr-6XrgLH4",
-      "formal_psd_id": "1iqnZcZeTJXfHNZ3S2l9e4bIZ_dmFALbd",
+      "formal_ref": "EXPLANATION-CARD",
       "generator_version": "V0.4.5_20260901",
       "visual_status": "READY",
       "panel_fill_opacity": 0.8,
@@ -565,11 +555,7 @@
         "same_tool_batch_render",
         "ai_json_schema_guide"
       ],
-      "formal_source_folder": "https://drive.google.com/drive/folders/1pMkqpnAXxWkVehQfNbxPIY8wEUhzxG1i",
-      "formal_psd_id": "10TEJVILkN_wmVlstXxhJS_2NkLB41QA_",
-      "formal_preview_id": "1SxExxdhWGrC6X9rNL-k51gfTlvSkCj-J",
-      "formal_record_id": "1WaDTHdWqXIut-Lup6wzwQs9GwG011pGOKrHo9H84DiM",
-      "formal_sha256": "c6529ab176ae53bc8e3d8aa5d64788e07e699e60be9e07b40cee6c8d4081f599",
+      "formal_ref": "QST-03",
       "formal_version": "V1.1",
       "panel_fill_opacity": 0.8,
       "generator_version": "V0.1.3_20260826",
@@ -628,7 +614,7 @@
     ]
   },
   "shared_edit_backup": {
-    "version": "V1.2.0_20260827",
+    "version": "V1.3.0_20260901",
     "history_limit": 5,
     "storage": "browser_localStorage",
     "default_save_mode": "manual",
@@ -656,7 +642,7 @@
     "image_restore_policy": "text_and_settings_restore; uploaded_image_files_must_be_selected_again"
   },
   "shared_project_package": {
-    "version": "V1.1.0_20260829",
+    "version": "V1.3.0_20260901",
     "tool_count": 13,
     "filename_pattern": "{card_category}-{title}-{state}.{ext}",
     "brand_prefix_in_filename": false,
@@ -670,7 +656,7 @@
     "legacy_json_compatible": true
   },
   "shared_batch_render": {
-    "version": "V1.1.0_20260829",
+    "version": "V1.3.0_20260901",
     "mode": "same_tool_json_zip_to_png_zip",
     "max_files": 20,
     "max_total_bytes": 209715200,
@@ -682,16 +668,25 @@
     "stop_supported": true
   },
   "shared_ai_json_guide": {
-    "version": "V1.0.7_20260831",
+    "version": "V1.3.0_20260901",
     "tool_count": 13,
-    "placement": "same_right_column_directly_below_preview",
+    "placement": "collapsed_completion_dock_below_editor",
     "copy_full_ai_prompt": true,
     "copy_json_example": true,
     "download_example_json": true,
     "raw_json_only_instruction": true,
     "schema_source": "current_tool_exporter_importer",
     "image_binary_policy": "json_does_not_embed_uploads; use_project_zip_for_images",
-    "layout_strategy": "wrap_preview_and_guide_in_same_grid_item",
+    "layout_strategy": "single_shared_after_edit_dock",
     "left_controls_untouched": true
+  },
+  "shared_ui_shell": {
+    "version": "V1.3.0_20260901",
+    "minimum_helper_text_px": 13,
+    "minimum_control_height_px": 42,
+    "after_edit_tools_collapsed": true,
+    "long_repeated_editors_collapsible": true,
+    "accessible_label_enhancement": true,
+    "embedded_editor_completion_tools_hidden": true
   }
 }

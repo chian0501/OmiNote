@@ -7,16 +7,9 @@
     component_id: 'QST-03',
     semantic_id: 'settlement_panel_16x9',
     usage: 'RESULT',
+    formal_ref: 'QST-03',
     formal_version: 'V1.1',
-    extension_approved_by: 'Omi',
-    folder_id: '1pMkqpnAXxWkVehQfNbxPIY8wEUhzxG1i',
-    psd_id: '10TEJVILkN_wmVlstXxhJS_2NkLB41QA_',
-    psd_sha256: 'c6529ab176ae53bc8e3d8aa5d64788e07e699e60be9e07b40cee6c8d4081f599',
-    preview_id: '1SxExxdhWGrC6X9rNL-k51gfTlvSkCj-J',
-    record_id: '1WaDTHdWqXIut-Lup6wzwQs9GwG011pGOKrHo9H84DiM',
-    manifest_id: '1IJp9SUsCMhAiA-bLGc7NTI8n382rXnr0',
-    mapping_id: '1-9cMX-gdTlYJ5Ej29o08oyy6Nu0Wu9ej',
-    qa_id: '1VDtQLtu1yKvC5XqZpfgpKs49HsOQoTZf'
+    extension_approved_by: 'Omi'
   };
 
   var STATIC_SOURCES = {

@@ -1,0 +1,200 @@
+/* O-Ne Tools shared application shell — V1.3.0 */
+:root{
+  --one-ui-text:#f5f1ea;
+  --one-ui-muted:#aeb8c5;
+  --one-ui-line:#354052;
+  --one-ui-panel:#101824;
+  --one-ui-panel-2:#0d141d;
+  --one-ui-teal:#29a6a7;
+  --one-ui-teal-soft:#8fe0d7;
+  --one-ui-pink:#f0a8cf;
+}
+
+html{scroll-behavior:smooth}
+body{font-size:16px}
+button,input,select,textarea{font-family:inherit}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{
+  outline:3px solid rgba(41,166,167,.55)!important;
+  outline-offset:2px;
+}
+
+/* Editor controls stay readable without changing the rendered card artwork. */
+.app label,.app-shell label,.editor label,.controls label,.settings label,.panel label,
+.app .hint,.app .help,.app .note,.app .dim,.app .muted,.app .small,
+.app-shell .hint,.app-shell .help,.app-shell .note,.app-shell .dim,.app-shell .muted,.app-shell .small{
+  font-size:13px!important;
+  line-height:1.55;
+}
+.app input:not([type="range"]):not([type="color"]):not([type="checkbox"]):not([type="radio"]),
+.app select,.app textarea,
+.app-shell input:not([type="range"]):not([type="color"]):not([type="checkbox"]):not([type="radio"]),
+.app-shell select,.app-shell textarea{
+  min-height:42px;
+  font-size:14px;
+}
+.app button,.app a.btn,.app-shell button,.app-shell a.btn{
+  min-height:42px;
+  font-size:14px;
+}
+.app summary,.app-shell summary{font-size:14px;line-height:1.45}
+
+/* One completion area replaces the four repeated always-open utility blocks. */
+.one-after-edit-dock{
+  width:100%;
+  margin-top:16px;
+  border:1px solid var(--one-ui-line);
+  border-radius:14px;
+  background:var(--one-ui-panel);
+  color:var(--one-ui-text);
+  overflow:hidden;
+  font-family:"Noto Sans TC","Microsoft JhengHei",sans-serif;
+}
+.one-after-edit-dock>summary{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  min-height:58px;
+  padding:12px 16px;
+  cursor:pointer;
+  list-style:none;
+  color:var(--one-ui-text);
+  font-size:16px!important;
+  font-weight:900;
+}
+.one-after-edit-dock>summary::-webkit-details-marker{display:none}
+.one-after-edit-dock>summary::after{
+  content:"＋";
+  margin-left:auto;
+  color:var(--one-ui-teal-soft);
+  font-size:22px;
+  line-height:1;
+}
+.one-after-edit-dock[open]>summary::after{content:"−"}
+.one-after-edit-dock__step{
+  display:grid;
+  place-items:center;
+  width:26px;
+  height:26px;
+  border-radius:50%;
+  background:#174449;
+  color:var(--one-ui-teal-soft);
+  font-size:13px;
+}
+.one-after-edit-dock__copy{display:flex;flex-direction:column;gap:2px;min-width:0}
+.one-after-edit-dock__copy small{color:var(--one-ui-muted);font-size:12px;font-weight:600}
+.one-after-edit-dock__badge{
+  margin-left:6px;
+  padding:4px 9px;
+  border-radius:999px;
+  background:#21363b;
+  color:var(--one-ui-teal-soft);
+  font-size:11px;
+  white-space:nowrap;
+}
+.one-after-edit-dock__content{
+  display:grid;
+  gap:12px;
+  padding:0 14px 14px;
+  border-top:1px solid #273244;
+}
+.one-after-edit-dock__content>.one-edit-backup,
+.one-after-edit-dock__content>.one-project-package,
+.one-after-edit-dock__content>.one-batch-render,
+.one-after-edit-dock__content>.one-ai-json-guide{
+  margin:12px 0 0!important;
+  width:auto!important;
+  box-shadow:none!important;
+}
+.one-after-edit-dock__content>[data-one-backup-ui]:not(.one-edit-backup){
+  margin-top:12px;
+  padding:13px;
+  border:1px solid #354052;
+  border-radius:11px;
+  background:#101620;
+}
+
+/* Shared utilities: readable text and comfortable targets. */
+.one-edit-backup__title,.one-project-package__title,.one-batch-render__title,
+.one-ai-json-guide__head strong{font-size:15px!important}
+.one-edit-backup__badge,.one-batch-render__badge,.one-ai-json-guide__badge{font-size:12px!important}
+.one-edit-backup__note,.one-project-package__note,.one-batch-render__note,
+.one-ai-json-guide__note,.one-ai-json-guide__rules,.one-ai-json-guide__file{font-size:13px!important}
+.one-edit-backup__status,.one-project-package__status,.one-batch-render__status,
+.one-ai-json-guide__status{font-size:13px!important;min-height:20px!important}
+.one-edit-backup select,.one-edit-backup button,.one-project-package button,
+.one-batch-render button,.one-ai-json-guide button{min-height:42px!important;font-size:14px!important}
+.one-ai-json-guide summary{font-size:13px!important}
+.one-ai-json-guide pre{font-size:12px!important}
+
+/* Long repeated editors are easier to scan when each item can fold. */
+.one-collapsible-item{
+  margin-top:10px;
+  border:1px solid #2e3949;
+  border-radius:11px;
+  background:#111923;
+  overflow:hidden;
+}
+.one-collapsible-item>summary{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  min-height:46px;
+  padding:8px 12px;
+  color:var(--one-ui-text);
+  cursor:pointer;
+  font-weight:800;
+}
+.one-collapsible-item__body{padding:0 10px 10px}
+.one-collapsible-item__body>.rating-editor,
+.one-collapsible-item__body>.row-editor,
+.one-collapsible-item__body>.item{margin-top:0}
+.one-collapsible-item[data-one-kind="station"] .one-collapsible-item__body>.item>.item-head{display:none}
+.one-advanced-section{overflow:hidden}
+.one-advanced-section>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:50px;cursor:pointer;list-style:none}
+.one-advanced-section>summary::-webkit-details-marker{display:none}.one-advanced-section>summary::after{content:"＋";color:var(--one-ui-teal-soft);font-size:20px}.one-advanced-section[open]>summary::after{content:"−"}
+
+@media(min-width:981px){
+  .workspace>.preview-panel,.grid>.preview-panel,.workspace>.one-ai-json-guide-stack,.grid>.one-ai-json-guide-stack{
+    position:sticky;
+    top:12px;
+    align-self:start;
+    max-height:calc(100dvh - 24px);
+    overflow:auto;
+  }
+}
+
+body.one-tool-embedded .one-after-edit-dock,
+body.one-tool-embedded [data-one-ai-json-guide]{display:none!important}
+
+/* Command Center: explanation card has no legacy atlas tile, so label it clearly. */
+.preview.p-explanation,.detail-preview.p-explanation{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  background:linear-gradient(145deg,rgba(34,23,17,.98),rgba(41,166,167,.22))!important;
+}
+.preview.p-explanation::before,.detail-preview.p-explanation::before{
+  content:"GET!  說明卡";
+  color:#fff6ed;
+  font-size:20px;
+  font-weight:950;
+}
+.preview.p-explanation::after,.detail-preview.p-explanation::after{
+  content:"圖文／純圖片拼版";
+  color:#91d9d2;
+  font-size:13px;
+  font-weight:800;
+}
+
+@media(max-width:760px){
+  .one-after-edit-dock>summary{align-items:flex-start;padding:12px}
+  .one-after-edit-dock__badge{display:none}
+  .one-after-edit-dock__content{padding:0 10px 10px}
+  .one-edit-backup__row,.one-edit-backup__row.is-manual{grid-template-columns:1fr!important}
+  .one-edit-backup__row select{grid-column:auto!important}
+  .one-project-package__row,.one-batch-render__row,.one-ai-json-guide__buttons{display:grid!important;grid-template-columns:1fr}
+  .one-project-package button,.one-batch-render button,.one-ai-json-guide button{width:100%}
+}

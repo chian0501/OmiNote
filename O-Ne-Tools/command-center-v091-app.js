@@ -1,3 +1,4 @@
+(()=>{if(!document.getElementById('one-tools-ui-css')){const l=document.createElement('link');l.id='one-tools-ui-css';l.rel='stylesheet';l.href='./one-tools-ui-v1.css?v=1300';document.head.appendChild(l)}if(!window.ONEUIEnhance){const s=document.createElement('script');s.src='./one-tools-ui-v1.js?v=1300';document.head.appendChild(s)}})();
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 const ATLAS={general:0,trigger:1,move:2,choice:3,dialogue:4,rating:5,focus:6,settlement:7,persistent:8,effect:9,challenge:10,'thumbnail-frame':11,omi:12,niete:13,kuma:14,nomi:15,logo:16,mainvisual:17,watermark:18,avatar:19};

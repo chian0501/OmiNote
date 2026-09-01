@@ -2,20 +2,11 @@
   "generator_version": "V1.3.6_20260811",
   "component_id": "DIALOGUE-CARD",
   "family": "對話卡",
+  "formal_ref": "DIALOGUE-CARD",
   "stable_entry": "O-Ne-Tools/dialogue-card.html?v=140",
   "implementation_entry": "O-Ne-Tools/dialogue-card-v135.html?v=140",
-  "formal_source_folder": "https://drive.google.com/drive/folders/18ddBMdVUEW6WvNyYF1gmuPSJ_eqYG8ad",
   "master_psd": {
-    "name": "對話卡.psd",
-    "drive_id": "16AzfHUXuznSj8adbA9lKDcEYbUZ5iL6U"
-  },
-  "formal_references": {
-    "Omi_card": "1iE6LgXNEPirKNFg9BvOvcaX6imd845ye",
-    "NieTe_card": "1DSUa8SmbPIdjENkUp8US6I1VWfHqSnnZ",
-    "Kuma_card": "1Cf6vuvGr9Qqjr03J6n4Ak3lliHnOyljr",
-    "Nomi_card": "1H20ePHU7UzKHhMyj7uTWwNIw3-eyV0Bv",
-    "NPC_card": "1zvjesZhoa1BPgzRcYtBi9dJZyWa5Jmc5",
-    "dual_card": "1H-sOGVjvkXSEAcNIR9j6oB7M3Hr8cWKu"
+    "name": "對話卡.psd"
   },
   "portrait_source_rule": {
     "mode": "four_complete_standalone_expression_bundles",

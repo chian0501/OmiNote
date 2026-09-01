@@ -7,13 +7,8 @@
   "generator": "./rating-card.html?v=101",
   "canvas": {"width": 1920, "height": 1080, "color_mode": "RGB_8bit"},
   "formal_source": {
-    "folder": "https://drive.google.com/drive/folders/1AGPXawwx3lBzAyZZl7X56BlAUUHM5ZBg",
-    "psd_id": "1RVtZOmq4pMNViGBRnj-qHPtd3NwsuhJU",
-    "preview_id": "11m7iZnxgOMuqfBvVNL80PD_koN9E8gCG",
-    "record_id": "1R6FIOKn1iWiXrFUuNICbxbFBJctzTu3Ky2pysaElFMc",
-    "sha256": "70b0a621e0593d037fe99bc9cf492f70a3ee0342cc60ffbf80dd8103878ef9a7",
-    "priority": ["評分卡.psd", "O-NE_評分卡_正式母檔紀錄_V1.0", "評分卡.jpg"],
-    "rejected_sources": ["評分卡.md", "評分卡.json", "評分卡.txt"]
+    "formal_ref": "COL-02",
+    "priority": ["formal_master", "formal_record", "formal_preview"]
   },
   "fixed_visuals": {
     "panel_fill": "#1F1713",

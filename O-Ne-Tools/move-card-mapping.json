@@ -1,8 +1,8 @@
 {
   "generator_version": "V1.0_20260807",
+  "formal_ref": "NAV-01",
   "template": {
     "name": "00_移動卡.psd",
-    "drive_id": "1KpEX-97ObOHxLxbnLmK-3lxlVlBsvCPA",
     "component_id": "NAV-01",
     "label": "MOVE",
     "states": ["WHITE", "ORANGE"],

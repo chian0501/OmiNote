@@ -2,29 +2,22 @@
   "generator_version": "V1.1.2_20260827",
   "component_id": "PERSISTENT-MISSION",
   "family": "常駐卡",
-  "formal_source_folder": "https://drive.google.com/drive/folders/1p8U9F7OwLlKkUZNFdwsXS1jFN8ue-fub",
+  "formal_ref": "PERSISTENT-MISSION",
   "master_psd": {
-    "name": "00_常駐卡.psd",
-    "drive_id": "1VMBCecO8QLuwtSMxy-BplfUa2Ybr3YDU"
+    "name": "00_常駐卡.psd"
   },
   "states": {
     "MISSION": {
-      "reference_png_id": "1DVJhC0KBwEMfyfUnn5wGMpObQGOv32kH",
-      "label_psd_id": "1AP7OfuoZJQvWHRgVbxbMWopsqzdTvtzM",
       "title_color": "#FDF3E7",
       "result_icon": null
     },
     "DONE": {
-      "reference_png_id": "16IvXs5BSgP2MP9bqbCi2SuujKGo18TF3",
-      "label_psd_id": "1qJ2RKpW75vhL-dNY6hg1aJKP8MyC3R98",
       "title_color": "#FFBE37",
-      "result_icon_psd_id": "1Z5lHCqO0BeyoPJ93vfhYPoRnB6lS8N4l"
+      "result_icon": true
     },
     "FAIL": {
-      "reference_png_id": "1tFdU_tztw5d6YoxFm2DIPXjjOJ27aCip",
-      "label_psd_id": "1ich_-2QjUsFEAewzh_9kZKR_s9PLFNU-",
       "title_color": "#FDF3E7",
-      "result_icon_psd_id": "1tu7b0MTq6LpXu2XvA-sVEPQ1JjNaLNBb"
+      "result_icon": true
     }
   },
   "canvas": {

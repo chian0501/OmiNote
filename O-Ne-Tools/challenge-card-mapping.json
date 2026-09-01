@@ -1,6 +1,7 @@
 {
   "schema": "o-ne.challenge-card.mapping.v0.1.0",
   "status": "READY",
+  "formal_ref": "CHALLENGE-CARD",
   "approved_by": "Omi",
   "approved_on": "2026-08-21",
   "generator": "./challenge-card.html?v=010",
@@ -21,17 +22,11 @@
   "modes": {
     "accept": {
       "default_emphasis": "接受",
-      "emphasis_color": "#FFBE37",
-      "formal_psd_id": "1SqUYmbv5VfVWei1Gp4hoUFPDiynwoIPU",
-      "reference_png_yes_selected_id": "1rZdfsqO1l3UAlWE1AlVHTLjH3UF_LSm9",
-      "reference_png_no_selected_id": "1g_9nmbHRYIjh-oRYhoag4gVn8zXanhr3"
+      "emphasis_color": "#FFBE37"
     },
     "abandon": {
       "default_emphasis": "放棄",
-      "emphasis_color": "#29A6A7",
-      "formal_psd_id": "1eNgO2nsgtK9A4h6Ieak6WkYv6J232gWd",
-      "reference_png_yes_selected_id": "1pUuOfG819W98EDHflXrLcQFbRa2ERrQw",
-      "reference_png_no_selected_id": "1uX7zTPI3tu7b5VJZkNPRnl_QwJTDRSvj"
+      "emphasis_color": "#29A6A7"
     }
   },
   "states": [

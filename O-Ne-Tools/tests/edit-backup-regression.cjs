@@ -36,7 +36,7 @@ vm.runInNewContext(librarySource, context, { filename: 'edit-backup-v1.js' });
 const backup = fakeWindow.ONEEditBackup;
 assert(backup, 'shared backup library must load');
 assert.strictEqual(backup.schema, 'o-ne.edit-backup.v1');
-assert.strictEqual(backup.version, '1.2.0');
+assert.strictEqual(backup.version, '1.3.0');
 assert.strictEqual(backup.__test.constants.historyLimit, 5);
 assert.strictEqual(backup.__test.constants.maxJsonBytes, 1024 * 1024);
 assert.strictEqual(backup.__test.shouldPersist({}, 'edit'), false, 'default mode must ignore edits');
@@ -174,7 +174,7 @@ for (const file of ['edit-backup-v1.js', 'settlement-card-v011.js']) {
 assert.deepStrictEqual(syntaxFailures, []);
 
 const registry = JSON.parse(fs.readFileSync(path.join(root, 'one-tools-registry-v1.json'), 'utf8'));
-assert.strictEqual(registry.version, 'V2.32_20260901');
+assert.strictEqual(registry.version, 'V2.33_20260901');
 assert.strictEqual(registry.total, 18);
 assert.strictEqual(registry.ready, 13);
 assert.strictEqual(registry.candidate, 0);
@@ -186,21 +186,21 @@ for (const id of registryIds) {
     assert(entry.features.includes(feature), id + ' missing ' + feature);
   }
 }
-assert.strictEqual(registry.shared_ai_json_guide.version, 'V1.0.7_20260831');
+assert.strictEqual(registry.shared_ai_json_guide.version, 'V1.3.0_20260901');
 assert.strictEqual(registry.shared_ai_json_guide.tool_count, 13);
 assert.strictEqual(registry.shared_ai_json_guide.raw_json_only_instruction, true);
-assert.strictEqual(registry.shared_ai_json_guide.placement, 'same_right_column_directly_below_preview');
+assert.strictEqual(registry.shared_ai_json_guide.placement, 'collapsed_completion_dock_below_editor');
 assert.strictEqual(registry.shared_ai_json_guide.left_controls_untouched, true);
-assert.strictEqual(registry.shared_batch_render.version, 'V1.1.0_20260829');
+assert.strictEqual(registry.shared_batch_render.version, 'V1.3.0_20260901');
 assert.strictEqual(registry.shared_batch_render.max_files, 20);
 assert.strictEqual(registry.shared_batch_render.image_tool_json_policy, 'zip_project_package_required');
-assert.strictEqual(registry.shared_project_package.version, 'V1.1.0_20260829');
+assert.strictEqual(registry.shared_project_package.version, 'V1.3.0_20260901');
 assert.strictEqual(registry.shared_project_package.filename_pattern, '{card_category}-{title}-{state}.{ext}');
 assert.strictEqual(registry.shared_project_package.brand_prefix_in_filename, false);
 assert.strictEqual(registry.shared_project_package.same_title_variant_safe, true);
 assert.strictEqual(registry.shared_edit_backup.history_limit, 5);
 assert.strictEqual(registry.shared_edit_backup.max_json_bytes, 1048576);
-assert.strictEqual(registry.shared_edit_backup.version, 'V1.2.0_20260827');
+assert.strictEqual(registry.shared_edit_backup.version, 'V1.3.0_20260901');
 assert.strictEqual(registry.shared_edit_backup.default_save_mode, 'manual');
 assert.strictEqual(registry.shared_edit_backup.manual_save_supported, true);
 assert.deepStrictEqual(registry.shared_edit_backup.manual_save_tools, [
@@ -209,28 +209,24 @@ assert.deepStrictEqual(registry.shared_edit_backup.manual_save_tools, [
 ]);
 
 const index = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
-for (const id of registryIds) {
-  const entry = registry.tools.find(tool => tool.id === id);
-  const href = entry.href.replace(/^\.\//, '');
-  assert(index.includes(href), 'index missing cache-busted link ' + href);
-}
+assert(index.includes("fetch('./one-tools-registry-v1.json?v=2330'"), 'index must read the canonical registry');
+assert(!index.includes('const tools=['), 'index must not keep a second hardcoded registry');
+assert(index.includes('command-center.html'), 'index must expose the Command Center entry');
 
 const aiBridge = fs.readFileSync(path.join(root, 'ai-card.html'), 'utf8');
 for (const href of [
-  'general-card.html?v=121&build=manual-history-v2',
-  'trigger-card.html?v=102&build=manual-history-v2',
-  'persistent-card.html?v=112&build=manual-history-v2',
-  'move-card.html?v=107&build=manual-history-v2',
-  'choice-card.html?v=101&build=manual-history-v2'
+  'general-card.html?v=121&build=ui-shell-v13',
+  'trigger-card.html?v=102&build=ui-shell-v13',
+  'persistent-card.html?v=112&build=ui-shell-v13',
+  'move-card.html?v=107&build=ui-shell-v13',
+  'choice-card.html?v=101&build=ui-shell-v13'
 ]) assert(aiBridge.includes(href), 'AI Bridge missing current editor link ' + href);
 
 const persistentMapping = JSON.parse(fs.readFileSync(path.join(root, 'persistent-card-mapping.json'), 'utf8'));
 assert.strictEqual(persistentMapping.generator_version, 'V1.1.2_20260827');
 const legacyRegistry = JSON.parse(fs.readFileSync(path.join(root, 'registry.json'), 'utf8'));
-const legacyPersistent = legacyRegistry.tools.find(tool => tool.id === 'persistent');
-assert.strictEqual(legacyPersistent.href, './persistent-card.html?v=112&build=manual-history-v2');
-assert.strictEqual(legacyPersistent.generator_version, 'V1.1.2_20260827');
-assert(legacyPersistent.features.includes('manual_edit_history_save'));
-assert(legacyPersistent.features.includes('unsaved_edits_not_persisted'));
+assert.strictEqual(legacyRegistry.status, 'DEPRECATED');
+assert.strictEqual(legacyRegistry.canonical_registry, './one-tools-registry-v1.json');
+assert(!legacyRegistry.tools, 'deprecated registry must not duplicate tool metadata');
 
-console.log('PASS: manual shared history, JSON validation boundaries, 12 shared adapters, syntax, registries, index and AI Bridge links.');
+console.log('PASS: manual shared history, JSON validation boundaries, 12 shared adapters, syntax, canonical registry, index and AI Bridge links.');

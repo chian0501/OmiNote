@@ -43,19 +43,21 @@ canvas{width:min(100%,900px);height:auto;filter:drop-shadow(0 8px 18px rgba(0,0,
   <div class="label-row"><label for="progressSize">進度文字大小</label><span id="progressSizeValue" class="px-value">20px</span></div>
   <input id="progressSize" type="range" min="14" max="28" step="1" value="20">
   <div id="status" class="status">READY｜可輸出透明 PNG</div>
-  <div class="buttons"><button id="download">輸出透明 PNG</button><button id="jsonBtn" class="secondary">輸出欄位 JSON</button><button id="loadJson" class="secondary">載入 JSON</button><input id="jsonFile" type="file" accept=".json,application/json" hidden><button id="reset" class="secondary">回復示例</button></div>
-  <div class="section-title history-title">02｜最近暫存</div>
+  <div class="buttons"><button id="download">輸出透明 PNG</button><button id="reset" class="secondary">回復示例</button></div>
+  <section id="persistentHistory" data-one-backup-ui>
+  <div class="section-title history-title">最近暫存與 JSON</div>
   <div class="note">只有按「暫存目前內容」才會保留這台裝置最近 5 次不同內容。未暫存的修改在重新整理或重開後會回到最後一筆；要換瀏覽器或裝置時，請使用 JSON 備份。</div>
   <label for="history">最近編輯內容</label>
   <select id="history"></select>
   <div id="historyStatus" class="status"></div>
-  <div class="buttons"><button id="saveHistory">暫存目前內容</button><button id="restoreHistory" class="secondary">載入選取暫存</button><button id="clearHistory" class="secondary">清除暫存</button></div>
+  <div class="buttons"><button id="saveHistory">暫存目前內容</button><button id="restoreHistory" class="secondary">還原</button><button id="jsonBtn" class="secondary">下載 JSON</button><button id="loadJson" class="secondary">載入 JSON</button><input id="jsonFile" type="file" accept=".json,application/json" hidden><button id="clearHistory" class="secondary">清除暫存</button></div>
+  </section>
   <div class="mini"><b class="lock">🔒 固定不改：</b>634×62、主底板 80%、白框、MISSION／DONE!／FAIL 標籤、成功／失敗圖示、正式色彩、透明背景。<br><b>可改：</b>狀態、任務文字、進度、任務字級、進度字級；可用 JSON 備份與還原。</div>
 </div>
-<div class="panel"><div class="section-title">03｜正式母版即時預覽</div><div class="preview-wrap"><canvas id="c" width="634" height="62"></canvas></div></div>
+<div class="panel"><div class="section-title">02｜正式母版即時預覽</div><div class="preview-wrap"><canvas id="c" width="634" height="62"></canvas></div></div>
 </div>
 </div>
-<script src="./project-package-v1.js?v=110"></script>
+<script src="./project-package-v1.js?v=1300"></script>
 <script>
 const canvas=document.getElementById('c');
 const ctx=canvas.getContext('2d');
@@ -209,7 +211,7 @@ $('taskSize').addEventListener('input',handleEdit);
 $('progressSize').addEventListener('input',handleEdit);
 $('saveHistory').onclick=()=>saveCurrentHistory();
 $('download').onclick=()=>{if(render())return;canvas.toBlob(blob=>{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='O-Ne_常駐卡_'+$('state').value+'.png';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);},'image/png');};
-$('jsonBtn').onclick=()=>{const payload={component_id:'PERSISTENT-MISSION',tool:'persistent-card',schema_version:'1.2',master_psd_id:'1VMBCecO8QLuwtSMxy-BplfUa2Ybr3YDU',generator_version:'V1.1.2_20260827',panel_fill_opacity:.8,state:$('state').value,task_text:$('task').value,progress:$('progress').value,task_font_size:Number($('taskSize').value),progress_font_size:Number($('progressSize').value),font_size_mode:'manual'};const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='O-Ne_常駐卡_data_v112.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);};
+$('jsonBtn').onclick=()=>{const payload={component_id:'PERSISTENT-MISSION',tool:'persistent-card',schema_version:'1.2',formal_ref:'PERSISTENT-MISSION',generator_version:'V1.1.2_20260827',panel_fill_opacity:.8,state:$('state').value,task_text:$('task').value,progress:$('progress').value,task_font_size:Number($('taskSize').value),progress_font_size:Number($('progressSize').value),font_size_mode:'manual'};const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='O-Ne_常駐卡_data_v112.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);};
 $('loadJson').onclick=()=>$('jsonFile').click();
 $('jsonFile').addEventListener('change',async event=>{
   const file=event.target.files&&event.target.files[0];

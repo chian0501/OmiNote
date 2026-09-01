@@ -2,29 +2,22 @@
   "generator_version": "V1.0_20260807",
   "component_id": "TRIGGER-CARD",
   "family": "觸發卡",
-  "formal_source_folder": "https://drive.google.com/drive/folders/1EEoUn-U_zkxNgYtfsJynvw8dbvp_LV7c",
+  "formal_ref": "TRIGGER-CARD",
   "master_psd": {
-    "name": "00_觸發卡.psd",
-    "drive_id": "10sd-QP_W3YqYksm1cVGYhaAqLbppjBJY"
+    "name": "00_觸發卡.psd"
   },
   "states": {
     "EVENT": {
-      "reference_png_id": "1TDlMx2pXtXfDXsRvtfTvaBdjXdBdAOVo",
-      "label_psd_id": "1r7Y5l1u_r5fbw_3EQrv5bqUXWLAqNlTz",
       "subtitle_color": "#FDF3E7",
       "result_icon": null
     },
     "DONE": {
-      "reference_png_id": "1rFme_zzzZHNA1msk3RuDEJB3JGE9TZXv",
-      "label_psd_id": "1qcC4_iUAXtuxipTFB0SPCCHI7RGZzBjN",
       "subtitle_color": "#FFBE37",
-      "result_icon_psd_id": "1EZ9T2VGMuJlif-nXfpcrNpfJdY72qbx3"
+      "result_icon": true
     },
     "FAIL": {
-      "reference_png_id": "1hbKMhJaSeDa7fcmx5i5PDzPErZ8kWGqe",
-      "label_psd_id": "1NznFTI1ClqdeHI90pLDVcWA32mryd6Gk",
       "subtitle_color": "#FDF3E7",
-      "result_icon_psd_id": "1t08Q_vFUpFEJVVUlkccvpHShPCNiAnic"
+      "result_icon": true
     }
   },
   "canvas": {"width": 653, "height": 127},

@@ -2,7 +2,22 @@
 (function (global) {
   'use strict';
 
-  var VERSION = '1.1.0';
+  function ensureSharedUi() {
+    if (typeof document === 'undefined' || !document.getElementById || !document.createElement) return;
+    if (!document.getElementById('one-tools-ui-css')) {
+      var link = document.createElement('link');
+      link.id = 'one-tools-ui-css'; link.rel = 'stylesheet'; link.href = './one-tools-ui-v1.css?v=1300';
+      (document.head || document.documentElement).appendChild(link);
+    }
+    if (!global.ONEAfterEditDock && !document.getElementById('one-tools-ui-js')) {
+      var script = document.createElement('script');
+      script.id = 'one-tools-ui-js'; script.src = './one-tools-ui-v1.js?v=1300'; script.async = false;
+      (document.head || document.documentElement).appendChild(script);
+    }
+  }
+  ensureSharedUi();
+
+  var VERSION = '1.3.0';
   var PACKAGE_SCHEMA = 'o-ne.project-package.v1';
   var MAX_PACKAGE_BYTES = 200 * 1024 * 1024;
   var mounts = Object.create(null);
@@ -573,9 +588,10 @@
   function placePanel(instance) {
     var backups = document.querySelectorAll('[data-one-backup-ui]');
     var backup = backups.length ? backups[backups.length - 1] : null;
-    if (backup && backup.parentNode) backup.parentNode.insertBefore(instance.panel, backup.nextSibling);
+    var anchor = typeof instance.config.anchor === 'string' ? document.querySelector(instance.config.anchor) : instance.config.anchor;
+    if (global.ONEAfterEditDock) global.ONEAfterEditDock.place(instance.id, instance.panel, { anchor: backup || anchor });
+    else if (backup && backup.parentNode) backup.parentNode.insertBefore(instance.panel, backup.nextSibling);
     else {
-      var anchor = typeof instance.config.anchor === 'string' ? document.querySelector(instance.config.anchor) : instance.config.anchor;
       if (anchor && anchor.parentNode) anchor.parentNode.insertBefore(instance.panel, anchor.nextSibling);
       else (document.querySelector('.panel') || document.body).appendChild(instance.panel);
     }
@@ -770,18 +786,18 @@
   wrapEditBackup();
 
   if (typeof document !== 'undefined' && document.readyState === 'loading' && typeof document.write === 'function') {
-    document.write('<script src="./batch-render-v1.js?v=110"></' + 'script>');
+    document.write('<script src="./batch-render-v1.js?v=1300"></' + 'script>');
   } else if (typeof document !== 'undefined' && document.createElement && document.head) {
     var batchScript = document.createElement('script');
-    batchScript.src = './batch-render-v1.js?v=110';
+    batchScript.src = './batch-render-v1.js?v=1300';
     document.head.appendChild(batchScript);
   }
 
   if (typeof document !== 'undefined' && document.readyState === 'loading' && typeof document.write === 'function') {
-    document.write('<script src="./ai-json-guide-v1.js?v=109"></' + 'script>');
+    document.write('<script src="./ai-json-guide-v1.js?v=1300"></' + 'script>');
   } else if (typeof document !== 'undefined' && document.createElement && document.head) {
     var aiGuideScript = document.createElement('script');
-    aiGuideScript.src = './ai-json-guide-v1.js?v=109';
+    aiGuideScript.src = './ai-json-guide-v1.js?v=1300';
     aiGuideScript.onload = function () { if (global.ONEAIJsonGuide) global.ONEAIJsonGuide.wrapProjectPackage(); };
     document.head.appendChild(aiGuideScript);
   }

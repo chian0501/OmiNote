@@ -1,8 +1,8 @@
-/* O-Ne shared AI JSON format guide — V1.0.7 */
+/* O-Ne shared AI JSON format guide — V1.3.0 */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.0.7';
+  var VERSION = '1.3.0';
   var mounted = Object.create(null);
 
   var GUIDES = {
@@ -19,7 +19,7 @@
       name: '觸發卡', code: 'TRIGGER-CARD', version: 'V1.0.2', file: '觸發卡-卡片標題-事件.json',
       values: ['component_id 固定 TRIGGER-CARD', 'state：EVENT／DONE／FAIL', 'progress 例如 0/1、1/1'],
       example: {
-        component_id: 'TRIGGER-CARD', master_psd_id: '10sd-QP_W3YqYksm1cVGYhaAqLbppjBJY', generator_version: 'V1.0.2_20260826', panel_fill_opacity: 0.8,
+        component_id: 'TRIGGER-CARD', formal_ref: 'TRIGGER-CARD', generator_version: 'V1.0.2_20260826', panel_fill_opacity: 0.8,
         state: 'EVENT', title: '在機場看煙火', subtitle: '關西國際機場 (KIX) 看到煙火', progress: '0/1'
       }
     },
@@ -27,7 +27,7 @@
       name: '常駐卡', code: 'PERSISTENT-MISSION', version: 'V1.1.2', file: '常駐卡-任務標題-任務中.json',
       values: ['component_id 固定 PERSISTENT-MISSION', 'tool 固定 persistent-card', 'state：MISSION／DONE／FAIL', '字級為數字，font_size_mode 固定 manual'],
       example: {
-        component_id: 'PERSISTENT-MISSION', tool: 'persistent-card', schema_version: '1.2', master_psd_id: '1VMBCecO8QLuwtSMxy-BplfUa2Ybr3YDU',
+        component_id: 'PERSISTENT-MISSION', tool: 'persistent-card', schema_version: '1.2', formal_ref: 'PERSISTENT-MISSION',
         generator_version: 'V1.1.2_20260827', panel_fill_opacity: 0.8, state: 'MISSION', task_text: '準備返台', progress: '0/1',
         task_font_size: 21, progress_font_size: 20, font_size_mode: 'manual'
       }
@@ -61,7 +61,7 @@
       name: '選項卡', code: 'SELECT-CARD', version: 'V1.0.1', file: '選項卡-問題標題-高亮選項.json',
       values: ['component_id 固定 SELECT-CARD', 'options 每項要有 index、text、state', 'option.state：BRIGHT／DIM；可以同時多項 BRIGHT'],
       example: {
-        component_id: 'SELECT-CARD', generator_version: 'V1.0.1_20260826', master_psd_id: '1wYnhZVvoQMl4hn1W7msw_oh3k-RqbHca',
+        component_id: 'SELECT-CARD', generator_version: 'V1.0.1_20260826', formal_ref: 'SELECT-CARD',
         title: '關西國際機場 (KIX) → 住宿飯店', question: '選擇的交通工具？',
         options: [{ index: 1, text: '關空特急 HARUKA', state: 'DIM' }, { index: 2, text: '南海電鐵', state: 'BRIGHT' }]
       }
@@ -72,7 +72,7 @@
       example: {
         schema: 'o-ne.challenge-card.ready.v0.1.1', status: 'READY', generator_version: 'V0.1.1_20260826', approved_by: 'Omi', approved_on: '2026-08-21',
         mode: 'accept', selected: 'yes', copy: { prefix: '確認', emphasis: '接受', suffix: '挑戰任務？', yes: 'YES', no: 'NO' },
-        formal_sources: { accept_psd_id: '1SqUYmbv5VfVWei1Gp4hoUFPDiynwoIPU', abandon_psd_id: '1eNgO2nsgtK9A4h6Ieak6WkYv6J232gWd' },
+        formal_ref: 'CHALLENGE-CARD',
         visual_rules: { panel_fill_opacity: 0.8, select_label_locked: true }
       }
     },
@@ -244,7 +244,7 @@
         '<button type="button" data-action="copy-json">複製 JSON 範例</button>' +
         '<button type="button" data-action="download-json">下載 JSON 範例</button>' +
       '</div>' +
-      '<details open><summary>JSON 範例｜可直接給 AI 照這個結構回覆</summary><pre></pre></details>' +
+      '<details><summary>JSON 範例｜需要時再展開</summary><pre></pre></details>' +
       '<div class="one-ai-json-guide__status" aria-live="polite"></div>';
     panel.querySelector('pre').textContent = exampleJson(guide);
     panel.querySelector('[data-action="copy-prompt"]').onclick = function () {
@@ -270,6 +270,13 @@
   }
 
   function insertBelowPreview(panel) {
+    var id = panel.getAttribute('data-one-ai-json-guide') || 'tool';
+    var utilities = document.querySelectorAll('[data-one-project-package-ui],[data-one-backup-ui],[data-one-batch-render-ui]');
+    var utilityAnchor = utilities.length ? utilities[utilities.length - 1] : null;
+    if (global.ONEAfterEditDock) {
+      global.ONEAfterEditDock.place(id, panel, { anchor: utilityAnchor });
+      return;
+    }
     var workspace = document.querySelector('.workspace');
     var grid = document.querySelector('.grid');
     var host = workspace || grid;
