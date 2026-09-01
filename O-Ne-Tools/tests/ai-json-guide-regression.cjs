@@ -61,7 +61,7 @@ assert.strictEqual(guide.example('thumbnail-frame').component_id, 'THUMBNAIL-FRA
 assert.strictEqual(guide.example('settlement-card').component_id, 'QST-03');
 assert.strictEqual(guide.example('move-card').segments.length, guide.example('move-card').stations.length - 1);
 assert.strictEqual(guide.guides['explanation-card'].version, 'V0.4.5');
-assert.strictEqual(guide.example('explanation-card').status, 'CANDIDATE');
+assert.strictEqual(guide.example('explanation-card').status, 'READY');
 assert.strictEqual(guide.example('explanation-card').data.mode, 'gallery');
 assert.strictEqual(guide.example('explanation-card').data.gallery.layout, 'triple');
 assert.strictEqual(guide.example('explanation-card').data.gallery.slots.length, 4);
