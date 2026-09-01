@@ -175,6 +175,9 @@
 
   window.ONECommandCenterProjectLinks={safeUrl,sanitizeProjects,decodeBootstrap,linkCount};
   if(!selectedProject)selectedProject=PROJECTS[0]||null;
+  $('#projectSearch').oninput=renderProjects;
+  $('#placeProject').oninput=updatePlace;
+  $('#placeType').onchange=updatePlace;
   renderProjects();
   renderProjectPanel();
   updatePlace();

@@ -19,6 +19,8 @@ assert(script.includes("const HASH_PREFIX='#one-private-links='"),'one-click loc
 assert(script.includes("history.replaceState(null,'',location.pathname+location.search)"),'private hash is not stripped');
 assert(script.includes('rel="noopener noreferrer"'),'direct links are missing opener protection');
 assert(script.includes('直接開啟 ${esc(FIELD_LABELS[field])}'),'placement direct link is missing');
+assert(script.includes("$('#placeProject').oninput=updatePlace"),'placement event is not rebound to the enhanced renderer');
+assert(script.includes("$('#projectSearch').oninput=renderProjects"),'project search is not rebound to the enhanced renderer');
 assert(css.includes('.project-link-grid'),'project-link UI styles are missing');
 
 const privateId=/https:\/\/(?:drive\.google\.com\/drive\/folders|docs\.google\.com\/document\/d)\/[A-Za-z0-9_-]{15,}/;
