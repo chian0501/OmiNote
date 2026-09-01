@@ -11,11 +11,13 @@
 .mode-btn span{margin-top:3px;color:#8f9aa8;font-size:9px}
 .mode-btn:hover,.mode-btn.is-active{border-color:#29a6a7;background:#12383d;color:#9ff1e7}
 .mode-btn.is-active span{color:#a9dcd8}
-.template-presets{margin-top:8px;border-top:1px solid #26313e}
+.template-presets{margin-top:10px;padding-top:10px;border-top:1px solid #26313e}
 .template-presets[hidden]{display:none}
-.template-presets>summary{padding:9px 2px 2px;color:#9aa8b4;font-size:10px;font-weight:800;cursor:pointer;list-style:none}
-.template-presets>summary:after{content:'展開';float:right;color:#70ded3;font-size:9px}
-.template-presets[open]>summary:after{content:'收合'}
+.template-presets-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.template-presets-head strong,.template-presets-head small{display:block}
+.template-presets-head strong{color:#f3f0ea;font-size:10px}
+.template-presets-head small{margin-top:3px;color:#8f9aa8;font-size:8px;line-height:1.45}
+.template-presets-head>span{flex:0 0 auto;padding:3px 7px;border:1px solid #2b686d;border-radius:999px;background:#12383d;color:#9ff1e7;font-size:8px;font-weight:850}
 .template-presets .template-buttons{padding-top:8px}
 .template-btn[data-template="gallery"]{display:none}
 

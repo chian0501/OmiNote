@@ -1,7 +1,7 @@
 'use strict';
 
 (function installGalleryMode(){
-  const VERSION='V0.4.4_20260901';
+  const VERSION='V0.4.5_20260901';
   const GALLERY_LAYOUTS={
     single:{label:'單張大圖',count:1,hint:'一張圖放滿圖片區；可搭配「大圖 820px」接近 16:9。'},
     split:{label:'左右雙圖',count:2,hint:'兩張圖左右等寬，適合前後、A／B 或台日對照。'},
@@ -723,8 +723,8 @@
 
   exportJson=function(){
     const payload={
-      schema:'o-ne.explanation-card.formal.v0.4.4',
-      status:'READY',
+      schema:'o-ne.explanation-card.formal.v0.4.5',
+      status:'CANDIDATE',
       generator_version:VERSION,
       component:{
         width:CARD_WIDTH,
@@ -803,15 +803,15 @@
   }
 
   function installVersionUi(){
-    document.title='O-Ne 說明卡生成器 V0.4.4 READY';
+    document.title='O-Ne 說明卡生成器 V0.4.5 CANDIDATE';
     const version=document.querySelector('.title-line h1 span');
-    if(version)version.textContent='V0.4.4';
+    if(version)version.textContent='V0.4.5';
     const badge=document.querySelector('.title-line .badge');
-    if(badge){badge.textContent='READY';badge.classList.remove('is-candidate');badge.classList.add('is-ready');}
+    if(badge){badge.textContent='CANDIDATE';badge.classList.remove('is-ready');badge.classList.add('is-candidate');}
     const description=document.querySelector('.title-block p');
-    if(description)description.textContent='正式版：純圖片直接鋪滿字卡下半部，並把模式、編輯與輸出整理成單一路徑。';
+    if(description)description.textContent='候選版：恢復原有一般說明範本為常駐入口；滿版圖片字卡與精簡工具流程維持不變。';
     const status=document.querySelector('.status');
-    if(status)status.textContent='V0.4.4 READY｜滿版圖片字卡｜UI 整併';
+    if(status)status.textContent='V0.4.5 CANDIDATE｜一般範本直接可見';
   }
 
   function runGalleryQa(){
@@ -824,6 +824,15 @@
       const fakeContext=fake.getContext('2d');
       fakeContext.fillStyle='#3F8FB7';
       fakeContext.fillRect(0,0,fake.width,fake.height);
+      state=cleanState({
+        ...clone(defaults),
+        mode:'content',
+        templateId:'standard',
+        blocks:TEMPLATES.standard.make()
+      });
+      renderEditor();
+      const templatePicker=$('contentTemplatePicker');
+      if(templatePicker.hidden||templatePicker.tagName==='DETAILS'||$('templateButtons').children.length<6)throw new Error('visible content template picker');
       state=cleanState({
         ...clone(defaults),
         mode:'gallery',
@@ -856,7 +865,7 @@
       const saveDock=document.querySelector('.save-dock');
       if(!saveDock||saveDock.parentElement!==$('editorScroll')||saveDock!==$('editorScroll').lastElementChild)throw new Error('save tools below editor');
       organizeUi();
-      $('qaResult').textContent='PASS｜gallery layouts｜full bleed image body｜no inner frame｜free crop｜compact mode UI｜save tools below editor｜header alignment｜project assets';
+      $('qaResult').textContent='PASS｜visible content templates｜gallery layouts｜full bleed image body｜no inner frame｜free crop｜compact mode UI｜save tools below editor｜header alignment｜project assets';
       document.body.dataset.qa='pass';
     }catch(error){
       $('qaResult').textContent='FAIL｜'+error.message;

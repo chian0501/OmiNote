@@ -122,7 +122,7 @@ const tools = [
   ['dialogue-card-v135.html', 'dialogue-card', 'V1.3.7'],
   ['rating-card.html', 'rating-card', 'V1.3.1'],
   ['focus-card.html', 'focus-card', 'V0.5.15'],
-  ['explanation-card.html', 'explanation-card', 'V0.4.4'],
+  ['explanation-card.html', 'explanation-card', 'V0.4.5'],
   ['thumbnail-frame.html', 'thumbnail-frame', 'V1.2.6'],
   ['settlement-card.html', 'settlement-card', 'V0.1.3']
 ];
@@ -174,10 +174,10 @@ for (const file of ['edit-backup-v1.js', 'settlement-card-v011.js']) {
 assert.deepStrictEqual(syntaxFailures, []);
 
 const registry = JSON.parse(fs.readFileSync(path.join(root, 'one-tools-registry-v1.json'), 'utf8'));
-assert.strictEqual(registry.version, 'V2.30_20260901');
+assert.strictEqual(registry.version, 'V2.31_20260901');
 assert.strictEqual(registry.total, 18);
-assert.strictEqual(registry.ready, 13);
-assert.strictEqual(registry.candidate, 0);
+assert.strictEqual(registry.ready, 12);
+assert.strictEqual(registry.candidate, 1);
 const registryIds = ['general', 'trigger', 'persistent', 'effect', 'move', 'choice', 'challenge', 'dialogue', 'rating', 'focus', 'explanation', 'thumbnail-frame', 'settlement'];
 for (const id of registryIds) {
   const entry = registry.tools.find(tool => tool.id === id);

@@ -17,10 +17,10 @@ for (const [file, source] of Object.entries(sources)) {
   assert.doesNotThrow(() => new Function(source), `${file} must parse`);
 }
 
-assert(html.includes('<title>O-Ne 說明卡生成器 V0.4.4 READY</title>'), 'ready version must be visible');
+assert(html.includes('<title>O-Ne 說明卡生成器 V0.4.5 CANDIDATE</title>'), 'candidate version must be visible');
 assert(html.includes('edit-backup-v1.js?v=1219'), 'shared manual backup library must load');
-assert(html.includes('explanation-card-v040.css?v=044'), 'gallery CSS must load');
-assert(html.includes('explanation-card-v040.js?v=0442'), 'gallery runtime must load with the READY cache key');
+assert(html.includes('explanation-card-v040.css?v=045'), 'gallery CSS must load');
+assert(html.includes('explanation-card-v040.js?v=0451'), 'gallery runtime must load with the candidate cache key');
 const editorScrollStart = html.indexOf('<div class="editor-scroll" id="editorScroll">');
 const editorScrollEnd = html.indexOf('</div></aside>', editorScrollStart);
 const saveDockIndex = html.indexOf('<section class="save-dock">');
@@ -28,6 +28,9 @@ assert(editorScrollStart >= 0 && editorScrollEnd > editorScrollStart, 'editor sc
 assert(saveDockIndex > html.indexOf('<section class="word-page-wrap">') && saveDockIndex < editorScrollEnd, 'save tools must live at the bottom of the editor scroll region');
 assert(html.includes('<span class="save-badge">最後一步</span>'), 'save tools must be presented as the last step');
 assert(html.includes('data-card-mode="content"') && html.includes('data-card-mode="gallery"'), 'content and gallery must be separate mode choices');
+assert(html.includes('<div class="template-presets" id="contentTemplatePicker"'), 'content templates must be visible without opening a details control');
+assert(html.includes('選擇一般說明版型') && html.includes('點一下立即套用'), 'the original content template picker must explain direct application');
+assert(!html.includes('<details class="template-presets"'), 'content templates must not be hidden in a collapsed control');
 assert(html.includes('<details class="legacy-save-tools">'), 'legacy project formats and reset must be collapsed');
 
 assert(combined.includes('const CARD_WIDTH=1552,MIN_HEIGHT=724'), 'formal explanation card dimensions must remain available');
@@ -46,8 +49,8 @@ assert(gallerySource.includes('gallery_images_max:4'), 'gallery must stay bounde
 assert(gallerySource.includes('gallery_per_image_free_crop:true'), 'JSON metadata must declare independent free crop');
 assert(gallerySource.includes('gallery_free_crop_unlocked_aspect:true'), 'JSON metadata must declare unlocked crop aspect');
 assert(gallerySource.includes('payload.assets.gallery=galleryAssets.map(galleryAssetPayload)'), 'project file must embed gallery assets');
-assert(gallerySource.includes("schema:'o-ne.explanation-card.formal.v0.4.4'"), 'formal JSON schema must be versioned');
-assert(gallerySource.includes("status:'READY'"), 'released formal JSON must be ready');
+assert(gallerySource.includes("schema:'o-ne.explanation-card.formal.v0.4.5'"), 'formal JSON schema must be versioned');
+assert(gallerySource.includes("status:'CANDIDATE'"), 'candidate formal JSON must be marked candidate');
 assert(gallerySource.includes("context.fillStyle='rgba(31,23,19,.80)'"), 'gallery card body must keep the formal 80% fill opacity');
 assert(gallerySource.includes('gallery_full_bleed_below_header:true'), 'JSON metadata must declare the full-bleed image body');
 assert(gallerySource.includes('gallery_inner_frame:false'), 'JSON metadata must declare that the inner gallery frame is removed');
@@ -144,9 +147,10 @@ assert(css.includes('.gallery-free-crop canvas'), 'per-image crop canvas must be
 assert(css.includes('.gallery-mode .image-trigger'), 'left-image control must be hidden in gallery mode');
 assert(css.includes('.gallery-mode .word-page{min-height:0'), 'gallery title editor must stay compact');
 assert(css.includes('.mode-buttons'), 'mode picker must be styled as the primary entry');
+assert(css.includes('.template-presets-head'), 'visible content template guidance must be styled');
 assert(css.includes('.gallery-slot-adjust'), 'per-image adjustment controls must be collapsible');
 assert(css.includes('.save-tool-details'), 'batch output must be collapsible');
 assert(css.includes('.editor-scroll>.save-dock{margin:4px 16px 18px'), 'bottom save tools must be styled as the last editor card');
 assert(!css.includes('.gallery-mode .save-dock{max-height:'), 'save tools must no longer reserve a fixed block above the editor');
 
-console.log('PASS: explanation-card V0.4.4 READY removes the inner gallery frame and consolidates the editing UI.');
+console.log('PASS: explanation-card V0.4.5 CANDIDATE restores the visible content template picker without changing the full-bleed gallery.');
