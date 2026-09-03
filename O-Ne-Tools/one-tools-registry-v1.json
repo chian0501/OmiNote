@@ -510,14 +510,15 @@
         "content_progressive_reveal_project_zip_regression": "pass_four_assets_restore_to_matching_steps_and_settings",
         "content_progressive_reveal_batch_export_regression": "pass_same_size_png_zip",
         "primary_instruction_legibility_regression": "pass_editor12px_mode15px_helper11px_advanced13px",
-        "browser_visual": "pass_public_v049_run_309",
+        "browser_visual": "pass_public_v049_project_zip_run_311",
         "browser_interaction": "pass_3_per_step_images_restore_and_same_1552x724",
         "browser_batch_export": "pass_3_png_same_1552x724",
         "browser_project_download": "pass_onecard_3_assets_and_independent_settings",
+        "browser_project_zip_collection": "pass_3_generated_step_assets_collected",
         "editor_viewport_px": "cloud_browser_default_20260903",
         "save_dock_parent": "editorScroll_last_child",
         "save_dock_visible_at_initial_scroll": false,
-        "public_pages_run": "pass_run_309",
+        "public_pages_run": "pass_run_311",
         "release_gate": "omi_approved_direct_main_v049_project_zip_hotfix",
         "app_console_errors": 0
       }
