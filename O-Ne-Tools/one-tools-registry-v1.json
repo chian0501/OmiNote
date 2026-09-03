@@ -1,5 +1,5 @@
 {
-  "version": "V2.36_20260901",
+  "version": "V2.37_20260903",
   "ui_shell_version": "V1.3.1_20260901",
   "public_boundary": "semantic_references_only",
   "principle": "one_function_one_entry",
@@ -420,7 +420,7 @@
       "group": "資訊／閱讀",
       "desc": "逐步畫面可讓每個文字項目切換自己的左圖與裁切設定；整張卡與左圖框固定不跳動",
       "status": "ready",
-      "href": "./explanation-card.html?v=049&build=per-step-image-lock-ready-v1&ui=131",
+      "href": "./explanation-card.html?v=0491&build=per-step-project-package-ready-v1&ui=131",
       "features": [
         "official_explanation_card_family",
         "independent_from_focus_card",
@@ -445,6 +445,7 @@
         "content_progressive_reveal_step_filename",
         "content_progressive_reveal_export_all_png_zip",
         "content_progressive_reveal_onecard_embeds_all_images",
+        "content_progressive_reveal_project_zip_embeds_all_images",
         "image_only_gallery_mode",
         "gallery_single_large_image",
         "gallery_split_two_images",
@@ -506,6 +507,7 @@
         "content_progressive_reveal_left_frame_regression": "pass_same_image_geometry_all_steps",
         "content_progressive_reveal_per_step_image_regression": "pass_independent_image_and_crop_per_body_block",
         "content_progressive_reveal_project_regression": "pass_onecard_embeds_all_step_images_and_settings",
+        "content_progressive_reveal_project_zip_regression": "pass_four_assets_restore_to_matching_steps_and_settings",
         "content_progressive_reveal_batch_export_regression": "pass_same_size_png_zip",
         "primary_instruction_legibility_regression": "pass_editor12px_mode15px_helper11px_advanced13px",
         "browser_visual": "pass_public_v049_run_309",
@@ -516,7 +518,7 @@
         "save_dock_parent": "editorScroll_last_child",
         "save_dock_visible_at_initial_scroll": false,
         "public_pages_run": "pass_run_309",
-        "release_gate": "omi_approved_direct_main_v049",
+        "release_gate": "omi_approved_direct_main_v049_project_zip_hotfix",
         "app_console_errors": 0
       }
     },
@@ -669,7 +671,7 @@
     "image_restore_policy": "text_and_settings_restore; uploaded_image_files_must_be_selected_again"
   },
   "shared_project_package": {
-    "version": "V1.3.1_20260901",
+    "version": "V1.3.2_20260903",
     "tool_count": 13,
     "filename_pattern": "{card_category}-{title}-{state}.{ext}",
     "brand_prefix_in_filename": false,
@@ -680,7 +682,9 @@
       "zip"
     ],
     "same_title_variant_safe": true,
-    "legacy_json_compatible": true
+    "legacy_json_compatible": true,
+    "virtual_asset_adapter": true,
+    "per_step_asset_restore": true
   },
   "shared_batch_render": {
     "version": "V1.3.1_20260901",

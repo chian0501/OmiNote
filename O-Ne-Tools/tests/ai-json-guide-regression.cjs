@@ -80,7 +80,7 @@ assert(guide.guides['explanation-card'].values.some(value => value.includes('同
 assert(guide.guides['explanation-card'].values.some(value => value.includes('內嵌每一步圖片')));
 for (const id of ['rating-card','focus-card','explanation-card','thumbnail-frame','settlement-card']) {
   assert.strictEqual(guide.guides[id].image, true, id + ' must warn that image binaries require project ZIP');
-  if (id === 'explanation-card') assert(guide.prompt(id).includes('完整專案 ZIP') && guide.prompt(id).includes('.onecard'), id + ' must mention the primary ZIP and compatible .onecard formats');
+  if (id === 'explanation-card') assert(guide.prompt(id).includes('完整專案 ZIP 與 .onecard 都會內嵌每一步圖片') && guide.prompt(id).includes('舊專案相容'), id + ' must explain that ZIP now embeds every step image while .onecard remains compatible');
   else assert(guide.prompt(id).includes('專案 ZIP'), id + ' must mention project ZIP for image handoff');
 }
 assert(guideSource.includes('給 AI 的 JSON 格式'));
@@ -92,6 +92,6 @@ assert(guideSource.includes('<details><summary>JSON 範例｜需要時再展開'
 assert(!guideSource.includes('<details open>'), 'large JSON preview must not consume initial editor space');
 assert(guideSource.includes('ONEEditBackup.__aiJsonGuideWrapped'), 'shared edit-backup tools must mount the AI guide');
 assert(guideSource.includes('ONEProjectPackage.__aiJsonGuideWrapped'), 'persistent/project-package path must mount the AI guide');
-assert(packageSource.includes('ai-json-guide-v1.js?v=1310'), 'project package must synchronously load the cache-busted AI JSON guide');
+assert(packageSource.includes('ai-json-guide-v1.js?v=1311'), 'project package must synchronously load the cache-busted AI JSON guide');
 new Function(guideSource);
 console.log('PASS: 13 AI JSON schemas, raw JSON handoff instructions, image ZIP notes, completion-dock placement and syntax.');

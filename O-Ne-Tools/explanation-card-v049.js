@@ -287,6 +287,101 @@
     });
   }
 
+  const SEQUENCE_PACKAGE_KEY='sequence-step:';
+
+  function sequencePackageKey(blockId){
+    return `${SEQUENCE_PACKAGE_KEY}${encodeURIComponent(String(blockId||''))}`;
+  }
+
+  function sequenceBlockIdFromPackageKey(key){
+    const value=String(key||'');
+    if(!value.startsWith(SEQUENCE_PACKAGE_KEY))return '';
+    try{return decodeURIComponent(value.slice(SEQUENCE_PACKAGE_KEY.length));}
+    catch(error){return '';}
+  }
+
+  function sequenceFileFromAsset(asset,index){
+    const source=String(asset&&asset.data_url||'');
+    const comma=source.indexOf(',');
+    if(comma<0)throw new Error(`第 ${index+1} 項左圖資料不完整。`);
+    const header=source.slice(0,comma);
+    const body=source.slice(comma+1);
+    const mimeType=String(asset.mime_type||(header.match(/^data:([^;,]+)/)||[])[1]||'image/png');
+    let bytes;
+    if(/;base64$/i.test(header)){
+      const binary=atob(body);
+      bytes=new Uint8Array(binary.length);
+      for(let offset=0;offset<binary.length;offset++)bytes[offset]=binary.charCodeAt(offset);
+    }else{
+      bytes=new TextEncoder().encode(decodeURIComponent(body));
+    }
+    return new File([bytes],String(asset.name||`step-${index+1}.png`),{type:mimeType});
+  }
+
+  function sequenceDataUrlFromFile(file){
+    return new Promise((resolve,reject)=>{
+      const reader=new FileReader();
+      reader.onload=()=>resolve(String(reader.result||''));
+      reader.onerror=()=>reject(new Error(`圖片 ${file&&file.name||''} 無法讀取。`));
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function sequencePackageAssets(){
+    if(!sequenceIsActive())return{excludeKeyPrefixes:[SEQUENCE_PACKAGE_KEY],assets:[]};
+    saveActiveSequenceFrame();
+    reconcileSequenceFrames();
+    const assets=state.sequence.frames.map(sequenceAssetPayload).map((asset,index)=>asset?{
+      key:sequencePackageKey(asset.block_id),
+      index,
+      file:sequenceFileFromAsset(asset,index)
+    }:null).filter(Boolean);
+    return{
+      excludeKeys:['id:explanationImage'],
+      excludeKeyPrefixes:[SEQUENCE_PACKAGE_KEY],
+      assets
+    };
+  }
+
+  async function restoreSequencePackageAsset(item){
+    const blockId=sequenceBlockIdFromPackageKey(item&&item.key);
+    if(!blockId||!item.file)return false;
+    reconcileSequenceFrames();
+    const frame=frameByBlockId(blockId);
+    const index=state.sequence.frames.findIndex(candidate=>candidate.blockId===blockId);
+    if(!frame||index<0)return false;
+    const dataUrl=await sequenceDataUrlFromFile(item.file);
+    await restoreSequenceAsset({
+      block_id:blockId,
+      name:item.file.name,
+      mime_type:item.file.type||'image/png',
+      data_url:dataUrl
+    },frame,index);
+    return true;
+  }
+
+  function installProjectPackageAdapter(attempt=0){
+    const packageApi=window.ONEProjectPackage;
+    if(!packageApi||typeof packageApi.setAssetAdapter!=='function'){
+      if(attempt<20)setTimeout(()=>installProjectPackageAdapter(attempt+1),100);
+      return;
+    }
+    packageApi.setAssetAdapter('explanation-card',{
+      prepareExport:()=>{if(sequenceIsActive())saveActiveSequenceFrame();},
+      exportAssets:sequencePackageAssets,
+      beforeImport:()=>{sequenceAssets.clear();activeSequenceBlockId=null;},
+      restoreAsset:restoreSequencePackageAsset,
+      afterImport:()=>{
+        activeSequenceBlockId=null;
+        if(sequenceIsActive())activateSequenceStep(activeFrameIndex(),{saveCurrent:false});
+        renderEditor();
+        renderCanvas();
+        renderCropper();
+        renderImageLivePreview();
+      }
+    });
+  }
+
   const loadProjectPayloadV048=loadProjectPayload;
   loadProjectPayload=async function(payload){
     await loadProjectPayloadV048(payload);
@@ -403,6 +498,7 @@
         content_sequence_height_independent_from_step_images:true,
         content_sequence_stable_left_image_frame:true,
         content_sequence_export_all_png_zip:true,
+        content_sequence_project_zip_embeds_all_images:true,
         content_image_vertical_align:['top','center','bottom'],
         content_image_manual_zoom_range:[25,300],
         content_image_prevent_automatic_upscale_modes:['contain','free'],
@@ -493,7 +589,7 @@
         context.fillStyle=fakeColors[index];
         context.fillRect(0,0,fake.width,fake.height);
         frame.image={...normalizeImageSettings(defaults.image),name:`qa-step-${index+1}.png`,fit:index===1?'free':'cover',cropX:index===1?10:0,cropY:index===1?12:0,cropWidth:index===1?70:100,cropHeight:index===1?68:100};
-        sequenceAssets.set(frame.blockId,{name:frame.image.name,dataUrl:`data:image/png;base64,qa-${index+1}`,mimeType:'image/png',element:fake});
+        sequenceAssets.set(frame.blockId,{name:frame.image.name,dataUrl:fake.toDataURL('image/png'),mimeType:'image/png',element:fake});
       });
       activeSequenceBlockId=null;
       activateSequenceStep(0,{saveCurrent:false});
@@ -506,7 +602,9 @@
       if(state.image.name!=='qa-step-2.png'||state.image.fit!=='free'||state.image.cropWidth!==70)throw new Error('per-step crop settings did not return');
       const payload=projectPayload();
       if((payload.assets.sequence_images||[]).filter(Boolean).length!==3)throw new Error('project did not embed every step image');
-      $('qaResult').textContent='PASS｜per-step left image｜per-step crop memory｜stable full card and image frame｜project embeds sequence images｜export all ZIP';
+      const packageAssets=sequencePackageAssets();
+      if(packageAssets.assets.length!==3||packageAssets.assets.some((asset,index)=>asset.index!==index||!asset.key.startsWith(SEQUENCE_PACKAGE_KEY)))throw new Error('project ZIP did not collect every step image');
+      $('qaResult').textContent='PASS｜per-step left image｜per-step crop memory｜stable full card and image frame｜onecard + project ZIP embed every sequence image｜export all ZIP';
       document.body.dataset.qa='pass';
     }catch(error){
       $('qaResult').textContent='FAIL｜'+error.message;
@@ -529,6 +627,7 @@
   reconcileSequenceFrames();
   installVersionUi();
   installSequenceHandlers();
+  installProjectPackageAdapter();
   renderEditor();
   if(sequenceIsActive())activateSequenceStep(activeFrameIndex(),{saveCurrent:false});
   renderCanvas();
@@ -547,7 +646,7 @@
     loadProjectPayload,
     exportAllSequencePngs,
     runQa:runSequenceQa,
-    __test:{normalizeImageSettings,normalizeSequenceFrames,missingSequenceSteps}
+    __test:{normalizeImageSettings,normalizeSequenceFrames,missingSequenceSteps,sequencePackageKey,sequenceBlockIdFromPackageKey}
   };
 
   if(new URLSearchParams(location.search).get('qa')==='1')setTimeout(runSequenceQa,300);

@@ -19,10 +19,10 @@ for (const [file, source] of Object.entries(sources)) {
 }
 
 assert(html.includes('<title>O-Ne 說明卡生成器 V0.4.9 READY</title>'), 'ready version must be visible');
-assert(html.includes('edit-backup-v1.js?v=1310'), 'shared manual backup library must load');
+assert(html.includes('edit-backup-v1.js?v=1320'), 'shared manual backup library must load the project-asset adapter release');
 assert(html.includes('explanation-card-v040.css?v=049'), 'gallery CSS must load with the current cache key');
 assert(html.includes('explanation-card-v040.js?v=049'), 'gallery runtime must load with the READY cache key');
-assert(html.includes('explanation-card-v049.js?v=049'), 'per-step image runtime must load after the gallery runtime');
+assert(html.includes('explanation-card-v049.js?v=0491'), 'per-step image runtime hotfix must load after the gallery runtime');
 const editorScrollStart = html.indexOf('<div class="editor-scroll" id="editorScroll">');
 const editorScrollEnd = html.indexOf('</div></aside>', editorScrollStart);
 const saveDockIndex = html.indexOf('<section class="save-dock">');
@@ -62,7 +62,12 @@ assert(sequenceImageSource.includes('if(sequenceIsActive())return null'), 'per-s
 assert(sequenceImageSource.includes('payload.assets.sequence_images=(state.sequence.frames||[]).map(sequenceAssetPayload)'), 'onecard must embed every step image');
 assert(sequenceImageSource.includes('content_sequence_per_step_crop_settings:true'), 'formal JSON must declare independent crop settings per step');
 assert(sequenceImageSource.includes('content_sequence_export_all_png_zip:true'), 'formal JSON must declare one-click PNG ZIP export');
+assert(sequenceImageSource.includes('content_sequence_project_zip_embeds_all_images:true'), 'formal JSON must declare complete per-step project ZIP assets');
 assert(sequenceImageSource.includes('async function exportAllSequencePngs()'), 'sequence mode must provide a one-click batch PNG export');
+assert(sequenceImageSource.includes("excludeKeys:['id:explanationImage']"), 'project ZIP must replace the single active file input with per-step assets');
+assert(sequenceImageSource.includes('excludeKeyPrefixes:[SEQUENCE_PACKAGE_KEY]'), 'project ZIP must discard stale per-step assets before rebuilding the package');
+assert(sequenceImageSource.includes("packageApi.setAssetAdapter('explanation-card'"), 'explanation card must register its reversible project ZIP adapter');
+assert(sequenceImageSource.includes('restoreAsset:restoreSequencePackageAsset'), 'project ZIP loading must route each image back to its own step');
 assert(sequenceImageSource.includes("schema:'o-ne.explanation-card.formal.v0.4.9'"), 'formal JSON schema must include the per-step image release');
 assert(combined.includes("saveMode:'manual'"), 'history must remain manual');
 assert(combined.includes("schema:'o-ne.explanation-card.project.v1'"), 'portable project schema must remain compatible');
@@ -148,6 +153,19 @@ assert.strictEqual(normalizedFrames[2].image.name, 'c.png', 'reordered body bloc
 assert.strictEqual(normalizedFrames[2].image.cropWidth, 62, 'each frame must retain its own free crop');
 normalizedFrames[0].image.zoom = 210;
 assert.strictEqual(normalizedFrames[2].image.zoom, 145, 'frame image settings must be independent objects');
+
+const sequencePackageContext = { encodeURIComponent, decodeURIComponent, File, Uint8Array, atob, TextEncoder };
+vm.runInNewContext(
+  `const SEQUENCE_PACKAGE_KEY='sequence-step:';${extractFunction(sequenceImageSource, 'sequencePackageKey')};${extractFunction(sequenceImageSource, 'sequenceBlockIdFromPackageKey')};${extractFunction(sequenceImageSource, 'sequenceFileFromAsset')};this.sequencePackageKey=sequencePackageKey;this.sequenceBlockIdFromPackageKey=sequenceBlockIdFromPackageKey;this.sequenceFileFromAsset=sequenceFileFromAsset;`,
+  sequencePackageContext
+);
+const encodedStepKey = sequencePackageContext.sequencePackageKey('步驟 A/1');
+assert.strictEqual(encodedStepKey, 'sequence-step:%E6%AD%A5%E9%A9%9F%20A%2F1', 'project ZIP keys must safely preserve the body block id');
+assert.strictEqual(sequencePackageContext.sequenceBlockIdFromPackageKey(encodedStepKey), '步驟 A/1', 'project ZIP keys must restore the original body block id');
+const packedStepFile = sequencePackageContext.sequenceFileFromAsset({ name: 'step.png', mime_type: 'image/png', data_url: 'data:image/png;base64,AQID' }, 0);
+assert.strictEqual(packedStepFile.name, 'step.png');
+assert.strictEqual(packedStepFile.type, 'image/png');
+assert.strictEqual(packedStepFile.size, 3, 'embedded step image bytes must become a real package asset without recompression');
 
 const layoutContext = {};
 vm.runInNewContext(`${extractFunction(gallerySource, 'galleryRects')};this.galleryRects=galleryRects;`, layoutContext);

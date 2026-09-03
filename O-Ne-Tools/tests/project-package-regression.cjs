@@ -18,6 +18,7 @@ const context = {
   ArrayBuffer,
   DataView,
   Blob,
+  File,
   URL,
   Date,
   JSON,
@@ -44,7 +45,7 @@ vm.runInContext(helperSource, context, { filename: 'project-package-v1.js' });
 
 const helper = context.ONEProjectPackage;
 assert(helper, 'project package helper must load');
-assert.strictEqual(helper.version, '1.3.1');
+assert.strictEqual(helper.version, '1.3.2');
 assert.strictEqual(helper.schema, 'o-ne.project-package.v1');
 assert.strictEqual(helper.__test.cleanPart('道頓堀/觀光船:晚班'), '道頓堀 觀光船 晚班');
 assert.strictEqual(helper.__test.toolName('focus-card'), '焦點卡');
@@ -89,7 +90,69 @@ assert(helperSource.indexOf('instance.config.apply(clone(project.data));') < hel
   assert.strictEqual(new TextDecoder().decode(entries['焦點卡_道頓堀.json']), '{"ok":true}');
   assert.deepStrictEqual(Array.from(entries['assets/route.png']), [137, 80, 78, 71]);
 
-  assert(backupSource.includes('project-package-v1.js?v=1310'), 'shared backup must synchronously bridge to the cache-busted project package helper');
+  const currentImage = { name: 'current.png', type: 'image/png', size: 11 };
+  const stepOne = { name: 'step-01.png', type: 'image/png', size: 21 };
+  const stepTwo = { name: 'step-02.png', type: 'image/png', size: 22 };
+  const gathered = await helper.__test.gatherAssets({
+    assets: {
+      'id:explanationImage': [currentImage],
+      'sequence-step:stale': [{ name: 'stale.png', type: 'image/png', size: 9 }]
+    },
+    assetAdapter: {
+      exportAssets() {
+        return {
+          excludeKeys: ['id:explanationImage'],
+          excludeKeyPrefixes: ['sequence-step:'],
+          assets: [
+            { key: 'sequence-step:one', file: stepOne },
+            { key: 'sequence-step:two', file: stepTwo }
+          ]
+        };
+      }
+    }
+  });
+  assert.deepStrictEqual(Array.from(gathered, item => item.key), ['sequence-step:one', 'sequence-step:two'], 'virtual step assets must replace the current input and any stale step assets');
+  assert.strictEqual(typeof helper.setAssetAdapter, 'function', 'tools must be able to register a reversible project-asset adapter');
+
+  const project = {
+    schema: 'o-ne.project-package.v1',
+    package_version: '1.3.2',
+    tool_id: 'explanation-card',
+    data: { sequence: { enabled: true, visibleCount: 4, frames: [{ zoom: 80 }, { zoom: 100 }, { zoom: 125 }, { zoom: 160 }] } },
+    assets: [1, 2, 3, 4].map(step => ({
+      input_key: `sequence-step:step-${step}`,
+      file_name: `step-${step}.png`,
+      mime_type: 'image/png',
+      zip_path: `assets/step-${step}.png`
+    }))
+  };
+  const packageBlob = await helper.__test.makeZip([
+    { name: '說明卡-逐步圖文.json', data: JSON.stringify(project) },
+    ...[1, 2, 3, 4].map(step => ({ name: `assets/step-${step}.png`, data: new Uint8Array([step, step + 10]) }))
+  ]);
+  const lifecycle = [];
+  const restoredKeys = [];
+  const instance = {
+    id: 'explanation-card',
+    config: { apply(snapshot) { lifecycle.push(`apply:${snapshot.sequence.visibleCount}`); } },
+    assets: Object.create(null),
+    assetAdapter: {
+      beforeImport() { lifecycle.push('before'); },
+      restoreAsset(item) { restoredKeys.push(item.key); lifecycle.push(`restore:${item.key}`); return true; },
+      afterImport(result) { lifecycle.push(`after:${result.restored}/${result.missing}`); }
+    },
+    status: null,
+    fileInput: null
+  };
+  await helper.__test.importPackage(instance, new File([packageBlob], 'project.zip', { type: 'application/zip' }));
+  assert.deepStrictEqual(restoredKeys, [1, 2, 3, 4].map(step => `sequence-step:step-${step}`), 'all four virtual step images must be handed back to the tool adapter');
+  assert.deepStrictEqual(lifecycle, [
+    'apply:4', 'before',
+    'restore:sequence-step:step-1', 'restore:sequence-step:step-2', 'restore:sequence-step:step-3', 'restore:sequence-step:step-4',
+    'apply:4', 'after:4/0'
+  ], 'project settings, four images and final rendering hook must restore in a stable order');
+
+  assert(backupSource.includes('project-package-v1.js?v=1320'), 'shared backup must synchronously bridge to the cache-busted project package helper');
   assert(backupSource.includes("version: '1.3.1'"), 'shared backup must expose the current UI-shell version');
 
   const sharedEditors = [
@@ -99,7 +162,7 @@ assert(helperSource.indexOf('instance.config.apply(clone(project.data));') < hel
   ];
   for (const file of sharedEditors) {
     const html = fs.readFileSync(path.join(root, file), 'utf8');
-    const backupVersion = 'edit-backup-v1.js?v=1310';
+    const backupVersion = file === 'explanation-card.html' ? 'edit-backup-v1.js?v=1320' : 'edit-backup-v1.js?v=1310';
     assert(html.includes(backupVersion), file + ' must still load the shared backup bridge');
   }
 

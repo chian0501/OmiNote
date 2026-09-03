@@ -1,4 +1,4 @@
-/* O-Ne shared project package / smart download names — V1.3.1 */
+/* O-Ne shared project package / smart download names — V1.3.2 */
 (function (global) {
   'use strict';
 
@@ -17,7 +17,7 @@
   }
   ensureSharedUi();
 
-  var VERSION = '1.3.1';
+  var VERSION = '1.3.2';
   var PACKAGE_SCHEMA = 'o-ne.project-package.v1';
   var MAX_PACKAGE_BYTES = 200 * 1024 * 1024;
   var mounts = Object.create(null);
@@ -385,7 +385,7 @@
     document.addEventListener('change', instance.assetListener, true);
   }
 
-  function gatherAssets(instance) {
+  async function gatherAssets(instance) {
     var result = [];
     Object.keys(instance.assets).forEach(function (key) {
       (instance.assets[key] || []).forEach(function (file, index) {
@@ -399,6 +399,23 @@
         if (!duplicate) result.push({ key: key, index: fileIndex, file: file });
       });
     });
+
+    var adapter = instance.assetAdapter;
+    if (adapter && typeof adapter.exportAssets === 'function') {
+      var provided = await adapter.exportAssets();
+      var extraAssets = Array.isArray(provided) ? provided : (provided && provided.assets || []);
+      var excludeKeys = Array.isArray(provided && provided.excludeKeys) ? provided.excludeKeys.map(String) : [];
+      var excludeKeyPrefixes = Array.isArray(provided && provided.excludeKeyPrefixes) ? provided.excludeKeyPrefixes.map(String) : [];
+      var replacementKeys = extraAssets.map(function (item) { return String(item && item.key || ''); }).filter(Boolean);
+      result = result.filter(function (item) {
+        var prefixExcluded = excludeKeyPrefixes.some(function (prefix) { return item.key.indexOf(prefix) === 0; });
+        return !prefixExcluded && excludeKeys.indexOf(item.key) < 0 && replacementKeys.indexOf(item.key) < 0;
+      });
+      extraAssets.forEach(function (item, index) {
+        if (!item || !item.key || !isImageFile(item.file)) return;
+        result.push({ key: String(item.key), index: Number.isFinite(item.index) ? item.index : index, file: item.file });
+      });
+    }
     return result;
   }
 
@@ -599,11 +616,14 @@
 
   async function exportPackage(instance) {
     try {
+      if (instance.assetAdapter && typeof instance.assetAdapter.prepareExport === 'function') {
+        await instance.assetAdapter.prepareExport();
+      }
       var snapshot = instance.config.capture ? clone(instance.config.capture()) : {};
       var title = inferTitle(instance, snapshot);
       var status = inferStatus(instance, snapshot, '');
       var base = buildBaseName(instance.id, title, status);
-      var assets = gatherAssets(instance);
+      var assets = await gatherAssets(instance);
       var assetManifest = [];
       var entries = [];
       var seenNames = Object.create(null);
@@ -676,15 +696,32 @@
       if (instance.config.apply) instance.config.apply(clone(project.data));
       await delay(350);
 
+      if (instance.assetAdapter && typeof instance.assetAdapter.beforeImport === 'function') {
+        await instance.assetAdapter.beforeImport({ project: clone(project) });
+      }
+
       var restored = 0;
       var missing = 0;
       var assets = Array.isArray(project.assets) ? project.assets : [];
       for (var i = 0; i < assets.length; i++) {
         var meta = assets[i];
         var bytes = entries[meta.zip_path];
-        var input = findInputByKey(meta.input_key || '');
-        if (!bytes || !input) { missing++; continue; }
+        if (!bytes) { missing++; continue; }
         var restoredFile = new File([bytes], meta.file_name || 'image', { type: meta.mime_type || 'application/octet-stream' });
+        if (instance.assetAdapter && typeof instance.assetAdapter.restoreAsset === 'function') {
+          var handled = await instance.assetAdapter.restoreAsset({
+            key: meta.input_key || '',
+            file: restoredFile,
+            meta: clone(meta)
+          });
+          if (handled) {
+            instance.assets[meta.input_key] = [restoredFile];
+            restored++;
+            continue;
+          }
+        }
+        var input = findInputByKey(meta.input_key || '');
+        if (!input) { missing++; continue; }
         if (restoreFileToInput(input, restoredFile)) {
           instance.assets[meta.input_key] = [restoredFile];
           restored++;
@@ -694,6 +731,9 @@
       if (assets.length) {
         await delay(650);
         if (instance.config.apply) instance.config.apply(clone(project.data));
+      }
+      if (instance.assetAdapter && typeof instance.assetAdapter.afterImport === 'function') {
+        await instance.assetAdapter.afterImport({ project: clone(project), restored: restored, missing: missing });
       }
       setStatus(instance, '專案包載入成功｜設定已還原' + (assets.length ? '，圖片 ' + restored + '／' + assets.length + ' 個已回填' : '') + (missing ? '；' + missing + ' 個圖片欄位未能自動回填' : '') + '。', Boolean(missing));
     } catch (error) {
@@ -710,7 +750,7 @@
       activeMount = mounts[config.id];
       return mounts[config.id].api;
     }
-    var instance = { id: config.id, config: config, assets: Object.create(null), panel: null, status: null, fileInput: null, assetListener: null };
+    var instance = { id: config.id, config: config, assets: Object.create(null), assetAdapter: null, panel: null, status: null, fileInput: null, assetListener: null };
     instance.panel = panelFor(instance);
     placePanel(instance);
     instance.status = instance.panel.querySelector('.one-project-package__status');
@@ -732,6 +772,13 @@
     };
     mounts[config.id] = instance;
     return instance.api;
+  }
+
+  function setAssetAdapter(id, adapter) {
+    var instance = mounts[id];
+    if (!instance) return false;
+    instance.assetAdapter = adapter && typeof adapter === 'object' ? adapter : null;
+    return true;
   }
 
   function wrapEditBackup() {
@@ -766,6 +813,7 @@
 
   global.ONEProjectPackage = {
     mount: mount,
+    setAssetAdapter: setAssetAdapter,
     version: VERSION,
     schema: PACKAGE_SCHEMA,
     wrapEditBackup: wrapEditBackup,
@@ -779,7 +827,9 @@
       stateName: stateName,
       statusFromSnapshot: statusFromSnapshot,
       buildBaseName: buildBaseName,
-      assetKey: ensureAssetKey
+      assetKey: ensureAssetKey,
+      gatherAssets: gatherAssets,
+      importPackage: importPackage
     }
   };
 
@@ -794,10 +844,10 @@
   }
 
   if (typeof document !== 'undefined' && document.readyState === 'loading' && typeof document.write === 'function') {
-    document.write('<script src="./ai-json-guide-v1.js?v=1310"></' + 'script>');
+    document.write('<script src="./ai-json-guide-v1.js?v=1311"></' + 'script>');
   } else if (typeof document !== 'undefined' && document.createElement && document.head) {
     var aiGuideScript = document.createElement('script');
-    aiGuideScript.src = './ai-json-guide-v1.js?v=1310';
+    aiGuideScript.src = './ai-json-guide-v1.js?v=1311';
     aiGuideScript.onload = function () { if (global.ONEAIJsonGuide) global.ONEAIJsonGuide.wrapProjectPackage(); };
     document.head.appendChild(aiGuideScript);
   }
