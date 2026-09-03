@@ -3,15 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>O-Ne 說明卡生成器 V0.4.5 READY</title>
+<title>O-Ne 說明卡生成器 V0.4.6 READY</title>
 
 <link rel="stylesheet" href="./explanation-card-v038.css?v=038">
-<link rel="stylesheet" href="./explanation-card-v040.css?v=0451">
+<link rel="stylesheet" href="./explanation-card-v040.css?v=046">
 </head>
 <body>
 
 <main class="app-shell">
-<header class="app-header"><a class="back-link" href="./">← 回工具入口</a><div class="header-divider"></div><div class="title-block"><div class="title-line"><h1>O-Ne 說明卡生成器 <span>V0.4.5</span></h1><strong class="badge is-ready">READY</strong></div><p>正式版：範本常駐、關鍵指示放大；純圖片區直接延續同一張 80% 咖啡色卡底。</p></div><div class="status">V0.4.5 READY｜範本常駐｜80% 咖啡底</div></header>
+<header class="app-header"><a class="back-link" href="./">← 回工具入口</a><div class="header-divider"></div><div class="title-block"><div class="title-line"><h1>O-Ne 說明卡生成器 <span>V0.4.6</span></h1><strong class="badge is-ready">READY</strong></div><p>正式版：左圖可垂直對齊，小圖與裁切範圍不再自動放大。</p></div><div class="status">V0.4.6 READY｜垂直對齊｜不強制放大</div></header>
 <section class="workspace">
 <aside class="editor-panel panel">
 <div class="editor-head"><strong>說明卡編輯器</strong><small>使用順序只有 3 步：① 先選模式與範本　② 編輯文字／圖片　③ 到最下方儲存與輸出。</small></div>
@@ -37,8 +37,9 @@
   <div class="drawer-scroll">
     <section class="drawer-section"><h3>圖片來源</h3><div class="upload-row"><label class="upload-button">選擇圖片<input accept="image/png,image/jpeg,image/webp" id="explanationImage" type="file"></label><span class="file-name" id="fileName">尚未選擇圖片</span><button class="small-btn" id="removeImage" type="button">移除</button></div><div class="image-summary"><span>目前模式：</span><b id="imageModeLabel">填滿裁切</b></div></section>
     <section class="drawer-section"><h3>顯示方式</h3><div class="crop-tabs"><button data-fit="contain" type="button">完整顯示</button><button data-fit="cover" type="button">填滿裁切</button><button data-fit="free" type="button">自由裁切</button></div><div class="mode-status"><div><strong id="modeStatusTitle">目前已選：填滿裁切</strong><small id="modeStatusHint">下方只會顯示目前模式需要的控制。</small></div><span class="mode-badge" id="modeStatusBadge">已選取</span></div></section>
+    <section class="drawer-section" id="verticalAlignControls"><h3>圖片垂直對齊</h3><div class="crop-tabs image-align-tabs" role="group" aria-label="圖片垂直對齊"><button data-image-align="top" type="button">置頂</button><button data-image-align="center" type="button">置中</button><button data-image-align="bottom" type="button">置底</button></div><p>圖片沒有填滿左欄時生效；小圖會保留原始尺寸，不會為了填滿而自動放大。</p></section>
     <section class="drawer-section"><div class="image-live-wrap"><div class="image-live-head"><strong>成品即時預覽</strong><span id="imageLiveSize">1552 × 724px</span></div><div class="image-live-stage"><canvas class="image-live-canvas" id="imageLivePreview"></canvas></div></div><p>拖裁切框、改縮放或切換顯示方式時，這裡會立即更新；不用關閉圖片設定才看結果。</p></section>
-    <section class="drawer-section" id="coverControls"><h3>填滿裁切</h3><label class="field"><span>裁切縮放</span><span class="range-row"><input id="zoom" max="300" min="100" step="1" type="range"><code id="zoomValue"></code></span></label><div class="field-row"><label class="field"><span>水平位置</span><span class="range-row"><input id="offsetX" max="100" min="-100" type="range"><code id="offsetXValue"></code></span></label><label class="field"><span>垂直位置</span><span class="range-row"><input id="offsetY" max="100" min="-100" type="range"><code id="offsetYValue"></code></span></label></div></section>
+    <section class="drawer-section" id="coverControls"><h3>填滿裁切｜不自動放大小圖</h3><label class="field"><span>手動縮放</span><span class="range-row"><input id="zoom" max="300" min="100" step="1" type="range"><code id="zoomValue"></code></span></label><div class="field-row"><label class="field"><span>水平焦點</span><span class="range-row"><input id="offsetX" max="100" min="-100" type="range"><code id="offsetXValue"></code></span></label><label class="field"><span>垂直焦點</span><span class="range-row"><input id="offsetY" max="100" min="-100" type="range"><code id="offsetYValue"></code></span></label></div><p>100% 會以「剛好填滿或原始尺寸」兩者較小者顯示；只有主動拉高縮放才會放大。</p></section>
     <section class="drawer-section" id="freeControls"><h3>自由裁切｜完整原圖裁切框</h3><div id="freePendingGuide" class="placeholder-guide">目前還沒切到 <b>自由裁切</b>。請先點上方「自由裁切」，這裡就會出現裁切框與下方 X／Y／W／H 數值。</div><div id="freeCropActiveArea" hidden><div class="mode-note">青綠框＝最後選取的原圖範圍。拖框內部移動；拖四邊或四角自由改寬高。完全不鎖比例，也不再用「拖圖片＋縮放」模擬裁切。</div><div class="cropper-stage"><canvas class="cropper-canvas" id="cropperCanvas" width="900" height="600"></canvas></div><div class="cropper-status"><span>拖框內＝移動</span><span>拖四邊／四角＝改長寬</span></div></div><div class="crop-selection-readout"><span>X <b id="cropReadX">—</b></span><span>Y <b id="cropReadY">—</b></span><span>W <b id="cropReadW">—</b></span><span>H <b id="cropReadH">—</b></span></div><div class="cropper-actions"><button class="small-btn" id="resetFreeCrop" type="button">重設為整張原圖</button><button class="small-btn" id="centerFreeCrop" type="button">裁切框置中</button></div></section>
   </div>
   <div class="drawer-footer"><button class="small-btn drawer-secondary-close" id="closeImageFooter" type="button">關閉</button><button class="primary-btn" id="applyImageSettings" type="button">完成</button></div>
@@ -51,10 +52,10 @@
 
 
 <script src="./edit-backup-v1.js?v=1310"></script>
-<script src="./explanation-card-v038-1.js?v=040"></script>
-<script src="./explanation-card-v038-2.js?v=040"></script>
-<script src="./explanation-card-v038-3.js?v=040"></script>
-<script src="./explanation-card-v038-4.js?v=040"></script>
-<script src="./explanation-card-v038-5.js?v=045"></script>
-<script src="./explanation-card-v040.js?v=0454"></script>
+<script src="./explanation-card-v038-1.js?v=046"></script>
+<script src="./explanation-card-v038-2.js?v=046"></script>
+<script src="./explanation-card-v038-3.js?v=046"></script>
+<script src="./explanation-card-v038-4.js?v=046"></script>
+<script src="./explanation-card-v038-5.js?v=046"></script>
+<script src="./explanation-card-v040.js?v=046"></script>
 </body></html>

@@ -20,6 +20,7 @@ function syncSettings(){
   if($('fileName'))$('fileName').textContent=state.image.name||'尚未選擇圖片';
   for(const k of ['zoom','offsetX','offsetY']){const el=$(k),out=$(k+'Value');if(el)el.value=state.image[k];if(out)out.textContent=(k==='zoom'?Math.round(state.image[k])+'%':Math.round(state.image[k]))}
   document.querySelectorAll('[data-fit]').forEach(b=>b.classList.toggle('is-active',b.dataset.fit===state.image.fit));
+  document.querySelectorAll('[data-image-align]').forEach(b=>{const active=b.dataset.imageAlign===state.image.verticalAlign;b.classList.toggle('is-active',active);b.setAttribute('aria-pressed',active?'true':'false')});
   if($('coverControls'))$('coverControls').hidden=state.image.fit!=='cover';
   const free=state.image.fit==='free';
   if($('freePendingGuide'))$('freePendingGuide').hidden=free;
@@ -27,7 +28,7 @@ function syncSettings(){
   const modeText=state.image.fit==='contain'?'完整顯示':state.image.fit==='free'?'自由裁切':'填滿裁切';
   if($('imageModeLabel'))$('imageModeLabel').textContent=modeText;
   if($('modeStatusTitle'))$('modeStatusTitle').textContent='目前已選：'+modeText;
-  if($('modeStatusHint'))$('modeStatusHint').textContent=free?'下一步：直接拖曳裁切框調整範圍；裁後比例會即時改變卡片高度。確認後按右下角「套用圖片設定」。':state.image.fit==='cover'?'可用下方滑桿調整圖片縮放與位置。完成後按右下角「套用圖片設定」。':'圖片會完整顯示，並依圖片比例自動調整左圖與整張卡高度。確認沒問題後按右下角「套用圖片設定」。';
+  if($('modeStatusHint'))$('modeStatusHint').textContent=free?'下一步：拖曳裁切框選範圍；裁切結果最多維持原始像素，不會自動放大。再選擇置頂、置中或置底。':state.image.fit==='cover'?'100% 只會縮小填滿，不會自動放大小圖；需要放大時再手動拉高縮放。':'圖片會完整顯示且不自動放大；可用垂直對齊決定留白位置。';
   if($('modeStatusBadge'))$('modeStatusBadge').textContent=free?'自由裁切中':'已選取';
   if(!free){for(const id of ['cropReadX','cropReadY','cropReadW','cropReadH'])if($(id))$(id).textContent='—';}
   if(imageDrawerOpen){if(free)renderCropper();else renderImageLivePreview();}

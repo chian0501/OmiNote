@@ -1,7 +1,7 @@
 'use strict';
 
 (function installGalleryMode(){
-  const VERSION='V0.4.5_20260901';
+  const VERSION='V0.4.6_20260903';
   const GALLERY_LAYOUTS={
     single:{label:'單張大圖',count:1,hint:'一張圖放滿圖片區；可搭配「大圖 820px」接近 16:9。'},
     split:{label:'左右雙圖',count:2,hint:'兩張圖左右等寬，適合前後、A／B 或台日對照。'},
@@ -721,7 +721,7 @@
 
   exportJson=function(){
     const payload={
-      schema:'o-ne.explanation-card.formal.v0.4.5',
+      schema:'o-ne.explanation-card.formal.v0.4.6',
       status:'READY',
       generator_version:VERSION,
       component:{
@@ -737,6 +737,8 @@
         gallery_full_bleed_below_header:true,
         gallery_inner_frame:false,
         gallery_continuous_coffee_background:true,
+        content_image_vertical_align:['top','center','bottom'],
+        content_image_prevent_automatic_upscale:true,
         project_file_embeds_images:true
       },
       data:capture(),
@@ -802,15 +804,15 @@
   }
 
   function installVersionUi(){
-    document.title='O-Ne 說明卡生成器 V0.4.5 READY';
+    document.title='O-Ne 說明卡生成器 V0.4.6 READY';
     const version=document.querySelector('.title-line h1 span');
-    if(version)version.textContent='V0.4.5';
+    if(version)version.textContent='V0.4.6';
     const badge=document.querySelector('.title-line .badge');
     if(badge){badge.textContent='READY';badge.classList.remove('is-candidate');badge.classList.add('is-ready');}
     const description=document.querySelector('.title-block p');
-    if(description)description.textContent='正式版：範本常駐、關鍵指示放大；純圖片區直接延續同一張 80% 咖啡色卡底。';
+    if(description)description.textContent='正式版：左圖可垂直對齊，小圖與裁切範圍不再自動放大。';
     const status=document.querySelector('.status');
-    if(status)status.textContent='V0.4.5 READY｜範本常駐｜80% 咖啡底';
+    if(status)status.textContent='V0.4.6 READY｜垂直對齊｜不強制放大';
   }
 
   function runGalleryQa(){
@@ -836,6 +838,10 @@
       const templateHeading=templatePicker.querySelector('strong');
       const templateButton=$('templateButtons').querySelector('.template-btn');
       if(parseFloat(getComputedStyle(templateHeading).fontSize)<14||parseFloat(getComputedStyle(templateButton).fontSize)<12)throw new Error('readable template guidance');
+      if(!$('verticalAlignControls')||document.querySelectorAll('[data-image-align]').length!==3)throw new Error('content image vertical alignment controls');
+      state.image.verticalAlign='bottom';
+      syncSettings();
+      if(!document.querySelector('[data-image-align="bottom"]').classList.contains('is-active'))throw new Error('content image alignment state');
       state=cleanState({
         ...clone(defaults),
         mode:'gallery',
@@ -870,7 +876,7 @@
       const saveDock=document.querySelector('.save-dock');
       if(!saveDock||saveDock.parentElement!==$('editorScroll')||saveDock!==$('editorScroll').lastElementChild)throw new Error('save tools below editor');
       organizeUi();
-      $('qaResult').textContent='PASS｜visible readable templates｜continuous 80% coffee background｜gallery layouts｜full bleed image body｜no inner frame｜free crop｜save tools below editor｜header alignment｜project assets';
+      $('qaResult').textContent='PASS｜visible readable templates｜content image vertical alignment｜no automatic content image upscale｜continuous 80% coffee background｜gallery layouts｜full bleed image body｜no inner frame｜free crop｜save tools below editor｜header alignment｜project assets';
       document.body.dataset.qa='pass';
     }catch(error){
       $('qaResult').textContent='FAIL｜'+error.message;
