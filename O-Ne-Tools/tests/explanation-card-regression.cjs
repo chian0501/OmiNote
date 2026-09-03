@@ -17,10 +17,10 @@ for (const [file, source] of Object.entries(sources)) {
   assert.doesNotThrow(() => new Function(source), `${file} must parse`);
 }
 
-assert(html.includes('<title>O-Ne 說明卡生成器 V0.4.6 READY</title>'), 'ready version must be visible');
+assert(html.includes('<title>O-Ne 說明卡生成器 V0.4.7 READY</title>'), 'ready version must be visible');
 assert(html.includes('edit-backup-v1.js?v=1310'), 'shared manual backup library must load');
-assert(html.includes('explanation-card-v040.css?v=046'), 'gallery CSS must load with the current cache key');
-assert(html.includes('explanation-card-v040.js?v=046'), 'gallery runtime must load with the READY cache key');
+assert(html.includes('explanation-card-v040.css?v=047'), 'gallery CSS must load with the current cache key');
+assert(html.includes('explanation-card-v040.js?v=047'), 'gallery runtime must load with the READY cache key');
 const editorScrollStart = html.indexOf('<div class="editor-scroll" id="editorScroll">');
 const editorScrollEnd = html.indexOf('</div></aside>', editorScrollStart);
 const saveDockIndex = html.indexOf('<section class="save-dock">');
@@ -34,6 +34,8 @@ assert(!html.includes('<details class="template-presets"'), 'content templates m
 assert(html.includes('<summary><span>進階設定</span><small>提醒框與提示樣式</small></summary>'), 'advanced content settings must have an explicit readable purpose');
 assert(html.includes('<details class="legacy-save-tools">'), 'legacy project formats and reset must be collapsed');
 assert(html.includes('id="verticalAlignControls"'), 'content image controls must expose vertical alignment');
+assert(html.includes('id="imageScaleControls"') && html.includes('id="zoom" max="300" min="25"'), 'manual image scale must remain visible for every content image mode');
+assert(html.indexOf('id="imageScaleControls"') < html.indexOf('id="coverControls"'), 'manual image scale must not be nested inside cover-only controls');
 for (const alignment of ['top', 'center', 'bottom']) {
   assert(html.includes(`data-image-align="${alignment}"`), `content image alignment ${alignment} must exist`);
 }
@@ -44,7 +46,8 @@ assert(combined.includes("verticalAlign:'top'"), 'legacy content images must kee
 assert(combined.includes("['top','center','bottom'].includes(im.verticalAlign)"), 'project loading must validate vertical alignment');
 assert(combined.includes('Math.min(1,w/iw,h/ih)'), 'complete image display must not upscale small images');
 assert(combined.includes('Math.min(1,w/sw,h/sh)'), 'free crop display must not upscale the selected pixels');
-assert(combined.includes('Math.min(1,fillScale)'), 'fill crop must not automatically upscale small images');
+assert(combined.includes('const manualScale=state.image.zoom/100'), 'manual zoom must affect every content image mode');
+assert(combined.includes('scale=fillScale*Math.max(1,manualScale)'), 'fill crop must automatically fill the image column at 100%');
 assert(combined.includes('const imageH=height-imageY-28'), 'image alignment must use the full left-column height');
 assert(combined.includes("saveMode:'manual'"), 'history must remain manual');
 assert(combined.includes("schema:'o-ne.explanation-card.project.v1'"), 'portable project schema must remain compatible');
@@ -60,14 +63,16 @@ assert(gallerySource.includes('gallery_images_max:4'), 'gallery must stay bounde
 assert(gallerySource.includes('gallery_per_image_free_crop:true'), 'JSON metadata must declare independent free crop');
 assert(gallerySource.includes('gallery_free_crop_unlocked_aspect:true'), 'JSON metadata must declare unlocked crop aspect');
 assert(gallerySource.includes('payload.assets.gallery=galleryAssets.map(galleryAssetPayload)'), 'project file must embed gallery assets');
-assert(gallerySource.includes("schema:'o-ne.explanation-card.formal.v0.4.6'"), 'formal JSON schema must be versioned');
+assert(gallerySource.includes("schema:'o-ne.explanation-card.formal.v0.4.7'"), 'formal JSON schema must be versioned');
 assert(gallerySource.includes("status:'READY'"), 'formal JSON must be marked ready');
 assert(gallerySource.includes("context.fillStyle='rgba(31,23,19,.80)'"), 'gallery card body must keep the formal 80% fill opacity');
 assert(gallerySource.includes('gallery_full_bleed_below_header:true'), 'JSON metadata must declare the full-bleed image body');
 assert(gallerySource.includes('gallery_inner_frame:false'), 'JSON metadata must declare that the inner gallery frame is removed');
 assert(gallerySource.includes('gallery_continuous_coffee_background:true'), 'JSON metadata must declare the continuous coffee card background');
 assert(gallerySource.includes("content_image_vertical_align:['top','center','bottom']"), 'JSON metadata must declare content image alignment');
-assert(gallerySource.includes('content_image_prevent_automatic_upscale:true'), 'JSON metadata must declare no automatic content image upscale');
+assert(gallerySource.includes('content_image_manual_zoom_range:[25,300]'), 'JSON metadata must declare manual content image zoom');
+assert(gallerySource.includes("content_image_prevent_automatic_upscale_modes:['contain','free']"), 'JSON metadata must limit no-upscale behavior to complete and free crop modes');
+assert(gallerySource.includes('content_image_cover_auto_fill:true'), 'JSON metadata must preserve cover auto-fill behavior');
 assert(gallerySource.includes('missingGallerySlots()'), 'PNG export must reject missing active images');
 assert(gallerySource.includes("fit:['contain','cover','free'].includes(item.fit)"), 'each gallery image must support true free crop mode');
 assert(gallerySource.includes('data-gallery-crop-canvas'), 'free crop must expose a draggable crop canvas per image');
@@ -143,12 +148,20 @@ assert.deepStrictEqual(
   { dx: 200, dy: 200, dw: 200, dh: 100 },
   'free crop must stay at natural size and vertically center inside the full image column'
 );
+contentImageContext.state.image.zoom = 200;
+contentRect = contentImageContext.transformedImageRect(0, 0, 600, 500, 'free');
+assert.deepStrictEqual(
+  JSON.parse(JSON.stringify({ dx: contentRect.dx, dy: contentRect.dy, dw: contentRect.dw, dh: contentRect.dh })),
+  { dx: 100, dy: 150, dw: 400, dh: 200 },
+  'free crop must support deliberate manual enlargement'
+);
+contentImageContext.state.image.zoom = 100;
 contentImageContext.state.image.verticalAlign = 'bottom';
 contentRect = contentImageContext.transformedImageRect(0, 0, 600, 500, 'cover');
 assert.deepStrictEqual(
   JSON.parse(JSON.stringify({ dx: contentRect.dx, dy: contentRect.dy, dw: contentRect.dw, dh: contentRect.dh })),
-  { dx: 200, dy: 400, dw: 200, dh: 100 },
-  'fill crop at 100% must not upscale a small image and must support bottom alignment'
+  { dx: -200, dy: 0, dw: 1000, dh: 500 },
+  'fill crop at 100% must automatically enlarge a small image to fill the image column'
 );
 
 const cropContext = { clamp(value, min, max) { return Math.min(max, Math.max(min, Number(value) || 0)); } };
@@ -192,4 +205,4 @@ assert(css.includes('.save-tool-details'), 'batch output must be collapsible');
 assert(css.includes('.editor-scroll>.save-dock{margin:4px 16px 18px'), 'bottom save tools must be styled as the last editor card');
 assert(!css.includes('.gallery-mode .save-dock{max-height:'), 'save tools must no longer reserve a fixed block above the editor');
 
-console.log('PASS: explanation-card V0.4.6 READY keeps templates readable, aligns content images vertically and prevents automatic image upscale.');
+console.log('PASS: explanation-card V0.4.7 READY restores manual zoom in every content image mode while keeping cover auto-fill.');

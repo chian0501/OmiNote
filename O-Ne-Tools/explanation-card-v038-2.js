@@ -18,7 +18,7 @@ function addBodyBlock(){if(state.blocks.length>=MAX_BLOCKS){toast('最多 12 個
 function syncSettings(){
   $('labelText').value=state.label.text;$('labelColor').value=state.label.color;$('noteEnabled').checked=state.note.enabled;$('noteText').value=state.note.text;$('noteColor').value=state.note.color;$('noteSize').value=state.note.size;
   if($('fileName'))$('fileName').textContent=state.image.name||'尚未選擇圖片';
-  for(const k of ['zoom','offsetX','offsetY']){const el=$(k),out=$(k+'Value');if(el)el.value=state.image[k];if(out)out.textContent=(k==='zoom'?Math.round(state.image[k])+'%':Math.round(state.image[k]))}
+  for(const k of ['zoom','offsetX','offsetY']){const el=$(k),out=$(k+'Value');if(el){if(k==='zoom')el.min=state.image.fit==='cover'?100:25;el.value=state.image[k]}if(out)out.textContent=(k==='zoom'?Math.round(state.image[k])+'%':Math.round(state.image[k]))}
   document.querySelectorAll('[data-fit]').forEach(b=>b.classList.toggle('is-active',b.dataset.fit===state.image.fit));
   document.querySelectorAll('[data-image-align]').forEach(b=>{const active=b.dataset.imageAlign===state.image.verticalAlign;b.classList.toggle('is-active',active);b.setAttribute('aria-pressed',active?'true':'false')});
   if($('coverControls'))$('coverControls').hidden=state.image.fit!=='cover';
@@ -28,7 +28,7 @@ function syncSettings(){
   const modeText=state.image.fit==='contain'?'完整顯示':state.image.fit==='free'?'自由裁切':'填滿裁切';
   if($('imageModeLabel'))$('imageModeLabel').textContent=modeText;
   if($('modeStatusTitle'))$('modeStatusTitle').textContent='目前已選：'+modeText;
-  if($('modeStatusHint'))$('modeStatusHint').textContent=free?'下一步：拖曳裁切框選範圍；裁切結果最多維持原始像素，不會自動放大。再選擇置頂、置中或置底。':state.image.fit==='cover'?'100% 只會縮小填滿，不會自動放大小圖；需要放大時再手動拉高縮放。':'圖片會完整顯示且不自動放大；可用垂直對齊決定留白位置。';
+  if($('modeStatusHint'))$('modeStatusHint').textContent=free?'下一步：拖曳裁切框選範圍，再用「圖片大小」手動縮放；系統不會自行放大。':state.image.fit==='cover'?'圖片會自動填滿左欄；100% 是滿版基準，可再手動放大與調整焦點。':'圖片會完整顯示且不自動放大；可手動縮放並調整垂直位置。';
   if($('modeStatusBadge'))$('modeStatusBadge').textContent=free?'自由裁切中':'已選取';
   if(!free){for(const id of ['cropReadX','cropReadY','cropReadW','cropReadH'])if($(id))$(id).textContent='—';}
   if(imageDrawerOpen){if(free)renderCropper();else renderImageLivePreview();}
