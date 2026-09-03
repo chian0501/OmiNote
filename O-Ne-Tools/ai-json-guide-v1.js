@@ -108,22 +108,27 @@
       }
     },
     'explanation-card': {
-      name: '說明卡', code: 'EXPLANATION-CARD', version: 'V0.4.8', file: '說明卡-卡片標題-純圖片字卡.json', image: true, projectFile: '完整專案 ZIP（相容 .onecard）',
-      values: ['schema 固定以 o-ne.explanation-card. 開頭', 'mode：content／gallery；content 保留 Word-lite 與左圖右文', 'content 的 sequence.enabled=true 會啟用剪輯用逐步顯示；sequence.visibleCount 決定目前累積顯示到第幾個 body 段落，輸出高度仍依完整 body 段落固定', '逐步顯示只改變已繪製段落，不改卡片尺寸、左圖框或既有圖片裁切設定', 'content 的 image.verticalAlign：top／center／bottom；image.zoom 為手動縮放，contain／free 可用 25–300，cover 以自動滿版的 100–300 為基準', 'contain／free 在 zoom=100 時不會自動放大小圖；cover 仍會自動放大到填滿左欄', 'gallery 模式從標題到圖片區都延續同一張 80% 咖啡色卡底；透明圖片區與間距不另鋪第二種底色，且不使用第二層圖片框', 'gallery.layout：single／split／triple／hero-right／hero-bottom／grid，依序使用 1／2／3／3／3／4 張圖', 'gallery.slots 固定最多 4 筆；每筆包含 name、fit（contain／cover／free）、focusX、focusY、cropX、cropY、cropWidth、cropHeight', 'fit=free 時 cropX／cropY／cropWidth／cropHeight 是原圖百分比；每張圖片獨立保存且裁切框不鎖比例', '純設定 JSON 不含圖片位元；需完整搬移 1–4 張圖片時優先使用完整專案 ZIP，舊 .onecard 仍可載入'],
+      name: '說明卡', code: 'EXPLANATION-CARD', version: 'V0.4.9', file: '說明卡-卡片標題-逐步圖文.json', image: true, projectFile: '逐步多圖 .onecard（一般專案 ZIP 相容）',
+      values: ['schema 固定以 o-ne.explanation-card. 開頭', 'mode：content／gallery；content 保留 Word-lite 與左圖右文', 'content 的 sequence.enabled=true 會啟用逐步圖文；sequence.visibleCount 決定目前累積顯示到第幾個 body 段落', 'sequence.frames 依 body blockId 綁定各步驟的 image；每一步可獨立保存圖片名稱、fit、zoom、verticalAlign、offset 與自由裁切百分比', '逐步圖文只切換目前左圖與累積文字；輸出高度依完整 body 段落固定，卡片尺寸與左圖框不會因圖片比例或裁切而變動', '一鍵輸出全部會產生同尺寸 PNG ZIP；逐步多圖搬移請下載 .onecard，它會內嵌每一步圖片與各自裁切設定', 'content 的 image.verticalAlign：top／center／bottom；image.zoom 為手動縮放，contain／free 可用 25–300，cover 以自動滿版的 100–300 為基準', 'contain／free 在 zoom=100 時不會自動放大小圖；cover 仍會自動放大到填滿左欄', 'gallery 模式從標題到圖片區都延續同一張 80% 咖啡色卡底；透明圖片區與間距不另鋪第二種底色，且不使用第二層圖片框', 'gallery.layout：single／split／triple／hero-right／hero-bottom／grid，依序使用 1／2／3／3／3／4 張圖', 'gallery.slots 固定最多 4 筆；每筆包含 name、fit（contain／cover／free）、focusX、focusY、cropX、cropY、cropWidth、cropHeight', 'fit=free 時 cropX／cropY／cropWidth／cropHeight 是原圖百分比；每張圖片獨立保存且裁切框不鎖比例', '純設定 JSON 不含圖片位元；一般單圖或 gallery 可用完整專案 ZIP，逐步多圖請使用 .onecard'],
       example: {
-        schema: 'o-ne.explanation-card.formal.v0.4.8', status: 'READY', generator_version: 'V0.4.8_20260903',
+        schema: 'o-ne.explanation-card.formal.v0.4.9', status: 'READY', generator_version: 'V0.4.9_20260903',
         data: {
-          mode: 'gallery', templateId: 'gallery',
-          label: { text: 'GET!', color: '#FFBE37', textColor: '#1F1713' },
-          blocks: [{ id: 'title-1', kind: 'title', marker: { enabled: false, text: '' }, align: 'left', html: '三個畫面快速看懂' }],
-          sequence: { enabled: false, visibleCount: 1 },
-          gallery: {
-            layout: 'triple', height: 650, gap: 12,
-            slots: [
-              { name: '左圖.jpg', fit: 'free', focusX: 0, focusY: 0, cropX: 8, cropY: 10, cropWidth: 70, cropHeight: 82 },
-              { name: '中圖.jpg', fit: 'cover', focusX: 12, focusY: -20, cropX: 0, cropY: 0, cropWidth: 100, cropHeight: 100 },
-              { name: '右圖.jpg', fit: 'contain', focusX: 0, focusY: 0, cropX: 0, cropY: 0, cropWidth: 100, cropHeight: 100 },
-              { name: '', fit: 'cover', focusX: 0, focusY: 0, cropX: 0, cropY: 0, cropWidth: 100, cropHeight: 100 }
+          mode: 'content', templateId: 'steps',
+          label: { text: '兌換', color: '#FFBE37', textColor: '#1F1713' },
+          blocks: [
+            { id: 'title-1', kind: 'title', marker: { enabled: false, text: '' }, align: 'left', html: 'HARUKA｜還要換實體票' },
+            { id: 'subtitle-1', kind: 'subtitle', marker: { enabled: false, text: '' }, align: 'left', html: '豪華版紙票流程：掃票券 QR、也要掃 IC 護照' },
+            { id: 'step-1', kind: 'body', marker: { enabled: true, text: '01' }, align: 'left', html: 'App 取得 E-TICKET' },
+            { id: 'step-2', kind: 'body', marker: { enabled: true, text: '02' }, align: 'left', html: '找指定 JR 售票機' },
+            { id: 'step-3', kind: 'body', marker: { enabled: true, text: '03' }, align: 'left', html: '掃 QR＋護照並取票' }
+          ],
+          image: { name: '步驟1.png', fit: 'free', verticalAlign: 'center', zoom: 100, offsetX: 0, offsetY: 0, cropX: 8, cropY: 10, cropWidth: 70, cropHeight: 82 },
+          sequence: {
+            enabled: true, visibleCount: 1,
+            frames: [
+              { blockId: 'step-1', image: { name: '步驟1.png', fit: 'free', verticalAlign: 'center', zoom: 100, offsetX: 0, offsetY: 0, cropX: 8, cropY: 10, cropWidth: 70, cropHeight: 82 } },
+              { blockId: 'step-2', image: { name: '步驟2.png', fit: 'contain', verticalAlign: 'bottom', zoom: 100, offsetX: 0, offsetY: 0, cropX: 0, cropY: 0, cropWidth: 100, cropHeight: 100 } },
+              { blockId: 'step-3', image: { name: '步驟3.png', fit: 'cover', verticalAlign: 'top', zoom: 120, offsetX: 0, offsetY: -15, cropX: 0, cropY: 0, cropWidth: 100, cropHeight: 100 } }
             ]
           }
         }

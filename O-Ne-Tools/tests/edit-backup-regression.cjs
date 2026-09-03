@@ -122,7 +122,7 @@ const tools = [
   ['dialogue-card-v135.html', 'dialogue-card', 'V1.3.7'],
   ['rating-card.html', 'rating-card', 'V1.3.1'],
   ['focus-card.html', 'focus-card', 'V0.5.15'],
-  ['explanation-card.html', 'explanation-card', 'V0.4.8'],
+  ['explanation-card.html', 'explanation-card', 'V0.4.9'],
   ['thumbnail-frame.html', 'thumbnail-frame', 'V1.2.6'],
   ['settlement-card.html', 'settlement-card', 'V0.1.3']
 ];

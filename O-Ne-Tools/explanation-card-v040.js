@@ -1,7 +1,7 @@
 'use strict';
 
 (function installGalleryMode(){
-  const VERSION='V0.4.8_20260903';
+  const VERSION='V0.4.9_20260903';
   const GALLERY_LAYOUTS={
     single:{label:'單張大圖',count:1,hint:'一張圖放滿圖片區；可搭配「大圖 820px」接近 16:9。'},
     split:{label:'左右雙圖',count:2,hint:'兩張圖左右等寬，適合前後、A／B 或台日對照。'},
@@ -762,7 +762,7 @@
 
   exportJson=function(){
     const payload={
-      schema:'o-ne.explanation-card.formal.v0.4.8',
+      schema:'o-ne.explanation-card.formal.v0.4.9',
       status:'READY',
       generator_version:VERSION,
       component:{
@@ -850,15 +850,15 @@
   }
 
   function installVersionUi(){
-    document.title='O-Ne 說明卡生成器 V0.4.8 READY';
+    document.title='O-Ne 說明卡生成器 V0.4.9 READY';
     const version=document.querySelector('.title-line h1 span');
-    if(version)version.textContent='V0.4.8';
+    if(version)version.textContent='V0.4.9';
     const badge=document.querySelector('.title-line .badge');
     if(badge){badge.textContent='READY';badge.classList.remove('is-candidate');badge.classList.add('is-ready');}
     const description=document.querySelector('.title-block p');
     if(description)description.textContent='正式版：逐步顯示會自動固定完整字卡尺寸，剪輯替換不再跳動。';
     const status=document.querySelector('.status');
-    if(status)status.textContent='V0.4.8 READY｜逐步顯示｜固定畫面';
+    if(status)status.textContent='V0.4.9 READY｜逐步圖文｜固定尺寸';
   }
 
   function runGalleryQa(){

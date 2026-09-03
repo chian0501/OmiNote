@@ -418,9 +418,9 @@
       "name": "說明卡",
       "family": "正式說明字卡母版",
       "group": "資訊／閱讀",
-      "desc": "一般說明可用逐步顯示固定完整字卡尺寸與左圖框；圖片仍可縮放、垂直對齊與自由裁切",
+      "desc": "逐步畫面可讓每個文字項目切換自己的左圖與裁切設定；整張卡與左圖框固定不跳動",
       "status": "ready",
-      "href": "./explanation-card.html?v=048&build=progressive-reveal-stable-frame-ready-v1&ui=131",
+      "href": "./explanation-card.html?v=049&build=per-step-image-lock-ready-v1&ui=131",
       "features": [
         "official_explanation_card_family",
         "independent_from_focus_card",
@@ -439,7 +439,12 @@
         "content_progressive_reveal_visible_count",
         "content_progressive_reveal_full_height_lock",
         "content_progressive_reveal_stable_left_image_frame",
+        "content_progressive_reveal_per_step_image",
+        "content_progressive_reveal_per_step_crop_settings",
+        "content_progressive_reveal_image_independent_height_lock",
         "content_progressive_reveal_step_filename",
+        "content_progressive_reveal_export_all_png_zip",
+        "content_progressive_reveal_onecard_embeds_all_images",
         "image_only_gallery_mode",
         "gallery_single_large_image",
         "gallery_split_two_images",
@@ -475,7 +480,7 @@
         "ai_json_schema_guide"
       ],
       "formal_ref": "EXPLANATION-CARD",
-      "generator_version": "V0.4.8_20260903",
+      "generator_version": "V0.4.9_20260903",
       "visual_status": "READY",
       "panel_fill_opacity": 0.8,
       "qa": {
@@ -499,7 +504,9 @@
         "content_progressive_reveal_regression": "pass_first_to_final_cumulative_rows",
         "content_progressive_reveal_height_regression": "pass_same_full_layout_height_all_steps",
         "content_progressive_reveal_left_frame_regression": "pass_same_image_geometry_all_steps",
-        "content_progressive_reveal_project_regression": "pass_onecard_state_roundtrip",
+        "content_progressive_reveal_per_step_image_regression": "pass_independent_image_and_crop_per_body_block",
+        "content_progressive_reveal_project_regression": "pass_onecard_embeds_all_step_images_and_settings",
+        "content_progressive_reveal_batch_export_regression": "pass_same_size_png_zip",
         "primary_instruction_legibility_regression": "pass_editor12px_mode15px_helper11px_advanced13px",
         "browser_visual": "pass_public_v048_run_307",
         "browser_interaction": "pass_progressive_reveal_1_to_9_same_1552x1541",
@@ -507,7 +514,7 @@
         "save_dock_parent": "editorScroll_last_child",
         "save_dock_visible_at_initial_scroll": false,
         "public_pages_run": "pass_run_307",
-        "release_gate": "omi_approved_direct_main_v048",
+        "release_gate": "omi_approved_direct_main_v049",
         "app_console_errors": 0
       }
     },

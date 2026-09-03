@@ -3,15 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>O-Ne 說明卡生成器 V0.4.8 READY</title>
+<title>O-Ne 說明卡生成器 V0.4.9 READY</title>
 
 <link rel="stylesheet" href="./explanation-card-v038.css?v=038">
-<link rel="stylesheet" href="./explanation-card-v040.css?v=048">
+<link rel="stylesheet" href="./explanation-card-v040.css?v=049">
 </head>
 <body>
 
 <main class="app-shell">
-<header class="app-header"><a class="back-link" href="./">← 回工具入口</a><div class="header-divider"></div><div class="title-block"><div class="title-line"><h1>O-Ne 說明卡生成器 <span>V0.4.8</span></h1><strong class="badge is-ready">READY</strong></div><p>正式版：逐步顯示會自動固定完整字卡尺寸，剪輯替換不再跳動。</p></div><div class="status">V0.4.8 READY｜逐步顯示｜固定畫面</div></header>
+<header class="app-header"><a class="back-link" href="./">← 回工具入口</a><div class="header-divider"></div><div class="title-block"><div class="title-line"><h1>O-Ne 說明卡生成器 <span>V0.4.9</span></h1><strong class="badge is-ready">READY</strong></div><p>正式版：每個步驟可綁定自己的左圖與裁切設定，全部畫面固定尺寸。</p></div><div class="status">V0.4.9 READY｜逐步圖文｜固定尺寸</div></header>
 <section class="workspace">
 <aside class="editor-panel panel">
 <div class="editor-head"><strong>說明卡編輯器</strong><small>使用順序只有 3 步：① 先選模式與範本　② 編輯文字／圖片　③ 到最下方儲存與輸出。</small></div>
@@ -27,14 +27,14 @@
 <button class="tool-btn" data-align="left" title="靠左" type="button">≡</button><button class="tool-btn" data-align="center" title="置中" type="button">≣</button><button class="tool-btn" data-align="right" title="靠右" type="button">≡›</button><button class="tool-btn" id="bulletBtn" title="項目符號" type="button">•</button><button class="tool-btn" id="clearBtn" title="清除格式" type="button">Tx</button><span class="toolbar-note" id="selectionHint">先反白文字，再套格式</span>
 </div>
 <section class="word-page-wrap"><div class="word-page" id="wordPage"></div><button class="add-block" id="addBlock" type="button">＋ 新增一般段落</button><p class="word-tip">左側標記是段落結構，不是空白欄：關掉某段標記後，年份／字母、直線與預留空間會一起消失，正文直接補到左側。標記永遠單行。</p></section>
-<section class="sequence-strip" id="sequenceStrip"><label class="sequence-toggle"><input id="sequenceEnabled" type="checkbox"><span><strong>逐步顯示（剪輯用）</strong><small>一般單張不用開。先完成全部段落，開啟後只要選擇目前顯示到第幾項。</small></span></label><label class="sequence-step" id="sequenceStepControl" hidden><span>目前顯示到</span><select id="sequenceVisibleCount"></select></label><div class="sequence-state" id="sequenceState">一般單張</div></section>
+<section class="sequence-strip" id="sequenceStrip"><div class="sequence-main"><label class="sequence-toggle"><input id="sequenceEnabled" type="checkbox"><span><strong>逐步畫面（文字＋左圖）</strong><small>一般單張不用開。先完成全部文字，再依序設定每一項的左圖。</small></span></label><label class="sequence-step" id="sequenceStepControl" hidden><span>目前畫面</span><select id="sequenceVisibleCount"></select></label><div class="sequence-state" id="sequenceState">一般單張</div></div><div class="sequence-image-controls" id="sequenceImageControls" hidden><div class="sequence-image-copy"><strong id="sequenceImageTitle">第 1 項左圖</strong><small id="sequenceImageName">尚未設定圖片</small></div><div class="sequence-image-status" id="sequenceImagesStatus">圖片 0／0 已設定</div><button class="small-btn sequence-image-button" id="sequenceImageButton" type="button">設定這一項左圖</button><button class="small-btn sequence-export-all" id="exportSequenceAll" type="button">一鍵輸出全部</button></div></section>
 <section class="save-dock"><div class="save-dock-head"><div><strong>③ 儲存與輸出</strong><small>快速暫存留在本機；跨裝置搬移請下載完整專案 ZIP。</small></div><span class="save-badge">最後一步</span></div><div id="quickSaveHost"></div><details class="legacy-save-tools"><summary>進階檔案與重設</summary><div class="save-file-actions project-actions"><button class="small-btn save-project-btn" id="exportProject" type="button">下載 .onecard</button><button class="small-btn" id="importProjectBtn" type="button">載入 .onecard</button><input id="projectInput" type="file" accept="application/json,.onecard,.json" hidden><button class="small-btn save-json-btn" id="exportJson" type="button">僅設定 JSON</button><button class="small-btn" id="resetAll" type="button">重設目前內容</button></div><div class="project-file-note">.onecard 與舊 JSON 保留相容性；日常完整搬移請優先使用上方專案 ZIP。</div></details></section>
 </div></aside>
 <div class="preview-stack"><section class="preview-panel panel"><div class="preview-toolbar"><strong>說明卡預覽</strong><span id="dimensionText">1552 × 724px｜自動高度</span></div><div class="canvas-stage"><canvas class="preview-canvas" id="previewCanvas"></canvas></div><footer class="export-bar"><p>透明 PNG；自動高度依 Rich Text 實際字級／換行、段落標記與提醒框計算。</p><div class="export-actions single"><button class="export-button primary" id="exportPng" type="button">輸出說明卡 PNG</button></div></footer></section></div>
 </section>
 <div class="drawer-backdrop" id="imageDrawerBackdrop" hidden></div>
 <aside class="image-drawer" id="imageDrawer" aria-hidden="true" aria-label="左側圖片設定">
-  <div class="drawer-head"><div><strong>左側圖片</strong><small>選圖、顯示方式與裁切集中在這裡；右側成品預覽會同步更新。</small></div><button class="drawer-close" id="closeImageDrawer" type="button" aria-label="關閉圖片設定">×</button></div>
+  <div class="drawer-head"><div><strong id="imageDrawerTitle">左側圖片</strong><small id="imageDrawerHelp">選圖、顯示方式與裁切集中在這裡；右側成品預覽會同步更新。</small></div><button class="drawer-close" id="closeImageDrawer" type="button" aria-label="關閉圖片設定">×</button></div>
   <div class="drawer-scroll">
     <section class="drawer-section"><h3>圖片來源</h3><div class="upload-row"><label class="upload-button">選擇圖片<input accept="image/png,image/jpeg,image/webp" id="explanationImage" type="file"></label><span class="file-name" id="fileName">尚未選擇圖片</span><button class="small-btn" id="removeImage" type="button">移除</button></div><div class="image-summary"><span>目前模式：</span><b id="imageModeLabel">填滿裁切</b></div></section>
     <section class="drawer-section"><h3>顯示方式</h3><div class="crop-tabs"><button data-fit="contain" type="button">完整顯示</button><button data-fit="cover" type="button">填滿裁切</button><button data-fit="free" type="button">自由裁切</button></div><div class="mode-status"><div><strong id="modeStatusTitle">目前已選：填滿裁切</strong><small id="modeStatusHint">下方只會顯示目前模式需要的控制。</small></div><span class="mode-badge" id="modeStatusBadge">已選取</span></div></section>
@@ -54,10 +54,11 @@
 
 
 <script src="./edit-backup-v1.js?v=1310"></script>
-<script src="./explanation-card-v038-1.js?v=048"></script>
-<script src="./explanation-card-v038-2.js?v=048"></script>
-<script src="./explanation-card-v038-3.js?v=048"></script>
-<script src="./explanation-card-v038-4.js?v=048"></script>
-<script src="./explanation-card-v038-5.js?v=048"></script>
-<script src="./explanation-card-v040.js?v=048"></script>
+<script src="./explanation-card-v038-1.js?v=049"></script>
+<script src="./explanation-card-v038-2.js?v=049"></script>
+<script src="./explanation-card-v038-3.js?v=049"></script>
+<script src="./explanation-card-v038-4.js?v=049"></script>
+<script src="./explanation-card-v038-5.js?v=049"></script>
+<script src="./explanation-card-v040.js?v=049"></script>
+<script src="./explanation-card-v049.js?v=049"></script>
 </body></html>

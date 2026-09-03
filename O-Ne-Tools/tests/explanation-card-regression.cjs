@@ -8,19 +8,21 @@ const vm = require('vm');
 const root = path.join(__dirname, '..');
 const html = fs.readFileSync(path.join(root, 'explanation-card.html'), 'utf8');
 const baseFiles = [1, 2, 3, 4, 5].map(number => `explanation-card-v038-${number}.js`);
-const scriptFiles = [...baseFiles, 'explanation-card-v040.js'];
+const scriptFiles = [...baseFiles, 'explanation-card-v040.js', 'explanation-card-v049.js'];
 const sources = Object.fromEntries(scriptFiles.map(file => [file, fs.readFileSync(path.join(root, file), 'utf8')]));
 const combined = Object.values(sources).join('\n');
 const gallerySource = sources['explanation-card-v040.js'];
+const sequenceImageSource = sources['explanation-card-v049.js'];
 
 for (const [file, source] of Object.entries(sources)) {
   assert.doesNotThrow(() => new Function(source), `${file} must parse`);
 }
 
-assert(html.includes('<title>O-Ne 說明卡生成器 V0.4.8 READY</title>'), 'ready version must be visible');
+assert(html.includes('<title>O-Ne 說明卡生成器 V0.4.9 READY</title>'), 'ready version must be visible');
 assert(html.includes('edit-backup-v1.js?v=1310'), 'shared manual backup library must load');
-assert(html.includes('explanation-card-v040.css?v=048'), 'gallery CSS must load with the current cache key');
-assert(html.includes('explanation-card-v040.js?v=048'), 'gallery runtime must load with the READY cache key');
+assert(html.includes('explanation-card-v040.css?v=049'), 'gallery CSS must load with the current cache key');
+assert(html.includes('explanation-card-v040.js?v=049'), 'gallery runtime must load with the READY cache key');
+assert(html.includes('explanation-card-v049.js?v=049'), 'per-step image runtime must load after the gallery runtime');
 const editorScrollStart = html.indexOf('<div class="editor-scroll" id="editorScroll">');
 const editorScrollEnd = html.indexOf('</div></aside>', editorScrollStart);
 const saveDockIndex = html.indexOf('<section class="save-dock">');
@@ -34,7 +36,9 @@ assert(!html.includes('<details class="template-presets"'), 'content templates m
 assert(html.includes('<summary><span>進階設定</span><small>提醒框與提示樣式</small></summary>'), 'advanced content settings must have an explicit readable purpose');
 assert(html.includes('<details class="legacy-save-tools">'), 'legacy project formats and reset must be collapsed');
 assert(html.includes('id="sequenceEnabled"') && html.includes('id="sequenceVisibleCount"'), 'simple progressive reveal controls must exist');
-assert(html.includes('逐步顯示（剪輯用）') && html.includes('先完成全部段落'), 'sequence workflow must explain the one-pass editing order');
+assert(html.includes('逐步畫面（文字＋左圖）') && html.includes('先完成全部文字'), 'sequence workflow must explain the one-pass editing order');
+assert(html.includes('id="sequenceImageButton"') && html.includes('id="exportSequenceAll"'), 'sequence workflow must expose per-step image editing and one-click export');
+assert(html.includes('id="sequenceImagesStatus"') && html.includes('圖片 0／0 已設定'), 'sequence workflow must show image completion status');
 assert(html.includes('id="verticalAlignControls"'), 'content image controls must expose vertical alignment');
 assert(html.includes('id="imageScaleControls"') && html.includes('id="zoom" max="300" min="25"'), 'manual image scale must remain visible for every content image mode');
 assert(html.indexOf('id="imageScaleControls"') < html.indexOf('id="coverControls"'), 'manual image scale must not be nested inside cover-only controls');
@@ -53,6 +57,13 @@ assert(combined.includes('scale=fillScale*Math.max(1,manualScale)'), 'fill crop 
 assert(combined.includes('const imageH=height-imageY-28'), 'image alignment must use the full left-column height');
 assert(combined.includes('const renderedRows=sequenceRows(l.rows)'), 'progressive reveal must only change rendered rows, not measured layout rows');
 assert(combined.includes("sequence:{enabled:false,visibleCount:1}"), 'legacy projects must default to normal single-card mode');
+assert(sequenceImageSource.includes('defaults.sequence={...(defaults.sequence||{}),frames:[]}'), 'sequence frames must extend the legacy state without breaking old projects');
+assert(sequenceImageSource.includes('if(sequenceIsActive())return null'), 'per-step image dimensions must not drive card height');
+assert(sequenceImageSource.includes('payload.assets.sequence_images=(state.sequence.frames||[]).map(sequenceAssetPayload)'), 'onecard must embed every step image');
+assert(sequenceImageSource.includes('content_sequence_per_step_crop_settings:true'), 'formal JSON must declare independent crop settings per step');
+assert(sequenceImageSource.includes('content_sequence_export_all_png_zip:true'), 'formal JSON must declare one-click PNG ZIP export');
+assert(sequenceImageSource.includes('async function exportAllSequencePngs()'), 'sequence mode must provide a one-click batch PNG export');
+assert(sequenceImageSource.includes("schema:'o-ne.explanation-card.formal.v0.4.9'"), 'formal JSON schema must include the per-step image release');
 assert(combined.includes("saveMode:'manual'"), 'history must remain manual');
 assert(combined.includes("schema:'o-ne.explanation-card.project.v1'"), 'portable project schema must remain compatible');
 assert(!combined.includes('focus-card'), 'explanation tool must remain independent from focus-card');
@@ -67,7 +78,7 @@ assert(gallerySource.includes('gallery_images_max:4'), 'gallery must stay bounde
 assert(gallerySource.includes('gallery_per_image_free_crop:true'), 'JSON metadata must declare independent free crop');
 assert(gallerySource.includes('gallery_free_crop_unlocked_aspect:true'), 'JSON metadata must declare unlocked crop aspect');
 assert(gallerySource.includes('payload.assets.gallery=galleryAssets.map(galleryAssetPayload)'), 'project file must embed gallery assets');
-assert(gallerySource.includes("schema:'o-ne.explanation-card.formal.v0.4.8'"), 'formal JSON schema must be versioned');
+assert(gallerySource.includes("schema:'o-ne.explanation-card.formal.v0.4.9'"), 'formal JSON schema must be versioned');
 assert(gallerySource.includes("status:'READY'"), 'formal JSON must be marked ready');
 assert(gallerySource.includes("context.fillStyle='rgba(31,23,19,.80)'"), 'gallery card body must keep the formal 80% fill opacity');
 assert(gallerySource.includes('gallery_full_bleed_below_header:true'), 'JSON metadata must declare the full-bleed image body');
@@ -112,6 +123,31 @@ sequenceContext.state.sequence.visibleCount = 3;
 assert.strictEqual(sequenceContext.sequenceRows(sequenceRows).length, 3, 'final progress must reveal every row');
 sequenceContext.state.sequence.enabled = false;
 assert.strictEqual(sequenceContext.sequenceRows(sequenceRows).length, 3, 'normal mode must render every row');
+
+const sequenceFrameContext = {
+  clone(value) { return JSON.parse(JSON.stringify(value)); },
+  clamp(value, min, max) { return Math.min(max, Math.max(min, Number(value) || 0)); }
+};
+vm.runInNewContext(
+  `${extractFunction(sequenceImageSource, 'normalizeImageSettings')};${extractFunction(sequenceImageSource, 'normalizeSequenceFrames')};this.normalizeSequenceFrames=normalizeSequenceFrames;`,
+  sequenceFrameContext
+);
+const fallbackImage = { name: '', fit: 'cover', verticalAlign: 'top', zoom: 100, offsetX: 0, offsetY: 0, freeZoom: 100, freePanX: 0, freePanY: 0, cropX: 0, cropY: 0, cropWidth: 100, cropHeight: 100 };
+const normalizedFrames = sequenceFrameContext.normalizeSequenceFrames(
+  [
+    { blockId: 'step-c', image: { ...fallbackImage, name: 'c.png', fit: 'free', verticalAlign: 'bottom', zoom: 145, cropX: 9, cropY: 11, cropWidth: 62, cropHeight: 71 } },
+    { blockId: 'step-a', image: { ...fallbackImage, name: 'a.png', fit: 'contain', verticalAlign: 'center', zoom: 80 } }
+  ],
+  [{ id: 'step-a' }, { id: 'step-b' }, { id: 'step-c' }],
+  fallbackImage
+);
+assert.deepStrictEqual(normalizedFrames.map(frame => frame.blockId), ['step-a', 'step-b', 'step-c'], 'frames must follow current body order');
+assert.strictEqual(normalizedFrames[0].image.name, 'a.png', 'frame image must stay attached to its body block id');
+assert.strictEqual(normalizedFrames[0].image.verticalAlign, 'center', 'each frame must retain vertical alignment');
+assert.strictEqual(normalizedFrames[2].image.name, 'c.png', 'reordered body blocks must recover their own image');
+assert.strictEqual(normalizedFrames[2].image.cropWidth, 62, 'each frame must retain its own free crop');
+normalizedFrames[0].image.zoom = 210;
+assert.strictEqual(normalizedFrames[2].image.zoom, 145, 'frame image settings must be independent objects');
 
 const layoutContext = {};
 vm.runInNewContext(`${extractFunction(gallerySource, 'galleryRects')};this.galleryRects=galleryRects;`, layoutContext);
@@ -217,6 +253,8 @@ assert(css.includes('.gallery-mode .image-trigger'), 'left-image control must be
 assert(css.includes('.gallery-mode .word-page{min-height:0'), 'gallery title editor must stay compact');
 assert(css.includes('.sequence-strip{display:grid'), 'progressive reveal control must stay compact');
 assert(css.includes('.sequence-state.is-active'), 'progressive reveal status must have an active state');
+assert(css.includes('.sequence-image-controls{display:grid'), 'per-step image controls must remain in one compact workflow');
+assert(css.includes('.sequence-export-all'), 'one-click sequence export must have a clear primary action');
 assert(css.includes('.mode-buttons'), 'mode picker must be styled as the primary entry');
 assert(css.includes('.template-presets-head'), 'visible content template guidance must be styled');
 assert(css.includes('.template-presets-head strong{color:#f3f0ea;font-size:14px}'), 'template heading must remain readable');
@@ -227,4 +265,4 @@ assert(css.includes('.save-tool-details'), 'batch output must be collapsible');
 assert(css.includes('.editor-scroll>.save-dock{margin:4px 16px 18px'), 'bottom save tools must be styled as the last editor card');
 assert(!css.includes('.gallery-mode .save-dock{max-height:'), 'save tools must no longer reserve a fixed block above the editor');
 
-console.log('PASS: explanation-card V0.4.8 READY adds a simple progressive reveal with stable full-card dimensions.');
+console.log('PASS: explanation-card V0.4.9 READY keeps one fixed card and restores an independent left image for every revealed item.');
