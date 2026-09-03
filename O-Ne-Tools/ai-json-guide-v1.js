@@ -108,14 +108,15 @@
       }
     },
     'explanation-card': {
-      name: '說明卡', code: 'EXPLANATION-CARD', version: 'V0.4.7', file: '說明卡-卡片標題-純圖片字卡.json', image: true, projectFile: '完整專案 ZIP（相容 .onecard）',
-      values: ['schema 固定以 o-ne.explanation-card. 開頭', 'mode：content／gallery；content 保留 Word-lite 與左圖右文', 'content 的 image.verticalAlign：top／center／bottom；image.zoom 為手動縮放，contain／free 可用 25–300，cover 以自動滿版的 100–300 為基準', 'contain／free 在 zoom=100 時不會自動放大小圖；cover 仍會自動放大到填滿左欄', 'gallery 模式從標題到圖片區都延續同一張 80% 咖啡色卡底；透明圖片區與間距不另鋪第二種底色，且不使用第二層圖片框', 'gallery.layout：single／split／triple／hero-right／hero-bottom／grid，依序使用 1／2／3／3／3／4 張圖', 'gallery.slots 固定最多 4 筆；每筆包含 name、fit（contain／cover／free）、focusX、focusY、cropX、cropY、cropWidth、cropHeight', 'fit=free 時 cropX／cropY／cropWidth／cropHeight 是原圖百分比；每張圖片獨立保存且裁切框不鎖比例', '純設定 JSON 不含圖片位元；需完整搬移 1–4 張圖片時優先使用完整專案 ZIP，舊 .onecard 仍可載入'],
+      name: '說明卡', code: 'EXPLANATION-CARD', version: 'V0.4.8', file: '說明卡-卡片標題-純圖片字卡.json', image: true, projectFile: '完整專案 ZIP（相容 .onecard）',
+      values: ['schema 固定以 o-ne.explanation-card. 開頭', 'mode：content／gallery；content 保留 Word-lite 與左圖右文', 'content 的 sequence.enabled=true 會啟用剪輯用逐步顯示；sequence.visibleCount 決定目前累積顯示到第幾個 body 段落，輸出高度仍依完整 body 段落固定', '逐步顯示只改變已繪製段落，不改卡片尺寸、左圖框或既有圖片裁切設定', 'content 的 image.verticalAlign：top／center／bottom；image.zoom 為手動縮放，contain／free 可用 25–300，cover 以自動滿版的 100–300 為基準', 'contain／free 在 zoom=100 時不會自動放大小圖；cover 仍會自動放大到填滿左欄', 'gallery 模式從標題到圖片區都延續同一張 80% 咖啡色卡底；透明圖片區與間距不另鋪第二種底色，且不使用第二層圖片框', 'gallery.layout：single／split／triple／hero-right／hero-bottom／grid，依序使用 1／2／3／3／3／4 張圖', 'gallery.slots 固定最多 4 筆；每筆包含 name、fit（contain／cover／free）、focusX、focusY、cropX、cropY、cropWidth、cropHeight', 'fit=free 時 cropX／cropY／cropWidth／cropHeight 是原圖百分比；每張圖片獨立保存且裁切框不鎖比例', '純設定 JSON 不含圖片位元；需完整搬移 1–4 張圖片時優先使用完整專案 ZIP，舊 .onecard 仍可載入'],
       example: {
-        schema: 'o-ne.explanation-card.formal.v0.4.7', status: 'READY', generator_version: 'V0.4.7_20260903',
+        schema: 'o-ne.explanation-card.formal.v0.4.8', status: 'READY', generator_version: 'V0.4.8_20260903',
         data: {
           mode: 'gallery', templateId: 'gallery',
           label: { text: 'GET!', color: '#FFBE37', textColor: '#1F1713' },
           blocks: [{ id: 'title-1', kind: 'title', marker: { enabled: false, text: '' }, align: 'left', html: '三個畫面快速看懂' }],
+          sequence: { enabled: false, visibleCount: 1 },
           gallery: {
             layout: 'triple', height: 650, gap: 12,
             slots: [

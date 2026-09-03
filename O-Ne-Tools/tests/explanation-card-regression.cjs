@@ -17,10 +17,10 @@ for (const [file, source] of Object.entries(sources)) {
   assert.doesNotThrow(() => new Function(source), `${file} must parse`);
 }
 
-assert(html.includes('<title>O-Ne 說明卡生成器 V0.4.7 READY</title>'), 'ready version must be visible');
+assert(html.includes('<title>O-Ne 說明卡生成器 V0.4.8 READY</title>'), 'ready version must be visible');
 assert(html.includes('edit-backup-v1.js?v=1310'), 'shared manual backup library must load');
-assert(html.includes('explanation-card-v040.css?v=047'), 'gallery CSS must load with the current cache key');
-assert(html.includes('explanation-card-v040.js?v=047'), 'gallery runtime must load with the READY cache key');
+assert(html.includes('explanation-card-v040.css?v=048'), 'gallery CSS must load with the current cache key');
+assert(html.includes('explanation-card-v040.js?v=048'), 'gallery runtime must load with the READY cache key');
 const editorScrollStart = html.indexOf('<div class="editor-scroll" id="editorScroll">');
 const editorScrollEnd = html.indexOf('</div></aside>', editorScrollStart);
 const saveDockIndex = html.indexOf('<section class="save-dock">');
@@ -33,6 +33,8 @@ assert(html.includes('一般說明｜套用設計範本') && html.includes('更�
 assert(!html.includes('<details class="template-presets"'), 'content templates must not be hidden in a collapsed control');
 assert(html.includes('<summary><span>進階設定</span><small>提醒框與提示樣式</small></summary>'), 'advanced content settings must have an explicit readable purpose');
 assert(html.includes('<details class="legacy-save-tools">'), 'legacy project formats and reset must be collapsed');
+assert(html.includes('id="sequenceEnabled"') && html.includes('id="sequenceVisibleCount"'), 'simple progressive reveal controls must exist');
+assert(html.includes('逐步顯示（剪輯用）') && html.includes('先完成全部段落'), 'sequence workflow must explain the one-pass editing order');
 assert(html.includes('id="verticalAlignControls"'), 'content image controls must expose vertical alignment');
 assert(html.includes('id="imageScaleControls"') && html.includes('id="zoom" max="300" min="25"'), 'manual image scale must remain visible for every content image mode');
 assert(html.indexOf('id="imageScaleControls"') < html.indexOf('id="coverControls"'), 'manual image scale must not be nested inside cover-only controls');
@@ -49,6 +51,8 @@ assert(combined.includes('Math.min(1,w/sw,h/sh)'), 'free crop display must not u
 assert(combined.includes('const manualScale=state.image.zoom/100'), 'manual zoom must affect every content image mode');
 assert(combined.includes('scale=fillScale*Math.max(1,manualScale)'), 'fill crop must automatically fill the image column at 100%');
 assert(combined.includes('const imageH=height-imageY-28'), 'image alignment must use the full left-column height');
+assert(combined.includes('const renderedRows=sequenceRows(l.rows)'), 'progressive reveal must only change rendered rows, not measured layout rows');
+assert(combined.includes("sequence:{enabled:false,visibleCount:1}"), 'legacy projects must default to normal single-card mode');
 assert(combined.includes("saveMode:'manual'"), 'history must remain manual');
 assert(combined.includes("schema:'o-ne.explanation-card.project.v1'"), 'portable project schema must remain compatible');
 assert(!combined.includes('focus-card'), 'explanation tool must remain independent from focus-card');
@@ -63,7 +67,7 @@ assert(gallerySource.includes('gallery_images_max:4'), 'gallery must stay bounde
 assert(gallerySource.includes('gallery_per_image_free_crop:true'), 'JSON metadata must declare independent free crop');
 assert(gallerySource.includes('gallery_free_crop_unlocked_aspect:true'), 'JSON metadata must declare unlocked crop aspect');
 assert(gallerySource.includes('payload.assets.gallery=galleryAssets.map(galleryAssetPayload)'), 'project file must embed gallery assets');
-assert(gallerySource.includes("schema:'o-ne.explanation-card.formal.v0.4.7'"), 'formal JSON schema must be versioned');
+assert(gallerySource.includes("schema:'o-ne.explanation-card.formal.v0.4.8'"), 'formal JSON schema must be versioned');
 assert(gallerySource.includes("status:'READY'"), 'formal JSON must be marked ready');
 assert(gallerySource.includes("context.fillStyle='rgba(31,23,19,.80)'"), 'gallery card body must keep the formal 80% fill opacity');
 assert(gallerySource.includes('gallery_full_bleed_below_header:true'), 'JSON metadata must declare the full-bleed image body');
@@ -73,6 +77,10 @@ assert(gallerySource.includes("content_image_vertical_align:['top','center','bot
 assert(gallerySource.includes('content_image_manual_zoom_range:[25,300]'), 'JSON metadata must declare manual content image zoom');
 assert(gallerySource.includes("content_image_prevent_automatic_upscale_modes:['contain','free']"), 'JSON metadata must limit no-upscale behavior to complete and free crop modes');
 assert(gallerySource.includes('content_image_cover_auto_fill:true'), 'JSON metadata must preserve cover auto-fill behavior');
+assert(gallerySource.includes('content_sequence_progressive_reveal:true'), 'JSON metadata must declare progressive reveal');
+assert(gallerySource.includes('content_sequence_uses_full_layout_height:true'), 'JSON metadata must declare stable full-content height');
+assert(gallerySource.includes('content_sequence_stable_left_image_frame:true'), 'JSON metadata must declare a stable left image frame');
+assert(gallerySource.includes('STEP${String(state.sequence.visibleCount).padStart'), 'sequence PNG names must include the current progress');
 assert(gallerySource.includes('missingGallerySlots()'), 'PNG export must reject missing active images');
 assert(gallerySource.includes("fit:['contain','cover','free'].includes(item.fit)"), 'each gallery image must support true free crop mode');
 assert(gallerySource.includes('data-gallery-crop-canvas'), 'free crop must expose a draggable crop canvas per image');
@@ -92,6 +100,18 @@ function extractFunction(source, name) {
   }
   throw new Error(`unable to extract ${name}`);
 }
+
+const sequenceContext = {
+  state: { sequence: { enabled: true, visibleCount: 2 } },
+  clamp(value, min, max) { return Math.min(max, Math.max(min, Number(value) || 0)); }
+};
+vm.runInNewContext(`${extractFunction(sources['explanation-card-v038-3.js'], 'sequenceRows')};this.sequenceRows=sequenceRows;`, sequenceContext);
+const sequenceRows = [{ id: 1 }, { id: 2 }, { id: 3 }];
+assert.strictEqual(sequenceContext.sequenceRows(sequenceRows).length, 2, 'progressive reveal must show the selected cumulative row count');
+sequenceContext.state.sequence.visibleCount = 3;
+assert.strictEqual(sequenceContext.sequenceRows(sequenceRows).length, 3, 'final progress must reveal every row');
+sequenceContext.state.sequence.enabled = false;
+assert.strictEqual(sequenceContext.sequenceRows(sequenceRows).length, 3, 'normal mode must render every row');
 
 const layoutContext = {};
 vm.runInNewContext(`${extractFunction(gallerySource, 'galleryRects')};this.galleryRects=galleryRects;`, layoutContext);
@@ -195,6 +215,8 @@ assert(css.includes('.layout-mini.triple'), 'three-across layout preview must be
 assert(css.includes('.gallery-free-crop canvas'), 'per-image crop canvas must be styled');
 assert(css.includes('.gallery-mode .image-trigger'), 'left-image control must be hidden in gallery mode');
 assert(css.includes('.gallery-mode .word-page{min-height:0'), 'gallery title editor must stay compact');
+assert(css.includes('.sequence-strip{display:grid'), 'progressive reveal control must stay compact');
+assert(css.includes('.sequence-state.is-active'), 'progressive reveal status must have an active state');
 assert(css.includes('.mode-buttons'), 'mode picker must be styled as the primary entry');
 assert(css.includes('.template-presets-head'), 'visible content template guidance must be styled');
 assert(css.includes('.template-presets-head strong{color:#f3f0ea;font-size:14px}'), 'template heading must remain readable');
@@ -205,4 +227,4 @@ assert(css.includes('.save-tool-details'), 'batch output must be collapsible');
 assert(css.includes('.editor-scroll>.save-dock{margin:4px 16px 18px'), 'bottom save tools must be styled as the last editor card');
 assert(!css.includes('.gallery-mode .save-dock{max-height:'), 'save tools must no longer reserve a fixed block above the editor');
 
-console.log('PASS: explanation-card V0.4.7 READY restores manual zoom in every content image mode while keeping cover auto-fill.');
+console.log('PASS: explanation-card V0.4.8 READY adds a simple progressive reveal with stable full-card dimensions.');

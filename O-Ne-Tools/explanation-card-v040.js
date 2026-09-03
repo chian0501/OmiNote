@@ -1,7 +1,7 @@
 'use strict';
 
 (function installGalleryMode(){
-  const VERSION='V0.4.7_20260903';
+  const VERSION='V0.4.8_20260903';
   const GALLERY_LAYOUTS={
     single:{label:'單張大圖',count:1,hint:'一張圖放滿圖片區；可搭配「大圖 820px」接近 16:9。'},
     split:{label:'左右雙圖',count:2,hint:'兩張圖左右等寬，適合前後、A／B 或台日對照。'},
@@ -399,6 +399,43 @@
     }
   }
 
+  function contentBodyCount(){
+    return state.blocks.filter(item=>item.kind==='body').length;
+  }
+
+  function renderSequenceUi(){
+    const host=$('sequenceStrip');
+    if(!host)return;
+    const galleryMode=state.mode==='gallery';
+    const total=contentBodyCount();
+    if(total<2)state.sequence.enabled=false;
+    state.sequence.visibleCount=Math.round(clamp(state.sequence.visibleCount||total,1,Math.max(1,total)));
+    const enabled=!galleryMode&&total>1&&state.sequence.enabled;
+    host.hidden=galleryMode;
+    const toggle=$('sequenceEnabled');
+    toggle.checked=enabled;
+    toggle.disabled=total<2;
+    const control=$('sequenceStepControl');
+    control.hidden=!enabled;
+    const select=$('sequenceVisibleCount');
+    const signature=Array.from({length:total},(_,index)=>String(index+1)).join(',');
+    if(select.dataset.options!==signature){
+      select.innerHTML=Array.from({length:total},(_,index)=>{
+        const count=index+1;
+        return `<option value="${count}">${count===total?`全部 ${total} 項`:`第 ${count} 項`}</option>`;
+      }).join('');
+      select.dataset.options=signature;
+    }
+    select.value=String(state.sequence.visibleCount);
+    const status=$('sequenceState');
+    status.classList.toggle('is-active',enabled);
+    status.textContent=total<2?'至少需要 2 個段落':enabled?`固定完整 ${total} 項｜目前 ${state.sequence.visibleCount}／${total}`:'一般單張';
+    const exportButton=$('exportPng');
+    if(exportButton)exportButton.textContent=enabled?'輸出目前進度 PNG':'輸出說明卡 PNG';
+    const exportNote=document.querySelector('.export-bar p');
+    if(exportNote&&!galleryMode)exportNote.textContent=enabled?'透明 PNG；尺寸依完整內容固定，只切換目前顯示進度與左圖。':'透明 PNG；高度依文字換行、段落與提醒框自動計算。';
+  }
+
   function updateModeUi(){
     const galleryMode=state.mode==='gallery';
     if(!galleryMode&&state.templateId!=='custom'&&state.templateId!=='gallery')lastContentTemplateId=state.templateId;
@@ -417,6 +454,7 @@
     const exportNote=document.querySelector('.export-bar p');
     if(exportNote)exportNote.textContent=galleryMode?'透明 PNG；圖片直接鋪滿標題下方，不另加內框。':'透明 PNG；高度依文字換行、段落與提醒框自動計算。';
     if(galleryMode)renderGalleryEditor();
+    renderSequenceUi();
   }
 
   const renderEditorV038=renderEditor;
@@ -707,8 +745,11 @@
     renderCanvas(out);
     out.toBlob(blob=>{
       if(!blob)return;
-      download(blob,`說明卡-${titlePlain()}-${state.mode==='gallery'?'純圖片字卡':'RichText'}.png`);
-      toast('PNG 已輸出。');
+      const total=contentBodyCount();
+      const sequenceEnabled=state.mode==='content'&&state.sequence.enabled&&total>1;
+      const progress=sequenceEnabled?`-STEP${String(state.sequence.visibleCount).padStart(2,'0')}-of-${String(total).padStart(2,'0')}`:'';
+      download(blob,`說明卡-${titlePlain()}-${state.mode==='gallery'?'純圖片字卡':'RichText'}${progress}.png`);
+      toast(sequenceEnabled?`第 ${state.sequence.visibleCount}／${total} 項 PNG 已輸出；畫面尺寸保持固定。`:'PNG 已輸出。');
     },'image/png');
   };
 
@@ -721,7 +762,7 @@
 
   exportJson=function(){
     const payload={
-      schema:'o-ne.explanation-card.formal.v0.4.7',
+      schema:'o-ne.explanation-card.formal.v0.4.8',
       status:'READY',
       generator_version:VERSION,
       component:{
@@ -741,6 +782,9 @@
         content_image_manual_zoom_range:[25,300],
         content_image_prevent_automatic_upscale_modes:['contain','free'],
         content_image_cover_auto_fill:true,
+        content_sequence_progressive_reveal:true,
+        content_sequence_uses_full_layout_height:true,
+        content_sequence_stable_left_image_frame:true,
         project_file_embeds_images:true
       },
       data:capture(),
@@ -806,15 +850,15 @@
   }
 
   function installVersionUi(){
-    document.title='O-Ne 說明卡生成器 V0.4.7 READY';
+    document.title='O-Ne 說明卡生成器 V0.4.8 READY';
     const version=document.querySelector('.title-line h1 span');
-    if(version)version.textContent='V0.4.7';
+    if(version)version.textContent='V0.4.8';
     const badge=document.querySelector('.title-line .badge');
     if(badge){badge.textContent='READY';badge.classList.remove('is-candidate');badge.classList.add('is-ready');}
     const description=document.querySelector('.title-block p');
-    if(description)description.textContent='正式版：三種顯示方式皆可手動縮放；填滿裁切維持自動滿版。';
+    if(description)description.textContent='正式版：逐步顯示會自動固定完整字卡尺寸，剪輯替換不再跳動。';
     const status=document.querySelector('.status');
-    if(status)status.textContent='V0.4.7 READY｜手動縮放｜填滿維持滿版';
+    if(status)status.textContent='V0.4.8 READY｜逐步顯示｜固定畫面';
   }
 
   function runGalleryQa(){
@@ -845,6 +889,21 @@
       state.image.verticalAlign='bottom';
       syncSettings();
       if(!document.querySelector('[data-image-align="bottom"]').classList.contains('is-active'))throw new Error('content image alignment state');
+      state=cleanState({
+        ...clone(defaults),
+        mode:'content',
+        templateId:'steps',
+        blocks:TEMPLATES.steps.make(),
+        sequence:{enabled:true,visibleCount:1}
+      });
+      renderEditor();
+      const sequenceFirst=renderCanvas();
+      if(!$('sequenceEnabled').checked||$('sequenceStepControl').hidden)throw new Error('simple sequence control');
+      if(sequenceRows(sequenceFirst.rows).length!==1)throw new Error('sequence first reveal');
+      state.sequence.visibleCount=3;
+      renderSequenceUi();
+      const sequenceFinal=renderCanvas();
+      if(sequenceRows(sequenceFinal.rows).length!==3||sequenceFinal.height!==sequenceFirst.height)throw new Error('sequence stable full height');
       state=cleanState({
         ...clone(defaults),
         mode:'gallery',
@@ -879,7 +938,7 @@
       const saveDock=document.querySelector('.save-dock');
       if(!saveDock||saveDock.parentElement!==$('editorScroll')||saveDock!==$('editorScroll').lastElementChild)throw new Error('save tools below editor');
       organizeUi();
-      $('qaResult').textContent='PASS｜visible readable templates｜manual zoom in all content image modes｜cover auto fill｜content image vertical alignment｜no automatic upscale in contain and free｜continuous 80% coffee background｜gallery layouts｜full bleed image body｜no inner frame｜free crop｜save tools below editor｜header alignment｜project assets';
+      $('qaResult').textContent='PASS｜visible readable templates｜simple progressive reveal｜stable full height and left image frame｜manual zoom in all content image modes｜cover auto fill｜content image vertical alignment｜no automatic upscale in contain and free｜continuous 80% coffee background｜gallery layouts｜full bleed image body｜no inner frame｜free crop｜save tools below editor｜header alignment｜project assets';
       document.body.dataset.qa='pass';
     }catch(error){
       $('qaResult').textContent='FAIL｜'+error.message;
@@ -895,6 +954,20 @@
   createGalleryEditor();
   state=cleanState(state);
   installVersionUi();
+  $('sequenceEnabled').onchange=event=>{
+    const total=contentBodyCount();
+    state.sequence.enabled=Boolean(event.target.checked)&&total>1;
+    state.sequence.visibleCount=total;
+    renderSequenceUi();
+    renderCanvas();
+    toast(state.sequence.enabled?'逐步顯示已開啟：尺寸會依完整內容固定。':'已切回一般單張。');
+  };
+  $('sequenceVisibleCount').onchange=event=>{
+    const total=contentBodyCount();
+    state.sequence.visibleCount=Math.round(clamp(event.target.value,1,Math.max(1,total)));
+    renderSequenceUi();
+    renderCanvas();
+  };
   $('contentMode').onclick=()=>{if(state.mode==='gallery')applyTemplate(lastContentTemplateId||'standard',true);};
   $('galleryMode').onclick=()=>{if(state.mode!=='gallery')applyTemplate('gallery',true);};
   renderEditor();
