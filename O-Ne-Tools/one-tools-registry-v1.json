@@ -501,13 +501,14 @@
         "content_progressive_reveal_left_frame_regression": "pass_same_image_geometry_all_steps",
         "content_progressive_reveal_project_regression": "pass_onecard_state_roundtrip",
         "primary_instruction_legibility_regression": "pass_editor12px_mode15px_helper11px_advanced13px",
-        "browser_visual": "pass_candidate_public_run_284_before_ready_promotion",
-        "browser_interaction": "pass_candidate_public_run_284_before_ready_promotion",
-        "editor_viewport_px": "1363x936",
+        "browser_visual": "pass_public_v048_run_307",
+        "browser_interaction": "pass_progressive_reveal_1_to_9_same_1552x1541",
+        "editor_viewport_px": "cloud_browser_default_20260903",
         "save_dock_parent": "editorScroll_last_child",
         "save_dock_visible_at_initial_scroll": false,
-        "public_pages_run": "pass_candidate_run_284",
-        "release_gate": "omi_approved_candidate_public_qa_pass_ready_promotion"
+        "public_pages_run": "pass_run_307",
+        "release_gate": "omi_approved_direct_main_v048",
+        "app_console_errors": 0
       }
     },
     {
