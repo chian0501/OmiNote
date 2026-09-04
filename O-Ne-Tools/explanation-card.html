@@ -7,6 +7,7 @@
 
 <link rel="stylesheet" href="./explanation-card-v038.css?v=038">
 <link rel="stylesheet" href="./explanation-card-v040.css?v=049">
+<link rel="stylesheet" href="./explanation-card-ui-fold-v1.css?v=1">
 </head>
 <body>
 
@@ -14,9 +15,9 @@
 <header class="app-header"><a class="back-link" href="./">← 回工具入口</a><div class="header-divider"></div><div class="title-block"><div class="title-line"><h1>O-Ne 說明卡生成器 <span>V0.4.9</span></h1><strong class="badge is-ready">READY</strong></div><p>正式版：每個步驟可綁定自己的左圖與裁切設定，全部畫面固定尺寸。</p></div><div class="status">V0.4.9 READY｜逐步圖文｜固定尺寸</div></header>
 <section class="workspace">
 <aside class="editor-panel panel">
-<div class="editor-head"><strong>說明卡編輯器</strong><small>使用順序只有 3 步：① 先選模式與範本　② 編輯文字／圖片　③ 到最下方儲存與輸出。</small></div>
+<div class="editor-head"><strong>說明卡編輯器</strong><small>使用順序只有 3 步：① 先選模式與版面／範本　② 編輯文字／圖片　③ 到最下方儲存與輸出。</small></div>
 <div class="editor-scroll" id="editorScroll">
-<section class="template-strip mode-strip"><div class="step-heading"><span class="step-no">①</span><div><b>選模式與範本</b><small>先選「一般說明」或「純圖片字卡」；一般說明的 6 種設計範本會直接顯示在下方。</small></div></div><div class="mode-buttons" role="group" aria-label="製作模式"><button class="mode-btn" id="contentMode" type="button" data-card-mode="content"><b>一般說明</b><span>6 種範本＋圖文段落</span></button><button class="mode-btn" id="galleryMode" type="button" data-card-mode="gallery"><b>純圖片字卡</b><span>標籤＋標題＋滿版圖片</span></button></div><div class="template-presets" id="contentTemplatePicker" aria-labelledby="contentTemplateHeading"><div class="template-presets-head"><div><strong id="contentTemplateHeading">一般說明｜套用設計範本</strong><small>建議先選範本再改字；之後更換範本會重設文字內容。</small></div><span>6 種範本</span></div><div class="template-buttons" id="templateButtons"></div></div></section>
+<section class="template-strip mode-strip"><div class="step-heading"><span class="step-no">①</span><div><b>選模式與版面</b><small>先選「一般說明」或「純圖片字卡」；範本／圖片排版會固定出現在同一位置，需要時再展開。</small></div></div><div class="mode-buttons" role="group" aria-label="製作模式"><button class="mode-btn" id="contentMode" type="button" data-card-mode="content"><b>一般說明</b><span>6 種範本＋圖文段落</span></button><button class="mode-btn" id="galleryMode" type="button" data-card-mode="gallery"><b>純圖片字卡</b><span>標籤＋標題＋滿版圖片</span></button></div><div class="template-presets" id="contentTemplatePicker" aria-labelledby="contentTemplateHeading"><div class="template-presets-head"><div><strong id="contentTemplateHeading">一般說明｜套用設計範本</strong><small>建議先選範本再改字；之後更換範本會重設文字內容。</small></div><span>6 種範本</span></div><div class="template-buttons" id="templateButtons"></div></div></section>
 <section class="settings"><div class="label-controls"><div class="label-controls-copy"><strong>卡片標籤</strong><small>標籤與標題會共用同一條水平中線。</small></div><label class="field"><span>文字</span><input id="labelText" maxlength="12"/></label><label class="field"><span>顏色</span><select id="labelColor"></select></label></div><details class="setting" id="contentCardSettings"><summary><span>進階設定</span><small>提醒框與提示樣式</small></summary><div class="setting-body"><label class="toggle-row"><input id="noteEnabled" type="checkbox"/><span>顯示底部提醒框</span></label><label class="field"><span>提醒文字</span><textarea id="noteText" maxlength="260"></textarea></label><div class="field-row"><label class="field"><span>提醒色</span><select id="noteColor"></select></label><label class="field"><span>提醒字級</span><select id="noteSize"><option>22</option><option selected="">24</option><option>26</option><option>28</option><option>30</option></select></label></div></div></details></section>
 <div class="word-toolbar" id="wordToolbar"><div class="toolbar-heading"><span class="step-no">②</span><div><b id="toolbarTitle">編輯文字</b><small id="toolbarHelp">先反白要修改的文字，再選格式；沒有反白時會套用目前段落。</small></div><button class="image-trigger" id="openImageDrawer" type="button">🖼 左側圖片</button></div>
 <button class="tool-btn" data-cmd="undo" title="復原" type="button">↶</button><button class="tool-btn" data-cmd="redo" title="重做" type="button">↷</button><span class="tool-divider"></span>
@@ -61,4 +62,5 @@
 <script src="./explanation-card-v038-5.js?v=049"></script>
 <script src="./explanation-card-v040.js?v=049"></script>
 <script src="./explanation-card-v049.js?v=0491"></script>
+<script src="./explanation-card-ui-fold-v1.js?v=1"></script>
 </body></html>

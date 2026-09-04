@@ -1,0 +1,52 @@
+/* Explanation Card UI fold pass — keeps V0.4.9 rendering/data behavior unchanged. */
+.ui-fold-panel{margin:10px 0 0;border:1px solid #315260;border-radius:10px;background:#101b26;overflow:hidden}
+.ui-fold-panel[hidden]{display:none!important}
+.ui-fold-panel>summary{list-style:none}
+.ui-fold-panel>summary::-webkit-details-marker{display:none}
+.ui-fold-summary{display:flex;align-items:center;gap:12px;min-height:48px;padding:10px 12px;color:#e8eef2;cursor:pointer;user-select:none}
+.ui-fold-summary:hover{background:#12202c}
+.ui-fold-summary-copy{min-width:0;display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
+.ui-fold-summary-copy strong{font-size:13px;color:#f3f0ea}
+.ui-fold-summary-copy small{font-size:10px;color:#9eabb7;font-weight:700}
+.ui-fold-badge{flex:0 0 auto;margin-left:auto;padding:4px 8px;border:1px solid #2b686d;border-radius:999px;background:#12383d;color:#9ff1e7;font-size:9px;font-weight:850}
+.ui-fold-summary:after{content:'＋';flex:0 0 auto;margin-left:4px;color:#70ded3;font-size:19px;font-weight:700;line-height:1}
+.ui-fold-panel[open]>.ui-fold-summary:after{content:'−'}
+.ui-fold-body{padding:0 12px 12px}
+.ui-fold-help{margin:0 0 10px;color:#96a3af;font-size:10px;line-height:1.5}
+
+/* ① Mode + template/layout selectors share one location and one fold pattern. */
+.template-presets.ui-fold-panel{padding:0}
+.mode-strip .ui-fold-panel{margin-top:10px}
+.content-template-fold .template-buttons{padding-top:0!important}
+.gallery-layout-picker{display:none}
+.gallery-mode .gallery-layout-picker{display:block}
+.gallery-layouts-original{display:none!important}
+.gallery-layouts-proxy{margin:0 0 8px}
+.gallery-layouts-proxy .gallery-layout-btn{min-height:62px;padding:7px 4px;font-size:11px}
+.gallery-layout-hint-proxy{min-height:1.5em;margin-bottom:0}
+
+/* Label controls are secondary settings: collapsed by default, but current value remains visible. */
+.settings>.label-setting{margin:0;border:0;border-radius:0;background:#0d151f;border-bottom:1px solid #26313e}
+.label-setting>.ui-fold-summary{min-height:48px;padding:10px 16px}
+.label-setting .ui-fold-body{padding:0}
+.label-fold-help{margin:0;padding:0 16px 3px}
+.label-setting .label-controls{grid-template-columns:minmax(160px,1fr) minmax(160px,1fr);padding:10px 16px 13px}
+.label-setting .label-controls-copy{display:none!important}
+.label-setting .label-controls input,.label-setting .label-controls select{height:38px}
+
+/* Once layout selection moves to step ①, the gallery editor only manages image content. */
+.gallery-editor-head strong{font-size:13px}
+.gallery-editor-head small{font-size:10px;line-height:1.5}
+.gallery-layout-hint.is-proxy-source{display:none!important}
+.gallery-layout-meta.is-compact-meta{grid-template-columns:minmax(170px,260px)}
+
+@media(max-width:700px){
+  .ui-fold-summary{align-items:flex-start;flex-wrap:wrap}
+  .ui-fold-badge{margin-left:0}
+  .ui-fold-summary:after{margin-left:auto}
+  .label-setting .label-controls{grid-template-columns:1fr 1fr}
+}
+@media(max-width:480px){
+  .label-setting .label-controls{grid-template-columns:1fr}
+  .gallery-layouts-proxy{grid-template-columns:1fr 1fr}
+}
