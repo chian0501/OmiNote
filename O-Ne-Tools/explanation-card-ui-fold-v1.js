@@ -47,6 +47,7 @@
     details.open=false;
 
     source.removeAttribute('id');
+    source.removeAttribute('aria-labelledby');
     source.hidden=false;
     source.classList.remove('template-presets');
     source.classList.add('ui-fold-body');
