@@ -10,8 +10,8 @@ const css=fs.readFileSync(path.join(root,'explanation-card-ui-fold-v1.css'),'utf
 
 assert.doesNotThrow(()=>new Function(js),'UI fold enhancer must parse');
 assert(html.includes('explanation-card-ui-fold-v1.css?v=1'),'fold CSS must load');
-assert(html.includes('explanation-card-ui-fold-v1.js?v=1'),'fold JS must load');
-assert(html.indexOf('explanation-card-v049.js?v=0491')<html.indexOf('explanation-card-ui-fold-v1.js?v=1'),'fold enhancer must run after existing V0.4.9 runtime');
+assert(html.includes('explanation-card-ui-fold-v1.js?v=2'),'fold JS must load with the current cache key');
+assert(html.indexOf('explanation-card-v049.js?v=0491')<html.indexOf('explanation-card-ui-fold-v1.js?v=2'),'fold enhancer must run after existing V0.4.9 runtime');
 assert(js.includes("details.id='labelSettings'"),'label controls must be wrapped in a native details control');
 assert(js.includes("details.open=false"),'new fold controls must start collapsed');
 assert(js.includes("details.id='contentTemplatePicker'"),'general templates must keep the canonical picker id after folding');
