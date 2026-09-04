@@ -1,0 +1,14 @@
+/* Explanation Card format controls — visual font sizes + stable format painter. */
+#fontSizeSelect.is-compat-control{position:absolute!important;width:1px!important;height:1px!important;margin:0!important;padding:0!important;opacity:0!important;pointer-events:none!important;clip-path:inset(50%)!important}
+.font-size-visual-picker{position:relative;display:inline-flex;align-items:center;flex:0 0 auto}
+.font-size-current{height:36px;min-width:88px;padding:0 10px;border:1px solid #415467;border-radius:6px;background:#111c27;color:#f1eee9;font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap}
+.font-size-current:hover{border-color:#29a6a7;color:#9ff1e7}.font-size-current.is-mixed{border-color:#8b6b24;color:#ffd978}
+.font-size-menu{position:absolute;top:calc(100% + 7px);left:0;z-index:120;width:250px;max-height:min(58vh,520px);overflow-y:auto;overflow-x:hidden;padding:7px;border:1px solid #405467;border-radius:9px;background:#0d151f;box-shadow:0 16px 42px rgba(0,0,0,.5)}
+.font-size-menu[hidden]{display:none}
+.font-size-option{width:100%;display:grid;grid-template-columns:54px minmax(0,1fr);align-items:center;gap:10px;padding:7px 9px;border:0;border-bottom:1px solid #263544;background:transparent;color:#f1eee9;text-align:left;cursor:pointer}
+.font-size-option:last-child{border-bottom:0}.font-size-option:hover,.font-size-option.is-active{background:#12383d}
+.font-size-value{font-size:11px;color:#8fe0d7;font-variant-numeric:tabular-nums;white-space:nowrap}.font-size-sample{display:block;line-height:1;white-space:nowrap;color:#fdf3e7;font-weight:700;font-family:inherit}
+.format-painter-group{display:inline-flex;align-items:center;gap:5px;flex:0 0 auto}.format-painter-group .tool-btn{width:auto;min-width:70px;padding:0 8px;font-size:11px;font-weight:800;white-space:nowrap}
+.format-painter-group .tool-btn.is-copied{border-color:#ffbe37;background:#3b2d12;color:#ffd978}.format-painter-group .tool-btn:disabled{opacity:.38;cursor:not-allowed}
+.tool-btn.is-format-active{border-color:#29a6a7!important;background:#12383d!important;color:#9ff1e7!important}.tool-btn.is-format-mixed{border-color:#8b6b24!important;color:#ffd978!important;box-shadow:inset 0 -2px 0 #8b6b24}
+@media(max-width:700px){.font-size-menu{width:min(250px,84vw)}.format-painter-group .tool-btn{min-width:62px;padding:0 6px}}
