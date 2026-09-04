@@ -1,0 +1,14 @@
+/* Explanation Card UI audit — stable toolbar rows and duplicate-control cleanup. */
+.word-toolbar{display:flex;flex-direction:column;align-items:stretch;gap:7px;flex-wrap:nowrap;overflow:visible}
+.toolbar-heading{align-items:center}.toolbar-heading>div:not(.toolbar-history){min-width:0;flex:1}.toolbar-history{display:flex;align-items:center;gap:6px;flex:0 0 auto;margin-left:auto}.toolbar-history .tool-btn{height:32px;min-width:34px}.toolbar-heading .image-trigger{margin-left:0}
+.toolbar-row{width:100%;min-width:0;display:flex;align-items:center;gap:6px;flex-wrap:nowrap}.toolbar-row-primary{min-height:36px}.toolbar-row-secondary{min-height:34px}
+.toolbar-row-primary .style-select{flex:1 1 190px;min-width:168px;max-width:250px}.toolbar-control-group{display:inline-flex;align-items:center;gap:6px;flex:0 0 auto}.toolbar-row-secondary .toolbar-swatches{flex:0 0 auto}.toolbar-row-secondary .format-painter-group{margin-left:auto}
+.toolbar-note,#selectionHint{display:none!important}.tool-divider{display:none!important}
+.sequence-state,.sequence-image-button,.image-summary,.mode-badge{display:none!important}.sequence-main{grid-template-columns:minmax(0,1fr) auto}.sequence-image-controls{grid-template-columns:minmax(0,1fr) auto auto}
+.mode-status{align-items:center}.mode-status>div{min-width:0;flex:1}
+@media(max-width:700px){
+  .toolbar-heading{flex-wrap:nowrap}.toolbar-heading>div:not(.toolbar-history){min-width:0}
+  .toolbar-row-primary{display:grid;grid-template-columns:minmax(150px,1fr) auto auto;align-items:center}.toolbar-row-primary .style-select{width:100%;min-width:0;max-width:none}
+  .toolbar-row-secondary{display:grid;grid-template-columns:minmax(0,1fr) auto;row-gap:6px}.toolbar-row-secondary .toolbar-swatches{grid-column:1/-1}.toolbar-row-secondary .format-painter-group{margin-left:0}
+  .sequence-main{grid-template-columns:1fr}.sequence-step{justify-self:start}.sequence-image-controls{grid-template-columns:1fr auto}.sequence-image-status{justify-self:start}.sequence-export-all{grid-column:1/-1}
+}
