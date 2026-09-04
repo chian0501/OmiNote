@@ -1,7 +1,7 @@
 'use strict';
 
 (function installExplanationCardUiFold(){
-  const VERSION='UI_FOLD_V2_20260904';
+  const VERSION='UI_FOLD_V3_20260904';
   const $=id=>document.getElementById(id);
   let templateObserver=null;
   let galleryObserver=null;
@@ -209,6 +209,7 @@
       nextFrame(()=>{
         updateTemplateSummary();
         updateGalleryProxy();
+        updateFontSizeDisplay();
       });
     }));
   }
@@ -226,9 +227,9 @@
     TEMPLATES.list.make=()=>[
       block('title','這裡先記住 3 件事'),
       block('subtitle','不需要左欄標記'),
-      block('body','第一個真正重要的重點'),
-      block('body','第二個觀眾會想知道的資訊'),
-      block('body','第三個結論或建議')
+      block('body','<ul><li>第一個真正重要的重點</li></ul>'),
+      block('body','<ul><li>第二個觀眾會想知道的資訊</li></ul>'),
+      block('body','<ul><li>第三個結論或建議</li></ul>')
     ];
   }
 
@@ -244,6 +245,10 @@
       .marker-input:disabled{display:none!important}
       .marker-control:has(.marker-input:disabled){min-width:28px;padding-right:4px;border-right:0}
       .marker-control:has(.marker-input:disabled) input[type=checkbox]{margin:7px 0}
+      #wordPage .rich ul{margin:0;padding-left:1.3em;list-style:disc outside}
+      #wordPage .rich li{display:list-item;margin:0;padding:0}
+      #wordPage .rich li::marker{color:#29A6A7}
+      .size-select option{font-variant-numeric:tabular-nums}
       @media(max-width:700px){
         .toolbar-heading{flex-wrap:wrap}
         .toolbar-heading>div:not(.toolbar-history){min-width:220px;flex:1}
@@ -274,7 +279,9 @@
   function normalizeMarkerUi(){
     document.querySelectorAll('#wordPage .marker-input').forEach(input=>{input.placeholder='標記';});
     const tip=document.querySelector('.word-tip');
-    if(tip)tip.textContent='左側標記只在需要編號／字母／時間軸時使用；一般清單不用開。每個項目獨立一列，標記永遠單行。';
+    if(tip)tip.textContent='年份／字母／序號範本會自動帶左側標記；重點清單會自動帶項目符號。新增一項時會沿用目前範本的結構。';
+    updateAddButtonLabel();
+    nextFrame(updateFontSizeDisplay);
   }
 
   function bindMarkerObserver(){
@@ -283,6 +290,174 @@
     normalizeMarkerUi();
     wordPageObserver=new MutationObserver(normalizeMarkerUi);
     wordPageObserver.observe(page,{subtree:true,childList:true});
+  }
+
+  function bodyBlocks(){
+    if(typeof state==='undefined'||!state||!Array.isArray(state.blocks))return[];
+    return state.blocks.filter(item=>item.kind==='body');
+  }
+
+  function htmlIsSingleBullet(html){
+    const host=document.createElement('div');
+    host.innerHTML=String(html||'');
+    const children=[...host.children];
+    return children.length===1&&children[0].tagName==='UL'&&children[0].children.length===1&&children[0].children[0].tagName==='LI';
+  }
+
+  function detectAddPattern(){
+    const bodies=bodyBlocks();
+    const templateId=typeof state!=='undefined'&&state?String(state.templateId||''):'';
+    if(templateId==='steps')return{kind:'sequence'};
+    if(templateId==='timeline')return{kind:'timeline'};
+    if(templateId==='abcd')return{kind:'letters'};
+    if(templateId==='list')return{kind:'bullet'};
+    if(!bodies.length)return{kind:'plain'};
+    if(bodies.every(item=>item.marker&&item.marker.enabled&&/^\d{2}$/.test(String(item.marker.text||'').trim())))return{kind:'sequence'};
+    if(bodies.every(item=>item.marker&&item.marker.enabled&&/^[A-Z]$/.test(String(item.marker.text||'').trim())))return{kind:'letters'};
+    if(bodies.every(item=>item.marker&&item.marker.enabled&&(/年$/.test(String(item.marker.text||'').trim())||String(item.marker.text||'').trim()==='年份')))return{kind:'timeline'};
+    if(bodies.every(item=>!item.marker?.enabled&&htmlIsSingleBullet(item.html)))return{kind:'bullet'};
+    return{kind:'plain'};
+  }
+
+  function nextSequenceMarker(){
+    const nums=bodyBlocks().map(item=>parseInt(String(item.marker&&item.marker.text||''),10)).filter(Number.isFinite);
+    return String((nums.length?Math.max(...nums):0)+1).padStart(2,'0');
+  }
+
+  function nextLetterMarker(){
+    const codes=bodyBlocks().map(item=>String(item.marker&&item.marker.text||'').trim()).filter(value=>/^[A-Z]$/.test(value)).map(value=>value.charCodeAt(0));
+    return String.fromCharCode(Math.min(90,(codes.length?Math.max(...codes):64)+1));
+  }
+
+  function addStructuredBodyBlock(){
+    if(typeof state==='undefined'||typeof block!=='function'||typeof renderEditor!=='function'||typeof renderCanvas!=='function')return;
+    if(state.blocks.length>=MAX_BLOCKS){if(typeof toast==='function')toast('最多 12 個文字段落。',true);return;}
+    const pattern=detectAddPattern();
+    const emphasize=value=>typeof styled==='function'?styled(value,'section'):value;
+    let added;
+    if(pattern.kind==='sequence')added=block('body',emphasize('新增步驟'),nextSequenceMarker(),true);
+    else if(pattern.kind==='letters')added=block('body',emphasize('新增選項'),nextLetterMarker(),true);
+    else if(pattern.kind==='timeline')added=block('body','新增時間點','年份',true);
+    else if(pattern.kind==='bullet')added=block('body','<ul><li>新增重點</li></ul>');
+    else added=block('body','新增一段說明內容');
+    state.blocks.push(added);
+    state.templateId='custom';
+    renderEditor();
+    renderCanvas();
+    updateAddButtonLabel();
+    nextFrame(updateFontSizeDisplay);
+  }
+
+  function updateAddButtonLabel(){
+    const button=$('addBlock');
+    if(!button)return;
+    const kind=detectAddPattern().kind;
+    button.textContent=kind==='sequence'?`＋ 新增下一步（${nextSequenceMarker()}）`:kind==='letters'?`＋ 新增下一項（${nextLetterMarker()}）`:kind==='timeline'?'＋ 新增時間點（年份）':kind==='bullet'?'＋ 新增重點（•）':'＋ 新增一般段落';
+  }
+
+  function baseFontSize(){
+    if(typeof activeEditor==='undefined'||!activeEditor)return null;
+    const kind=activeEditor.dataset&&activeEditor.dataset.kind||'body';
+    if(typeof BASE_STYLE!=='undefined'&&BASE_STYLE[kind]&&BASE_STYLE[kind].size)return Number(BASE_STYLE[kind].size);
+    return kind==='title'?68:kind==='subtitle'?34:29;
+  }
+
+  function fontSizeAtNode(node){
+    if(typeof activeEditor==='undefined'||!activeEditor)return null;
+    let element=node&&node.nodeType===1?node:node&&node.parentElement;
+    while(element&&element!==activeEditor){
+      const size=parseFloat(element.style&&element.style.fontSize||'');
+      if(Number.isFinite(size)&&size>0)return Math.round(size);
+      element=element.parentElement;
+    }
+    const own=parseFloat(activeEditor.style&&activeEditor.style.fontSize||'');
+    return Number.isFinite(own)&&own>0?Math.round(own):baseFontSize();
+  }
+
+  function rangeFontSize(range){
+    if(!range||typeof activeEditor==='undefined'||!activeEditor||!activeEditor.contains(range.commonAncestorContainer))return baseFontSize();
+    if(range.collapsed)return fontSizeAtNode(range.startContainer);
+    const sizes=new Set();
+    const walker=document.createTreeWalker(activeEditor,NodeFilter.SHOW_TEXT);
+    let node;
+    while((node=walker.nextNode())){
+      if(!String(node.nodeValue||'').trim())continue;
+      let intersects=false;
+      try{intersects=range.intersectsNode(node);}catch(error){intersects=false;}
+      if(intersects){const size=fontSizeAtNode(node);if(size)sizes.add(size);if(sizes.size>1)return'mixed';}
+    }
+    return sizes.size===1?[...sizes][0]:fontSizeAtNode(range.commonAncestorContainer);
+  }
+
+  function currentFontSize(){
+    if(typeof activeEditor==='undefined'||!activeEditor)return null;
+    const selection=window.getSelection&&window.getSelection();
+    if(selection&&selection.rangeCount){
+      const range=selection.getRangeAt(0);
+      if(activeEditor.contains(range.commonAncestorContainer))return rangeFontSize(range);
+    }
+    if(typeof savedRange!=='undefined'&&savedRange&&activeEditor.contains(savedRange.commonAncestorContainer))return rangeFontSize(savedRange);
+    return baseFontSize();
+  }
+
+  function ensureFontSizeOption(select,value,label){
+    if(!select)return;
+    let option=[...select.options].find(item=>item.value===String(value));
+    if(!option){option=document.createElement('option');option.value=String(value);select.appendChild(option);}
+    option.textContent=label;
+    return option;
+  }
+
+  function updateFontSizeDisplay(){
+    const select=$('fontSizeSelect');
+    if(!select)return;
+    [...select.options].forEach(option=>{
+      if(option.value&&option.value!=='mixed')option.textContent=`${option.value} px`;
+    });
+    const size=currentFontSize();
+    if(size==='mixed'){
+      ensureFontSizeOption(select,'mixed','混合字級');
+      select.value='mixed';
+      select.title='目前選取：混合字級';
+      return;
+    }
+    const numeric=Math.round(Number(size)||0);
+    if(numeric>0){
+      ensureFontSizeOption(select,numeric,`${numeric} px`);
+      select.value=String(numeric);
+      select.title=`目前字級：${numeric}px`;
+    }else{
+      select.value='';
+      if(select.options[0])select.options[0].textContent='字級';
+      select.title='字級';
+    }
+  }
+
+  function bindFontSizeReadout(){
+    const select=$('fontSizeSelect');
+    const page=$('wordPage');
+    const toolbar=$('wordToolbar');
+    if(!select||!page)return;
+    if(select.options[0])select.options[0].textContent='字級';
+    [...select.options].forEach(option=>{if(option.value)option.textContent=`${option.value} px`;});
+    select.onchange=event=>{
+      const value=Number(event.target.value);
+      if(Number.isFinite(value)&&value>0&&typeof applyInlineStyle==='function')applyInlineStyle({size:value});
+      nextFrame(updateFontSizeDisplay);
+    };
+    ['focusin','click','keyup','mouseup','input'].forEach(type=>page.addEventListener(type,()=>nextFrame(updateFontSizeDisplay)));
+    if(toolbar)toolbar.addEventListener('click',()=>nextFrame(updateFontSizeDisplay));
+    document.addEventListener('selectionchange',()=>{
+      if(typeof activeEditor!=='undefined'&&activeEditor&&document.activeElement===activeEditor)nextFrame(updateFontSizeDisplay);
+    });
+    nextFrame(updateFontSizeDisplay);
+  }
+
+  function bindStructuredAdd(){
+    const button=$('addBlock');
+    if(!button)return;
+    button.onclick=addStructuredBodyBlock;
+    updateAddButtonLabel();
   }
 
   function init(){
@@ -294,6 +469,8 @@
     bindModeSync();
     moveHistoryControls();
     bindMarkerObserver();
+    bindStructuredAdd();
+    bindFontSizeReadout();
     document.documentElement.dataset.explanationUiFold=VERSION;
   }
 
