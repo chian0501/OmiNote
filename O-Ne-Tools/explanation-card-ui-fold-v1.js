@@ -1,10 +1,11 @@
 'use strict';
 
 (function installExplanationCardUiFold(){
-  const VERSION='UI_FOLD_V1_20260904';
+  const VERSION='UI_FOLD_V2_20260904';
   const $=id=>document.getElementById(id);
   let templateObserver=null;
   let galleryObserver=null;
+  let wordPageObserver=null;
 
   function text(value){return String(value||'').replace(/\s+/g,' ').trim();}
   function nextFrame(fn){if(typeof requestAnimationFrame==='function')requestAnimationFrame(fn);else setTimeout(fn,0);}
@@ -212,11 +213,87 @@
     }));
   }
 
+  function installCompactItemDefaults(){
+    if(typeof TEMPLATES==='undefined'||typeof block!=='function')return;
+    const emphasize=value=>typeof styled==='function'?styled(value,'section'):value;
+    TEMPLATES.steps.make=()=>[
+      block('title','照這幾步走就好'),
+      block('subtitle','第一次去也能快速跟上'),
+      block('body',emphasize('先找到入口'),'01',true),
+      block('body',emphasize('接著完成第二步'),'02',true),
+      block('body',emphasize('最後確認'),'03',true)
+    ];
+    TEMPLATES.list.make=()=>[
+      block('title','這裡先記住 3 件事'),
+      block('subtitle','不需要左欄標記'),
+      block('body','第一個真正重要的重點'),
+      block('body','第二個觀眾會想知道的資訊'),
+      block('body','第三個結論或建議')
+    ];
+  }
+
+  function installCompactItemStyles(){
+    if($('explanationCardItemRowPatch'))return;
+    const style=document.createElement('style');
+    style.id='explanationCardItemRowPatch';
+    style.textContent=`
+      .toolbar-heading{align-items:center}
+      .toolbar-history{display:flex;align-items:center;gap:6px;flex:0 0 auto;margin-left:auto}
+      .toolbar-history .tool-btn{height:32px;min-width:34px}
+      .toolbar-heading .image-trigger{margin-left:0}
+      .marker-input:disabled{display:none!important}
+      .marker-control:has(.marker-input:disabled){min-width:28px;padding-right:4px;border-right:0}
+      .marker-control:has(.marker-input:disabled) input[type=checkbox]{margin:7px 0}
+      @media(max-width:700px){
+        .toolbar-heading{flex-wrap:wrap}
+        .toolbar-heading>div:not(.toolbar-history){min-width:220px;flex:1}
+        .toolbar-history{margin-left:0}
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  function moveHistoryControls(){
+    const toolbar=$('wordToolbar');
+    const heading=toolbar&&toolbar.querySelector('.toolbar-heading');
+    if(!toolbar||!heading||heading.querySelector('.toolbar-history'))return;
+    const undo=toolbar.querySelector('[data-cmd="undo"]');
+    const redo=toolbar.querySelector('[data-cmd="redo"]');
+    if(!undo||!redo)return;
+    const group=document.createElement('div');
+    group.className='toolbar-history';
+    group.setAttribute('aria-label','復原與重做');
+    group.append(undo,redo);
+    const image=$('openImageDrawer');
+    if(image&&image.parentNode===heading)heading.insertBefore(group,image);
+    else heading.appendChild(group);
+    const divider=[...toolbar.children].find(el=>el.classList&&el.classList.contains('tool-divider'));
+    if(divider)divider.remove();
+  }
+
+  function normalizeMarkerUi(){
+    document.querySelectorAll('#wordPage .marker-input').forEach(input=>{input.placeholder='標記';});
+    const tip=document.querySelector('.word-tip');
+    if(tip)tip.textContent='左側標記只在需要編號／字母／時間軸時使用；一般清單不用開。每個項目獨立一列，標記永遠單行。';
+  }
+
+  function bindMarkerObserver(){
+    const page=$('wordPage');
+    if(!page)return;
+    normalizeMarkerUi();
+    wordPageObserver=new MutationObserver(normalizeMarkerUi);
+    wordPageObserver.observe(page,{subtree:true,childList:true});
+  }
+
   function init(){
+    installCompactItemDefaults();
+    installCompactItemStyles();
     buildTemplateFold();
     buildLabelFold();
     buildGalleryFold();
     bindModeSync();
+    moveHistoryControls();
+    bindMarkerObserver();
     document.documentElement.dataset.explanationUiFold=VERSION;
   }
 
