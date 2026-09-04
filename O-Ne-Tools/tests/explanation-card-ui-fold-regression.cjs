@@ -24,4 +24,17 @@ assert(css.includes('.gallery-layouts-original{display:none!important}'),'old la
 assert(css.includes('.settings>.label-setting'),'label fold must align with the settings section');
 assert(css.includes('.gallery-editor-head small{font-size:10px'),'tiny gallery helper text must be normalized for legibility');
 
+assert(js.includes("TEMPLATES.steps.make=()=>["),'step template must be overridden by the compact one-line variant');
+assert(js.includes("block('body',emphasize('先找到入口'),'01',true)"),'step rows must stay separate and keep the 01 marker');
+assert(!js.includes("補充要做什麼與辨識點。"),'step defaults must not inject a second explanatory line');
+assert(js.includes("TEMPLATES.list.make=()=>["),'list template must use separate body blocks');
+assert(js.includes("block('body','第一個真正重要的重點')"),'first list item must be its own block');
+assert(js.includes("block('body','第二個觀眾會想知道的資訊')"),'second list item must be its own block');
+assert(js.includes("block('body','第三個結論或建議')"),'third list item must be its own block');
+assert(js.includes("input.placeholder='標記'"),'generic marker placeholder must not imply every row is a year row');
+assert(js.includes(".marker-input:disabled{display:none!important}"),'unused marker input must disappear instead of occupying every row');
+assert(js.includes("group.className='toolbar-history'"),'undo and redo must be grouped with the toolbar heading instead of taking a row alone');
+assert(js.includes("group.append(undo,redo)"),'undo and redo must move together');
+assert(js.includes("heading.insertBefore(group,image)"),'history controls must sit beside the image action in the editor heading');
+
 console.log('explanation-card UI fold regression: PASS');
