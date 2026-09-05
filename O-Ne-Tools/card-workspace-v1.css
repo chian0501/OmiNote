@@ -167,6 +167,15 @@ body[data-one-card-workspace=focus] .one-workspace-header {padding:12px 0 0;marg
 .one-workspace-react-app .mode-tabs {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));}
 .one-workspace-react-app .mode-tabs button {min-width:0;}
 .one-workspace-react-app .optional-copy-controls,.one-workspace-react-app .color-grid,.one-workspace-react-app .preset-section {grid-template-columns:1fr;}
+/* The settings column stays narrow even on a wide monitor. Reuse the native
+   compact layout for composite label/color controls at every viewport width. */
+.one-workspace-react-app .color-preset-control,.one-workspace-react-app .label-color-block,
+.one-workspace-react-app .label-text-controls,.one-workspace-react-app .label-text-color,
+.one-workspace-react-app .item-frame-tools {grid-template-columns:1fr;}
+.one-workspace-react-app .label-position-choice {grid-template-columns:repeat(2,minmax(0,1fr));}
+.one-workspace-react-app .label-position-choice > .field-label {grid-column:1 / -1;}
+.one-workspace-react-app .color-swatches {grid-template-columns:repeat(2,minmax(0,1fr));}
+.one-workspace-react-app .item-frame-bulk-actions {flex-wrap:wrap;}
 .one-workspace-react-app .item-row {grid-template-columns:18px 25px minmax(0,1fr);}
 .one-workspace-react-app .item-row .row-actions {grid-column:2 / -1;justify-content:flex-end;flex-wrap:wrap;}
 [data-one-workspace-ready] .one-workspace-react-app .one-workspace-preview {min-height:0;}

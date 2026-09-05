@@ -177,6 +177,19 @@ for (const card of cards) {
         await page.locator('.preview-switch').getByRole('button', { name: '元件', exact: true }).click();
         await expect(page.locator(mainCanvas)).not.toHaveAttribute('width', '1920');
         await screenshot(page, info, `${card.id}-${width}-component`);
+        const swatches = page.locator('.color-swatches button');
+        const editorBox = await page.locator('.one-workspace-editor').boundingBox();
+        for (let i = 0; i < await swatches.count(); i++) {
+          if (!await swatches.nth(i).isVisible()) continue;
+          const box = await swatches.nth(i).boundingBox();
+          expect(box.width, 'color labels have usable width in the narrow sidebar').toBeGreaterThanOrEqual(60);
+          expect(box.x).toBeGreaterThanOrEqual(editorBox.x);
+          expect(box.x + box.width).toBeLessThanOrEqual(editorBox.x + editorBox.width);
+        }
+        if (await page.locator('.color-swatches').first().isVisible()) {
+          await page.locator('.color-swatches').first().scrollIntoViewIfNeeded();
+          await screenshot(page, info, `${card.id}-${width}-color-controls`);
+        }
         await page.locator('.preview-switch').getByRole('button', { name: '全畫布', exact: true }).click();
         await expect(page.locator(mainCanvas)).toHaveAttribute('width', '1920');
       }
