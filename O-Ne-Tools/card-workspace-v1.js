@@ -191,13 +191,13 @@
     if (!state.editor.id) state.editor.id = 'one-workspace-editor';
     toggle.setAttribute('aria-controls', state.editor.id);
     bar.appendChild(toggle);
-    var summary = element('span', 'one-workspace-mode-hint', state.config.name + '｜編輯內容後即時預覽');
+    var summary = element('span', 'one-workspace-mode-hint', '點字卡文字直接編輯｜預覽最多 100%，只縮小');
     bar.appendChild(summary);
     if (state.config.mode) {
       var control = document.getElementById(state.config.mode);
       if (control) {
-        var mode = element('details', 'one-workspace-mode');
-        var heading = element('summary');
+        var mode = element('section', 'one-workspace-mode');
+        var heading = element('div', 'one-workspace-mode-heading');
         var value = element('span', 'one-workspace-mode-value');
         heading.append(element('strong', '', '版型與狀態'), value);
         var body = element('div', 'one-workspace-mode-content');
@@ -210,7 +210,7 @@
           if (custom) body.appendChild(custom);
         }
         mode.append(heading, body);
-        bar.appendChild(mode);
+        state.editor.insertBefore(mode, state.editor.firstChild);
         var update = function () {
           var selected = control.options[control.selectedIndex];
           var text = selected ? selected.textContent : '';
@@ -275,21 +275,21 @@
   }
 
   function fitPreview(state) {
-    if (state.config.react || !state.canvas || !state.stage) return;
+    if (!state.canvas || !state.stage) return;
     var rect = state.stage.getBoundingClientRect();
     var width = state.canvas.width, height = state.canvas.height;
     if (!width || !height) return;
     var size = width + ' × ' + height + ' px';
     if (state.size.textContent !== size) state.size.textContent = size;
     if (rect.width <= 24 || rect.height <= 24) return;
-    var scale = state.zoom.value === 'actual' ? 1 : Math.min((rect.width - 32) / width, (rect.height - 32) / height);
+    var scale = state.zoom.value === 'actual' ? 1 : Math.min(1, (rect.width - 32) / width, (rect.height - 32) / height);
     state.stage.classList.toggle('one-workspace-actual-size', state.zoom.value === 'actual');
     state.canvas.style.width = Math.max(1, Math.round(width * scale)) + 'px';
     state.canvas.style.height = Math.max(1, Math.round(height * scale)) + 'px';
+    if (global.ONECardDirectEdit) global.ONECardDirectEdit.refresh();
   }
   function preparePreview(state) {
     state.preview.classList.add('one-workspace-preview');
-    if (state.config.react) return;
     var originalTitle = state.preview.querySelector(':scope > .section-title');
     if (originalTitle) originalTitle.classList.add('one-workspace-empty');
     var toolbar = element('div', 'one-workspace-preview-heading');
@@ -299,7 +299,7 @@
     zoomLabel.setAttribute('role', 'group');
     zoomLabel.setAttribute('aria-label', '預覽縮放');
     zoomLabel.append(element('span', '', '檢視'));
-    state.zoom = { value: state.config.actualSize ? 'actual' : 'fit' };
+    state.zoom = { value: 'fit' };
     var zoomButtons = [];
     [['fit', '適合畫面'], ['actual', '100% 原尺寸']].forEach(function (entry) {
       var option = button(entry[1], '', function () {
@@ -322,7 +322,7 @@
     var status = document.getElementById('status');
     if (status) footer.appendChild(status);
     var exports = element('div', 'one-workspace-export-actions');
-    ['download', 'downloadPng', 'downloadWhite', 'downloadOrange', 'downloadBoth'].forEach(function (id) {
+    ['downloadSet', 'download', 'downloadPng', 'downloadWhite', 'downloadOrange', 'downloadBoth'].forEach(function (id) {
       var node = document.getElementById(id);
       if (node && /^(BUTTON|A)$/.test(node.tagName)) {
         node.classList.add('one-workspace-export-button');
@@ -330,7 +330,7 @@
       }
     });
     if (exports.children.length) footer.appendChild(exports);
-    state.preview.appendChild(footer);
+    if (!state.config.react) state.preview.appendChild(footer);
     if (global.ResizeObserver && state.stage) {
       state.resizeObserver = new ResizeObserver(function () { fitPreview(state); });
       state.resizeObserver.observe(state.stage);
@@ -449,7 +449,7 @@
     observer = new MutationObserver(schedule);
     observer.observe(document.body, { childList: true, subtree: true });
   }
-  global.ONECardWorkspace = { version: '1.0.0', refresh: refresh };
+  global.ONECardWorkspace = { version: '1.1.0', refresh: refresh };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
   else init();
 })(window);
