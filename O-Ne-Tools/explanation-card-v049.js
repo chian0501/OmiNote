@@ -41,7 +41,7 @@
     return blocks.map((item,index)=>{
       let frame=source.find(candidate=>candidate&&String(candidate.blockId||candidate.block_id||'')===item.id);
       if(frame)used.add(frame);
-      if(!frame&&source[index]&&!used.has(source[index])){
+      if(!frame&&source[index]&&!used.has(source[index])&&!source[index].blockId&&!source[index].block_id){
         frame=source[index];
         used.add(frame);
       }
@@ -147,6 +147,24 @@
     if($('explanationImage'))$('explanationImage').value='';
     syncSettings();
     activatingSequenceImage=false;
+  }
+
+  // Candidate workspace inheritance: stable IDs, same assets and crop settings.
+  function copyStepImage(toId,fromId){
+    if(!toId||!fromId||toId===fromId)return false;
+    if(activeSequenceBlockId!==toId)saveActiveSequenceFrame();
+    reconcileSequenceFrames();
+    const source=state.sequence.frames.find(f=>f.blockId===fromId);
+    const target=state.sequence.frames.find(f=>f.blockId===toId);
+    if(!source||!target)return false;
+    const asset=sequenceAssets.get(fromId);
+    target.image=clone(source.image);
+    if(asset)sequenceAssets.set(toId,cloneRuntimeAsset(asset));else sequenceAssets.delete(toId);
+    if(activeSequenceBlockId===toId){
+      state.image=clone(target.image);
+      imageElement=asset?.element||null;imageDataUrl=asset?.dataUrl||null;imageMimeType=asset?.mimeType||null;
+    }
+    return Boolean(asset);
   }
 
   function configuredSequenceCount(){
@@ -641,6 +659,7 @@
     version:VERSION,
     getState:()=>capture(),
     getSequenceAssets:()=>new Map(sequenceAssets),
+    copyStepImage,
     activateStep:index=>{activateSequenceStep(index);renderEditor();return renderCanvas();},
     projectPayload,
     loadProjectPayload,
