@@ -103,6 +103,12 @@ Command Center V0.9.4 也會讀取同一份 canonical registry，並顯示全部
 - 對話卡已確認為正式卡，後續整合 Omi／涅特／Kuma／Nomi／NPC／雙人與表情選擇。
 - 玩家 1 為移動卡同系藍色，玩家 2 為紅色。
 
+## 共用編輯介面瀏覽器驗收
+
+GitHub Actions 的 `Card workspace browser QA` 使用鎖定版本 Chromium／Playwright，執行 12 個工具 × 1920／1366／390 px 共 36 組版面與鍵盤測試，另有 12 組編輯、JSON 往返、暫存還原、專案 ZIP 往返、PNG 與批次 ZIP 實際下載測試。縮圖品牌框另以真實 PNG 驗證專案包圖片回填。固定基準 `07e37a9dfbbddd3e27a91d4a80b6d40c5a12bb53` 用於瀏覽器 Canvas 像素比對；此基準不可默默更新為候選版。
+
+流程僅有 `contents: read`，不含發布權限或密鑰，保留 30 天截圖、下載樣本、失敗 trace 與 HTML／JSON 報告。測試入口為 `tests/card-workspace.browser.spec.cjs`，隔離的靜態服務只在 runner loopback 提供工具檔案。**工作流程全綠不等於視覺核准**：合併前必須打開 artifact 檢視實際畫面，核對字型、溢出、卡面、控制項與手機捲動，再依既有核准決定合併；失敗或缺少證據時保持未合併。
+
 ## 維護規則
 - 後續新工具或版本更新，直接更新 `O-Ne-Tools/` 內對應檔案。
 - 新增工具時只更新 canonical `one-tools-registry-v1.json`；入口頁會自動讀取。
