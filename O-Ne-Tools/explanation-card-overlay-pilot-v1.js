@@ -36,19 +36,21 @@
   const plain=html=>{const el=document.createElement('div');el.innerHTML=sanitizeHtml(html);return el.textContent||'';};
 
   function targets(layout){
-    if(!layout||state.mode==='gallery')return [];
+    if(!layout)return [];
+    if(state.mode==='gallery')return [{id:layout.title.id,kind:'title',x:layout.titleX,y:layout.titleY,w:layout.titleW,h:layout.titleLayout.height,rich:layout.titleLayout,align:layout.title.align}];
     const result=[];
     for(const kind of ['title','subtitle']){
       const b=currentBlocks().find(item=>item.kind===kind),rich=layout[kind+'Layout'];
       if(b&&rich?.lines?.length)result.push({id:b.id,kind,x:layout.textX,y:layout[kind+'Y'],w:layout.textW,h:rich.height,rich,align:b.align});
     }
     const visible=visibleIds();
-    for(const row of layout.rows||[])if(visible.has(row.block.id))
+    for(const row of layout.rows||[])if(visible.has(row.block.id)&&!row.isNote)
       result.push({id:row.block.id,kind:'body',x:row.rowTextX,y:row.y,w:row.rowTextW,h:row.rich.height,rich:row.rich,align:row.block.align});
+    if(layout.inlineNote&&visible.has(layout.inlineNote.id))result.push(layout.inlineNote);
     return result;
   }
-  function supported(target){return target?.rich?.lines?.length===1;}
-  function geometry(){return layoutCard(preview.getContext('2d'));}
+  function supported(target){return target?.rich?.lines?.length===1||Boolean(target?.isNote);}
+  function geometry(){return state.mode==='gallery'?lastLayout:layoutCard(preview.getContext('2d'));}
   function targetFor(id,layout=geometry()){return targets(layout).find(t=>t.id===id);}
   function richFor(id){return page.querySelector(`.edit-block[data-id="${CSS.escape(id)}"] .rich`);}
   function tellComposition(){status('請先完成中文選字，再切換項目、套格式或輸出。');}
@@ -134,7 +136,7 @@
     const clone=rich.cloneNode(true);clone.removeAttribute('contenteditable');clone.className='one-overlay-measure';
     Object.assign(clone.style,{position:'fixed',left:'-10000px',top:'0',visibility:'hidden',padding:'0',margin:'0',whiteSpace:'pre-wrap',wordBreak:'break-all',border:'0'});
     const probe=document.createElement('span');probe.style.cssText='display:inline-block;width:0;height:0;padding:0;margin:0;vertical-align:baseline';
-    (clone.querySelector('li')||clone).appendChild(probe);document.body.appendChild(clone);
+    (clone.querySelector('li')||clone).prepend(probe);document.body.appendChild(clone);
     const domBaseline=probe.getBoundingClientRect().top-clone.getBoundingClientRect().top;clone.remove();
     rich.style.transform=`translateY(${line.height*.78-domBaseline}px)`;
     if(target.rich.lines.length>1)status('內容已超過單行；完成後請縮短文案，或改用原編輯區。內容不會被刪除。');
@@ -145,7 +147,7 @@
     if(list.dataset.signature===signature)return;list.dataset.signature=signature;list.replaceChildren();
     currentBlocks().forEach(b=>{
       const button=document.createElement('button');button.type='button';button.dataset.overlayBlock=b.id;
-      const prefix=b.kind==='title'?'主標':b.kind==='subtitle'?'副標':`${bodyBlocks().findIndex(x=>x.id===b.id)+1}${visible.has(b.id)?'':'・後續幕'}`;
+      const prefix=b.id===state.note?.blockId?'小提醒':b.kind==='title'?'主標':b.kind==='subtitle'?'副標':`${bodyBlocks().findIndex(x=>x.id===b.id)+1}${visible.has(b.id)?'':'・後續幕'}`;
       button.textContent=`${prefix}｜${plain(b.html)||'（空白）'}`;button.title=button.textContent;
       button.addEventListener('click',()=>open(b.id));list.appendChild(button);
     });
@@ -156,11 +158,12 @@
       source.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true}));source.click();
       const id=bodyBlocks().at(-1)?.id;setTimeout(()=>{refreshOutline();if(id)open(id);},30);
     });list.appendChild(add);
+    window.ONEExplanationWorkspace?.decorateOutline(list,open);
   }
   function refresh(){
     refreshToken=0;
     if(session&&!page.contains(session.rich)){session=null;home.after(page);page.classList.remove('one-overlay-page');page.hidden=enabled;}
-    if(enabled&&state.mode==='gallery'){showOriginal();return;}
+
     if(session){const target=targetFor(session.id);if(target&&!supported(target)&&!composing&&!settling){const id=session.id;showOriginal(id);status('文字已超過單行，已保留內容並切回原編輯區。');return;}if(target)position(target);}
     refreshOutline();
   }
@@ -195,6 +198,7 @@
     const layout=geometry(),hit=targets(layout).find(t=>x>=t.x&&x<=t.x+t.w&&y>=t.y&&y<=t.y+Math.max(t.h,30));
     if(hit){event.preventDefault();open(hit.id,{x:event.clientX,y:event.clientY});return;}
     if(state.mode!=='gallery'&&x>=layout.imageX&&x<=layout.imageX+layout.imageW&&y>=layout.imageY&&y<=layout.imageY+layout.imageH){if(finish())$('openImageDrawer')?.click();return;}
+    if(state.mode==='gallery'){const i=layout.rects?.findIndex(r=>x>=r.x&&x<=r.x+r.w&&y>=r.y&&y<=r.y+r.h);if(i>=0){finish();document.querySelector(`[data-gallery-upload="${i}"]`)?.click();return;}}
     finish();
   });
   document.addEventListener('compositionstart',event=>{
@@ -247,10 +251,19 @@
   window.ONEExplanationOverlayPilot={version:'OVERLAY_PILOT_V1_20260905',open,finish,showOriginal,enable,
     state:()=>({enabled,activeBlockId:session?.id||null,composing:composing||settling}),
     targets:()=>targets(geometry()).map(({rich,...target})=>({...target,supported:supported({rich})}))};
-  document.title='說明卡｜原位編輯 PILOT（未發布）';
+  document.title='說明卡｜截圖需求整合候選（未發布）';
   const badge=document.querySelector('.title-line .badge');
   if(badge){badge.textContent='PILOT';badge.classList.remove('is-ready');}
   const liveStatus=document.querySelector('.app-header .status');
   if(liveStatus)liveStatus.textContent='候選樣品｜未合併／未部署';
   enable();
+  window.ONEExplanationWorkspace?.mountAfterOverlay();
+  // Reuse the existing native save-host boundary. No shared-shell change is needed.
+  const quickHost=$('quickSaveHost'),projectBar=$('oneProjectBar');
+  if(quickHost&&projectBar){
+    quickHost.id='oneQuickSaveContents';
+    const nativeHost=document.createElement('div');nativeHost.id='quickSaveHost';
+    nativeHost.style.cssText='position:sticky;top:0;z-index:35';
+    projectBar.before(nativeHost);nativeHost.append(projectBar);
+  }
 })();
