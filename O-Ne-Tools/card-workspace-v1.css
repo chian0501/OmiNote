@@ -161,7 +161,8 @@ body[data-one-card-workspace=focus] .one-workspace-header {padding:12px 0 0;marg
 .one-workspace-react-app > .app-header {display:none;}
 [data-one-workspace-ready] .one-workspace-react-app .workspace {align-items:start;flex:none;}
 [data-one-workspace-ready] .one-workspace-react-app.app-shell .one-workspace-editor.editor-panel {padding:0;min-height:0;height:calc(100dvh - 143px);max-height:900px;top:12px;display:flex;flex-direction:column;}
-.one-workspace-react-app .editor-scroll {min-height:0;overflow:auto;}
+/* Contain absolutely positioned, visually hidden upload inputs in this scroller. */
+.one-workspace-react-app .editor-scroll {position:relative;min-height:0;overflow:auto;}
 .one-workspace-react-app .editor-section,.one-workspace-react-app .advanced-section,.one-workspace-react-app .preset-section {padding:13px;}
 .one-workspace-react-app .mode-tabs {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));}
 .one-workspace-react-app .mode-tabs button {min-width:0;}

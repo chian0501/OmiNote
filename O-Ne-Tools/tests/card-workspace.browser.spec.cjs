@@ -133,6 +133,10 @@ for (const card of cards) {
       await info.attach('layout-geometry', { body: JSON.stringify(geometry, null, 2), contentType: 'application/json' });
       const contentBottom = Math.max(geometry.viewport.height, ...geometry.elements.filter(e => ['.one-workspace-editor', '.one-workspace-preview'].includes(e.selector)).map(e => e.bottom));
       expect.soft(geometry.elements.find(e => e.selector === 'html').scrollHeight, 'no large blank area below the editor and preview').toBeLessThanOrEqual(contentBottom + 40);
+      if (card.id === 'focus') {
+        const editor = geometry.elements.find(e => e.selector === '.one-workspace-editor');
+        expect.soft(editor.scrollHeight, 'upload inputs must not create a second outer scrollbar').toBeLessThanOrEqual(editor.height + 1);
+      }
       const dimensions = await page.evaluate(() => ({ viewport: innerWidth, document: document.documentElement.scrollWidth }));
       expect(dimensions.document, 'no document-level horizontal overflow').toBeLessThanOrEqual(dimensions.viewport + 1);
       await expect(page.locator('.one-workspace-header')).toHaveCount(1);
