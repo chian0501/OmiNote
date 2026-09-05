@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>說明卡｜原位編輯 Pilot（未發布候選）</title>
+<style>html,body{margin:0;height:100%;background:#0c131b;color:#d9ecec;font:14px system-ui}body{display:flex;flex-direction:column}header{padding:10px 16px;display:flex;gap:16px;align-items:center;flex-wrap:wrap}header b{color:#ffbe37}header a{color:#8fdfdb}iframe{flex:1;width:100%;border:0;min-height:0}</style></head>
+<body><header><b>原位編輯 Pilot｜非正式版</b><span id="loadStatus">載入原生成器…</span><a href="./explanation-card.html">開啟原版</a></header>
+<iframe id="app" title="說明卡原位編輯候選" src="./explanation-card.html?overlay_pilot=1"></iframe>
+<script>
+'use strict';
+const frame=document.getElementById('app'),status=document.getElementById('loadStatus');
+frame.addEventListener('load',()=>{
+  let attempts=0;
+  const wait=setInterval(()=>{
+    try{
+      const w=frame.contentWindow,d=frame.contentDocument;
+      if(!w.ONEExplanationFormatCore){if(++attempts>100){clearInterval(wait);status.textContent='未讀到格式核心；請以本機 HTTP 伺服器開啟候選分支。';}return;}
+      clearInterval(wait);
+      const css=d.createElement('link');css.rel='stylesheet';css.href='./explanation-card-overlay-pilot-v1.css';d.head.appendChild(css);
+      css.onload=()=>{const script=d.createElement('script');script.src='./explanation-card-overlay-pilot-v1.js';script.onload=()=>{status.textContent=w.ONEExplanationOverlayPilot?'可點成品的單行文字直接改字。':'候選未啟用，請回到原版。';};script.onerror=()=>{status.textContent='候選模組讀取失敗；原版未被修改。';};d.body.appendChild(script);};
+      css.onerror=()=>{status.textContent='候選樣式讀取失敗；原版未被修改。';};
+    }catch(error){clearInterval(wait);status.textContent='請以本機 HTTP 伺服器開啟，不支援 file:// 跨視窗存取。';}
+  },100);
+});
+</script></body></html>
