@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>字卡編輯器畫面驗收</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #e8edf1; font: 14px/1.5 system-ui, sans-serif; color: #18232d; }
+    header { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; gap: 12px; padding: 10px 16px; background: #fff; border-bottom: 1px solid #9aabb9; }
+    select, button { font: inherit; padding: 6px 10px; }
+    button[aria-pressed="true"] { background: #164d52; color: #fff; }
+    output { margin-left: auto; }
+    main { padding: 12px; width: max-content; min-width: 100%; }
+    iframe { display: block; border: 0; background: #0b1016; box-shadow: 0 0 0 1px #9aabb9; }
+  </style>
+</head>
+<body>
+  <header>
+    <label>驗收工具 <select id="tool" aria-label="驗收工具">
+      <option value="general-card.html">一般卡</option>
+      <option value="trigger-card.html">觸發卡</option>
+      <option value="persistent-card.html">常駐卡</option>
+      <option value="effect-card.html">效果卡</option>
+      <option value="move-card.html">移動卡</option>
+      <option value="choice-card.html">選項卡</option>
+      <option value="challenge-card.html">挑戰卡</option>
+      <option value="dialogue-card-v135.html">對話卡</option>
+      <option value="rating-card.html">評分卡</option>
+      <option value="focus-card.html">焦點內容卡</option>
+      <option value="thumbnail-frame.html">縮圖品牌框</option>
+      <option value="settlement-card.html">片尾結算</option>
+    </select></label>
+    <button type="button" data-width="1920" data-height="1080" aria-pressed="true">1920 桌面</button>
+    <button type="button" data-width="1366" data-height="900" aria-pressed="false">1366 桌面</button>
+    <button type="button" data-width="390" data-height="844" aria-pressed="false">390 窄螢幕</button>
+    <output id="size">1920 × 1080</output>
+  </header>
+  <main><iframe id="editor" title="字卡編輯器" src="../general-card.html" width="1920" height="1080"></iframe></main>
+  <script>
+    const frame = document.getElementById('editor');
+    document.getElementById('tool').addEventListener('change', event => {
+      frame.src = '../' + event.target.value;
+    });
+    document.querySelectorAll('button[data-width]').forEach(button => {
+      button.addEventListener('click', () => {
+        frame.width = button.dataset.width;
+        frame.height = button.dataset.height;
+        document.getElementById('size').textContent = frame.width + ' × ' + frame.height;
+        document.querySelectorAll('button[data-width]').forEach(other => {
+          other.setAttribute('aria-pressed', String(other === button));
+        });
+      });
+    });
+  </script>
+</body>
+</html>

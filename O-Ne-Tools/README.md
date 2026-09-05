@@ -35,6 +35,8 @@ O-Ne 字卡工具入口與編輯器集合。
 
 程式驗證：`tests/card-workspace-regression.cjs` 已以 Node.js 24、`jsdom@30.0.1` 與 `@napi-rs/canvas@0.1.100` 執行。依賴可安裝到外部暫存目錄並透過 `NODE_PATH` 載入，正式網頁不需要 npm。執行 `node O-Ne-Tools/tests/card-workspace-regression.cjs` 會比較 12 個工具更新前後的原生控制項、Canvas PNG、編輯、暫存快照、還原與下載事件；基準提交預設為 `07e37a9`，可用 `ONE_WORKSPACE_BASE_REF` 指定。這項測試不取代實際瀏覽器的桌面／窄螢幕畫面檢查。
 
+畫面驗收：根目錄執行 `npm ci`、`npm run dev`，開啟開發伺服器會進入 `tests/workspace-preview.html`。可切換 12 個工具，使用 1920 × 1080、1366 × 900、390 × 844 的 iframe 視窗檢查排版及操作。Vite 與驗收頁僅供開發，正式 GitHub Pages 仍直接使用既有靜態 HTML。
+
 入口頁只讀 `one-tools-registry-v1.json`；`registry.json` 僅保留相容指標，不再複製一份舊工具清單。
 Command Center V0.9.4 也會讀取同一份 canonical registry，並顯示全部 13 個可用工具，避免入口數量與導覽內容不同步。依 Omi 明確核准的例外，專案頁直接提供 8 個專案共 47 個母專案、企劃卡與 01～04 Drive／Docs 入口，不再要求每台瀏覽器匯入；Google 權限仍是內容存取的唯一判定。USJ 尚無已核對的唯一企劃卡入口，因此目前提供 5 個，其餘每案 6 個。正式白名單優先於舊 localStorage；本機資料只能補尚未提供的欄位與備份相容，不能覆蓋已核對網址。
 
