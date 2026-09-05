@@ -175,7 +175,11 @@
     }
     return baseDraw(context,layout,x,y,width,align);
   };
-  renderCanvas=function(target=preview){const result=baseRender(target);if(target===preview){if(session)position(targetFor(session.id,result));schedule();}return result;};
+  renderCanvas=function(target=preview){
+    // Detached export canvases otherwise lose inherited zh-Hant glyph selection.
+    // Reuse the document language for preview, PNG and ZIP without changing layout.
+    if(!target.hasAttribute('lang'))target.lang=document.documentElement.lang||'zh-Hant';
+    const result=baseRender(target);if(target===preview){if(session)position(targetFor(session.id,result));schedule();}return result;};
   renderEditor=function(){
     // Structural/import callers may already have replaced state. Never sync stale DOM back into it.
     rebuilding=true;
@@ -243,5 +247,10 @@
   window.ONEExplanationOverlayPilot={version:'OVERLAY_PILOT_V1_20260905',open,finish,showOriginal,enable,
     state:()=>({enabled,activeBlockId:session?.id||null,composing:composing||settling}),
     targets:()=>targets(geometry()).map(({rich,...target})=>({...target,supported:supported({rich})}))};
+  document.title='說明卡｜原位編輯 PILOT（未發布）';
+  const badge=document.querySelector('.title-line .badge');
+  if(badge){badge.textContent='PILOT';badge.classList.remove('is-ready');}
+  const liveStatus=document.querySelector('.app-header .status');
+  if(liveStatus)liveStatus.textContent='候選樣品｜未合併／未部署';
   enable();
 })();
