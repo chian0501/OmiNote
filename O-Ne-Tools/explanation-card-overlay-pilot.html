@@ -1,23 +1,37 @@
 <!doctype html>
 <html lang="zh-Hant">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>說明卡｜原位編輯 Pilot（未發布候選）</title>
-<style>html,body{margin:0;height:100%;background:#0c131b;color:#d9ecec;font:14px system-ui}body{display:flex;flex-direction:column}header{padding:10px 16px;display:flex;gap:16px;align-items:center;flex-wrap:wrap}header b{color:#ffbe37}header a{color:#8fdfdb}iframe{flex:1;width:100%;border:0;min-height:0}</style></head>
-<body><header><b>原位編輯 Pilot｜非正式版</b><span id="loadStatus">載入原生成器…</span><a href="./explanation-card.html">開啟原版</a></header>
-<iframe id="app" title="說明卡原位編輯候選" src="./explanation-card.html?overlay_pilot=1"></iframe>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>說明卡｜截圖需求整合候選 V2</title>
+<style>html,body{height:100%;margin:0;background:#0c131b;color:#d9ecec;font:13px system-ui}body{display:flex;flex-direction:column}header{display:flex;gap:16px;align-items:center;padding:7px 14px;flex-wrap:wrap}header b{color:#ffbe37}header a{color:#8fdfdb}iframe{flex:1;border:0;width:100%;min-height:0}</style></head>
+<body><header><b>截圖需求整合 V2｜候選，未上線</b><span id="loadStatus">檢查來源與載入修正…</span><a href="./explanation-card.html">原版入口</a></header><iframe id="app" title="說明卡截圖需求整合候選"></iframe>
 <script>
 'use strict';
-const frame=document.getElementById('app'),status=document.getElementById('loadStatus');
-frame.addEventListener('load',()=>{
-  let attempts=0;
-  const wait=setInterval(()=>{
-    try{
-      const w=frame.contentWindow,d=frame.contentDocument;
-      if(!w.ONEExplanationFormatCore){if(++attempts>100){clearInterval(wait);status.textContent='未讀到格式核心；請以本機 HTTP 伺服器開啟候選分支。';}return;}
-      clearInterval(wait);
-      const css=d.createElement('link');css.rel='stylesheet';css.href='./explanation-card-overlay-pilot-v1.css';d.head.appendChild(css);
-      css.onload=()=>{const script=d.createElement('script');script.src='./explanation-card-overlay-pilot-v1.js';script.onload=()=>{status.textContent=w.ONEExplanationOverlayPilot?'可點成品的單行文字直接改字。':'候選未啟用，請回到原版。';};script.onerror=()=>{status.textContent='候選模組讀取失敗；原版未被修改。';};d.body.appendChild(script);};
-      css.onerror=()=>{status.textContent='候選樣式讀取失敗；原版未被修改。';};
-    }catch(error){clearInterval(wait);status.textContent='請以本機 HTTP 伺服器開啟，不支援 file:// 跨視窗存取。';}
-  },100);
-});
+(async()=>{
+ const frame=document.getElementById('app'),status=document.getElementById('loadStatus');
+ const base=new URL('./',location.href).href;
+ async function text(name){const r=await fetch(new URL(name,base),{cache:'no-store'});if(!r.ok)throw new Error('讀取失敗：'+name);return r.text();}
+ async function hash(value){const bytes=new TextEncoder().encode(value),digest=await crypto.subtle.digest('SHA-256',bytes);return [...new Uint8Array(digest)].map(b=>b.toString(16).padStart(2,'0')).join('');}
+ const script=source=>'<script>'+source.replace(/<\/script/gi,'<\\/script')+'</'+'script>';
+ try{
+  const manifest=JSON.parse(await text('explanation-card-screenshot-repair-v2.json'));
+  async function patched(name){
+   let source=await text(name);const spec=manifest.files[name];if(!spec)return source;
+   const digest=await hash(source);if(digest===spec.result_sha256)return source;
+   if(digest!==spec.source_sha256)throw new Error('來源版本已變更，停止載入：'+name);
+   for(const change of spec.replacements){if(source.split(change.before).length!==2)throw new Error('修正位置不唯一：'+name);source=source.replace(change.before,change.after);}
+   if(await hash(source)!==spec.result_sha256)throw new Error('修正結果驗證失敗：'+name);
+   return source;
+  }
+  let html=await text('explanation-card.html');
+  const names=[...html.matchAll(/<script src="\.\/([^?" ]+)[^"]*"><\/script>/g)].map(m=>m[1]);
+  const sources=Object.fromEntries(await Promise.all(names.map(async name=>[name,await patched(name)])));
+  html=html.replace(/<script src="\.\/([^?" ]+)[^"]*"><\/script>/g,(_,name)=>script(sources[name]));
+  html=html.replace('</head>','<base href="'+base+'">'+script(await text('explanation-card-sequence-model-v1.js'))+'</head>');
+  const overlay=await patched('explanation-card-overlay-pilot-v1.js'),workspace=await text('explanation-card-workspace-v2.js');
+  const css=(await text('explanation-card-overlay-pilot-v1.css'))+'\n'+await text('explanation-card-workspace-v2.css');
+  const boot=`document.addEventListener('DOMContentLoaded',()=>{let tries=0;const wait=setInterval(()=>{if(!window.ONEExplanationFormatCore||!document.getElementById('wordToolbar')?.dataset.uiAuditOrganized){if(++tries>100){clearInterval(wait);parent.postMessage({oneCandidate:'error',message:'必要核心載入逾時'},location.origin);}return;}clearInterval(wait);try{const add=source=>{const s=document.createElement('script');s.textContent=source;document.body.append(s);};add(${JSON.stringify(overlay)});add(${JSON.stringify(workspace)});parent.postMessage({oneCandidate:'ready'},location.origin);}catch(error){parent.postMessage({oneCandidate:'error',message:error.message},location.origin);}},50);});`;
+  html=html.replace('</body>','<style>'+css+'</style>'+script(boot)+'</body>');
+  addEventListener('message',event=>{if(event.source!==frame.contentWindow||event.origin!==location.origin)return;if(event.data?.oneCandidate==='ready')status.textContent='提醒累積、截圖修正與原位編輯已載入。';if(event.data?.oneCandidate==='error')status.textContent='未啟用：'+event.data.message;});
+  frame.srcdoc=html;
+ }catch(error){status.textContent='候選未啟用：'+error.message+'。本機請以 HTTP 伺服器開啟，原版不受影響。';}
+})();
 </script></body></html>

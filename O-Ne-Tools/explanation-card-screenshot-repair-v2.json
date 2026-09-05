@@ -1,0 +1,122 @@
+{
+  "version": "SCREENSHOT_REPAIR_V2_20260905",
+  "purpose": "Opt-in candidate source assembly; base formal entry is untouched. Match exact SHA-256 and replacements or abort.",
+  "files": {
+    "explanation-card-v038-1.js": {
+      "source_sha256": "d44a19ed49b3305e26b8569e2dea7516c28b7d46ef8b46a96b9dec4181dea722",
+      "result_sha256": "9f215dc057fa1808f0d7bc2ddf7a4fabb0244f57e2dbe051e47f12d99eef8fe4",
+      "replacements": [
+        {
+          "before": "const bodyCount=next.blocks.filter(b=>b.kind==='body').length",
+          "after": "const bodyCount=window.ONEExplanationSequenceModel?window.ONEExplanationSequenceModel.items(next).length:next.blocks.filter(b=>b.kind==='body').length"
+        }
+      ]
+    },
+    "explanation-card-v038-3.js": {
+      "source_sha256": "d572698ef357d3ed53af9229cf3413f6a35a2e30c80472b56f70852c96704955",
+      "result_sha256": "5c404e843eb933ae61c629881a591cbc7110d488a79e5f5e189841b62927b321",
+      "replacements": [
+        {
+          "before": "if(l.noteY!==null){const x=l.textX",
+          "after": "if(l.noteY!==null&&(!window.ONEExplanationSequenceModel||window.ONEExplanationSequenceModel.noteVisible(state))){const x=l.textX"
+        }
+      ]
+    },
+    "explanation-card-v040.js": {
+      "source_sha256": "a4a00130954f7a24cf6a5b5a7241323a56aadac084b6946ce80913be2056c421",
+      "result_sha256": "f7484fa8103ccfb753019861ed64f2bff0e0aa3a5ac57a41f8336209f1c8f752",
+      "replacements": [
+        {
+          "before": "return state.blocks.filter(item=>item.kind==='body').length;",
+          "after": "return window.ONEExplanationSequenceModel?window.ONEExplanationSequenceModel.items(state).length:state.blocks.filter(item=>item.kind==='body').length;"
+        },
+        {
+          "before": "const outer=28,headerTop=30,labelH=48,bottomEdge=3;",
+          "after": "const outer=28,headerTop=30,labelH=48,inset=typeof window!=='undefined'&&window.ONEExplanationSequenceModel?28:3,bottomEdge=inset;"
+        },
+        {
+          "before": "const galleryY=dividerY+3;\n    const galleryX=3;\n    const galleryW=CARD_WIDTH-6;",
+          "after": "const galleryY=dividerY+inset;\n    const galleryX=inset;\n    const galleryW=CARD_WIDTH-inset*2;"
+        }
+      ]
+    },
+    "explanation-card-v049.js": {
+      "source_sha256": "c5fa3d5a02495e4f43fd13378d00eac5e04f5eb5102d1333a009a85324ace145",
+      "result_sha256": "81c09c9ceeceaeff845f568dd04c1f92a998d49ee1c8550f0fabcdacbc7588b0",
+      "replacements": [
+        {
+          "before": "return state.blocks.filter(item=>item.kind==='body');",
+          "after": "return window.ONEExplanationSequenceModel?window.ONEExplanationSequenceModel.items(state):state.blocks.filter(item=>item.kind==='body');"
+        },
+        {
+          "before": "const blocks=next.blocks.filter(item=>item.kind==='body');",
+          "after": "const blocks=window.ONEExplanationSequenceModel?window.ONEExplanationSequenceModel.items(next):next.blocks.filter(item=>item.kind==='body');"
+        },
+        {
+          "before": "if(!frame&&source[index]&&!used.has(source[index])){",
+          "after": "if(!frame&&source[index]&&!used.has(source[index])&&!source[index].blockId&&!source[index].block_id){"
+        },
+        {
+          "before": "    state.sequence.visibleCount=Math.round(clamp(state.sequence.visibleCount||blocks.length,1,Math.max(1,blocks.length)));\n  }",
+          "after": "    state.sequence.visibleCount=Math.round(clamp(state.sequence.visibleCount||blocks.length,1,Math.max(1,blocks.length)));\n    // A separate reminder frame inherits the final body image unless explicitly replaced.\n    const model=window.ONEExplanationSequenceModel;\n    if(model&&model.inheritsImage(state)){\n      const index=state.sequence.frames.findIndex(frame=>frame.blockId===model.NOTE_ID);\n      const frame=state.sequence.frames[index],previous=state.sequence.frames[index-1];\n      if(frame&&previous){\n        frame.image=clone(previous.image);\n        const asset=sequenceAssets.get(previous.blockId);\n        if(asset)sequenceAssets.set(frame.blockId,cloneRuntimeAsset(asset));\n        else sequenceAssets.delete(frame.blockId);\n      }\n    }\n  }"
+        },
+        {
+          "before": "if(activatingSequenceImage||!activeSequenceBlockId)return;",
+          "after": "if(activatingSequenceImage||!activeSequenceBlockId)return;\n    if(window.ONEExplanationSequenceModel?.inheritsImage(state)&&activeSequenceBlockId===window.ONEExplanationSequenceModel.NOTE_ID)return;"
+        }
+      ]
+    },
+    "explanation-card-v038-2.js": {
+      "source_sha256": "77cc05ac2e2933848c9ee6ebf59568e37b8908154a0518e367760580459287b1",
+      "result_sha256": "05ba066210397f773fda08fe9e1cf4b3dd2a49e06f0812b6c67a0db63940f131",
+      "replacements": [
+        {
+          "before": "rich.addEventListener('input',()=>{b.html=sanitizeHtml(rich.innerHTML);",
+          "after": "rich.addEventListener('input',()=>{const current=state.blocks.find(item=>item.id===b.id);if(!current)return;current.html=sanitizeHtml(rich.innerHTML);"
+        },
+        {
+          "before": "ck.onchange=()=>{b.marker.enabled=ck.checked;",
+          "after": "ck.onchange=()=>{const current=state.blocks.find(item=>item.id===b.id);if(!current)return;current.marker.enabled=ck.checked;"
+        },
+        {
+          "before": "b.marker.text=mi.value;renderCanvas()",
+          "after": "const current=state.blocks.find(item=>item.id===b.id);if(current)current.marker.text=mi.value;renderCanvas()"
+        }
+      ]
+    },
+    "explanation-card-ui-fold-v1.js": {
+      "source_sha256": "12fba74af863f4fe32545b6039ccaa162b5f416e80d4c6b74d9d9cef109aa311",
+      "result_sha256": "563ac725b2daa45d6e59a7238b64df0516dd8a966a8f03932364f83ba746fd5a",
+      "replacements": [
+        {
+          "before": "[...select.options].forEach(option=>{if(option.value)option.textContent=`${option.value} px`;});",
+          "after": "[...select.options].forEach(option=>{const value=parseFloat(option.getAttribute('value')||option.textContent);if(Number.isFinite(value)){option.value=String(value);option.textContent=`${value} px`;}});"
+        }
+      ]
+    },
+    "explanation-card-overlay-pilot-v1.js": {
+      "source_sha256": "72cf8377dd4a6c51772b4bea883384cccee26b680eb4ed967a9f34ad3e9d2fdd",
+      "result_sha256": "45c701f29a5e6e8348a9ee1eca086f8c4d6bd2cb4af9905a3db30bee2ca1509e",
+      "replacements": [
+        {
+          "before": "const bodyIndex=bodyBlocks().findIndex",
+          "after": "if(window.ONEExplanationWorkspace&&!window.ONEExplanationWorkspace.commitField())return false;\n    const bodyIndex=bodyBlocks().findIndex"
+        },
+        {
+          "before": "    if(hasSequence()&&bodyIndex>=state.sequence.visibleCount){",
+          "after": "    if(hasSequence()&&bodyIndex>=state.sequence.visibleCount){\n      if($('oneFollowPreview')&&!$('oneFollowPreview').checked){showOriginal(id);status('保留目前幕次；在原編輯區修改後續內容。');return false;}"
+        }
+      ]
+    },
+    "explanation-card-format-tools-v1.js": {
+      "source_sha256": "ea04221f6626e92b280beb2c844c77b97da47c8aa07025fa4b166476cb6eafbd",
+      "result_sha256": "1aeec257affd67da76253622dbec55a990a83187536b982c20c15628839e4999",
+      "replacements": [
+        {
+          "before": "      if(prior&&!historyRestoring)requestAnimationFrame(()=>{const editor=document.querySelector(`.edit-block[data-id=\"${CSS.escape(prior)}\"] .rich`);if(editor)setActive(editor);updateFormatUi();});",
+          "after": "      const pendingEditor=activeEditor;\n      if(prior&&!historyRestoring)requestAnimationFrame(()=>{const editor=document.querySelector(`.edit-block[data-id=\"${CSS.escape(prior)}\"] .rich`);if(editor&&activeEditor===pendingEditor&&!document.activeElement?.matches('input,textarea'))setActive(editor);updateFormatUi();});"
+        }
+      ]
+    }
+  }
+}
