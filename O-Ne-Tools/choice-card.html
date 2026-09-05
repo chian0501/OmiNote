@@ -48,8 +48,9 @@ button.tiny{padding:7px 10px;font-size:12px}
 @media(max-width:1050px){.grid{grid-template-columns:1fr}}
 </style>
 
-<link rel="stylesheet" href="./card-workspace-v1.css?v=1000">
-<script src="./card-workspace-v1.js?v=1000" defer></script>
+<link rel="stylesheet" href="./card-workspace-v1.css?v=1100">
+<script src="./card-direct-edit-v1.js?v=1100"></script>
+<script src="./card-workspace-v1.js?v=1100" defer></script>
 </head>
 <body data-one-card-workspace="choice">
 <div class="app"><a class="tool-home-link" href="./" style="min-width:118px;height:44px;display:inline-flex;align-items:center;color:#53ced0;font-size:14px;font-weight:800;text-decoration:none">回工具入口</a>
@@ -88,7 +89,8 @@ button.tiny{padding:7px 10px;font-size:12px}
   <div id="status" class="status">READY｜可輸出透明 PNG</div>
 
   <div class="buttons">
-    <button id="download">輸出透明 PNG</button>
+    <button id="downloadSet">輸出整組 PNG（全部暗＋逐項亮）</button>
+    <button id="download" class="secondary">僅下載目前畫面 PNG</button>
     <button id="jsonBtn" class="secondary">輸出欄位 JSON</button>
     <button id="reset" class="secondary">回復示例</button>
   </div>
@@ -109,7 +111,7 @@ button.tiny{padding:7px 10px;font-size:12px}
 </div>
 </div>
 
-<script src="./edit-backup-v1.js?v=1310"></script>
+<script src="./edit-backup-v1.js?v=1321"></script>
 <script>
 const canvas=document.getElementById('c');
 const ctx=canvas.getContext('2d');
@@ -139,11 +141,13 @@ const defaults={
 };
 
 let data=JSON.parse(JSON.stringify(defaults));
+let exportingSet=false;
 
 function font(weight,px){
   return `${weight} ${px}px "Noto Sans TC","Noto Sans CJK TC","Microsoft JhengHei",sans-serif`;
 }
-function roundedRect(x,y,w,h,r){
+function roundedRect(x,y,w,h,r,context=ctx){
+  const ctx=context;
   ctx.beginPath();
   ctx.moveTo(x+r,y);
   ctx.arcTo(x+w,y,x+w,y+h,r);
@@ -152,7 +156,8 @@ function roundedRect(x,y,w,h,r){
   ctx.arcTo(x,y,x+w,y,r);
   ctx.closePath();
 }
-function fitText(text,maxWidth,startSize,minSize,weight){
+function fitText(text,maxWidth,startSize,minSize,weight,context=ctx){
+  const ctx=context;
   let s=startSize;
   while(s>=minSize){
     ctx.font=font(weight,s);
@@ -163,7 +168,8 @@ function fitText(text,maxWidth,startSize,minSize,weight){
   ctx.font=font(weight,minSize);
   return {size:minSize,width:ctx.measureText(text).width,ok:false};
 }
-function drawOuter(h){
+function drawOuter(h,context=ctx){
+  const ctx=context;
   ctx.save();
   ctx.fillStyle=C.panel;
   ctx.strokeStyle='rgba(255,255,255,.92)';
@@ -186,9 +192,10 @@ function drawOuter(h){
   ctx.fillRect(3,22,10,h-47);
   ctx.restore();
 }
-function drawSelectBadge(){
+function drawSelectBadge(context=ctx){
+  const ctx=context;
   const x=33,y=20,w=193,h=40;
-  roundedRect(x,y,w,h,10);
+  roundedRect(x,y,w,h,10,ctx);
   ctx.fillStyle=C.red;ctx.fill();
   ctx.fillStyle='#fff';
   ctx.font=font(900,23);
@@ -239,21 +246,23 @@ function renderForm(){
     });
   });
 }
-function render(){
-  const n=data.options.length;
+function render(snapshot,outputCanvas){
+  const options=snapshot&&snapshot.options||data.options;
+  const target=outputCanvas||canvas,ctx=target.getContext('2d');
+  const n=options.length;
   const H=208+n*94;
-  canvas.width=882;
-  canvas.height=H;
+  target.width=882;
+  target.height=H;
   ctx.clearRect(0,0,882,H);
 
-  drawOuter(H);
-  drawSelectBadge();
+  drawOuter(H,ctx);
+  drawSelectBadge(ctx);
 
   let blocked=false;
 
-  const title=$('title').value;
-  const titleFit=fitText(title,805,34,19,800);
-  $('title').classList.toggle('bad',!titleFit.ok);
+  const title=snapshot&&snapshot.title!==undefined?snapshot.title:$('title').value;
+  const titleFit=fitText(title,805,34,19,800,ctx);
+  if(!outputCanvas)$('title').classList.toggle('bad',!titleFit.ok);
   ctx.font=font(800,titleFit.size);
   ctx.fillStyle=C.cream;
   ctx.textAlign='left';
@@ -261,18 +270,18 @@ function render(){
   ctx.fillText(title,37,111);
   blocked=blocked||!titleFit.ok;
 
-  const q=$('question').value;
-  const qFit=fitText(q,805,29,18,500);
-  $('question').classList.toggle('bad',!qFit.ok);
+  const q=snapshot&&snapshot.question!==undefined?snapshot.question:$('question').value;
+  const qFit=fitText(q,805,29,18,500,ctx);
+  if(!outputCanvas)$('question').classList.toggle('bad',!qFit.ok);
   ctx.font=font(500,qFit.size);
   ctx.fillStyle=C.cream;
   ctx.fillText(q,37,171);
   blocked=blocked||!qFit.ok;
 
   const x=37,w=805,rowH=65,pitch=94,startY=210;
-  data.options.forEach((opt,i)=>{
+  options.forEach((opt,i)=>{
     const y=startY+i*pitch;
-    roundedRect(x,y,w,rowH,10);
+    roundedRect(x,y,w,rowH,10,ctx);
     ctx.fillStyle=opt.bright?C.bright:C.dim;
     ctx.fill();
     ctx.strokeStyle=C.outline;
@@ -280,7 +289,7 @@ function render(){
     ctx.stroke();
 
     const text=`${i+1}.${opt.text}`;
-    const fit=fitText(text,755,31,18,800);
+    const fit=fitText(text,755,31,18,800,ctx);
     blocked=blocked||!fit.ok;
 
     ctx.font=font(800,fit.size);
@@ -290,13 +299,16 @@ function render(){
     ctx.fillText(text,x+21,y+rowH/2+1);
   });
 
+  if(outputCanvas)return blocked;
   const st=$('status');
   $('download').disabled=blocked;
+  $('downloadSet').disabled=blocked||exportingSet;
+  $('downloadSet').textContent=exportingSet?'整組輸出中…':`輸出整組 PNG（${n+1} 張）`;
   if(blocked){
     st.textContent='BLOCKED｜有文字長到超出正式安全範圍，請縮短內容';
     st.className='status error';
   }else{
-    st.textContent=`READY｜${n} 項，可輸出透明 PNG`;
+    st.textContent=`${n} 個選項｜整組 ${n+1} 張：全部暗＋每項各自亮，下載為 ZIP`;
     st.className='status';
   }
   return blocked;
@@ -326,6 +338,26 @@ $('download').onclick=()=>{
     a.click();
     setTimeout(()=>URL.revokeObjectURL(a.href),1000);
   },'image/png');
+};
+$('downloadSet').onclick=async()=>{
+  if(exportingSet||render())return;
+  if(window.ONECardDirectEdit)window.ONECardDirectEdit.finish();
+  const snapshot={title:$('title').value,question:$('question').value,options:data.options.map(o=>({...o}))};
+  const name=String(snapshot.title||'未命名').replace(/[<>:"/\\|?*\u0000-\u001f]/g,'_').slice(0,70);
+  const target=document.createElement('canvas'),entries=[];
+  exportingSet=true;render();
+  try{
+    for(let step=0;step<=snapshot.options.length;step++){
+      const frame={...snapshot,options:snapshot.options.map((o,i)=>({...o,bright:i===step-1}))};
+      if(render(frame,target))throw new Error('文字超出安全範圍，請縮短後重試。');
+      const blob=await new Promise((resolve,reject)=>target.toBlob(value=>value?resolve(value):reject(new Error('PNG 產生失敗。')),'image/png'));
+      const state=step===0?'全部暗':`選項${step}亮`;
+      entries.push({name:`選項卡-${name}-${String(step).padStart(2,'0')}-${state}.png`,data:blob});
+    }
+    const zip=await ONEProjectPackage.createZip(entries),url=URL.createObjectURL(zip),a=document.createElement('a');
+    a.href=url;a.download=`選項卡-${name}-全狀態.zip`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1500);
+    exportingSet=false;render();$('status').textContent=`已輸出 ${entries.length} 張 PNG｜全部暗＋逐項亮；編輯內容與亮暗狀態保留`;
+  }catch(error){exportingSet=false;render();$('status').className='status error';$('status').textContent='輸出失敗｜'+error.message;}
 };
 $('jsonBtn').onclick=()=>{
   const payload={

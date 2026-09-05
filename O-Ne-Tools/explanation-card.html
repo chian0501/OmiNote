@@ -4867,7 +4867,7 @@ window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{'use strict';
     if(innerWidth>700){
       const stage=canvas.parentElement;
       const available=Math.max(180,innerHeight-stage.getBoundingClientRect().top-$('sequenceStrip').offsetHeight-footer.offsetHeight-40);
-      const w=Math.min(stage.clientWidth-32,available*canvas.width/canvas.height),h=w*canvas.height/canvas.width;
+      const w=Math.min(canvas.width,stage.clientWidth-32,available*canvas.width/canvas.height),h=w*canvas.height/canvas.width;
       if(Math.abs(canvas.getBoundingClientRect().width-w)>.5){canvas.style.setProperty('width',w+'px','important');canvas.style.setProperty('height',h+'px','important');canvas.style.setProperty('max-height','none','important');}
     }else{canvas.style.removeProperty('width');canvas.style.removeProperty('height');}
     if(fieldSession&&!fieldSession.composing)positionField();

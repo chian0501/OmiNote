@@ -1,12 +1,6 @@
 name: Card workspace browser QA
 
 on:
-  push:
-    branches: [codex/card-editors-unified-ui-v1]
-    paths:
-      - 'O-Ne-Tools/**'
-      - 'package*.json'
-      - '.github/workflows/card-workspace-qa.yml'
   pull_request:
     branches: [main]
     paths:
@@ -33,7 +27,7 @@ jobs:
       - name: Check out the approved artwork baseline
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
-          ref: 07e37a9dfbbddd3e27a91d4a80b6d40c5a12bb53
+          ref: 98d3b0da14d9bc5224b8a3d714ef11279f72e5f6
           path: .workspace-baseline
           persist-credentials: false
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6

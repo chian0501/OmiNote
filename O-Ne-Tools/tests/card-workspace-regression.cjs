@@ -257,7 +257,7 @@ function set(page, id, value, type = 'input') {
       if (tool.id === 'focus') {
         click(page, '.mode-tabs button:first-child');
       } else {
-        const field = page.document.querySelector('.one-workspace-editor input[type="text"],.one-workspace-editor input:not([type]),.one-workspace-editor textarea');
+        const field = page.document.querySelector(tool.id === 'general' ? '#title' : '.one-workspace-editor input[type="text"],.one-workspace-editor input:not([type]),.one-workspace-editor textarea');
         assert(field, tool.id + ': editable content for restore');
         field.value = '還原測試';
         field.dispatchEvent(new page.window.Event('input', { bubbles: true }));
@@ -273,7 +273,7 @@ function set(page, id, value, type = 'input') {
         assert.equal(page.window.localStorage.getItem(key), value, tool.id + ': restore must not rewrite history');
       }
       click(page, '.one-workspace-dialog-head button');
-      const output = page.document.querySelector('.one-workspace-export-button,.export-actions .export-button.primary');
+      const output = page.document.querySelector('.one-workspace-export-button:not(#downloadSet),.export-actions .export-button.primary');
       assert(output, tool.id + ': preview export');
       const exportEnabled = !output.disabled && output.getAttribute('aria-disabled') !== 'true';
       if (exportEnabled) {

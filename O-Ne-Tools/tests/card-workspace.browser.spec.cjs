@@ -94,6 +94,135 @@ function assertPNG(bytes) {
   expect(bytes.readUInt32BE(16)).toBeGreaterThan(0);
   expect(bytes.readUInt32BE(20)).toBeGreaterThan(0);
 }
+
+const directFields = {
+  general: ['主標題', '#title'], trigger: ['主標題', '#title'], persistent: ['任務文字', '#task'],
+  effect: ['主標題', '#titleText'], move: ['主標題', '#title'], choice: ['主標題', '#title'],
+  challenge: ['開頭文字', '#prefix'], dialogue: ['對話內容', '#dialogue'], rating: ['店家／商品名稱', '#storeName'],
+  focus: ['主標題', 'input[placeholder="輸入卡片標題"]'], 'thumbnail-frame': ['角標文字', '#cornerText'], settlement: ['篇章標題', '#chapterTitle']
+};
+for (const card of cards) {
+  test(`${card.id} direct canvas text editing and cancel`, async ({ page }, info) => {
+    const errors = []; page.on('pageerror', e => errors.push(e.message));
+    await openCard(page, card);
+    if (card.id === 'thumbnail-frame') { await expandEditor(page); await page.locator('[data-corner-content="text"]').click(); }
+    if (card.id === 'focus') await page.locator('.preview-switch').getByRole('button', { name: '元件', exact: true }).click();
+    const [label, field] = directFields[card.id];
+    const source = page.locator(field), original = await source.inputValue(), before = await artwork(page);
+    const target = page.getByRole('button', { name: '編輯：' + label, exact: true });
+    await expect(target).toBeVisible();
+    await target.click();
+    const input = page.getByRole('textbox', { name: '直接編輯：' + label, exact: true });
+    await input.fill('直接改字');
+    await expect(source).toHaveValue('直接改字');
+    await expect.poll(() => artwork(page)).not.toBe(before);
+    await screenshot(page, info, `${card.id}-direct-edit`);
+    await page.locator('.one-direct-editor').getByRole('button', { name: '完成', exact: true }).click();
+    await expect(page.locator('.one-direct-editor')).toHaveCount(0);
+    const edited = await artwork(page);
+    await target.focus(); await page.keyboard.press('Enter');
+    await input.fill('取消測試'); await page.keyboard.press('Escape');
+    await expect(source).toHaveValue('直接改字');
+    await expect.poll(() => artwork(page)).toBe(edited);
+    await target.click(); await input.fill(original);
+    await page.locator('.one-direct-editor').getByRole('button', { name: '完成', exact: true }).click();
+    await expect.poll(() => artwork(page)).toBe(before);
+    if (card.id === 'general') {
+      await target.click();
+      await input.dispatchEvent('compositionstart');
+      await input.fill('輸入法組字');
+      await expect(source).toHaveValue(original);
+      await input.dispatchEvent('compositionend');
+      await expect(source).toHaveValue('輸入法組字');
+      await page.keyboard.press('Escape');
+      await expect(source).toHaveValue(original);
+    }
+    if (card.id === 'trigger') {
+      for (const [label, id] of [['副標題', 'subtitle'], ['進度', 'progress']]) {
+        const native = page.locator('#' + id), previous = await native.inputValue();
+        await page.getByRole('button', { name: '編輯：' + label, exact: true }).click();
+        await page.locator('.one-direct-input').fill(id === 'progress' ? '1/2' : '觸發卡副標');
+        await expect(native).toHaveValue(id === 'progress' ? '1/2' : '觸發卡副標');
+        await page.keyboard.press('Escape');
+        await expect(native).toHaveValue(previous);
+      }
+    }
+    expect(errors).toEqual([]);
+  });
+}
+
+test('choice complete set contains all-dim plus one bright per option and preserves edits', async ({ page }, info) => {
+  await openCard(page, cards.find(c => c.id === 'choice'));
+  await page.locator('#optionList [data-action="toggle"][data-index="0"]').click();
+  await page.locator('#optionList [data-action="toggle"][data-index="2"]').click();
+  const before = await artwork(page), toggles = await page.locator('#optionList [data-action="toggle"]').allTextContents();
+  await page.locator('.one-workspace-save-host button').click();
+  const history = await page.evaluate(() => JSON.stringify(localStorage));
+  const output = await download(page, page.locator('#downloadSet'), info, 'choice-complete-set', 'zip');
+  const entries = Object.entries(zipEntries(output.bytes)).sort(([a], [b]) => a.localeCompare(b));
+  expect(entries).toHaveLength(toggles.length + 1);
+  expect(await artwork(page)).toBe(before);
+  expect(await page.locator('#optionList [data-action="toggle"]').allTextContents()).toEqual(toggles);
+  expect(await page.evaluate(() => JSON.stringify(localStorage))).toBe(history);
+  await expect(page.locator('#status')).toContainText('已輸出 6 張');
+  await screenshot(page, info, 'choice-complete-set');
+  const hashes = new Set();
+  for (let step = 0; step < entries.length; step++) {
+    const [name, bytes] = entries[step]; assertPNG(bytes);
+    expect(name).toContain(String(step).padStart(2, '0'));
+    expect(bytes.readUInt32BE(16)).toBe(882); expect(bytes.readUInt32BE(20)).toBe(678);
+    await page.locator('#allDim').click();
+    if (step) await page.locator(`#optionList [data-action="toggle"][data-index="${step - 1}"]`).click();
+    const native = await page.locator(mainCanvas).first().evaluate(c => c.toDataURL('image/png').split(',')[1]);
+    expect(bytes.equals(Buffer.from(native, 'base64')), 'bundle frame equals the corresponding native manual state').toBe(true);
+    hashes.add(crypto.createHash('sha256').update(bytes).digest('hex'));
+  }
+  expect(hashes.size).toBe(6);
+});
+
+test('choice duplicate option labels edit the clicked row only', async ({ page }, info) => {
+  await openCard(page, cards.find(c => c.id === 'choice'));
+  for (let i = 0; i < 3; i++) await page.locator(`#optionList input[data-index="${i}"]`).fill('相同選項');
+  await page.getByRole('button', { name: '編輯：選項 2', exact: true }).click();
+  await page.getByRole('textbox', { name: '直接編輯：選項 2', exact: true }).fill('只改第二項');
+  await page.locator('.one-direct-editor').getByRole('button', { name: '完成', exact: true }).click();
+  await expect(page.locator('#optionList input[data-index="0"]')).toHaveValue('相同選項');
+  await expect(page.locator('#optionList input[data-index="1"]')).toHaveValue('只改第二項');
+  await expect(page.locator('#optionList input[data-index="2"]')).toHaveValue('相同選項');
+  await screenshot(page, info, 'choice-direct-option');
+});
+
+test('rating settings fit the narrow sidebar and numeric scores edit on canvas', async ({ page }, info) => {
+  await openCard(page, cards.find(c => c.id === 'rating')); await expandEditor(page);
+  const row = page.locator('.rating-editor').first(); await row.scrollIntoViewIfNeeded();
+  const name = await row.locator('input[data-field="label"]').boundingBox(), score = await row.locator('input[data-field="value"]').boundingBox();
+  expect(name.width).toBeGreaterThanOrEqual(200); expect(score.width).toBeGreaterThanOrEqual(70);
+  await screenshot(page, info, 'rating-sidebar-fields');
+  const scoreId = await row.locator('input[data-field="value"]').getAttribute('id');
+  await page.locator(`.one-direct-target[data-field-key="${scoreId}"]`).click();
+  await page.locator('.one-direct-input').fill('3.2');
+  await page.locator('.one-direct-editor').getByRole('button', { name: '完成', exact: true }).click();
+  await expect(page.locator('#' + scoreId)).toHaveValue('3.2');
+  await row.locator('select[data-field="type"]').selectOption('text');
+  const result = row.locator('input[data-field="value"]');
+  expect((await result.boundingBox()).width).toBeGreaterThanOrEqual(200);
+  await page.locator(`.one-direct-target[data-field-key="${scoreId}"]`).click();
+  await page.locator('.one-direct-input').fill('值得再訪');
+  await page.locator('.one-direct-editor').getByRole('button', { name: '完成', exact: true }).click();
+  await expect(result).toHaveValue('值得再訪');
+  await screenshot(page, info, 'rating-text-result');
+});
+
+for (const width of [1920, 1366, 390]) {
+  test(`explanation preview never enlarges native pixels ${width}px`, async ({ page }, info) => {
+    await page.setViewportSize({ width, height: width === 390 ? 844 : 900 });
+    await page.goto('/O-Ne-Tools/explanation-card.html');
+    const canvas = page.locator('#previewCanvas'); await expect(canvas).toBeVisible();
+    await page.evaluate(() => document.fonts.ready);
+    await expect.poll(() => canvas.evaluate(c => c.getBoundingClientRect().width / c.width)).toBeLessThanOrEqual(1.001);
+    await screenshot(page, info, `explanation-${width}-preview`);
+  });
+}
 async function changeContent(page, card) {
   if (card.id === 'focus') {
     await page.locator('.mode-tabs button').nth(1).click();
@@ -119,6 +248,13 @@ for (const card of cards) {
       const errors = [];
       page.on('pageerror', error => errors.push(error.message));
       await openCard(page, card);
+      const originalScale = await page.locator(mainCanvas).first().evaluate(c => ({ width: c.getBoundingClientRect().width / c.width, height: c.getBoundingClientRect().height / c.height }));
+      expect(originalScale.width, 'default preview never enlarges the native canvas').toBeLessThanOrEqual(1.001);
+      expect(originalScale.height).toBeLessThanOrEqual(1.001);
+      if (await page.locator('.one-workspace-mode').count()) {
+        await expect(page.locator('.one-workspace-editor .one-workspace-mode select').first()).toBeVisible();
+        await expect(page.locator('.one-workspace-modebar select')).toHaveCount(0);
+      }
       await screenshot(page, info, `${card.id}-${width}-workspace`);
       const geometry = await page.evaluate(() => {
         const selectors = ['html', 'body', '#root', '.one-workspace-app', '.one-workspace-layout', '.one-workspace-editor', '.one-workspace-preview', '.editor-scroll'];
@@ -252,7 +388,7 @@ for (const card of cards) {
       await expect.poll(() => artwork(page)).not.toBe(initial);
     }
     const saved = await artwork(page);
-    const png = await download(page, page.locator('.one-workspace-export-button,.export-actions .export-button.primary').first(), info, 'exported-card', 'png');
+    const png = await download(page, page.locator('.one-workspace-export-button:not(#downloadSet),.export-actions .export-button.primary').first(), info, 'exported-card', 'png');
     assertPNG(png.bytes);
     await files(page);
     const project = await download(page, page.locator('[data-action="export-package"]'), info, 'native-project', 'zip');

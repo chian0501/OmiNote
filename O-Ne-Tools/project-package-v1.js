@@ -812,6 +812,7 @@
   }
 
   global.ONEProjectPackage = {
+    createZip: makeZip,
     mount: mount,
     setAssetAdapter: setAssetAdapter,
     version: VERSION,
