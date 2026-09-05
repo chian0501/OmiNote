@@ -120,6 +120,19 @@ for (const card of cards) {
       page.on('pageerror', error => errors.push(error.message));
       await openCard(page, card);
       await screenshot(page, info, `${card.id}-${width}-workspace`);
+      const geometry = await page.evaluate(() => {
+        const selectors = ['html', 'body', '#root', '.one-workspace-app', '.one-workspace-layout', '.one-workspace-editor', '.one-workspace-preview', '.editor-scroll'];
+        return { viewport: { width: innerWidth, height: innerHeight }, elements: selectors.flatMap(selector => {
+          const e = document.querySelector(selector);
+          if (!e) return [];
+          const r = e.getBoundingClientRect(), c = getComputedStyle(e);
+          return [{ selector, top: r.top, bottom: r.bottom, height: r.height, scrollHeight: e.scrollHeight,
+            cssHeight: c.height, minHeight: c.minHeight, maxHeight: c.maxHeight, gridRows: c.gridTemplateRows, overflow: c.overflow }];
+        }) };
+      });
+      await info.attach('layout-geometry', { body: JSON.stringify(geometry, null, 2), contentType: 'application/json' });
+      const contentBottom = Math.max(geometry.viewport.height, ...geometry.elements.filter(e => ['.one-workspace-editor', '.one-workspace-preview'].includes(e.selector)).map(e => e.bottom));
+      expect.soft(geometry.elements.find(e => e.selector === 'html').scrollHeight, 'no large blank area below the editor and preview').toBeLessThanOrEqual(contentBottom + 40);
       const dimensions = await page.evaluate(() => ({ viewport: innerWidth, document: document.documentElement.scrollWidth }));
       expect(dimensions.document, 'no document-level horizontal overflow').toBeLessThanOrEqual(dimensions.viewport + 1);
       await expect(page.locator('.one-workspace-header')).toHaveCount(1);
@@ -156,6 +169,12 @@ for (const card of cards) {
         const area = await stage.boundingBox();
         expect(fit.width).toBeLessThanOrEqual(area.width);
         expect(fit.height).toBeLessThanOrEqual(area.height);
+      } else {
+        await page.locator('.preview-switch').getByRole('button', { name: '元件', exact: true }).click();
+        await expect(page.locator(mainCanvas)).not.toHaveAttribute('width', '1920');
+        await screenshot(page, info, `${card.id}-${width}-component`);
+        await page.locator('.preview-switch').getByRole('button', { name: '全畫布', exact: true }).click();
+        await expect(page.locator(mainCanvas)).toHaveAttribute('width', '1920');
       }
       await files(page);
       await screenshot(page, info, `${card.id}-${width}-project`);
