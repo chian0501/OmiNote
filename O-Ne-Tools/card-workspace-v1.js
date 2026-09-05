@@ -93,6 +93,24 @@
     dialog.append(head, tabs, panels);
     document.body.appendChild(dialog);
     state.dialog = dialog;
+    // Keep both Tab directions inside the modal, including at the ends of the
+    // native tab sequence where Chromium may otherwise focus browser chrome.
+    dialog.addEventListener('keydown', function (event) {
+      if (event.key !== 'Tab') return;
+      var targets = Array.prototype.filter.call(dialog.querySelectorAll('a[href],button,input,select,textarea,summary,[tabindex]'), function (node) {
+        return node.tabIndex >= 0 && !node.disabled && !node.closest('[hidden],[inert]') &&
+          node.getClientRects().length && getComputedStyle(node).visibility !== 'hidden';
+      });
+      if (!targets.length) { event.preventDefault(); return; }
+      var first = targets[0], last = targets[targets.length - 1];
+      if (event.shiftKey && (document.activeElement === first || !dialog.contains(document.activeElement))) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && (document.activeElement === last || !dialog.contains(document.activeElement))) {
+        event.preventDefault();
+        first.focus();
+      }
+    });
     dialog.addEventListener('close', function () {
       if (state.opener && state.opener.isConnected) state.opener.focus();
     });

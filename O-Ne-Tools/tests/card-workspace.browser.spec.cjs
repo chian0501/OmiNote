@@ -171,6 +171,10 @@ for (const card of cards) {
         await page.keyboard.press('Tab');
         expect(await page.evaluate(() => document.querySelector('dialog').contains(document.activeElement)), 'focus stays inside modal').toBe(true);
       }
+      for (let i = 0; i < 18; i++) {
+        await page.keyboard.press('Shift+Tab');
+        expect(await page.evaluate(() => document.querySelector('dialog').contains(document.activeElement)), 'reverse focus stays inside modal').toBe(true);
+      }
       await page.keyboard.press('Escape');
       await expect(page.locator('dialog')).toBeHidden();
       await expect(page.locator('.one-workspace-header-actions').getByRole('button', { name: '專案檔案', exact: true })).toBeFocused();
@@ -220,7 +224,7 @@ for (const card of cards) {
     const projectName = Object.keys(entries).find(name => name.endsWith('.json') && !name.includes('/'));
     expect(projectName).toBeTruthy();
     const manifest = JSON.parse(entries[projectName]);
-    expect(manifest.tool_id).toBe(card.id);
+    expect(manifest.tool_id).toBe(card.id === 'thumbnail-frame' ? card.id : card.id + '-card');
     if (card.id === 'thumbnail-frame') expect(manifest.assets.length).toBeGreaterThan(0);
     await closeFiles(page);
     await changeContent(page, card);
@@ -239,7 +243,11 @@ for (const card of cards) {
     expect(outputs).toHaveLength(1);
     expect(outputs[0][0]).toMatch(/\.png$/i);
     assertPNG(outputs[0][1]);
-    await expect(page.locator('.one-batch-render__status')).toContainText('完成｜1 張 PNG');
+    // Native refreshList restores the ready-count status after completion.
+    // The per-file result and actual downloaded PNG ZIP prove completion.
+    await expect(page.locator('.one-batch-render__item')).toHaveCount(1);
+    await expect(page.locator('.one-batch-render__item')).toContainText('已輸出');
+    await expect(page.locator('.one-batch-render__item')).not.toHaveClass(/error/);
     await expect(page.locator('.one-batch-render__status')).not.toHaveClass(/error/);
     await screenshot(page, info, `${card.id}-batch-complete`);
     expect(errors).toEqual([]);
