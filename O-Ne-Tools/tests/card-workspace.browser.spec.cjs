@@ -137,6 +137,16 @@ for (const card of cards) {
       await page.keyboard.press('Escape');
       await expect(source).toHaveValue(original);
     }
+    if (card.id === 'trigger') {
+      for (const [label, id] of [['副標題', 'subtitle'], ['進度', 'progress']]) {
+        const native = page.locator('#' + id), previous = await native.inputValue();
+        await page.getByRole('button', { name: '編輯：' + label, exact: true }).click();
+        await page.locator('.one-direct-input').fill(id === 'progress' ? '1/2' : '觸發卡副標');
+        await expect(native).toHaveValue(id === 'progress' ? '1/2' : '觸發卡副標');
+        await page.keyboard.press('Escape');
+        await expect(native).toHaveValue(previous);
+      }
+    }
     expect(errors).toEqual([]);
   });
 }

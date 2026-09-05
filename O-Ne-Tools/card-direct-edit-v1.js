@@ -36,6 +36,19 @@
     queued = true;
     requestAnimationFrame(function () { queued = false; if (mounted) refresh(); else mount(); });
   }
+  function textRecord(ctx, text, x, y, maxWidth) {
+    var metrics = ctx.measureText(text), size = parseFloat((ctx.font.match(/([\d.]+)px/) || [0, 16])[1]);
+    var factor = maxWidth > 0 && metrics.width > maxWidth ? maxWidth / metrics.width : 1;
+    var left = metrics.actualBoundingBoxLeft, right = metrics.actualBoundingBoxRight;
+    if (!Number.isFinite(left) || !Number.isFinite(right)) {
+      left = ctx.textAlign === 'center' ? metrics.width / 2 : ['right', 'end'].includes(ctx.textAlign) ? metrics.width : 0;
+      right = metrics.width - left;
+    }
+    var ascent = metrics.actualBoundingBoxAscent, descent = metrics.actualBoundingBoxDescent;
+    if (!Number.isFinite(ascent) || !Number.isFinite(descent) || ascent + descent < 1) { ascent = size * .8; descent = size * .2; }
+    var rect = transformRect({ x: x - left * factor, y: y - ascent, w: Math.max(1, (left + right) * factor), h: Math.max(1, ascent + descent) }, ctx.getTransform());
+    return { text: String(text), rect: rect, font: ctx.font, color: typeof ctx.fillStyle === 'string' ? ctx.fillStyle : '#fdf3e7', size: size };
+  }
   // Observe draw commands without changing any pixels. Offscreen canvas text is
   // carried through drawImage so the React focus card uses the same hit testing.
   var getContext = HTMLCanvasElement.prototype.getContext;
@@ -53,17 +66,14 @@
     };
     ctx.fillText = function (text, x, y, maxWidth) {
       var result = fillText.apply(this, arguments);
-      var metrics = this.measureText(text), size = parseFloat((this.font.match(/([\d.]+)px/) || [0, 16])[1]);
-      var factor = maxWidth > 0 && metrics.width > maxWidth ? maxWidth / metrics.width : 1;
-      var left = metrics.actualBoundingBoxLeft, right = metrics.actualBoundingBoxRight;
-      if (!Number.isFinite(left) || !Number.isFinite(right)) {
-        left = this.textAlign === 'center' ? metrics.width / 2 : ['right', 'end'].includes(this.textAlign) ? metrics.width : 0;
-        right = metrics.width - left;
-      }
-      var ascent = metrics.actualBoundingBoxAscent, descent = metrics.actualBoundingBoxDescent;
-      if (!Number.isFinite(ascent) || !Number.isFinite(descent) || ascent + descent < 1) { ascent = size * .8; descent = size * .2; }
-      var rect = transformRect({ x: x - left * factor, y: y - ascent, w: Math.max(1, (left + right) * factor), h: Math.max(1, ascent + descent) }, this.getTransform());
-      records.push({ text: String(text), rect: rect, font: this.font, color: typeof this.fillStyle === 'string' ? this.fillStyle : '#fdf3e7', size: size });
+      // Trigger renders two fields in one left-aligned draw call. Retain their
+      // separate measured positions while leaving the actual draw untouched.
+      var sub = document.body.dataset.oneCardWorkspace === 'trigger' && document.getElementById('subtitle');
+      var progress = sub && document.getElementById('progress');
+      if (sub && progress && sub.value.trim() && progress.value.trim() && String(text) === sub.value.trim() + ' ' + progress.value.trim()) {
+        records.push(textRecord(this, sub.value.trim(), x, y));
+        records.push(textRecord(this, progress.value.trim(), x + this.measureText(sub.value.trim() + ' ').width, y));
+      } else records.push(textRecord(this, text, x, y, maxWidth));
       if (canvas.isConnected) queue();
       return result;
     };
@@ -96,6 +106,7 @@
       if (input.dataset.k === 'station') label = '站點 ' + (Number(input.dataset.i) + 1);
       if (input.dataset.k === 'name') label = '路段 ' + (Number(input.dataset.i) + 1);
       if (!label && nativeLabel) label = nativeLabel.querySelector('.field-label') ? nativeLabel.querySelector('.field-label').textContent : nativeLabel.textContent;
+      if (input.closest('.rating-editor')) label = '評分 ' + (Array.prototype.indexOf.call(document.querySelectorAll('.rating-editor'), input.closest('.rating-editor')) + 1) + '｜' + label;
       if (!label) label = input.placeholder || (input.closest('.item-row') ? '項目 ' + (index + 1) : '文字 ' + (index + 1));
       return { key: input.id || 'field-' + index, index: index, input: input, label: label.replace(/\s+/g, ' ').trim().slice(0,45), value: input.value };
     }).filter(function (field) { return !field.input.disabled && !field.input.readOnly; });
@@ -111,6 +122,7 @@
     fields().sort(function (a, b) { return normal(b.value).length - normal(a.value).length || a.index - b.index; }).forEach(function (field) {
       var value = normal(field.value), variants = [value], match;
       if (field.input.type === 'number' && value !== '') variants.push(Number(field.value).toFixed(1));
+      if (field.input.type === 'number' && field.input.closest('.rating-editor') && value !== '') variants.push(normal(Number(field.value).toFixed(1) + ' / 5'));
       if (value) {
         // First seek complete runs, then the native wrapped/highlighted fragments.
         for (var pass = 0; pass < 2 && !match; pass++) {

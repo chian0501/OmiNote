@@ -1,12 +1,6 @@
 name: Card workspace browser QA
 
 on:
-  push:
-    branches: [codex/card-direct-edit-choice-export-v1]
-    paths:
-      - 'O-Ne-Tools/**'
-      - 'package*.json'
-      - '.github/workflows/card-workspace-qa.yml'
   pull_request:
     branches: [main]
     paths:
