@@ -1,0 +1,12 @@
+{
+  "name": "omi-note-preview",
+  "private": true,
+  "scripts": {
+    "dev": "vite --config O-Ne-Tools/tests/vite-preview.config.mjs",
+    "test:workspace:browser": "playwright test --config O-Ne-Tools/tests/playwright.workspace.config.cjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "vite": "7.3.1"
+  }
+}
