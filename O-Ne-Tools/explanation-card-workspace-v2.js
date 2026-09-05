@@ -205,7 +205,7 @@
     $('oneSaveNow').onclick=()=>{if(!finish())return;$('quickSaveHost')?.querySelector('[data-action="save"]')?.click();localDirty=false;const msg=$('quickSaveHost')?.querySelector('.one-edit-backup__status')?.textContent||'';$('oneSaveState').textContent=msg.includes('失敗')?msg:'已暫存於此瀏覽器';};
     const reset=$('resetAll'),oldReset=reset.onclick;reset.onclick=()=>{if(confirm('確定重設目前內容？未暫存的修改將消失。')){finish();oldReset();markDirty();}};
     for(const sel of ['[data-one-batch-render-ui]','.one-batch-render','.one-ai-json-guide']){const n=document.querySelector(sel);if(n&&!$('oneExtraTools').contains(n))$('oneExtraTools').append(n);}
-    const batch=document.querySelector('details.batch-render-setting');if(batch)$('oneExtraTools').append(batch);
+    const batch=document.querySelector('details.batch-tools,details.batch-render-setting');if(batch){const content=document.querySelector('[data-one-batch-render-ui]');if(content&&!batch.contains(content))batch.append(content);$('oneExtraTools').append(batch);}
     bar.querySelectorAll(':scope > details').forEach(d=>d.addEventListener('toggle',()=>{if(d.open)bar.querySelectorAll(':scope > details').forEach(other=>{if(other!==d)other.open=false;});}));
     document.addEventListener('pointerdown',e=>{if(!bar.contains(e.target))bar.querySelectorAll(':scope > details').forEach(d=>d.open=false);});
   }
