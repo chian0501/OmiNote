@@ -218,7 +218,7 @@ const labelBottom = vertical.labelY + vertical.labelHeight;
 const titleTop = vertical.titleBaseline - vertical.titleFont * 0.8;
 assert(Math.abs(titleTop - labelBottom - vertical.labelTitleGap) < 0.001, 'label-to-title gap must be dedicated and stable');
 assert.strictEqual(vertical.labelHeight, 48, 'label uses the explanation card native capsule height');
-const longLabel = { ...label, position: 'before', text: 'MISSION CLEAR' };
+const longLabel = { ...label, position: 'before', text: 'MISSION DONE' };
 const longBefore = layout.focusVerticalMetrics('body', content, longLabel, style, scale, false, false, 520);
 const availableTitleWidth = 520 - layout.focusLabelMetrics(longLabel).width - longBefore.gap;
 assert.strictEqual(longBefore.titleLines, layout.focusMeasuredLineCount(content.title, availableTitleWidth, style.titleSize, 6, 800), 'label-before mode must reserve the actual capsule width when measuring the title');

@@ -1016,7 +1016,7 @@ test('focus GET capsule matches explanation size and exports without title overl
     return {sameSize:image.width===c.width&&image.height===c.height,changed};
   },png.bytes.toString('base64'));
   expect(comparison.sameSize).toBe(true);expect(comparison.changed,'PNG pixels must match the visible component, including inherited font synthesis').toBe(0);
-  await page.locator('.label-text-controls input').fill('MISSION CLEAR');
+  await page.locator('.label-text-controls input').fill('MISSION DONE');
   await page.getByRole('button',{name:'標題前方',exact:true}).click();
   await page.locator('input[placeholder="輸入卡片標題"]').fill('梅田到 HARUKA｜跟著 5 步走');
   await expect.poll(async()=>{const a=await title.boundingBox(),b=await tag.boundingBox();return a.x>=b.x+b.width;}).toBe(true);
