@@ -27,7 +27,7 @@ jobs:
       - name: Check out the approved artwork baseline
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
-          ref: 5184afc7c508c04e548dba4b14faf0d151c95cc8
+          ref: fc28b288f27e5dd2d365b048433dffc7b1540116
           path: .workspace-baseline
           persist-credentials: false
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
@@ -39,7 +39,7 @@ jobs:
         run: |
           npx playwright install --with-deps chromium
           sudo apt-get install -y fonts-noto-cjk
-      - name: Run 12-tool visual and interaction checks
+      - name: Run 13-tool visual and interaction checks
         run: npm run test:workspace:browser
       - name: Preserve screenshots, downloads, traces, and report
         if: ${{ !cancelled() }}
