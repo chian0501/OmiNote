@@ -174,6 +174,11 @@ function set(page, id, value, type = 'input') {
     const before = await load(tool, false);
     const page = await load(tool, true);
     try {
+      if (['rating', 'settlement'].includes(tool.id)) {
+        const background = before.document.getElementById('bgVisible');
+        background.checked = false;
+        background.dispatchEvent(new before.window.Event('change', { bubbles: true }));
+      }
       assert.deepEqual(page.errors, before.errors, tool.id + ': new runtime errors');
       assert.deepEqual(canvasBytes(page), canvasBytes(before), tool.id + ': initial artwork changed');
       assert.equal(page.document.querySelectorAll('.one-workspace-header').length, 1, tool.id + ': one header');

@@ -34,6 +34,7 @@
   }
   function labelText(node) {
     var heading = node.querySelector('.section-title,.group-title,.section-heading,h3');
+    if (heading && heading.matches('.group-title') && heading.querySelector('span')) heading = heading.querySelector('span');
     return (heading ? heading.textContent : '').replace(/^\s*\d+\s*[｜|]\s*/, '').replace(/\s+/g, ' ').trim();
   }
   function hideEmptyContainers(root) {
@@ -192,6 +193,7 @@
     toggle.setAttribute('aria-controls', state.editor.id);
     bar.appendChild(toggle);
     var summary = element('span', 'one-workspace-mode-hint', '點字卡文字直接編輯｜預覽最多 100%，只縮小');
+    if (state.id === 'rating') summary.textContent = '點文字編輯・點圖片更換｜預覽最多 100%，只縮小';
     bar.appendChild(summary);
     if (state.config.mode) {
       var control = document.getElementById(state.config.mode);
@@ -248,7 +250,7 @@
         if (!next || next.matches('.group-title,.status,.buttons,.mini')) break;
         node = next;
       }
-      foldSection(section, index < 2);
+      foldSection(section, index === 3);
     });
   }
   function prepareEditor(state) {
@@ -268,10 +270,14 @@
     if (state.id === 'rating') foldRatingGroups(state.editor);
     var sections = state.editor.querySelectorAll(':scope > .section,:scope > .slots > .slot');
     sections.forEach(function (node, index) {
-      var open = state.id === 'effect' ? index === 1 : state.id === 'settlement' ? index < 2 : index === 0;
+      var open = state.id === 'dialogue' ? true : state.id === 'effect' ? index === 1 : state.id === 'settlement' ? index < 2 : index === 0;
       foldSection(node, open);
     });
     if (!state.editor.querySelector('details')) toggle.hidden = true;
+    if (state.id === 'dialogue') {
+      var swap = state.editor.querySelector('#swap');
+      if (swap) { swap.textContent = '⇄ 交換左右角色'; swap.setAttribute('aria-label', '交換左右角色'); }
+    }
   }
 
   function fitPreview(state) {
@@ -449,7 +455,7 @@
     observer = new MutationObserver(schedule);
     observer.observe(document.body, { childList: true, subtree: true });
   }
-  global.ONECardWorkspace = { version: '1.1.0', refresh: refresh };
+  global.ONECardWorkspace = { version: '1.2.0', refresh: refresh };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
   else init();
 })(window);

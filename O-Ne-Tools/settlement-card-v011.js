@@ -651,7 +651,7 @@
     $('viewerQuestion').value = '你見過外國旅客買過最意外的台灣商品是什麼？';
     rows = cloneDefaultRows();
     renderRowsEditor();
-    $('bgVisible').checked = true;
+    $('bgVisible').checked = false;
     $('subscribeVisible').checked = false;
     $('catsVisible').checked = true;
     $('showGuides').checked = false;

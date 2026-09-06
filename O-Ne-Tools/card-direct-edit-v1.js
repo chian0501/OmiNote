@@ -1,7 +1,7 @@
 /* Direct text editing over the native canvas. Renderers and saved formats remain the source of truth. */
 (function (global) {
   'use strict';
-  var drawings = new WeakMap();
+  var drawings = new WeakMap(), imageTargets = new WeakMap();
   var mounted, queued = false;
   var selector = '.one-workspace-preview canvas';
   var fieldsByTool = {
@@ -148,6 +148,10 @@
         result.push(Object.assign({}, mounted.lastTargets.get(field.key), field));
       }
     });
+    (imageTargets.get(mounted.canvas) || []).forEach(function (target) {
+      var input = document.getElementById(target.inputId);
+      if (input && input.type === 'file' && !input.disabled) result.push(target);
+    });
     return result.sort(function (a, b) { return a.rect.y - b.rect.y || a.rect.x - b.rect.x; });
   }
   function sourceFor(key) { return fields().find(function (field) { return field.key === key; }); }
@@ -221,11 +225,21 @@
     var list = targets(); mounted.targets = list;
     var nodes = list.map(function (target) {
       var node = document.createElement('button'), r = target.rect;
-      node.type = 'button'; node.className = 'one-direct-target'; node.dataset.fieldKey = target.key;
-      node.setAttribute('aria-label', '編輯：' + target.label); node.title = '點一下直接編輯：' + target.label;
-      var x = Math.max(0, r.x * sx - 4), y = Math.max(0, r.y * sy - 4);
-      Object.assign(node.style, { left: x + 'px', top: y + 'px', width: Math.max(12, Math.min(box.width - x, r.w * sx + 8)) + 'px', height: Math.max(16, r.h * sy + 8) + 'px' });
-      node.addEventListener('click', function () { edit(target); }); return node;
+      var isImage = target.type === 'image', padding = isImage ? 0 : 4;
+      node.type = 'button'; node.className = 'one-direct-target' + (isImage ? ' one-direct-image-target' : ''); node.dataset.fieldKey = target.key;
+      node.setAttribute('aria-label', (isImage ? '更換：' : '編輯：') + target.label);
+      node.title = (isImage ? '點一下更換：' : '點一下直接編輯：') + target.label;
+      var x = Math.max(0, r.x * sx - padding), y = Math.max(0, r.y * sy - padding);
+      Object.assign(node.style, { left: x + 'px', top: y + 'px', width: Math.max(12, Math.min(box.width - x, r.w * sx + padding * 2)) + 'px', height: Math.max(16, r.h * sy + padding * 2) + 'px' });
+      node.addEventListener('click', function () {
+        if (!isImage) { edit(target); return; }
+        var input = document.getElementById(target.inputId);
+        if (input && !input.disabled) {
+          // Clear only the picker so choosing the same file again fires change.
+          // The renderer retains the current image if the picker is cancelled.
+          input.value = ''; input.click();
+        }
+      }); return node;
     });
     mounted.buttons.replaceChildren.apply(mounted.buttons, nodes);
   }
@@ -245,5 +259,13 @@
     mount();
     new MutationObserver(function (changes) { if (changes.some(function (change) { return !change.target.closest || !change.target.closest('[data-one-direct-ui]'); })) queue(); }).observe(document.body, { childList: true, subtree: true });
   });
-  global.ONECardDirectEdit = { version: '1.0.0', refresh: queue, finish: function () { finish(false, false); } };
+  global.ONECardDirectEdit = {
+    version: '1.1.0', refresh: queue, finish: function () { finish(false, false); },
+    setImageTargets: function (canvas, targets) {
+      imageTargets.set(canvas, targets.filter(function (target) {
+        return target.rect && ['x', 'y', 'w', 'h'].every(function (key) { return Number.isFinite(target.rect[key]); }) && target.rect.w > 0 && target.rect.h > 0;
+      }).map(function (target) { return Object.assign({}, target, { type: 'image', key: 'image-' + target.inputId }); }));
+      queue();
+    }
+  };
 })(window);
