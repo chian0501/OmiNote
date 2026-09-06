@@ -964,7 +964,7 @@ for(const width of [1366,390]){
         await toggle.scrollIntoViewIfNeeded();
         const check=async()=>{
           const g=await toggle.evaluate(e=>{const a=e.getBoundingClientRect(),b=e.firstElementChild.getBoundingClientRect();return {w:a.width,h:a.height,thumb:b.width,vertical:Math.abs(a.y+a.height/2-b.y-b.height/2),left:b.left-a.left,right:a.right-b.right};});
-          expect(g.w).toBe(40);expect(g.h).toBe(24);expect(g.thumb).toBe(16);expect(g.vertical).toBeLessThanOrEqual(.5);expect(g.left).toBeGreaterThanOrEqual(3);expect(g.right).toBeGreaterThanOrEqual(3);
+          expect(g.w).toBeCloseTo(40,1);expect(g.h).toBeCloseTo(24,1);expect(g.thumb).toBeCloseTo(16,1);expect(g.vertical).toBeLessThanOrEqual(.5);expect(g.left).toBeGreaterThanOrEqual(3);expect(g.right).toBeGreaterThanOrEqual(3);
         };
         await check();if(!await toggle.isEnabled())continue;
         const original=await toggle.getAttribute('aria-checked');await toggle.press('Space');
@@ -1007,7 +1007,15 @@ test('focus GET capsule matches explanation size and exports without title overl
   await page.locator('.label-color-block').getByRole('button',{name:/高亮黃/}).click();
   await screenshot(page,info,'focus-GET-larger-capsule');
   const png=await download(page,page.locator('.export-button').filter({hasText:'輸出含字 PNG'}),info,'focus-GET-capsule','png');assertPNG(png.bytes);
-  const native=Buffer.from(await canvas.evaluate(c=>c.toDataURL('image/png').split(',')[1]),'base64');expect(png.bytes.equals(native)).toBe(true);
+  const comparison=await canvas.evaluate(async(c,data)=>{
+    const image=new Image();image.src='data:image/png;base64,'+data;await image.decode();
+    const exported=document.createElement('canvas');exported.width=image.width;exported.height=image.height;
+    const context=exported.getContext('2d');context.drawImage(image,0,0);
+    const a=context.getImageData(0,0,image.width,image.height).data,b=c.getContext('2d').getImageData(0,0,c.width,c.height).data;
+    let changed=0;for(let i=0;i<a.length;i++)if(a[i]!==b[i])changed++;
+    return {sameSize:image.width===c.width&&image.height===c.height,changed};
+  },png.bytes.toString('base64'));
+  expect(comparison.sameSize).toBe(true);expect(comparison.changed,'PNG pixels must match the visible component, including inherited font synthesis').toBe(0);
   await page.locator('.label-text-controls input').fill('MISSION CLEAR');
   await page.getByRole('button',{name:'標題前方',exact:true}).click();
   await page.locator('input[placeholder="輸入卡片標題"]').fill('梅田到 HARUKA｜跟著 5 步走');

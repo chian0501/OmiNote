@@ -4531,6 +4531,8 @@ body.one-workspace-v2 .editor-panel{position:sticky;top:10px;height:calc(100dvh 
 body.one-workspace-v2 .editor-head{padding:11px 12px}
 body.one-workspace-v2 .editor-head small{display:none}
 body.one-workspace-v2 .editor-scroll{padding:8px}
+/* Transient feedback must not intercept the next edit or reorder click. */
+body.one-workspace-v2 #toast{pointer-events:none}
 body.one-workspace-v2 #oneOverlayOutline{padding:8px;margin:0 0 10px}
 body.one-workspace-v2 .one-overlay-list{grid-template-columns:minmax(0,1fr);min-width:0;gap:7px}
 .one-outline-row{display:flex;flex-direction:column;min-width:0;max-width:100%;gap:5px;padding:6px;border:1px solid #304450;border-radius:6px;background:#101b24}
