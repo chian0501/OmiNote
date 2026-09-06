@@ -847,10 +847,10 @@
   }
 
   if (typeof document !== 'undefined' && document.readyState === 'loading' && typeof document.write === 'function') {
-    document.write('<script src="./ai-json-guide-v1.js?v=1311"></' + 'script>');
+    document.write('<script src="./ai-json-guide-v1.js?v=1312"></' + 'script>');
   } else if (typeof document !== 'undefined' && document.createElement && document.head) {
     var aiGuideScript = document.createElement('script');
-    aiGuideScript.src = './ai-json-guide-v1.js?v=1311';
+    aiGuideScript.src = './ai-json-guide-v1.js?v=1312';
     aiGuideScript.onload = function () { if (global.ONEAIJsonGuide) global.ONEAIJsonGuide.wrapProjectPackage(); };
     document.head.appendChild(aiGuideScript);
   }

@@ -77,10 +77,10 @@
       }
     },
     'dialogue-card': {
-      name: '對話卡', code: 'DIALOGUE-CARD', version: 'V1.3.7', file: '對話卡-對話摘要-Omi疑惑-涅特無奈.json',
-      values: ['component_id 固定 DIALOGUE-CARD', 'character：NONE／Omi／NieTe／Kuma／Nomi／NPC', '表情：大笑／驚訝／生氣／委屈哭／疑惑／無奈（NPC 不使用頭像表情）', 'left／right 都要保留 character、expression、name'],
+      name: '對話卡', code: 'DIALOGUE-CARD', version: 'V1.3.8', file: '對話卡-對話摘要-Omi疑惑-涅特無奈.json',
+      values: ['component_id 固定 DIALOGUE-CARD', 'character：NONE／Omi／NieTe／Kuma／Nomi／NPC', '表情：一般／大笑／驚訝／生氣／委屈哭／疑惑／無奈（NPC 不使用頭像表情）', 'left／right 都要保留 character、expression、name'],
       example: {
-        component_id: 'DIALOGUE-CARD', generator_version: 'V1.3.7_20260826',
+        component_id: 'DIALOGUE-CARD', generator_version: 'V1.3.8_20260906',
         left: { character: 'Omi', expression: '疑惑', name: 'Omi' }, right: { character: 'NieTe', expression: '無奈', name: 'Nie Te' },
         dialogue: '你不是說走這條比較快嗎？'
       }

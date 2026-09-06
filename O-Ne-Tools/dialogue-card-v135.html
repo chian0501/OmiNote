@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>O-Ne 對話卡生成器 V1.3.7</title>
+<title>O-Ne 對話卡生成器 V1.3.8</title>
 <style>
 *{box-sizing:border-box}
 body{margin:0;min-height:100vh;background:#0e1117;color:#f3efe8;font-family:"Noto Sans TC","Noto Sans CJK TC","Microsoft JhengHei",sans-serif}
@@ -36,19 +36,19 @@ canvas{width:617px;max-width:100%;height:auto;image-rendering:auto;filter:drop-s
 </head>
 <body data-one-card-workspace="dialogue">
 <div class="app"><a class="tool-home-link" href="./" style="min-width:118px;height:44px;display:inline-flex;align-items:center;color:#53ced0;font-size:14px;font-weight:800;text-decoration:none">回工具入口</a>
-<h1>O-Ne 對話卡生成器 <span style="font-size:12px;color:#8c96a5">V1.3.7</span></h1>
-<div class="sub">正式資產修正版：直接使用 Drive 的 24 張獨立透明頭像；每張以 224 px 高密度資產載入，先裁透明空白、只縮小不放大。正式框與人物完全分離，原生 617×120。</div>
+<h1>O-Ne 對話卡生成器 <span style="font-size:12px;color:#8c96a5">V1.3.8</span></h1>
+<div class="sub">每個角色有一般與六種情緒，共 28 個透明頭像。左右可分別選擇角色、表情與名稱；預覽與輸出維持原生 617×120。</div>
 <div class="grid">
 <div class="panel">
   <div class="section-title">01｜左右角色設定</div>
-  <div class="note"><b>角色來源：</b>Omi／涅特／Kuma／Nomi 的完整獨立透明頭像資產。<br><b>表情：</b>大笑／驚訝／生氣／委屈哭／疑惑／無奈。沒有獨立來源的「一般」不提供。<br>NPC 無頭像，名稱可自行改成「站務員／店員阿姨／工作人員」等。</div>
+  <div class="note"><b>角色來源：</b>Omi／涅特／Kuma／Nomi 的完整獨立透明頭像資產。<br><b>表情：</b>一般／大笑／驚訝／生氣／委屈哭／疑惑／無奈。<br>NPC 無頭像，名稱可自行改成「站務員／店員阿姨／工作人員」等。</div>
   <div class="slots">
     <div class="slot"><h3>⬅ 左側角色</h3><label>角色</label><select id="leftCharacter"></select><label>表情</label><select id="leftExpression"></select><label>角色名稱（可自訂）</label><input id="leftName"><button type="button" id="leftDefault" class="secondary small">使用預設名稱</button><div class="hint">選「不顯示」可關閉左側；NPC 不顯示人物頭像。</div></div>
     <button id="swap" class="swap" title="交換左右">⇄</button>
     <div class="slot"><h3>右側角色 ➡</h3><label>角色</label><select id="rightCharacter"></select><label>表情</label><select id="rightExpression"></select><label>角色名稱（可自訂）</label><input id="rightName"><button type="button" id="rightDefault" class="secondary small">使用預設名稱</button><div class="hint">左右可選相同角色；任一側關閉即自動變單人卡。</div></div>
   </div>
   <label>對話文字</label><textarea id="dialogue">你不是說走這條比較快嗎？</textarea>
-  <div id="status" class="status">LOADING｜正在驗證 24 個獨立表情…</div>
+  <div id="status" class="status">LOADING｜正在驗證角色表情…</div>
   <div class="buttons"><a id="download" class="download-link disabled" aria-disabled="true">輸出透明 PNG</a><button id="jsonBtn" class="secondary">輸出欄位 JSON</button><button id="reset" class="secondary">回復示例</button></div>
   <div class="mini"><b class="lock">🔒 固定不改：</b>617×120、正式切角白框、#1F1713 主底板 80%、角色識別色、透明背景。<br><b>人物規則：</b>使用 224 px 高密度獨立頭像，先裁透明空白，只等比例縮小、不放大；不從完成卡擷取人物。<br><b>可改：</b>左右角色、左右表情、左右名稱、台詞。</div>
 </div>
@@ -56,14 +56,14 @@ canvas{width:617px;max-width:100%;height:auto;image-rendering:auto;filter:drop-s
 </div>
 </div>
 
-<script src="./dialogue-assets-omi.js?v=136"></script>
-<script src="./dialogue-assets-niete.js?v=136"></script>
-<script src="./dialogue-assets-kuma.js?v=136"></script>
-<script src="./dialogue-assets-nomi.js?v=136"></script>
-<script src="./edit-backup-v1.js?v=1312"></script>
+<script src="./dialogue-assets-omi.js?v=138"></script>
+<script src="./dialogue-assets-niete.js?v=138"></script>
+<script src="./dialogue-assets-kuma.js?v=138"></script>
+<script src="./dialogue-assets-nomi.js?v=138"></script>
+<script src="./edit-backup-v1.js?v=1313"></script>
 <script>
 'use strict';
-const EXPRESSIONS=['大笑','驚訝','生氣','委屈哭','疑惑','無奈'];
+const EXPRESSIONS=['一般','大笑','驚訝','生氣','委屈哭','疑惑','無奈'];
 const CHARACTERS={
   NONE:{label:'不顯示',name:'',color:'#777777',text:'#FFFFFF',portrait:false},
   Omi:{label:'Omi',name:'Omi',color:'#FD4537',text:'#FFFFFF',portrait:true},
@@ -73,6 +73,8 @@ const CHARACTERS={
   NPC:{label:'NPC',name:'NPC',color:'#29A6A7',text:'#FFFFFF',portrait:false}
 };
 const $=id=>document.getElementById(id),canvas=$('c'),ctx=canvas.getContext('2d');
+const PORTRAIT_ROLES=Object.keys(CHARACTERS).filter(role=>CHARACTERS[role].portrait);
+const REQUIRED_ASSET_COUNT=PORTRAIT_ROLES.length*EXPRESSIONS.length;
 const portraits={};
 let assetsReady=false;
 const defaults={leftCharacter:'Omi',leftExpression:'委屈哭',leftName:'Omi',rightCharacter:'NieTe',rightExpression:'驚訝',rightName:'Nie Te',dialogue:'你不是說走這條比較快嗎？'};
@@ -82,7 +84,7 @@ function fill(el,items){el.innerHTML='';for(const [v,t] of items){const o=docume
 function init(){fill($('leftCharacter'),Object.entries(CHARACTERS).map(([k,v])=>[k,v.label]));fill($('rightCharacter'),Object.entries(CHARACTERS).map(([k,v])=>[k,v.label]));fill($('leftExpression'),EXPRESSIONS.map(x=>[x,x]));fill($('rightExpression'),EXPRESSIONS.map(x=>[x,x]));reset(false)}
 function loadImage(src){return new Promise(resolve=>{const im=new Image();let done=false;const finish=ok=>{if(done)return;done=true;clearTimeout(timer);resolve(ok?im:null)};const timer=setTimeout(()=>finish(false),8000);im.onload=()=>finish(true);im.onerror=()=>finish(false);im.src=src})}
 function alphaBox(im){const t=document.createElement('canvas');t.width=im.naturalWidth||im.width;t.height=im.naturalHeight||im.height;const c=t.getContext('2d',{willReadFrequently:true});c.clearRect(0,0,t.width,t.height);c.drawImage(im,0,0);const data=c.getImageData(0,0,t.width,t.height).data;let x0=t.width,y0=t.height,x1=-1,y1=-1;for(let y=0;y<t.height;y++){for(let x=0;x<t.width;x++){if(data[(y*t.width+x)*4+3]>8){if(x<x0)x0=x;if(y<y0)y0=y;if(x>x1)x1=x;if(y>y1)y1=y}}}return x1>=x0&&y1>=y0?{x:x0,y:y0,w:x1-x0+1,h:y1-y0+1}:null}
-async function loadAssets(){const source=window.DIALOGUE_ASSETS||window.ONE_DIALOGUE_ASSETS||{},jobs=[];const missing=[];for(const role of ['Omi','NieTe','Kuma','Nomi']){portraits[role]={};for(const expr of EXPRESSIONS){const src=source[role]&&source[role][expr];if(typeof src!=='string'||!src.startsWith('data:image/')){missing.push(`${role}/${expr}`);continue}jobs.push(loadImage(src).then(im=>{if(!im){missing.push(`${role}/${expr}`);return}const box=alphaBox(im);if(!box){missing.push(`${role}/${expr}`);return}portraits[role][expr]={im,box}}))}}await Promise.all(jobs);const count=Object.values(portraits).reduce((n,m)=>n+Object.keys(m).length,0);assetsReady=count===24&&missing.length===0;syncAll();render();if(assetsReady){$('status').className='status';$('status').textContent='READY｜24／24 個獨立表情已解碼驗證';updateDownloadLink(true)}else{$('status').className='status error';$('status').textContent=`ERROR｜只驗證 ${count}／24；缺少 ${missing.length} 個素材`;updateDownloadLink(false)}}
+async function loadAssets(){const source=window.DIALOGUE_ASSETS||window.ONE_DIALOGUE_ASSETS||{},jobs=[];const missing=[];for(const role of PORTRAIT_ROLES){portraits[role]={};for(const expr of EXPRESSIONS){const src=source[role]&&source[role][expr];if(typeof src!=='string'||!src.startsWith('data:image/')){missing.push(`${role}/${expr}`);continue}jobs.push(loadImage(src).then(im=>{if(!im){missing.push(`${role}/${expr}`);return}const box=alphaBox(im);if(!box){missing.push(`${role}/${expr}`);return}portraits[role][expr]={im,box}}))}}await Promise.all(jobs);const count=Object.values(portraits).reduce((n,m)=>n+Object.keys(m).length,0);assetsReady=count===REQUIRED_ASSET_COUNT&&missing.length===0;syncAll();render();if(assetsReady){$('status').className='status';$('status').textContent=`READY｜${count}／${REQUIRED_ASSET_COUNT} 個獨立表情已解碼驗證`;updateDownloadLink(true)}else{$('status').className='status error';$('status').textContent=`ERROR｜只驗證 ${count}／${REQUIRED_ASSET_COUNT}；缺少 ${missing.length} 個素材`;updateDownloadLink(false)}}
 function frame(){ctx.clearRect(0,0,617,120);ctx.save();ctx.beginPath();ctx.moveTo(18,1);ctx.lineTo(599,1);ctx.lineTo(616,18);ctx.lineTo(616,102);ctx.lineTo(599,119);ctx.lineTo(18,119);ctx.lineTo(1,102);ctx.lineTo(1,18);ctx.closePath();ctx.fillStyle='rgba(31,23,19,.80)';ctx.fill();ctx.strokeStyle='rgba(255,255,255,.80)';ctx.lineWidth=2;ctx.stroke();ctx.restore()}
 function fitName(n,m=118,s=20,min=12){while(s>=min){ctx.font=font(800,s);if(ctx.measureText(n).width<=m)return s;s--}return min}
 function portraitLayout(side,ch,e){const p=portraits[ch]&&portraits[ch][e];if(!p)return null;const b=p.box;const scale=Math.min(120/b.w,120/b.h,1);const w=Math.round(b.w*scale),h=Math.round(b.h*scale);return{p,x:side==='left'?0:617-w,y:120-h,w,h}}
@@ -92,7 +94,7 @@ function wrap(text,maxWidth,size){ctx.font=font(800,size);const lines=[''];for(c
 function drawDialogue(text,leftBox,rightBox,leftChar,rightChar){const x1=leftBox?Math.max(132,leftBox.x+leftBox.w+14):(leftChar==='NPC'?24:20);const x2=rightBox?Math.min(485,rightBox.x-14):(rightChar==='NPC'?593:597);const maxW=Math.max(155,x2-x1);let size=27,lines=null;while(size>=15){lines=wrap(text,maxW,size);if(lines)break;size--}if(!lines)lines=[String(text).slice(0,18)+'…'];ctx.font=font(800,size);ctx.fillStyle='#FDF3E7';ctx.textAlign='left';ctx.textBaseline='middle';if(lines.length===1)ctx.fillText(lines[0],x1,66);else{ctx.fillText(lines[0],x1,51);ctx.fillText(lines[1],x1,82)}}
 function sync(side,resetName=false){const ch=$(side+'Character').value,d=def(ch);$(side+'Expression').disabled=!d.portrait;$(side+'Name').disabled=ch==='NONE';if(resetName)$(side+'Name').value=d.name;render()}
 function syncAll(){sync('left');sync('right')}
-function render(){frame();const lc=$('leftCharacter').value,rc=$('rightCharacter').value,le=$('leftExpression').value,re=$('rightExpression').value;if(lc==='NONE'&&rc==='NONE'){$('status').className='status error';$('status').textContent='BLOCKED｜左右至少保留一個角色或 NPC';updateDownloadLink(false);return}const lp=portraitLayout('left',lc,le),rp=portraitLayout('right',rc,re);drawTag('left',lc,$('leftName').value,lp);drawTag('right',rc,$('rightName').value,rp);paintPortrait(lp);paintPortrait(rp);drawDialogue($('dialogue').value,lp,rp,lc,rc);if(assetsReady){updateDownloadLink(true);$('status').className='status';$('status').textContent=`READY｜24／24｜左 ${def(lc).label}${def(lc).portrait?'／'+le:''}｜右 ${def(rc).label}${def(rc).portrait?'／'+re:''}`}}
+function render(){frame();const lc=$('leftCharacter').value,rc=$('rightCharacter').value,le=$('leftExpression').value,re=$('rightExpression').value;if(lc==='NONE'&&rc==='NONE'){$('status').className='status error';$('status').textContent='BLOCKED｜左右至少保留一個角色或 NPC';updateDownloadLink(false);return}const lp=portraitLayout('left',lc,le),rp=portraitLayout('right',rc,re);drawTag('left',lc,$('leftName').value,lp);drawTag('right',rc,$('rightName').value,rp);paintPortrait(lp);paintPortrait(rp);drawDialogue($('dialogue').value,lp,rp,lc,rc);if(assetsReady){updateDownloadLink(true);$('status').className='status';$('status').textContent=`READY｜${REQUIRED_ASSET_COUNT}／${REQUIRED_ASSET_COUNT}｜左 ${def(lc).label}${def(lc).portrait?'／'+le:''}｜右 ${def(rc).label}${def(rc).portrait?'／'+re:''}`}}
 function snap(side){return{character:$(side+'Character').value,expression:$(side+'Expression').value,name:$(side+'Name').value}}
 function put(side,s){$(side+'Character').value=s.character;$(side+'Expression').value=s.expression;$(side+'Name').value=s.name;sync(side)}
 function reset(redraw=true){for(const [k,v] of Object.entries(defaults))$(k).value=v;syncAll();if(redraw)render()}
@@ -104,7 +106,7 @@ init();
 $('dialogue').addEventListener('input',render);
 $('swap').onclick=()=>{const a=snap('left'),b=snap('right');put('left',b);put('right',a);render()};
 $('reset').onclick=()=>reset(true);
-$('jsonBtn').onclick=()=>{const data={component_id:'DIALOGUE-CARD',generator_version:'V1.3.7_20260826',left:snap('left'),right:snap('right'),dialogue:$('dialogue').value};saveBlob(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),'O-Ne_對話卡_data_v137.json')};
+$('jsonBtn').onclick=()=>{const data={component_id:'DIALOGUE-CARD',generator_version:'V1.3.8_20260906',left:snap('left'),right:snap('right'),dialogue:$('dialogue').value};saveBlob(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),'O-Ne_對話卡_data_v138.json')};
 function validateDialogue(snapshot){
   if(!snapshot||!snapshot.left||!snapshot.right)throw new Error('JSON 缺少左右角色。');
   for(const side of ['left','right']){
@@ -115,7 +117,7 @@ function validateDialogue(snapshot){
   return snapshot;
 }
 ONEEditBackup.mount({
-  id:'dialogue-card',generatorVersion:'V1.3.7_20260826',anchor:document.querySelector('.buttons'),
+  id:'dialogue-card',generatorVersion:'V1.3.8_20260906',anchor:document.querySelector('.buttons'),
   capture:()=>({left:snap('left'),right:snap('right'),dialogue:$('dialogue').value}),
   apply:snapshot=>{snapshot=validateDialogue(snapshot);put('left',snapshot.left);put('right',snapshot.right);$('dialogue').value=String(snapshot.dialogue??'');syncAll();render()},
   fromJSON:payload=>{if(!payload||payload.component_id!=='DIALOGUE-CARD')throw new Error('component_id 必須是 DIALOGUE-CARD。');return validateDialogue({left:payload.left,right:payload.right,dialogue:payload.dialogue})}
