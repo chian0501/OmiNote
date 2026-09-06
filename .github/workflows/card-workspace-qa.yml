@@ -27,7 +27,7 @@ jobs:
       - name: Check out the approved artwork baseline
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
-          ref: f42b3884d8fc880e48ad9156be1045d3fdf82fd4
+          ref: 5184afc7c508c04e548dba4b14faf0d151c95cc8
           path: .workspace-baseline
           persist-credentials: false
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6

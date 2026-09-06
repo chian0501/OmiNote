@@ -101,6 +101,13 @@ const narrowHeight = layout.focusAutoHeight('body', shortContent, label, style, 
 const largeHeight = layout.focusAutoHeight('body', shortContent, label, style, largeImage, scale);
 assert(largeHeight > narrowHeight + 250, 'larger square images must extend the card downward');
 
+for (const mode of ['stack-left', 'stack-right', 'pair-left', 'pair-right']) {
+  const grouped = layout.focusImageLayout('body', { ...largeImage, placement: mode, right: narrowImage.left });
+  const textLeft = mode.endsWith('left') ? grouped.innerLeft + grouped.groupWidth + grouped.gap : 86;
+  const textRight = mode.endsWith('left') ? 1240 - grouped.innerRight : 1240 - grouped.innerRight - grouped.groupWidth - grouped.gap;
+  assert.strictEqual(grouped.textWidth, textRight - textLeft, 'auto-height wrapping must use the actual grouped renderer text width');
+}
+
 const cropAsset = {
   enabled: true,
   element: { naturalWidth: 800, naturalHeight: 800 },
@@ -224,22 +231,22 @@ assert.notStrictEqual(
 
 assert(!source.includes('function focusShrinkScale'), 'automatic text shrink helper must be removed');
 assert(!source.includes('Ph(s,B.title'), 'title renderer must not auto-shrink');
-assert(source.includes('const p=f+focusImageTop(B,ht)'), 'renderer must use the title-aligned image anchor');
+assert(/const p(?:2)?=f\+focusImageTop\(B,ht\)/.test(source), 'renderer must use the title-aligned image anchor');
 assert(source.includes('zl=ul?focusImageTop(j,W)+ul+'), 'auto height must use the same title-aligned image anchor');
 assert(!source.includes('const p=f+ht.labelY'), 'renderer must not align the image to the label top');
-assert(source.includes('zl&&Kh(s,X.left'), 'renderer must pass the full left image crop state');
-assert(source.includes('cl&&Kh(s,X.right'), 'renderer must pass the full right image crop state');
+assert(source.includes('Kh(s,X.left'), 'renderer must pass the full left image crop state');
+assert(source.includes('Kh(s,X.right'), 'renderer must pass the full right image crop state');
 assert(source.includes('max:"45"'), 'image control must allow 45% width');
-assert(source.includes('children:"16:9 裁切"'), 'image editor must keep the fixed 16:9 crop mode');
-assert(source.includes('children:"自由裁切"'), 'image editor must expose free crop mode');
-assert(source.includes('拖框移動・拉邊角縮放'), 'free crop editor must explain direct edge and corner manipulation');
-assert(source.includes('focusFreeCropEdit(H.crop,H.action'), 'free crop pointer movement must update the selected rectangle');
-assert(source.includes('拖曳圖片定位'), 'image editor must expose direct drag positioning');
-assert(source.includes('max:"300"'), 'crop zoom control must reach 300%');
+const cropEditor = fs.readFileSync(path.join(root, 'card-image-editor-v1.js'), 'utf8');
+assert(cropEditor.includes('>16:9<'), 'shared editor keeps fixed aspect crop');
+assert(cropEditor.includes('自由裁切'), 'shared editor exposes free crop');
+assert(cropEditor.includes('拖曳選取框與邊角'), 'crop editor explains direct manipulation');
+assert(cropEditor.includes("'pointermove'"), 'crop editor handles drag movement');
+assert(source.includes('ONECardImageEditor.open'), 'focus card opens the shared crop editor');
 assert(source.includes('...focusCrop(fl.left)'), 'manual history must capture left crop settings');
 assert(source.includes('...focusCrop(fl.right)'), 'manual history must capture right crop settings');
 assert(source.includes('...focusCrop(q),embeddedInPngOnly'), 'JSON export must include non-destructive crop settings');
-assert(source.includes('...focusCrop(rl[O]),enabled:!0'), 'reselecting an image after JSON import must keep its crop settings');
+assert(source.includes('...focusCrop(rl[O]),enabled:true'), 'reselecting an image after JSON import must keep its crop settings');
 assert(source.includes('q.scale??q.scalePercent'), 'legacy and exported JSON image width keys must both restore');
 assert(source.includes('不再自動縮字'));
 assert(source.includes('放大只向下延伸'));

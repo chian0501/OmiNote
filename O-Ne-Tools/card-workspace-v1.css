@@ -256,11 +256,81 @@ body[data-one-card-workspace=focus] .one-workspace-header {padding:12px 0 0;marg
 .one-direct-editor .one-direct-input {box-sizing:border-box;display:block;width:100%;min-width:0;max-width:100%;margin:0;border:0;border-radius:0;background:#211c18;outline:0;padding:10px 12px;resize:vertical;line-height:1.45;box-shadow:none;}
 
 .one-direct-layer .one-direct-image-target {cursor:pointer;}
+.one-direct-layer .one-direct-crop-target {position:absolute;z-index:1;pointer-events:auto;min-height:28px;padding:4px 8px;border:1px solid #4b8988;border-radius:5px;background:#123d40;color:#d2fffa;font:12px/1.4 "Noto Sans TC",sans-serif;cursor:pointer;opacity:.8;}
+.one-direct-layer .one-direct-crop-target:hover,.one-direct-layer .one-direct-crop-target:focus-visible {opacity:1;outline:2px solid #70ded3;}
 .one-direct-image-target::after {content:'更換圖片';position:absolute;top:8px;right:8px;padding:6px 9px;border-radius:5px;background:#123d40;color:#d2fffa;font:12px/1.4 "Noto Sans TC",sans-serif;opacity:0;}
 .one-direct-image-target:hover::after,.one-direct-image-target:focus-visible::after {opacity:1;}
 body[data-one-card-workspace=rating] .one-workspace-editor .asset-head {flex-wrap:wrap;}
 body[data-one-card-workspace=rating] .one-workspace-editor .asset-actions {margin-left:auto;flex-wrap:wrap;}
 body[data-one-card-workspace=rating] .one-workspace-editor .asset button {white-space:nowrap;}
+
+/* Compact source cards keep crop controls out of the settings scroller. */
+.one-workspace-react-app .editor-scroll {overflow-x:hidden;padding:12px;}
+.one-workspace-react-app .focus-settings-group {margin:0 0 10px;border:1px solid #314957;border-radius:8px;background:#101923;overflow:hidden;min-width:0;}
+.one-workspace-react-app .focus-settings-group > summary {padding:13px 12px;cursor:pointer;font-size:13px;font-weight:800;color:#eef5f5;list-style-position:inside;}
+.one-workspace-react-app .focus-settings-group[open] > summary {border-bottom:1px solid #2b414d;}
+.one-workspace-react-app .focus-settings-body {padding:12px;display:grid;gap:12px;min-width:0;}
+.one-workspace-react-app .focus-settings-body > *, .one-workspace-react-app .focus-settings-body .editor-section {min-width:0;max-width:100%;margin:0;padding:0;border:0;}
+.one-workspace-react-app .focus-settings-body .image-section {padding:0;border:0;display:grid;gap:10px;}
+.one-workspace-react-app .focus-settings-body .image-placement-tabs {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;border:0;}
+.one-workspace-react-app .focus-settings-body .image-placement-tabs button {min-width:0;min-height:36px;padding:6px 4px;font-size:12px;border:1px solid #354b59;border-radius:5px;white-space:nowrap;}
+.one-workspace-react-app .focus-settings-body .image-slots {display:grid;grid-template-columns:minmax(0,1fr);gap:10px;}
+.one-workspace-react-app .focus-settings-body .image-slot {padding:10px;margin:0;min-width:0;border:1px solid #2d414f;border-radius:7px;}
+.one-workspace-react-app .image-slot-heading {display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:10px;}
+.one-workspace-react-app .image-slot-heading strong {font-size:12px;}
+.one-workspace-react-app .image-slot-heading .toggle-control {gap:5px;}
+.one-workspace-react-app .image-slot-heading .toggle-control > span {display:none;}
+.one-workspace-react-app .image-slot-heading [role=switch] {min-width:34px;width:34px;height:24px;min-height:24px;padding:3px;}
+.one-workspace-react-app .image-slot-heading [role=switch]::after {width:16px;height:16px;}
+.one-workspace-react-app .focus-image-card {display:grid;grid-template-columns:70px minmax(0,1fr);gap:9px;min-width:0;}
+.one-workspace-react-app .focus-image-thumb {display:flex;align-items:center;justify-content:center;width:70px;height:90px;min-width:0;padding:0;overflow:hidden;background:#09131c;border:1px solid #3a6673;border-radius:6px;font-size:11px;}
+.one-workspace-react-app .focus-image-thumb img {width:100%;height:100%;object-fit:contain;}
+.one-workspace-react-app .focus-image-actions {display:flex;flex-wrap:wrap;gap:5px;min-width:0;align-content:start;}
+.one-workspace-react-app .focus-image-actions .image-file-name {width:100%;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.5;font-size:10px;margin-bottom:2px;}
+.one-workspace-react-app .focus-image-actions button {height:29px;min-height:29px;padding:4px 6px;white-space:nowrap;font-size:11px;border:1px solid #335765;border-radius:5px;background:#122b35;color:#92dedc;}
+.one-workspace-react-app .focus-image-actions .image-remove-button {color:#a6b6c3;background:transparent;}
+.one-workspace-react-app .focus-settings-body .image-scale-field {display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:center;font-size:11px;margin:4px 0 0;}
+.one-workspace-react-app .focus-settings-body .image-scale-field input {width:100%;min-width:0;}
+.one-workspace-react-app .focus-settings-body .preset-section {display:grid;gap:12px;}
+.one-workspace-react-app .focus-settings-body .color-swatches {gap:5px;}
+.one-workspace-react-app .focus-settings-body .color-swatch {min-width:0;padding:7px;font-size:10px;}
+.one-workspace-react-app .focus-settings-body .hint {font-size:11px;line-height:1.6;color:#8fa8ba;margin:0;}
+[data-one-card-workspace=rating] #productArrangement .segmented {grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;}
+[data-one-card-workspace=rating] #productArrangement button {min-width:0;padding:10px 3px;font-size:12px;border-radius:0;background:#101620;color:#c5ccd5;white-space:nowrap;}
+[data-one-card-workspace=rating] #productArrangement button[aria-checked=true] {background:#29a6a7;color:white;}
+[data-one-card-workspace=rating] .one-workspace-editor .image-upload-row {display:grid;grid-template-columns:64px minmax(0,1fr) minmax(0,1fr);gap:7px;}
+[data-one-card-workspace=rating] .one-workspace-editor .image-upload-preview {grid-column:1;grid-row:1 / 4;width:64px;height:90px;cursor:pointer;}
+[data-one-card-workspace=rating] .one-workspace-editor .image-file-name {grid-column:2 / 4;grid-row:1;max-width:100%;}
+[data-one-card-workspace=rating] .one-workspace-editor .image-upload-button {grid-column:2 / 4;grid-row:2;margin:0;height:30px;}
+[data-one-card-workspace=rating] .one-workspace-editor .image-crop-button {grid-column:2;}
+[data-one-card-workspace=rating] .one-workspace-editor .image-upload-row > button {font-size:10px;padding:7px 3px;}
+[data-one-card-workspace=rating] .one-workspace-editor .asset-head {align-items:center!important;}
+[data-one-card-workspace=rating] .one-workspace-editor .asset-actions {flex-direction:row;}
+.one-image-dialog {box-sizing:border-box;width:min(820px,calc(100vw - 24px));max-height:calc(100dvh - 24px);padding:0;border:1px solid #385865;border-radius:12px;background:#101923;color:#eef5f5;box-shadow:0 24px 80px #000a;overflow:auto;font:13px/1.5 "Noto Sans TC",sans-serif;}
+.one-image-dialog::backdrop {background:#02080dc9;}
+.one-image-dialog form {margin:0;}
+.one-image-dialog header,.one-image-dialog footer {display:flex;align-items:center;gap:10px;padding:14px 18px;background:#12222d;}
+.one-image-dialog header {justify-content:space-between;border-bottom:1px solid #2e4654;}
+.one-image-dialog header strong {display:block;font-size:16px;}
+.one-image-dialog header small {display:block;color:#a2bac9;font-size:11px;margin-top:4px;}
+.one-image-dialog button {min-height:34px;width:auto;padding:7px 12px;border:1px solid #3c5969;border-radius:6px;background:#10212c;color:#c9e5e7;font:700 12px/1.4 "Noto Sans TC",sans-serif;cursor:pointer;}
+.one-image-dialog button:hover,.one-image-dialog button:focus-visible {border-color:#70ded3;outline:1px solid #70ded3;}
+.one-image-dialog button[aria-pressed=true],.one-image-dialog [data-apply] {background:#268e91;border-color:#65d6cf;color:white;}
+.one-image-dialog-body {padding:16px 18px;}
+.one-image-modes {display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px;}
+.one-image-crop-stage {display:flex;align-items:center;justify-content:center;padding:12px;background:#080f16;border:1px solid #273e4d;border-radius:7px;}
+.one-image-crop-stage canvas {display:block;max-width:100%;max-height:44dvh;width:auto;height:auto;touch-action:none;cursor:move;}
+.one-image-crop-fields {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:12px;}
+.one-image-crop-fields label {display:grid;gap:5px;margin:0;font-size:11px;color:#adbfcb;}
+.one-image-crop-fields input {box-sizing:border-box;width:100%;min-width:0;min-height:36px;padding:7px;border:1px solid #385261;border-radius:5px;background:#0b1620;color:white;font:14px "Noto Sans TC",sans-serif;}
+.one-image-dialog-body p {margin:10px 0 0;font-size:11px;color:#93aaba;}
+.one-image-dialog footer {border-top:1px solid #2e4654;position:sticky;bottom:0;flex-wrap:wrap;}
+.one-image-dialog footer span {flex:1;}
+@media(max-width:480px) {
+  .one-image-dialog header,.one-image-dialog footer,.one-image-dialog-body {padding:12px;}
+  .one-image-modes {gap:5px;}.one-image-modes button {padding:6px 9px;}
+  .one-image-crop-fields {grid-template-columns:repeat(2,minmax(0,1fr));}
+}
 
 /* Both characters stay visible together; the 617 × 120 card needs a short stage. */
 body[data-one-card-workspace=dialogue][data-one-workspace-ready] .one-workspace-layout {grid-template-columns:540px minmax(0,1fr);}
@@ -274,3 +344,12 @@ body[data-one-card-workspace=dialogue][data-one-workspace-ready] .one-workspace-
   body[data-one-card-workspace=dialogue][data-one-workspace-ready] .one-workspace-layout {grid-template-columns:minmax(0,1fr);}
   body[data-one-card-workspace=dialogue][data-one-workspace-ready] .one-workspace-editor {position:static;}
 }
+
+.one-workspace-react-app .image-slot-heading .toggle span {width:16px;height:16px;}
+.one-workspace-react-app .image-slot-heading .toggle.is-on span {transform:translateX(10px);}
+
+[data-one-card-workspace=rating] #productArrangement .seg-button[aria-checked=true] {background:#29a6a7!important;color:white!important;}
+[data-one-card-workspace=rating] .rating-layout-size {margin-top:12px;border-top:1px solid #2d414f;padding-top:10px;}
+[data-one-card-workspace=rating] .rating-layout-size > summary {cursor:pointer;color:#9db7c6;font-size:12px;padding:4px 0;}
+.one-workspace-react-app .focus-image-actions .image-file-name {display:block!important;flex-basis:100%;}
+.one-workspace-react-app .focus-image-actions button:disabled {opacity:.4;cursor:default;}
