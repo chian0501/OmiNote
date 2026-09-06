@@ -19,7 +19,7 @@ vm.runInNewContext(
     'FOCUS_TEXT_LIMITS,FOCUS_LABEL_METRICS,FOCUS_TYPE_METRICS,FOCUS_CROP_ASPECT,FOCUS_FREE_CROP_MIN,' +
     'focusTextLength,focusEstimatedLineCount,focusMeasuredLineCount,focusTypography,' +
     'focusImageLayout,focusCrop,focusFreeCropEdit,focusFreeCropAction,focusImageDisplayHeight,focusImageDrawRect,focusImageHeight,focusVerticalMetrics,focusImageTop,' +
-    'focusRowMetrics,focusAutoHeight' +
+    'focusRowMetrics,focusAutoHeight,focusLabelMetrics' +
   '};',
   context,
   { filename: 'focus-card-layout.js' }
@@ -27,7 +27,7 @@ vm.runInNewContext(
 
 const layout = context.__focusLayout;
 assert(layout, 'focus layout helpers must evaluate');
-assert.strictEqual(layout.FOCUS_LABEL_METRICS.regularHeight, 32);
+assert.strictEqual(layout.FOCUS_LABEL_METRICS.regularHeight, 48);
 assert.strictEqual(layout.FOCUS_LABEL_METRICS.titleGap, 24);
 assert.strictEqual(layout.FOCUS_TYPE_METRICS.contentLineHeight, 1.45);
 assert.strictEqual(layout.FOCUS_CROP_ASPECT, 16 / 9);
@@ -217,7 +217,11 @@ const vertical = layout.focusVerticalMetrics('body', content, label, style, scal
 const labelBottom = vertical.labelY + vertical.labelHeight;
 const titleTop = vertical.titleBaseline - vertical.titleFont * 0.8;
 assert(Math.abs(titleTop - labelBottom - vertical.labelTitleGap) < 0.001, 'label-to-title gap must be dedicated and stable');
-assert(vertical.labelHeight < 43, 'label vertical padding must remain compact');
+assert.strictEqual(vertical.labelHeight, 48, 'label uses the explanation card native capsule height');
+const longLabel = { ...label, position: 'before', text: 'MISSION DONE' };
+const longBefore = layout.focusVerticalMetrics('body', content, longLabel, style, scale, false, false, 520);
+const availableTitleWidth = 520 - layout.focusLabelMetrics(longLabel).width - longBefore.gap;
+assert.strictEqual(longBefore.titleLines, layout.focusMeasuredLineCount(content.title, availableTitleWidth, style.titleSize, 6, 800), 'label-before mode must reserve the actual capsule width when measuring the title');
 assert.strictEqual(
   layout.focusImageTop(content, vertical),
   titleTop,

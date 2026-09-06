@@ -884,3 +884,141 @@ test('explanation direct edit, keyboard save, order limits and project round tri
   expect(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth)).toBeLessThanOrEqual(1);
   expect(errors).toEqual([]);
 });
+
+// User-reported content, including mixed CJK, fares and an unbroken identifier.
+// The sidebar's own scroll width matters: checking only the document missed this bug.
+const fareCopy = [
+  ['title', '平良港接駁車｜票價怎麼買？'],
+  ['subtitle', '單趟、日票、搭幾趟才划算？'],
+  ['body', '單趟｜大人 ¥500・小孩 ¥250'],
+  ['body', '一日通票｜大人 ¥1,500・小孩 ¥750'],
+  ['body', '搭 3 趟｜¥500 × 3 = 一日票價格'],
+  ['body', '搭第 4 趟｜一日通票才划算 Ticket_ADULT500_CHILD250_DAY1500']
+];
+async function fillFareOutline(page, baseline=false) {
+  await page.goto((baseline?'/baseline':'')+'/O-Ne-Tools/explanation-card.html');
+  await expect(page.locator('body')).toHaveClass(/one-workspace-v2/);
+  await page.evaluate(()=>document.fonts.ready);
+  for(let i=0;i<fareCopy.length;i++) {
+    const [kind,text]=fareCopy[i];
+    if(i>=3) await page.getByRole('button',{name:'＋新增一項',exact:true}).click();
+    else await page.locator('#oneOverlayOutline [data-overlay-block]').nth(i).click();
+    await page.locator('#wordPage .rich[data-kind="'+kind+'"]').filter({visible:true}).last().fill(text);
+    await page.locator('#oneOverlayDone').click();
+    await expect(page.locator('#oneOverlayOutline [data-overlay-block]').nth(i)).toContainText(text);
+  }
+}
+for(const width of [1920,1366,1024,390]) {
+  test(`explanation long fare outline stays inside its sidebar ${width}px`,async({page,context},info)=>{
+    const errors=[];page.on('pageerror',e=>errors.push(e.message));
+    await page.setViewportSize({width,height:width===390?844:900});
+    if(width===1366) {
+      const before=await context.newPage();await fillFareOutline(before,true);
+      await screenshot(before,info,'explanation-long-fares-before');await before.close();
+    }
+    await fillFareOutline(page);
+    const sidebar=page.locator('.editor-scroll'),rows=page.locator('.one-outline-row');
+    await expect(rows).toHaveCount(fareCopy.length);
+    expect(await sidebar.evaluate(e=>e.scrollWidth-e.clientWidth),'no nested horizontal scroll or clipped outline').toBeLessThanOrEqual(1);
+    const geometry=await rows.evaluateAll(rows=>rows.map(row=>{
+      const button=row.querySelector('[data-overlay-block]'),box=button.getBoundingClientRect(),range=document.createRange();range.selectNodeContents(button);
+      const parent=row.closest('.editor-scroll').getBoundingClientRect();
+      return {text:button.textContent,left:box.left,right:box.right,parentLeft:parent.left,parentRight:parent.right,
+        overflow:button.scrollWidth-button.clientWidth,textRects:Array.from(range.getClientRects(),r=>({left:r.left,right:r.right}))};
+    }));
+    for(const row of geometry){
+      expect(row.left).toBeGreaterThanOrEqual(row.parentLeft);expect(row.right).toBeLessThanOrEqual(row.parentRight);
+      expect(row.overflow).toBeLessThanOrEqual(1);
+      for(const rect of row.textRects){expect(rect.left).toBeGreaterThanOrEqual(row.left-1);expect(rect.right).toBeLessThanOrEqual(row.right+1);}
+    }
+    await info.attach('long-outline-geometry',{body:JSON.stringify(geometry,null,2),contentType:'application/json'});
+    const actions=page.locator('.one-outline-actions button');
+    for(let i=0;i<await actions.count();i++){
+      const action=actions.nth(i);await action.scrollIntoViewIfNeeded();
+      expect(await action.evaluate(e=>{const r=e.getBoundingClientRect(),at=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);return e===at||e.contains(at);}),'each marker/order/delete action can be reached without sideways scrolling').toBe(true);
+    }
+    await page.locator('[data-order-action="up"]').nth(2).click();
+    await expect(rows.nth(3)).toContainText(fareCopy[4][1]);
+    await page.locator('[data-order-action="down"]').nth(1).click();
+    await expect(rows.nth(4)).toContainText(fareCopy[4][1]);
+    await page.locator('.one-outline-actions input[type=checkbox]').first().uncheck();
+    await expect(page.locator('[data-order-action="down"]').first()).toBeEnabled();
+    await rows.first().scrollIntoViewIfNeeded();
+    await screenshot(page,info,'explanation-long-fares-'+width);
+    await page.keyboard.press('Control+s');await page.reload();
+    await expect(page.locator('#oneOverlayOutline')).toContainText(fareCopy[5][1]);
+    expect(await sidebar.evaluate(e=>e.scrollWidth-e.clientWidth)).toBeLessThanOrEqual(1);
+    expect(errors).toEqual([]);
+  });
+}
+for(const width of [1366,390]){
+  test(`focus compact switches stay centered and keyboard operable ${width}px`,async({page},info)=>{
+    await page.setViewportSize({width,height:width===390?844:900});
+    await openCard(page,cards.find(c=>c.id==='focus'));await expandEditor(page);
+    await page.getByLabel('上傳：右側圖片',{exact:true}).setInputFiles(await patternedImage(page,'switch-image.png',['#ff00ff','#00ff00']));
+    for(const mode of ['一般內文','項目','步驟']){
+      await page.locator('.mode-tabs').getByRole('button',{name:mode,exact:true}).click();
+      const switches=page.getByRole('switch');
+      for(let i=0;i<await switches.count();i++){
+        const toggle=switches.nth(i);if(!await toggle.isVisible())continue;
+        await toggle.scrollIntoViewIfNeeded();
+        const check=async()=>{
+          const g=await toggle.evaluate(e=>{const a=e.getBoundingClientRect(),b=e.firstElementChild.getBoundingClientRect();return {w:a.width,h:a.height,thumb:b.width,vertical:Math.abs(a.y+a.height/2-b.y-b.height/2),left:b.left-a.left,right:a.right-b.right};});
+          expect(g.w).toBeCloseTo(40,1);expect(g.h).toBeCloseTo(24,1);expect(g.thumb).toBeCloseTo(16,1);expect(g.vertical).toBeLessThanOrEqual(.5);expect(g.left).toBeGreaterThanOrEqual(3);expect(g.right).toBeGreaterThanOrEqual(3);
+        };
+        await check();if(!await toggle.isEnabled())continue;
+        const original=await toggle.getAttribute('aria-checked');await toggle.press('Space');
+        await expect(toggle).toHaveAttribute('aria-checked',String(original!=='true'));await check();
+        await toggle.press('Space');await expect(toggle).toHaveAttribute('aria-checked',original);
+      }
+    }
+    await page.locator('.mode-tabs').getByRole('button',{name:'一般內文',exact:true}).click();
+    await page.getByRole('switch',{name:'顯示標題',exact:true}).scrollIntoViewIfNeeded();
+    await screenshot(page,info,'focus-compact-title-switches-'+width);
+    expect(await page.locator('.editor-scroll').evaluate(e=>e.scrollWidth-e.clientWidth)).toBeLessThanOrEqual(1);
+  });
+}
+
+test('focus GET capsule matches explanation size and exports without title overlap',async({page,context},info)=>{
+  const card=cards.find(c=>c.id==='focus');
+  async function setup(p,baseline=false){
+    await openCard(p,card,baseline);await expandEditor(p);
+    await p.locator('.preview-switch').getByRole('button',{name:'元件',exact:true}).click();
+    await p.getByRole('switch',{name:'加入標籤',exact:true}).click();
+    await p.locator('.label-text-controls select').selectOption('GET!');
+    await p.getByRole('button',{name:'標題上方',exact:true}).click();
+  }
+  const before=await context.newPage();await setup(before,true);await screenshot(before,info,'focus-GET-before');await before.close();
+  await setup(page);
+  await page.locator('.label-color-block').getByRole('button',{name:/移動藍/}).click();
+  const canvas=page.locator(mainCanvas).first();
+  const badge=await canvas.evaluate(c=>{
+    const pixels=c.getContext('2d').getImageData(0,0,c.width,c.height).data;let x=c.width,y=c.height,right=-1,bottom=-1;
+    for(let py=0;py<c.height;py++)for(let px=Math.ceil(c.width*.04);px<c.width;px++){
+      const i=(py*c.width+px)*4;if(pixels[i]===63&&pixels[i+1]===143&&pixels[i+2]===183&&pixels[i+3]===255){x=Math.min(x,px);y=Math.min(y,py);right=Math.max(right,px);bottom=Math.max(bottom,py);}
+    }
+    return {width:right-x+1,height:bottom-y+1};
+  });
+  // 48px / 150px at the renderer's 1240px design width, exported at 882px.
+  expect(badge.height).toBeGreaterThanOrEqual(33);expect(badge.height).toBeLessThanOrEqual(35);
+  expect(badge.width).toBeGreaterThanOrEqual(105);expect(badge.width).toBeLessThanOrEqual(108);
+  const title=page.getByRole('button',{name:'編輯：主標題',exact:true}),tag=page.getByRole('button',{name:'編輯：標籤文字',exact:true});
+  const t=await title.boundingBox(),l=await tag.boundingBox();expect(l.y+l.height).toBeLessThan(t.y);
+  await page.locator('.label-color-block').getByRole('button',{name:/高亮黃/}).click();
+  await screenshot(page,info,'focus-GET-larger-capsule');
+  const png=await download(page,page.locator('.export-button').filter({hasText:'輸出含字 PNG'}),info,'focus-GET-capsule','png');assertPNG(png.bytes);
+  const comparison=await canvas.evaluate(async(c,data)=>{
+    const image=new Image();image.src='data:image/png;base64,'+data;await image.decode();
+    const exported=document.createElement('canvas');exported.width=image.width;exported.height=image.height;
+    const context=exported.getContext('2d');context.drawImage(image,0,0);
+    const a=context.getImageData(0,0,image.width,image.height).data,b=c.getContext('2d').getImageData(0,0,c.width,c.height).data;
+    let changed=0;for(let i=0;i<a.length;i++)if(a[i]!==b[i])changed++;
+    return {sameSize:image.width===c.width&&image.height===c.height,changed};
+  },png.bytes.toString('base64'));
+  expect(comparison.sameSize).toBe(true);expect(comparison.changed,'PNG pixels must match the visible component, including inherited font synthesis').toBe(0);
+  await page.locator('.label-text-controls input').fill('MISSION DONE');
+  await page.getByRole('button',{name:'標題前方',exact:true}).click();
+  await page.locator('input[placeholder="輸入卡片標題"]').fill('梅田到 HARUKA｜跟著 5 步走');
+  await expect.poll(async()=>{const a=await title.boundingBox(),b=await tag.boundingBox();return a.x>=b.x+b.width;}).toBe(true);
+  await screenshot(page,info,'focus-long-label-before-title');
+});
