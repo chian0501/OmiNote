@@ -1073,8 +1073,13 @@ for(const width of [1920,1366,1024,390]) {
     await rows.first().scrollIntoViewIfNeeded();
     await screenshot(page,info,'explanation-long-fares-'+width);
     await page.keyboard.press('Control+s');await page.reload();
+    // Saved text can appear before the delayed workspace initialization.
+    // Measure the restored editor after its rows and responsive styles are ready.
+    await expect(page.locator('body')).toHaveClass(/one-workspace-v2/);
+    await expect(rows).toHaveCount(fareCopy.length);
     await expect(page.locator('#oneOverlayOutline')).toContainText(fareCopy[5][1]);
     expect(await sidebar.evaluate(e=>e.scrollWidth-e.clientWidth)).toBeLessThanOrEqual(1);
+    await screenshot(page,info,'explanation-long-fares-restored-'+width);
     expect(errors).toEqual([]);
   });
 }
