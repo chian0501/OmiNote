@@ -17,7 +17,7 @@
   }
   ensureSharedUi();
 
-  var VERSION = '1.3.2';
+  var VERSION = '1.3.3';
   var PACKAGE_SCHEMA = 'o-ne.project-package.v1';
   var MAX_PACKAGE_BYTES = 200 * 1024 * 1024;
   var mounts = Object.create(null);
@@ -344,6 +344,8 @@
     if (!input || !input.closest) return '';
     var slot = input.closest('.image-slot');
     if (slot) {
+      var stable = slot.getAttribute('data-one-image-slot');
+      if (stable) return stable;
       var strong = slot.querySelector('strong');
       var slotText = strong ? String(strong.textContent || '').trim() : '';
       if (slotText) return slotText;

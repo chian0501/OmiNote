@@ -186,7 +186,7 @@
     finish(false, false);
     var field = sourceFor(target.key);
     if (!field) return;
-    var inline = document.body.dataset.oneCardWorkspace === 'focus';
+    var tool = document.body.dataset.oneCardWorkspace, inline = ['focus', 'rating'].includes(tool);
     var panel = document.createElement('div'); panel.className = 'one-direct-editor' + (inline ? ' one-direct-inline-editor' : ''); panel.dataset.oneDirectUi = '1';
     var head = document.createElement('div'); head.className = 'one-direct-editor-head';
     var name = document.createElement('strong'); name.textContent = target.label;
@@ -203,7 +203,8 @@
     if (!inline && !multiline) input.type = field.input.type === 'number' ? 'number' : 'text';
     ['maxlength', 'min', 'max', 'step'].forEach(function (key) { if (field.input.hasAttribute(key)) input.setAttribute(key, field.input.getAttribute(key)); });
     head.append(name, done, cancel); panel.append(head, input); mounted.layer.appendChild(panel);
-    var format = inline && global.ONEFocusTextStyle && global.ONEFocusTextStyle.describe(field.input);
+    var formatter = tool === 'rating' ? global.ONERatingTextStyle : global.ONEFocusTextStyle;
+    var format = inline && formatter && formatter.describe(field.input);
     mounted.session = { target: target, original: field.value, input: input, panel: panel, multiline: multiline, composing: false, inline: inline, format: format };
     if (format) addFormatControls(head, input, format);
     mounted.canvas.setAttribute('data-one-direct-editing', '1');
@@ -224,7 +225,7 @@
     var controls = document.createElement('div'); controls.className = 'one-direct-format';
     controls.setAttribute('role', 'toolbar'); controls.setAttribute('aria-label', '文字格式');
     if (format.size !== null) {
-      var label = document.createElement('label'); label.textContent = format.kind === 'title' ? '標題字級' : '內文／項目字級';
+      var label = document.createElement('label'); label.textContent = format.sizeLabel || (format.kind === 'title' ? '標題字級' : '內文／項目字級');
       var size = document.createElement('input'); size.type = 'number'; size.min = format.min; size.max = format.max; size.value = format.size;
       size.setAttribute('aria-label', label.textContent); label.appendChild(size); controls.appendChild(label);
       size.addEventListener('input', function () { if (size.value && size.validity.valid) format.update({ size: Number(size.value) }); });
@@ -237,7 +238,7 @@
         format.update({ color: entry[0] }); controls.querySelectorAll('[aria-pressed]').forEach(function (node) { node.setAttribute('aria-pressed', String(node === button)); });
       }); controls.appendChild(button);
     });
-    if (format.kind !== 'label') {
+    if (format.kind !== 'label' && format.emphasis !== false) {
       var mark = document.createElement('button'); mark.type = 'button'; mark.textContent = '強調選字';
       mark.addEventListener('pointerdown', function (event) { event.preventDefault(); });
       mark.addEventListener('click', function () {
@@ -304,6 +305,13 @@
         }
       }); return node;
     });
+    list.filter(function (t) { return t.type === 'image' && typeof t.onEdit === 'function'; }).forEach(function (target) {
+      var crop = document.createElement('button'), r = target.rect;
+      crop.type = 'button'; crop.className = 'one-direct-crop-target'; crop.textContent = '裁切';
+      crop.setAttribute('aria-label', '裁切：' + target.label);
+      Object.assign(crop.style, { left: Math.max(0, (r.x + r.w) * sx - 52) + 'px', top: Math.max(0, (r.y + r.h) * sy - 34) + 'px' });
+      crop.addEventListener('click', function (event) { event.stopPropagation(); target.onEdit(); }); nodes.push(crop);
+    });
     mounted.buttons.replaceChildren.apply(mounted.buttons, nodes);
   }
   function mount() {
@@ -323,7 +331,7 @@
     new MutationObserver(function (changes) { if (changes.some(function (change) { return !change.target.closest || !change.target.closest('[data-one-direct-ui]'); })) queue(); }).observe(document.body, { childList: true, subtree: true });
   });
   global.ONECardDirectEdit = {
-    version: '1.2.0', refresh: queue, finish: function () { finish(false, false); },
+    version: '1.3.0', refresh: queue, finish: function () { finish(false, false); },
     setImageTargets: function (canvas, targets) {
       imageTargets.set(canvas, targets.filter(function (target) {
         return target.rect && ['x', 'y', 'w', 'h'].every(function (key) { return Number.isFinite(target.rect[key]); }) && target.rect.w > 0 && target.rect.h > 0;
