@@ -507,12 +507,12 @@ test('rating click-to-replace images preserve sides, proportions and project rou
   await expect(page.locator('#rightProductName')).toHaveText('right-wide.png');
   await upload(page, right, wide);
   await expect.poll(() => page.evaluate(() => window.rightUploadChanges)).toBe(2);
-  await expect.poll(async () => { const box = await right.boundingBox(); return box.width / box.height; }).toBeCloseTo(2, 2);
+  await expect.poll(async () => { const box = await right.boundingBox(); return box ? box.width / box.height : 0; }).toBeCloseTo(2, 2);
   const rightSource = await page.locator('#rightProductPreview').getAttribute('src');
   await page.locator('[data-position="both"]').click(); await upload(page, left, tall);
   await expect(page.locator('#leftProductName')).toHaveText('left-tall.png');
   await expect(page.locator('#rightProductPreview')).toHaveAttribute('src', rightSource);
-  await expect.poll(async () => { const box = await left.boundingBox(); return box.width / box.height; }).toBeCloseTo(.5, 2);
+  await expect.poll(async () => { const box = await left.boundingBox(); return box ? box.width / box.height : 0; }).toBeCloseTo(.5, 2);
   await screenshot(page, info, 'rating-replaced-dual-images');
   for (const position of ['left', 'right', 'none', 'both']) {
     await page.locator('[data-position="' + position + '"]').click();
@@ -522,7 +522,7 @@ test('rating click-to-replace images preserve sides, proportions and project rou
   await page.locator('#leftProductVisible').uncheck(); await expect(left).toHaveCount(0);
   await page.locator('#leftProductVisible').check(); await expect(left).toHaveCount(1);
   await page.locator('.one-workspace-zoom button[value="actual"]').click();
-  await expect.poll(async () => { const box = await right.boundingBox(); return box.width / box.height; }).toBeCloseTo(2, 2);
+  await expect.poll(async () => { const box = await right.boundingBox(); return box ? box.width / box.height : 0; }).toBeCloseTo(2, 2);
   await page.locator('.one-workspace-zoom button[value="fit"]').click();
   const saved = await artwork(page);
   await files(page);
