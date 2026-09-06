@@ -248,13 +248,13 @@
       "name": "對話卡",
       "family": "對話卡",
       "group": "對話／角色",
-      "desc": "正式框與完整獨立透明頭像分離；左右角色／表情／名稱獨立；24／24 表情已驗證；NPC 無頭像；單人／雙人同一工具",
+      "desc": "正式框與完整獨立透明頭像分離；左右角色／表情／名稱獨立；含原始一般表情，共 28 個頭像；NPC 無頭像；單人／雙人同一工具",
       "status": "ready",
       "href": "./dialogue-card.html?v=141&build=manual-history-v2&ui=131&redirect=131",
       "features": [
         "left_right_independent",
         "character_select",
-        "six_standalone_expressions",
+        "seven_standalone_expressions",
         "custom_display_name",
         "npc_custom_name",
         "swap_sides",
@@ -264,7 +264,7 @@
         "alpha_bbox_crop_at_render",
         "portrait_no_upscale",
         "native_canvas_preview",
-        "asset_decode_24_of_24",
+        "asset_decode_28_of_28",
         "local_edit_history_5",
         "manual_edit_history_save",
         "unsaved_edits_not_persisted",
@@ -275,7 +275,7 @@
       ],
       "formal_ref": "DIALOGUE-CARD",
       "panel_fill_opacity": 0.8,
-      "generator_version": "V1.3.7_20260826",
+      "generator_version": "V1.3.8_20260906",
       "portrait_source": {
         "repo_files": [
           "O-Ne-Tools/dialogue-assets-omi.js",
@@ -285,7 +285,7 @@
         ],
         "source": "standalone transparent expression heads",
         "finished_cards_reference_only": true,
-        "neutral_removed_no_standalone_source": true
+        "general_restored_from_original_psd": true
       },
       "quality_rules": {
         "canvas_native_size": [
@@ -295,12 +295,12 @@
         "css_upscale": false,
         "portrait_upscale": false,
         "transparent_margin_crop_at_render": true,
-        "required_asset_count": 24
+        "required_asset_count": 28
       },
       "qa": {
-        "asset_decode": "24_of_24_pass",
-        "alpha_bbox_validation": "24_of_24_pass",
-        "expression_uniqueness": "6_of_6_per_character_pass",
+        "asset_decode": "covered_by_card_workspace_browser_qa",
+        "alpha_bbox_validation": "covered_by_card_workspace_browser_qa",
+        "expression_uniqueness": "covered_by_card_workspace_browser_qa",
         "single_npc_case": "pass",
         "dual_character_case": "pass",
         "headless_browser_dom": "pass"

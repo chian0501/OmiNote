@@ -1,10 +1,10 @@
 {
-  "generator_version": "V1.3.6_20260811",
+  "generator_version": "V1.3.8_20260906",
   "component_id": "DIALOGUE-CARD",
   "family": "對話卡",
   "formal_ref": "DIALOGUE-CARD",
-  "stable_entry": "O-Ne-Tools/dialogue-card.html?v=140",
-  "implementation_entry": "O-Ne-Tools/dialogue-card-v135.html?v=140",
+  "stable_entry": "O-Ne-Tools/dialogue-card.html?v=141&ui=131",
+  "implementation_entry": "O-Ne-Tools/dialogue-card-v135.html?v=141&ui=131",
   "master_psd": {
     "name": "對話卡.psd"
   },
@@ -18,20 +18,88 @@
     ],
     "global_namespace": "window.DIALOGUE_ASSETS",
     "compatibility_alias": "window.ONE_DIALOGUE_ASSETS",
-    "source_image_size_px": 1254,
     "embedded_high_density_size_px": 224,
     "render_max_size_px": 120,
     "finished_dialogue_cards_are_reference_only": true,
     "forbid_portrait_extraction_from_finished_cards": true,
     "transparent_margin_crop_at_render": true,
     "upscale_forbidden": true,
-    "required_asset_count": 24,
-    "verified_asset_count": 24
+    "required_asset_count": 28,
+    "verified_asset_count": 28,
+    "emotion_source_image_size_px": 1254,
+    "general_expression_source": "Original embedded smart objects in the master PSD; transparent trim and proportional downscale only, preserving PSD rotation. Finished cards are visual references only.",
+    "original_expression_sources": {
+      "Omi": {
+        "artboard": "Omi對話卡",
+        "smart_object_layer": "Omi頭",
+        "embedded_file": "Omi頭.png",
+        "source_sha256": "sha256:180eaa19d6ab117ff6276565532f7899198155a540deaf6a4b108869ab590334",
+        "source_size_px": [
+          940,
+          926
+        ],
+        "preserved_psd_rotation_degrees_ccw": 0,
+        "asset_sha256": "sha256:db920e735613801955cef174a19734af9eefb18925cb0d7c05df2a4e356487f4",
+        "asset_size_px": [
+          212,
+          224
+        ]
+      },
+      "NieTe": {
+        "artboard": "涅特對話框",
+        "smart_object_layer": "涅特頭",
+        "embedded_file": "涅特頭.png",
+        "source_sha256": "sha256:92ba6e73a116e0925c80d6f7e0c8e2c44d7e021de0368187fb1a304fd8e8de85",
+        "source_size_px": [
+          940,
+          926
+        ],
+        "preserved_psd_rotation_degrees_ccw": 0,
+        "asset_sha256": "sha256:95d9003a1413ad856e30a76c0b45b120ea9977862b4942bfaf24d5df2f340f43",
+        "asset_size_px": [
+          204,
+          224
+        ]
+      },
+      "Kuma": {
+        "artboard": "Kuma對話卡",
+        "smart_object_layer": "kuma頭",
+        "embedded_file": "kuma頭.png",
+        "source_sha256": "sha256:01d6030a3dc22b0081670c6217368647ef3913313cceee429742c40d93d1ce7a",
+        "source_size_px": [
+          683,
+          658
+        ],
+        "preserved_psd_rotation_degrees_ccw": 0,
+        "asset_sha256": "sha256:52a3ed21bf236d918a59c9f84a39e62b8baada3dd167061f8477dd53d6afda5c",
+        "asset_size_px": [
+          224,
+          185
+        ]
+      },
+      "Nomi": {
+        "artboard": "nomi對話卡",
+        "smart_object_layer": "nomi頭",
+        "embedded_file": "nomi頭.png",
+        "source_sha256": "sha256:b99306b901a663a60ea02040c970e3b12ca2890b1b56822fda1e7dc81fa7c453",
+        "source_size_px": [
+          706,
+          789
+        ],
+        "preserved_psd_rotation_degrees_ccw": 5.45513932,
+        "asset_sha256": "sha256:b649667c288dd306e3b94b6ed6b57dc6b44aad4207b1c3311428cfb7969e3b2b",
+        "asset_size_px": [
+          224,
+          188
+        ]
+      }
+    }
   },
   "characters": {
     "Omi": {
       "label_color": "#FD4537",
       "expressions": [
+        "一般",
         "大笑",
         "驚訝",
         "生氣",
@@ -43,6 +111,7 @@
     "NieTe": {
       "label_color": "#57B5E8",
       "expressions": [
+        "一般",
         "大笑",
         "驚訝",
         "生氣",
@@ -54,6 +123,7 @@
     "Kuma": {
       "label_color": "#FFBE37",
       "expressions": [
+        "一般",
         "大笑",
         "驚訝",
         "生氣",
@@ -65,6 +135,7 @@
     "Nomi": {
       "label_color": "#FFBE37",
       "expressions": [
+        "一般",
         "大笑",
         "驚訝",
         "生氣",
@@ -91,6 +162,7 @@
       "NPC"
     ],
     "expression_options": [
+      "一般",
       "大笑",
       "驚訝",
       "生氣",
@@ -98,7 +170,6 @@
       "疑惑",
       "無奈"
     ],
-    "neutral_expression_removed_because_no_standalone_source": true,
     "custom_display_name": true,
     "npc_custom_name": true,
     "npc_label_flush_to_card_edge": true,
@@ -106,7 +177,8 @@
     "swap_sides": true,
     "dialogue_auto_shrink": true,
     "max_dialogue_lines": 2,
-    "both_sides_none_blocks_export": true
+    "both_sides_none_blocks_export": true,
+    "general_expression_uses_original_psd_portrait": true
   },
   "canvas": {
     "width": 617,
@@ -128,11 +200,11 @@
     "canvas_safe_same_origin_assets": true
   },
   "qa": {
-    "repository_asset_inventory": "24_of_24_pass",
-    "browser_asset_decode": "24_of_24_pass",
-    "alpha_bbox_validation": "24_of_24_pass",
-    "expression_uniqueness": "6_of_6_per_character_pass",
-    "expression_cycle": "24_of_24_pass",
+    "repository_asset_inventory": "28_of_28_pass",
+    "browser_asset_decode": "covered_by_card_workspace_browser_qa",
+    "alpha_bbox_validation": "covered_by_card_workspace_browser_qa",
+    "expression_uniqueness": "covered_by_card_workspace_browser_qa",
+    "expression_cycle": "covered_by_card_workspace_browser_qa",
     "single_npc_left_case": "pass",
     "single_npc_right_case": "pass",
     "dual_character_case": "pass",

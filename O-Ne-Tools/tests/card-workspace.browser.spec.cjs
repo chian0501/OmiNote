@@ -689,6 +689,133 @@ for (const card of cards) {
   });
 }
 
+for (const width of [1366, 390]) {
+  test(`dialogue original general expressions, all portraits and exports at ${width}`, async ({ page }, info) => {
+    const errors = []; page.on('pageerror', error => errors.push(error.message));
+    await page.setViewportSize({ width, height: 900 });
+    await openCard(page, cards.find(c => c.id === 'dialogue'));
+    await expect(page.locator('#status')).toContainText('28／28');
+    await expandEditor(page);
+    const expressions = ['一般', '大笑', '驚訝', '生氣', '委屈哭', '疑惑', '無奈'];
+    for (const side of ['left', 'right']) {
+      expect(await page.locator(`#${side}Expression option`).allTextContents()).toEqual(expressions);
+    }
+    const sources = await page.evaluate(() => window.DIALOGUE_ASSETS);
+    const mapping = JSON.parse(await fs.readFile(path.resolve(__dirname, '../dialogue-card-mapping.json'), 'utf8'));
+    for (const [role, slug] of [['Omi', 'omi'], ['NieTe', 'niete'], ['Kuma', 'kuma'], ['Nomi', 'nomi']]) {
+      const oldScript = await fs.readFile(path.resolve(__dirname, `../../.workspace-baseline/O-Ne-Tools/dialogue-assets-${slug}.js`), 'utf8');
+      const old = JSON.parse(oldScript.match(new RegExp(`window.DIALOGUE_ASSETS\\["${role}"\\]=(\\{.*\\});`))[1]);
+      for (const expression of expressions.slice(1)) {
+        expect(sources[role][expression], `${role}/${expression} source stays byte-for-byte unchanged`).toBe(old[expression]);
+      }
+      const generalBytes = Buffer.from(sources[role]['一般'].split(',')[1], 'base64');
+      expect('sha256:' + crypto.createHash('sha256').update(generalBytes).digest('hex')).toBe(mapping.portrait_source_rule.original_expression_sources[role].asset_sha256);
+      const decoded = await page.evaluate(async ({ sources, role }) => {
+        const result = [];
+        for (const [expression, src] of Object.entries(sources[role])) {
+          const image = new Image(); image.src = src; await image.decode();
+          const c = document.createElement('canvas'); c.width = image.width; c.height = image.height;
+          const ctx = c.getContext('2d'); ctx.drawImage(image, 0, 0);
+          const pixels = ctx.getImageData(0, 0, c.width, c.height).data;
+          let transparent = 0, opaque = 0;
+          for (let i = 3; i < pixels.length; i += 4) {
+            if (pixels[i] === 0) transparent++;
+            if (pixels[i] > 240) opaque++;
+          }
+          result.push({ expression, width: c.width, height: c.height, transparent, opaque });
+        }
+        return result;
+      }, { sources, role });
+      expect(decoded).toHaveLength(7);
+      for (const asset of decoded) {
+        expect(Math.max(asset.width, asset.height)).toBe(224);
+        expect(Math.min(asset.width, asset.height)).toBeGreaterThan(120);
+        expect(asset.transparent, `${role}/${asset.expression} has genuine transparent pixels`).toBeGreaterThan(0);
+        expect(asset.opaque, `${role}/${asset.expression} is a visible portrait`).toBeGreaterThan(500);
+      }
+      await page.locator('#rightCharacter').selectOption('NONE');
+      await page.locator('#leftCharacter').selectOption(role);
+      const rendered = new Set();
+      for (const expression of expressions) {
+        await page.locator('#leftExpression').selectOption(expression);
+        await expect(page.locator('#status')).toContainText(`／${expression}`);
+        rendered.add(await artwork(page));
+      }
+      expect(rendered.size, `${role} has seven distinct rendered expressions`).toBe(7);
+      await page.locator('#leftExpression').selectOption('一般');
+      await page.locator('#rightCharacter').selectOption(role);
+      await page.locator('#rightExpression').selectOption('一般');
+      const canvas = page.locator('#c');
+      await expect(canvas).toHaveAttribute('width', '617');
+      await expect(canvas).toHaveAttribute('height', '120');
+      const box = await canvas.boundingBox();
+      expect(box.width).toBeLessThanOrEqual(617);
+      expect(box.height).toBeLessThanOrEqual(120);
+      const output = await download(page, page.locator('.one-workspace-export-button').first(), info, `dialogue-${role}-general-${width}`, 'png');
+      assertPNG(output.bytes);
+      expect(output.bytes.readUInt32BE(16)).toBe(617);
+      expect(output.bytes.readUInt32BE(20)).toBe(120);
+      await screenshot(page, info, `dialogue-${role}-general-${width}-workspace`);
+    }
+    expect(errors).toEqual([]);
+  });
+}
+
+test('dialogue general expressions survive swap, history, JSON, project and batch export', async ({ page }, info) => {
+  page.on('dialog', dialog => dialog.accept());
+  await openCard(page, cards.find(c => c.id === 'dialogue'));
+  await expect(page.locator('#status')).toContainText('28／28');
+  await expandEditor(page);
+  await page.locator('#leftExpression').selectOption('一般');
+  await page.locator('#rightExpression').selectOption('一般');
+  await page.locator('#leftName').fill('Omi 原始');
+  await page.locator('#rightName').fill('涅特 原始');
+  const original = await artwork(page);
+  await page.locator('#swap').click();
+  await expect(page.locator('#leftCharacter')).toHaveValue('NieTe');
+  await expect(page.locator('#rightCharacter')).toHaveValue('Omi');
+  await expect(page.locator('#leftExpression')).toHaveValue('一般');
+  await expect(page.locator('#rightExpression')).toHaveValue('一般');
+  await page.locator('#swap').click();
+  expect(await artwork(page)).toBe(original);
+  await page.locator('.one-workspace-save-host button').click();
+  await page.reload();
+  await expect(page.locator('#status')).toContainText('28／28');
+  await expect.poll(() => artwork(page)).toBe(original);
+  await files(page);
+  const json = await download(page, page.locator('.one-workspace-native-files #jsonBtn'), info, 'dialogue-general-settings', 'json');
+  const state = JSON.parse(json.bytes.toString());
+  expect(state.left.expression).toBe('一般'); expect(state.right.expression).toBe('一般');
+  const project = await download(page, page.locator('[data-action="export-package"]'), info, 'dialogue-general-project', 'zip');
+  await closeFiles(page);
+  await expandEditor(page);
+  await page.locator('#leftExpression').selectOption('生氣');
+  await page.locator('#rightExpression').selectOption('大笑');
+  expect(await artwork(page)).not.toBe(original);
+  await files(page);
+  // Older native JSON carrying 一般 must also load, without a version-specific rejection.
+  state.generator_version = 'V1.3.5_20260807';
+  const legacy = info.outputPath('dialogue-original-legacy.json');
+  await fs.writeFile(legacy, JSON.stringify(state));
+  await upload(page, page.locator('.one-workspace-native-files [data-action="load"]'), legacy);
+  await expect.poll(() => artwork(page)).toBe(original);
+  await closeFiles(page);
+  await page.locator('#leftExpression').selectOption('疑惑');
+  await files(page);
+  await upload(page, page.locator('[data-action="import-package"]'), project.target);
+  await expect(page.locator('.one-project-package__status')).toContainText('專案包載入成功');
+  await expect.poll(() => artwork(page)).toBe(original);
+  await page.locator('#one-workspace-tab-batch').click();
+  await upload(page, page.locator('[data-one-batch-render-ui] [data-action="select"]'), project.target);
+  const batch = await download(page, page.locator('[data-one-batch-render-ui] [data-action="run"]'), info, 'dialogue-general-batch', 'zip');
+  const outputs = Object.entries(zipEntries(batch.bytes));
+  expect(outputs).toHaveLength(1); assertPNG(outputs[0][1]);
+  const rendered = 'data:image/png;base64,' + outputs[0][1].toString('base64');
+  expect(crypto.createHash('sha256').update(rendered).digest('hex')).toBe(original);
+  await closeFiles(page);
+  await screenshot(page, info, 'dialogue-general-restored');
+});
+
 for (const id of ['rating', 'settlement']) {
   test(`${id} transparent default, reset, PNG and saved background compatibility`, async ({ page, context }, info) => {
     page.on('dialog', dialog => dialog.accept());
@@ -946,8 +1073,13 @@ for(const width of [1920,1366,1024,390]) {
     await rows.first().scrollIntoViewIfNeeded();
     await screenshot(page,info,'explanation-long-fares-'+width);
     await page.keyboard.press('Control+s');await page.reload();
+    // Saved text can appear before the delayed workspace initialization.
+    // Measure the restored editor after its rows and responsive styles are ready.
+    await expect(page.locator('body')).toHaveClass(/one-workspace-v2/);
+    await expect(rows).toHaveCount(fareCopy.length);
     await expect(page.locator('#oneOverlayOutline')).toContainText(fareCopy[5][1]);
     expect(await sidebar.evaluate(e=>e.scrollWidth-e.clientWidth)).toBeLessThanOrEqual(1);
+    await screenshot(page,info,'explanation-long-fares-restored-'+width);
     expect(errors).toEqual([]);
   });
 }
