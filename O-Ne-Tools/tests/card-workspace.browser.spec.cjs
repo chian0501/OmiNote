@@ -755,7 +755,7 @@ for (const width of [1366, 390]) {
       assertPNG(output.bytes);
       expect(output.bytes.readUInt32BE(16)).toBe(617);
       expect(output.bytes.readUInt32BE(20)).toBe(120);
-      await screenshot(page, info, `dialogue-${role}-general-${width}`);
+      await screenshot(page, info, `dialogue-${role}-general-${width}-workspace`);
     }
     expect(errors).toEqual([]);
   });
