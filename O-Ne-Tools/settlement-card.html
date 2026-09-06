@@ -73,9 +73,9 @@ canvas{display:block;width:min(100%,1120px);height:auto;filter:drop-shadow(0 10p
 @media(max-width:680px){.app{padding:15px}.two,.buttons,.row-editor,.adjust{grid-template-columns:1fr}.row-no,.icon-field,.preset-field,.row-title-field,.row-value-field,.row-remove,.accent-check{grid-column:1;grid-row:auto}.row-no{text-align:left}.preview-toolbar{align-items:flex-start;flex-direction:column}.stage{min-height:360px;padding:12px}}
 </style>
 
-<link rel="stylesheet" href="./card-workspace-v1.css?v=1100">
-<script src="./card-direct-edit-v1.js?v=1100"></script>
-<script src="./card-workspace-v1.js?v=1100" defer></script>
+<link rel="stylesheet" href="./card-workspace-v1.css?v=1200">
+<script src="./card-direct-edit-v1.js?v=1200"></script>
+<script src="./card-workspace-v1.js?v=1200" defer></script>
 </head>
 <body data-one-card-workspace="settlement">
 <main class="app">
@@ -116,7 +116,7 @@ canvas{display:block;width:min(100%,1120px);height:auto;filter:drop-shadow(0 10p
       </div>
       <div class="section">
         <div class="section-title"><span>04｜背景與訂閱框</span><small>圖片皆保留原比例裁滿</small></div>
-        <div class="switch-row"><div class="switch-copy"><strong>顯示背景</strong><small>關閉後輸出透明 PNG；正式 UI、角色與卡體仍保留。</small></div><input id="bgVisible" type="checkbox" checked></div>
+        <div class="switch-row"><div class="switch-copy"><strong>顯示背景</strong><small>關閉後輸出透明 PNG；正式 UI、角色與卡體仍保留。</small></div><input id="bgVisible" type="checkbox"></div>
         <div class="asset">
           <div class="asset-head"><strong>背景圖片</strong><span id="bgName">正式背景</span></div>
           <div class="asset-actions"><label class="file-button">上傳背景<input id="bgUpload" type="file" accept="image/*"></label><button id="clearBg" class="tiny-button" type="button">使用正式背景</button></div>
@@ -194,6 +194,6 @@ $('downloadJson').onclick=downloadJson;$('reset').onclick=resetAll;
 Promise.all([loadStatic('background',STATIC_SOURCES.background),loadStatic('overlay',STATIC_SOURCES.overlay),loadStatic('ui',STATIC_SOURCES.ui),loadStatic('cats',STATIC_SOURCES.cats),document.fonts.load('700 36px "O-Ne Noto Sans TC"'),document.fonts.load('800 52px "O-Ne Noto Sans TC"')]).then(()=>{assetsReady=true;for(const id of ['bgScale','nextScale','subscribeScale'])syncRange(id);render()}).catch(error=>{$('status').classList.add('error');$('status').textContent=`載入失敗：${error.message}`});
 </script>
 <script src="./edit-backup-v1.js?v=1310"></script>
-<script src="./settlement-card-v011.js?v=013-ready"></script>
+<script src="./settlement-card-v011.js?v=013-transparent"></script>
 </body>
 </html>

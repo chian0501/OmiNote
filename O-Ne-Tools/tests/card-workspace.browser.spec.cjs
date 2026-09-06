@@ -248,6 +248,24 @@ for (const card of cards) {
       const errors = [];
       page.on('pageerror', error => errors.push(error.message));
       await openCard(page, card);
+      if (card.id === 'rating') {
+        const groups = page.locator('.one-workspace-editor > .one-workspace-fold');
+        await expect(groups).toHaveCount(4);
+        for (let i = 0; i < 3; i++) await expect(groups.nth(i)).not.toHaveAttribute('open');
+        await expect(groups.nth(3)).toHaveAttribute('open');
+        await expect(groups.locator(':scope > summary')).toHaveText(['標籤與店家標題', '評分項目', '價格與心得', '影像']);
+      }
+      if (card.id === 'dialogue') {
+        const left = await page.locator('#leftCharacter').boundingBox(), right = await page.locator('#rightCharacter').boundingBox();
+        expect(left.width).toBeGreaterThanOrEqual(120); expect(right.width).toBeGreaterThanOrEqual(120);
+        expect(Math.abs(left.y - right.y)).toBeLessThanOrEqual(1);
+        expect(right.x).toBeGreaterThanOrEqual(left.x + left.width);
+        expect((await page.locator('.one-workspace-stage').boundingBox()).height).toBeLessThanOrEqual(220);
+        await page.getByRole('button', { name: '交換左右角色', exact: true }).click();
+        await expect(page.locator('#leftCharacter')).toHaveValue('NieTe');
+        await expect(page.locator('#rightCharacter')).toHaveValue('Omi');
+        await page.getByRole('button', { name: '交換左右角色', exact: true }).click();
+      }
       const originalScale = await page.locator(mainCanvas).first().evaluate(c => ({ width: c.getBoundingClientRect().width / c.width, height: c.getBoundingClientRect().height / c.height }));
       expect(originalScale.width, 'default preview never enlarges the native canvas').toBeLessThanOrEqual(1.001);
       expect(originalScale.height).toBeLessThanOrEqual(1.001);
@@ -280,6 +298,10 @@ for (const card of cards) {
       if (width === 1366) {
         const base = await context.newPage();
         await openCard(base, card, true);
+        if (['rating', 'settlement'].includes(card.id)) {
+          await expandEditor(base);
+          await base.locator('#bgVisible').uncheck();
+        }
         expect(await artwork(page), 'unchanged approved renderer pixels').toBe(await artwork(base));
         await base.close();
       }
@@ -425,3 +447,96 @@ for (const card of cards) {
     expect(errors).toEqual([]);
   });
 }
+
+for (const id of ['rating', 'settlement']) {
+  test(`${id} transparent default, reset, PNG and saved background compatibility`, async ({ page, context }, info) => {
+    page.on('dialog', dialog => dialog.accept());
+    const card = cards.find(c => c.id === id);
+    await openCard(page, card);
+    await expect(page.locator('#bgVisible')).not.toBeChecked();
+    const initial = await artwork(page);
+    const png = await download(page, page.locator('.one-workspace-export-button').first(), info, id + '-transparent', 'png');
+    assertPNG(png.bytes);
+    const alpha = await page.evaluate(async data => {
+      const image = new Image(); image.src = 'data:image/png;base64,' + data; await image.decode();
+      const canvas = document.createElement('canvas'); canvas.width = image.width; canvas.height = image.height;
+      const ctx = canvas.getContext('2d'); ctx.drawImage(image, 0, 0);
+      return ctx.getImageData(2, 2, 1, 1).data[3];
+    }, png.bytes.toString('base64'));
+    expect(alpha, 'exported PNG has actual alpha transparency outside the card').toBe(0);
+    await expandEditor(page); await page.locator('#bgVisible').check();
+    const base = await context.newPage(); await openCard(base, card, true);
+    const withBackground = await artwork(base);
+    expect(await artwork(page), 'enabling the background preserves the approved artwork').toBe(withBackground);
+    await files(base);
+    const oldJSON = await download(base, base.locator('.one-workspace-native-files #jsonBtn,.one-workspace-native-files #downloadJson'), info, id + '-previous-version', 'json');
+    await base.close();
+    await page.locator('#bgVisible').uncheck();
+    await files(page);
+    await upload(page, page.locator('.one-workspace-native-files [data-action="load"],.one-workspace-native-files #loadJson'), oldJSON.target);
+    await expect(page.locator('#bgVisible')).toBeChecked();
+    await expect.poll(() => artwork(page)).toBe(withBackground);
+    await closeFiles(page); await page.locator('.one-workspace-save-host button').click();
+    await page.reload(); await expect(page.locator('.one-workspace-save-host button')).toBeVisible();
+    await expect(page.locator('#bgVisible')).toBeChecked();
+    await expect.poll(() => artwork(page)).toBe(withBackground);
+    await files(page); await page.locator('.one-workspace-native-files #reset').click(); await closeFiles(page);
+    await expect(page.locator('#bgVisible')).not.toBeChecked();
+    await expect.poll(() => artwork(page)).toBe(initial);
+    await screenshot(page, info, id + '-transparent-reset');
+  });
+}
+
+test('rating click-to-replace images preserve sides, proportions and project roundtrip', async ({ page }, info) => {
+  page.on('dialog', dialog => dialog.accept());
+  const errors = []; page.on('pageerror', error => errors.push(error.message));
+  await openCard(page, cards.find(c => c.id === 'rating'));
+  const fixture = async (name, width, height, color) => ({ name, mimeType: 'image/png', buffer: Buffer.from(await page.evaluate(({ width, height, color }) => {
+    const c = document.createElement('canvas'); c.width = width; c.height = height;
+    const ctx = c.getContext('2d'); ctx.fillStyle = color; ctx.fillRect(0, 0, width, height);
+    return c.toDataURL('image/png').split(',')[1];
+  }, { width, height, color }), 'base64') });
+  const wide = await fixture('right-wide.png', 160, 80, '#28a6a7');
+  const tall = await fixture('left-tall.png', 80, 160, '#ffbe37');
+  const right = page.getByRole('button', { name: '更換：右側圖片', exact: true });
+  const left = page.getByRole('button', { name: '更換：左側圖片', exact: true });
+  await expect(right).toBeVisible(); await expect(left).toHaveCount(0);
+  await page.evaluate(() => { window.rightUploadChanges = 0; document.querySelector('#rightProductUpload').addEventListener('change', () => window.rightUploadChanges++); });
+  const pending = page.waitForEvent('filechooser'); await right.focus(); await page.keyboard.press('Enter');
+  await (await pending).setFiles(wide);
+  await expect(page.locator('#rightProductName')).toHaveText('right-wide.png');
+  await upload(page, right, wide);
+  await expect.poll(() => page.evaluate(() => window.rightUploadChanges)).toBe(2);
+  await expect.poll(async () => { const box = await right.boundingBox(); return box ? box.width / box.height : 0; }).toBeCloseTo(2, 2);
+  const rightSource = await page.locator('#rightProductPreview').getAttribute('src');
+  await page.locator('[data-position="both"]').click(); await upload(page, left, tall);
+  await expect(page.locator('#leftProductName')).toHaveText('left-tall.png');
+  await expect(page.locator('#rightProductPreview')).toHaveAttribute('src', rightSource);
+  await expect.poll(async () => { const box = await left.boundingBox(); return box ? box.width / box.height : 0; }).toBeCloseTo(.5, 2);
+  await screenshot(page, info, 'rating-replaced-dual-images');
+  for (const position of ['left', 'right', 'none', 'both']) {
+    await page.locator('[data-position="' + position + '"]').click();
+    await expect(left).toHaveCount(['left', 'both'].includes(position) ? 1 : 0);
+    await expect(right).toHaveCount(['right', 'both'].includes(position) ? 1 : 0);
+  }
+  await page.locator('#leftProductVisible').uncheck(); await expect(left).toHaveCount(0);
+  await page.locator('#leftProductVisible').check(); await expect(left).toHaveCount(1);
+  await page.locator('.one-workspace-zoom button[value="actual"]').click();
+  await expect.poll(async () => { const box = await right.boundingBox(); return box ? box.width / box.height : 0; }).toBeCloseTo(2, 2);
+  await page.locator('.one-workspace-zoom button[value="fit"]').click();
+  const saved = await artwork(page);
+  await files(page);
+  const project = await download(page, page.locator('[data-action="export-package"]'), info, 'rating-dual-image-project', 'zip');
+  const entries = zipEntries(project.bytes);
+  const manifest = JSON.parse(entries[Object.keys(entries).find(name => name.endsWith('.json') && !name.includes('/'))]);
+  expect(manifest.assets).toHaveLength(2);
+  await page.locator('.one-workspace-native-files #reset').click();
+  await upload(page, page.locator('[data-action="import-package"]'), project.target);
+  await expect(page.locator('.one-project-package__status')).toContainText('專案包載入成功');
+  await expect.poll(() => artwork(page)).toBe(saved); await closeFiles(page);
+  await expect(left).toHaveCount(1); await expect(right).toHaveCount(1);
+  await expect(page.locator('#bgVisible')).not.toBeChecked();
+  await page.setViewportSize({ width: 390, height: 844 });
+  await screenshot(page, info, 'rating-replaced-images-mobile');
+  expect(errors).toEqual([]);
+});
