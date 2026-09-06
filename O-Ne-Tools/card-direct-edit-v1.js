@@ -46,8 +46,9 @@
     }
     var ascent = metrics.actualBoundingBoxAscent, descent = metrics.actualBoundingBoxDescent;
     if (!Number.isFinite(ascent) || !Number.isFinite(descent) || ascent + descent < 1) { ascent = size * .8; descent = size * .2; }
-    var rect = transformRect({ x: x - left * factor, y: y - ascent, w: Math.max(1, (left + right) * factor), h: Math.max(1, ascent + descent) }, ctx.getTransform());
-    return { text: String(text), rect: rect, font: ctx.font, color: typeof ctx.fillStyle === 'string' ? ctx.fillStyle : '#fdf3e7', size: size };
+    var matrix = ctx.getTransform();
+    var rect = transformRect({ x: x - left * factor, y: y - ascent, w: Math.max(1, (left + right) * factor), h: Math.max(1, ascent + descent) }, matrix);
+    return { text: String(text), rect: rect, font: ctx.font, color: typeof ctx.fillStyle === 'string' ? ctx.fillStyle : '#fdf3e7', size: size * Math.hypot(matrix.c, matrix.d) };
   }
   // Observe draw commands without changing any pixels. Offscreen canvas text is
   // carried through drawImage so the React focus card uses the same hit testing.
@@ -89,7 +90,7 @@
         var r = record.rect;
         if (r.x + r.w < sx || r.y + r.h < sy || r.x > sx + sw || r.y > sy + sh) return;
         var rect = transformRect({ x: dx + (r.x - sx) * dw / sw, y: dy + (r.y - sy) * dh / sh, w: r.w * dw / sw, h: r.h * dh / sh }, matrix);
-        records.push(Object.assign({}, record, { rect: rect, size: record.size * dh / sh }));
+        records.push(Object.assign({}, record, { rect: rect, size: record.size * dh / sh * Math.hypot(matrix.c, matrix.d) }));
       });
       if (canvas.isConnected) queue();
       return result;
@@ -260,8 +261,9 @@
       var head = session.panel.firstChild, toolbarWidth = Math.min(480, Math.max(0, box.width));
       head.style.width = toolbarWidth + 'px'; head.style.left = Math.max(-inlineX, Math.min(0, box.width - inlineX - toolbarWidth)) + 'px';
       var top = parseFloat(session.panel.style.top), headHeight = head.getBoundingClientRect().height;
-      head.style.bottom = top >= headHeight + 8 ? 'calc(100% + 8px)' : 'auto';
-      head.style.top = top >= headHeight + 8 ? 'auto' : 'calc(100% + 8px)';
+      var roomAbove = box.top - mounted.stage.getBoundingClientRect().top + top;
+      head.style.bottom = roomAbove >= headHeight + 8 ? 'calc(100% + 8px)' : 'auto';
+      head.style.top = roomAbove >= headHeight + 8 ? 'auto' : 'calc(100% + 8px)';
       return;
     }
     var width = Math.min(box.width, Math.max(240, rect.w * scale + 28)), x = Math.max(0, Math.min(box.width - width, rect.x * scale - 6));

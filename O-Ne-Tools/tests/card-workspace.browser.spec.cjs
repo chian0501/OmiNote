@@ -122,6 +122,10 @@ test('focus inline formatting, COST alignment, composition and project restore',
   await input.fill('焦點卡直接改字');
   await page.getByRole('spinbutton', { name: '標題字級', exact: true }).fill('64');
   await page.getByRole('button', { name: '字色：淺色字', exact: true }).click();
+  await expect.poll(() => input.evaluate(el => parseFloat(getComputedStyle(el).fontSize))).toBeCloseTo(64 * 882 / 1240, 1);
+  const editingBox = await input.boundingBox(), toolBox = await page.locator('.one-direct-editor-head').boundingBox();
+  expect(toolBox.y + toolBox.height).toBeLessThanOrEqual(editingBox.y);
+  expect(editingBox.height).toBeLessThan(70);
   await screenshot(page, info, 'focus-inline-formatting');
   await page.locator('.one-direct-editor').getByRole('button', { name: '完成', exact: true }).click();
   await expect(page.locator('input[placeholder="輸入卡片標題"]')).toHaveValue('焦點卡直接改字');
