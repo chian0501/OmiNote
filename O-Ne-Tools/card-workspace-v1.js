@@ -38,8 +38,9 @@
     return (heading ? heading.textContent : '').replace(/^\s*\d+\s*[｜|]\s*/, '').replace(/\s+/g, ' ').trim();
   }
   function hideEmptyContainers(root) {
-    root.querySelectorAll('.buttons,.two,.title-row,.app-header,.export,.export-actions').forEach(function (node) {
-      if (!node.children.length && !node.textContent.trim()) node.classList.add('one-workspace-empty');
+    Array.prototype.slice.call(root.querySelectorAll('.buttons,.two,.title-row,.app-header,.export,.export-bar,.export-actions')).reverse().forEach(function (node) {
+      var visibleChild = Array.prototype.some.call(node.children, function (child) { return getComputedStyle(child).display !== 'none'; });
+      if (!visibleChild && !node.textContent.trim()) node.classList.add('one-workspace-empty');
     });
   }
 
@@ -300,11 +301,12 @@
     if (!width || !height) return;
     // Measure the real toolbar/footer instead of assuming every card has the same
     // chrome. Small cards get a short stage; large cards leave room for export.
-    var footer = state.preview.querySelector('.one-workspace-export,.export-bar');
+    var footer = state.preview.querySelector(state.config.react ? '.export-bar' : '.one-workspace-export');
     var stacked = getComputedStyle(state.workspace).gridTemplateColumns.split(' ').length === 1;
     var available = stacked ? Math.min(520, global.innerHeight * .48) :
       Math.max(180, global.innerHeight - (rect.top + global.scrollY) - (footer ? footer.offsetHeight : 84) - 20);
-    var nativeFitHeight = height * Math.min(1, Math.max(1, rect.width - 32) / width) + 48;
+    // Compact focus cards need space above the text for their inline format bar.
+    var nativeFitHeight = height * Math.min(1, Math.max(1, rect.width - 32) / width) + (state.id === 'focus' ? 224 : 48);
     var stageHeight = Math.round(Math.min(available, Math.max(200, nativeFitHeight)));
     if (state.id === 'dialogue') stageHeight = Math.min(220, stageHeight);
     var stageSize = stageHeight + 'px';

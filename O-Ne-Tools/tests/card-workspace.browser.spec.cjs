@@ -815,7 +815,7 @@ for(const id of ['general','persistent'])test(`${id} file errors stay visible an
   if(id==='general'){
     page.once('dialog',d=>d.dismiss());await page.locator('#reset').click();expect(await artwork(page)).toBe(current);
     await closeFiles(page);await page.keyboard.press('Control+s');await files(page,'history');
-    page.once('dialog',d=>d.dismiss());await page.locator('[data-action="clear"]').click();
+    page.once('dialog',d=>d.dismiss());await page.locator('[data-one-backup-ui] [data-action="clear"]').click();
     await expect(page.locator('[data-action="restore"]')).toBeEnabled();await closeFiles(page);await files(page);
   }
   await screenshot(page,info,id+'-file-error-visible');
@@ -844,6 +844,13 @@ test('explanation direct edit, keyboard save, order limits and project round tri
   await expect(page.locator('[data-order-action="up"]').last()).toBeEnabled();
   await page.locator('#sequenceEnabled').check();
   await expect(page.locator('#exportSequenceAll')).toHaveAttribute('aria-label','輸出全部 2 幕 PNG ZIP');
+  for (const [index, colors] of [['1',['#ff00ff','#00ff00']],['2',['#0000ff','#ffff00']]]) {
+    await page.locator('#sequenceVisibleCount').selectOption(index);
+    await page.locator('#openImageDrawer').click();
+    await page.locator('#explanationImage').setInputFiles(await patternedImage(page,'step-'+index+'.png',colors));
+    await expect(page.locator('#sequenceImageName')).toContainText('step-'+index+'.png');
+    await page.locator('#applyImageSettings').click();
+  }
   const canvas=page.locator('#previewCanvas');
   const pixels=()=>canvas.evaluate(c=>c.toDataURL());
   const before=await pixels();
@@ -858,6 +865,10 @@ test('explanation direct edit, keyboard save, order limits and project round tri
   await expect.poll(pixels).toBe(before);
   await expect(page.locator('#exportSequenceAll')).toHaveAttribute('aria-label','輸出全部 2 幕 PNG ZIP');
   const png=await download(page,page.locator('#exportPng'),info,'explanation-restored-frame','png');assertPNG(png.bytes);
+  const sequence=await download(page,page.locator('#exportSequenceAll'),info,'explanation-restored-sequence','zip');
+  const frames=Object.values(zipEntries(sequence.bytes));expect(frames).toHaveLength(2);
+  frames.forEach(assertPNG);expect(frames[0].equals(frames[1])).toBe(false);
+  await expect.poll(pixels).toBe(before);
   await screenshot(page,info,'explanation-audit-desktop');
   await page.setViewportSize({width:390,height:844});await screenshot(page,info,'explanation-audit-mobile');
   expect(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth)).toBeLessThanOrEqual(1);
