@@ -4603,6 +4603,13 @@ body.one-workspace-v2:not(.one-overlay-pilot) .workspace{grid-template-columns:m
 body.one-workspace-v2:not(.one-overlay-pilot) .editor-panel{display:flex}
 @media(max-width:1000px){body.one-workspace-v2 .mode-strip{z-index:10}body.one-workspace-v2 .mode-strip .ui-fold-panel{min-width:180px}body.one-workspace-v2 .workspace{grid-template-columns:220px minmax(0,1fr)!important}.one-project-actions{gap:5px}#oneSaveStatus{display:none}}
 @media(max-width:700px){body.one-workspace-v2 .app-shell{padding:8px!important}body.one-workspace-v2 .workspace,body.one-workspace-v2:not(.one-overlay-pilot) .workspace{grid-template-columns:1fr!important}body.one-workspace-v2 .preview-stack{grid-row:1;position:static}body.one-workspace-v2 .editor-panel{position:static;height:auto;max-height:500px}body.one-workspace-v2 .canvas-stage{max-height:none;padding:10px}body.one-workspace-v2 .preview-canvas{width:100%;max-height:none}body.one-workspace-v2 .mode-buttons{width:100%}body.one-workspace-v2 .mode-btn{flex:1;gap:4px;padding:5px}body.one-workspace-v2 .mode-btn span{font-size:9px}body.one-workspace-v2 .drawer-scroll.one-drawer-grid{grid-template-columns:1fr;overflow-y:auto!important}.one-drawer-controls{overflow:visible}.one-drawer-preview{position:static}body.one-workspace-v2 .content-template-fold[open]>.ui-fold-body{width:min(94vw,420px)}.one-project-actions{margin-left:0}.one-project-actions button{font-size:11px;padding:5px 8px}body.one-workspace-v2 .template-buttons{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:700px){
+  body.one-workspace-v2 .app-header{display:grid;grid-template-columns:90px minmax(0,1fr);gap:8px 12px}
+  body.one-workspace-v2 .title-line{flex-wrap:wrap;gap:5px}
+  body.one-workspace-v2 .title-line h1{font-size:18px}
+  body.one-workspace-v2 .one-project-actions{grid-column:1/-1;width:100%;flex-wrap:wrap;justify-content:flex-end}
+  body.one-workspace-v2 #oneSaveStatus{min-width:0;max-width:130px;margin-right:auto}
+}
 body.one-workspace-v2 .one-overlay-controls button{min-height:28px!important;height:28px!important}
 body.one-workspace-v2 #wordToolbar .toolbar-heading .tool-btn{min-height:26px!important;height:26px!important}
 body.one-workspace-v2 .preview-stack .toolbar-row-secondary[hidden]{display:none!important}

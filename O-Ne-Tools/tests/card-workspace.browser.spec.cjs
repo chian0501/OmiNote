@@ -446,6 +446,12 @@ for (const width of [1920, 1366, 390]) {
     const format=await page.locator('#oneEditingBar .format-painter-group').boundingBox();
     const history=await page.locator('#oneEditingBar .toolbar-history').boundingBox();
     expect(format.y+format.height<=history.y+1||format.x+format.width<=history.x+1,'format actions must not overlap undo/redo').toBe(true);
+    if(width===390){
+      const title=await page.locator('.title-line h1').boundingBox(),actions=await page.locator('.one-project-actions').boundingBox();
+      expect(title.width,'mobile title must not wrap one character per line').toBeGreaterThanOrEqual(180);
+      expect(title.height).toBeLessThanOrEqual(80);
+      expect(actions.y).toBeGreaterThanOrEqual(title.y+title.height);
+    }
     await screenshot(page, info, `explanation-${width}-preview`);
   });
 }
