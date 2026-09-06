@@ -101,6 +101,13 @@ const narrowHeight = layout.focusAutoHeight('body', shortContent, label, style, 
 const largeHeight = layout.focusAutoHeight('body', shortContent, label, style, largeImage, scale);
 assert(largeHeight > narrowHeight + 250, 'larger square images must extend the card downward');
 
+for (const mode of ['stack-left', 'stack-right', 'pair-left', 'pair-right']) {
+  const grouped = layout.focusImageLayout('body', { ...largeImage, placement: mode, right: narrowImage.left });
+  const textLeft = mode.endsWith('left') ? grouped.innerLeft + grouped.groupWidth + grouped.gap : 86;
+  const textRight = mode.endsWith('left') ? 1240 - grouped.innerRight : 1240 - grouped.innerRight - grouped.groupWidth - grouped.gap;
+  assert.strictEqual(grouped.textWidth, textRight - textLeft, 'auto-height wrapping must use the actual grouped renderer text width');
+}
+
 const cropAsset = {
   enabled: true,
   element: { naturalWidth: 800, naturalHeight: 800 },

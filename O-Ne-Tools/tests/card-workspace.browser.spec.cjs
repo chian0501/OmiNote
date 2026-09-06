@@ -148,6 +148,10 @@ test('focus grouped images, compact controls, independent crop and source ZIP re
     await expect.poll(async()=>{const [a,b]=await colorBounds(page,[[255,0,255],[255,255,0]]);return a.count>100&&b.count>100&&(arrangement==='上下兩張'?a.bottom<b.y:a.right<b.x)&&Math.abs(a.w/a.h-1)<.02&&Math.abs(b.w/b.h-1)<.02;}).toBe(true);
     await screenshot(page,info,'focus-'+arrangement+'-'+side);
   }
+  const bodyField=page.locator('.one-workspace-editor textarea').first(),originalBody=await bodyField.inputValue();
+  await bodyField.fill('這段較長的內容用來確認圖片放右邊時，文字換行與卡片高度一致。'.repeat(4));
+  await expect.poll(async()=>{const text=await page.getByRole('button',{name:'編輯：一般內文',exact:true}).boundingBox(),canvas=await page.locator(mainCanvas).first().boundingBox();return text&&canvas&&text.y+text.height<=canvas.y+canvas.height;}).toBe(true);
+  await screenshot(page,info,'focus-pair-long-content');await bodyField.fill(originalBody);
   const saved=await artwork(page);
   await page.getByRole('button',{name:'編輯裁切：第一張圖片',exact:true}).click();
   const dialog=page.getByRole('dialog',{name:/編輯裁切/});await dialog.getByRole('button',{name:'完整圖片',exact:true}).click();
