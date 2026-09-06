@@ -442,6 +442,10 @@ for (const width of [1920, 1366, 390]) {
     const canvas = page.locator('#previewCanvas'); await expect(canvas).toBeVisible();
     await page.evaluate(() => document.fonts.ready);
     await expect.poll(() => canvas.evaluate(c => c.getBoundingClientRect().width / c.width)).toBeLessThanOrEqual(1.001);
+    await expect(page.locator('#oneEditingBar')).toBeVisible();
+    const format=await page.locator('#oneEditingBar .format-painter-group').boundingBox();
+    const history=await page.locator('#oneEditingBar .toolbar-history').boundingBox();
+    expect(format.y+format.height<=history.y+1||format.x+format.width<=history.x+1,'format actions must not overlap undo/redo').toBe(true);
     await screenshot(page, info, `explanation-${width}-preview`);
   });
 }
