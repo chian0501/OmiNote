@@ -73,9 +73,9 @@ canvas{display:block;width:min(100%,1120px);height:auto;filter:drop-shadow(0 10p
 @media(max-width:680px){.app{padding:15px}.two,.buttons,.row-editor,.adjust{grid-template-columns:1fr}.row-no,.icon-field,.preset-field,.row-title-field,.row-value-field,.row-remove,.accent-check{grid-column:1;grid-row:auto}.row-no{text-align:left}.preview-toolbar{align-items:flex-start;flex-direction:column}.stage{min-height:360px;padding:12px}}
 </style>
 
-<link rel="stylesheet" href="./card-workspace-v1.css?v=1400">
+<link rel="stylesheet" href="./card-workspace-v1.css?v=1500">
 <script src="./card-direct-edit-v1.js?v=1400"></script>
-<script src="./card-workspace-v1.js?v=1400" defer></script>
+<script src="./card-workspace-v1.js?v=1500" defer></script>
 </head>
 <body data-one-card-workspace="settlement">
 <main class="app">
@@ -193,7 +193,7 @@ $('downloadJson').onclick=downloadJson;$('reset').onclick=resetAll;
 
 Promise.all([loadStatic('background',STATIC_SOURCES.background),loadStatic('overlay',STATIC_SOURCES.overlay),loadStatic('ui',STATIC_SOURCES.ui),loadStatic('cats',STATIC_SOURCES.cats),document.fonts.load('700 36px "O-Ne Noto Sans TC"'),document.fonts.load('800 52px "O-Ne Noto Sans TC"')]).then(()=>{assetsReady=true;for(const id of ['bgScale','nextScale','subscribeScale'])syncRange(id);render()}).catch(error=>{$('status').classList.add('error');$('status').textContent=`載入失敗：${error.message}`});
 </script>
-<script src="./edit-backup-v1.js?v=1311"></script>
+<script src="./edit-backup-v1.js?v=1312"></script>
 <script src="./settlement-card-v011.js?v=013-transparent"></script>
 </body>
 </html>

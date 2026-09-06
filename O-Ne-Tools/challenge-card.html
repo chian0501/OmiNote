@@ -21,9 +21,9 @@ button{border:0;border-radius:9px;padding:10px 13px;font-weight:900;cursor:point
 @media(max-width:1000px){.grid{grid-template-columns:1fr}.preview-wrap{min-height:420px}}@media(max-width:560px){.app{padding:18px}.row{grid-template-columns:1fr}}
 </style>
 
-<link rel="stylesheet" href="./card-workspace-v1.css?v=1400">
+<link rel="stylesheet" href="./card-workspace-v1.css?v=1500">
 <script src="./card-direct-edit-v1.js?v=1400"></script>
-<script src="./card-workspace-v1.js?v=1400" defer></script>
+<script src="./card-workspace-v1.js?v=1500" defer></script>
 </head>
 <body data-one-card-workspace="challenge">
 <div class="app">
@@ -37,14 +37,14 @@ button{border:0;border-radius:9px;padding:10px 13px;font-weight:900;cursor:point
 
   <label>挑戰動作</label>
   <div class="seg" id="modeSeg">
-    <button type="button" data-mode="accept" class="active">接受</button>
-    <button type="button" data-mode="abandon">放棄</button>
+    <button type="button" data-mode="accept" aria-pressed="true" class="active">接受</button>
+    <button type="button" data-mode="abandon" aria-pressed="false">放棄</button>
   </div>
 
   <label>目前選取</label>
   <div class="seg yellow" id="selectSeg">
-    <button type="button" data-selected="yes" class="active">YES</button>
-    <button type="button" data-selected="no">NO</button>
+    <button type="button" data-selected="yes" aria-pressed="true" class="active">YES</button>
+    <button type="button" data-selected="no" aria-pressed="false">NO</button>
   </div>
 
   <div class="row">
@@ -67,7 +67,7 @@ button{border:0;border-radius:9px;padding:10px 13px;font-weight:900;cursor:point
   </div>
 
   <div class="mini"><b class="lock">🔒 固定不改：</b>SELECT 標籤、外框、左紅條、卡體 80% 透明、按鈕形狀與正式色票。<br><b>可改：</b>接受／放棄狀態、YES／NO 選取、主句三段文字、左右按鈕文字。<br>文字過長時會自動縮字；低於安全字級仍放不下時停止輸出。</div>
-  <div class="source">正式來源：固定卡／挑戰任務-接受.psd（1SqUYmbv5VfVWei1Gp4hoUFPDiynwoIPU）＋挑戰任務-放棄.psd（1eNgO2nsgtK9A4h6Ieak6WkYv6J232gWd）</div>
+  <div class="source">接受／放棄切換任務文字；YES／NO 選擇目前亮起的選項。</div>
 </div>
 
 <div class="panel">
@@ -76,7 +76,7 @@ button{border:0;border-radius:9px;padding:10px 13px;font-weight:900;cursor:point
 </div>
 </div>
 </div>
-<script src="./edit-backup-v1.js?v=1311"></script>
+<script src="./edit-backup-v1.js?v=1312"></script>
 <script>
 const $=id=>document.getElementById(id);
 const canvas=$('c'),ctx=canvas.getContext('2d');
@@ -92,8 +92,8 @@ function fitSingle(text,maxWidth,start,min){let s=start;for(;s>=min;s--){ctx.fon
 function drawMain(){const parts=[{text:$('prefix').value,color:C.cream},{text:$('emphasis').value,color:state.mode==='accept'?C.yellow:C.teal},{text:$('suffix').value,color:C.cream}];const fit=fitSegments(parts,620,53,34);ctx.font=font(900,fit.size);ctx.textAlign='left';ctx.textBaseline='alphabetic';let x=37;for(const p of parts){ctx.fillStyle=p.color;ctx.fillText(p.text,x,158);x+=ctx.measureText(p.text).width}return fit.ok}
 function drawButton(x,text,on){rr(x,210,297,65,10);ctx.fillStyle=on?C.yellow:C.dim;ctx.fill();ctx.strokeStyle='rgba(255,255,255,.92)';ctx.lineWidth=1.4;ctx.stroke();const fit=fitSingle(text,245,48,26);ctx.font=font(900,fit.size);ctx.fillStyle=on?C.dark:C.cream;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(text,x+148.5,244);return fit.ok}
 function render(){ctx.clearRect(0,0,692,326);drawOuter();drawBadge();const okMain=drawMain();const okYes=drawButton(38,$('yesText').value,state.selected==='yes');const okNo=drawButton(364,$('noText').value,state.selected==='no');const ok=okMain&&okYes&&okNo;['prefix','emphasis','suffix'].forEach(id=>$(id).classList.toggle('bad',!okMain));$('yesText').classList.toggle('bad',!okYes);$('noText').classList.toggle('bad',!okNo);$('download').disabled=!ok;$('status').textContent=ok?'READY｜可輸出透明 PNG':'BLOCKED｜文字超出安全範圍，請縮短內容';$('status').className='status'+(ok?'':' error');return ok}
-function setMode(mode,resetEmphasis=true){state.mode=mode;if(resetEmphasis)$('emphasis').value=mode==='accept'?'接受':'放棄';document.querySelectorAll('#modeSeg button').forEach(b=>b.classList.toggle('active',b.dataset.mode===mode));render()}
-function setSelected(v){state.selected=v;document.querySelectorAll('#selectSeg button').forEach(b=>b.classList.toggle('active',b.dataset.selected===v));render()}
+function setMode(mode,resetEmphasis=true){state.mode=mode;if(resetEmphasis)$('emphasis').value=mode==='accept'?'接受':'放棄';document.querySelectorAll('#modeSeg button').forEach(b=>{b.classList.toggle('active',b.dataset.mode===mode);b.setAttribute('aria-pressed',String(b.dataset.mode===mode));});render()}
+function setSelected(v){state.selected=v;document.querySelectorAll('#selectSeg button').forEach(b=>{b.classList.toggle('active',b.dataset.selected===v);b.setAttribute('aria-pressed',String(b.dataset.selected===v));});render()}
 document.querySelectorAll('#modeSeg button').forEach(b=>b.onclick=()=>setMode(b.dataset.mode,true));document.querySelectorAll('#selectSeg button').forEach(b=>b.onclick=()=>setSelected(b.dataset.selected));['prefix','emphasis','suffix','yesText','noText'].forEach(id=>$(id).addEventListener('input',render));
 $('download').onclick=()=>{if(!render())return;canvas.toBlob(blob=>{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`O-Ne_挑戰卡_${state.mode}_${state.selected}_READY_V0.1.1.png`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)},'image/png')};
 $('jsonBtn').onclick=()=>{const payload={schema:'o-ne.challenge-card.ready.v0.1.1',status:'READY',generator_version:'V0.1.1_20260826',approved_by:'Omi',approved_on:'2026-08-21',formal_ref:'CHALLENGE-CARD',mode:state.mode,selected:state.selected,copy:{prefix:$('prefix').value,emphasis:$('emphasis').value,suffix:$('suffix').value,yes:$('yesText').value,no:$('noText').value},visual_rules:{panel_fill_opacity:.8,select_label_locked:true}};const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='O-Ne_挑戰卡設定_READY_V0.1.1.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};

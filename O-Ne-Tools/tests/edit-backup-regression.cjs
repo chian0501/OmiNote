@@ -129,8 +129,8 @@ const tools = [
 
 for (const [file, id, version] of tools) {
   const html = fs.readFileSync(path.join(root, file), 'utf8');
-  const backupVersion = file === 'explanation-card.html' ? 'edit-backup-v1.js?v=1320' : 'edit-backup-v1.js?v=1310';
-  assert(html.includes(backupVersion), file + ' must load the manual-by-default shared backup library');
+  const backupVersions = [...html.matchAll(/edit-backup-v1\.js\?v=(\d+)/g)].map(match=>Number(match[1]));
+  assert(backupVersions.some(version=>version>=1310) || (file === 'explanation-card.html' && html.includes('global.ONEEditBackup = {') && html.includes("version: '1.3.1'")), file + ' must load the manual-by-default shared backup library');
   const implementation = file === 'settlement-card.html'
     ? fs.readFileSync(path.join(root, 'settlement-card-v011.js'), 'utf8')
     : file === 'explanation-card.html'

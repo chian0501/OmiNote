@@ -500,6 +500,10 @@ for (const card of cards) {
         await expect(page.locator('.one-workspace-editor .one-workspace-mode select').first()).toBeVisible();
         await expect(page.locator('.one-workspace-modebar select')).toHaveCount(0);
       }
+      if(width>=1366){
+        const footer=await page.locator('.one-workspace-export,.one-workspace-preview .export-bar').last().boundingBox();
+        expect(footer.y+footer.height,'export actions fit inside the desktop viewport').toBeLessThanOrEqual(900);
+      }
       await screenshot(page, info, `${card.id}-${width}-workspace`);
       const geometry = await page.evaluate(() => {
         const selectors = ['html', 'body', '#root', '.one-workspace-app', '.one-workspace-layout', '.one-workspace-editor', '.one-workspace-preview', '.editor-scroll'];
@@ -766,5 +770,96 @@ test('rating click-to-replace images preserve sides, proportions and project rou
   await expect(page.locator('#bgVisible')).not.toBeChecked();
   await page.setViewportSize({ width: 390, height: 844 });
   await screenshot(page, info, 'rating-replaced-images-mobile');
+  expect(errors).toEqual([]);
+});
+
+// Audit fixes: test observable results, including cancelled destructive actions.
+test('move orange survives typing and the two-state ZIP preserves the selected preview', async ({page}, info) => {
+  await openCard(page, cards.find(c=>c.id==='move'));
+  const white=await artwork(page);
+  await page.locator('#previewState').selectOption('orange');
+  await expect.poll(()=>artwork(page)).not.toBe(white);
+  const orange=await artwork(page);
+  const title=await page.locator('#title').inputValue();
+  await page.locator('#title').fill('驗收交通路線');
+  await page.locator('#title').fill(title);
+  await expect.poll(()=>artwork(page)).toBe(orange);
+  const zip=await download(page,page.locator('#downloadBoth'),info,'move-both-states','zip');
+  const entries=zipEntries(zip.bytes),names=Object.keys(entries);expect(names).toHaveLength(2);
+  names.forEach(name=>assertPNG(entries[name]));
+  expect(entries[names[0]].equals(entries[names[1]])).toBe(false);
+  await expect(page.locator('#previewState')).toHaveValue('orange');expect(await artwork(page)).toBe(orange);
+  await screenshot(page,info,'move-orange-zip-complete');
+  for(let i=0;i<2;i++)await page.locator('#removeStation').click();
+  await expect(page.locator('#removeStation')).toBeDisabled();
+  for(let i=0;i<6;i++)await page.locator('#addStation').click();
+  await expect(page.locator('#addStation')).toBeDisabled();
+});
+
+for(const id of ['general','persistent','focus','rating'])test(`${id} keyboard save restores content after reload`, async({page},info)=>{
+  const card=cards.find(c=>c.id===id);await openCard(page,card);await changeContent(page,card);
+  await page.keyboard.press('Control+s');
+  await expect(page.locator('.one-workspace-save-feedback')).toContainText(/暫存/);
+  const saved=await artwork(page);await page.reload();
+  await expect.poll(()=>artwork(page)).toBe(saved);
+  await screenshot(page,info,id+'-saved-feedback');
+});
+
+for(const id of ['general','persistent'])test(`${id} file errors stay visible and cancel protects unsaved content`,async({page},info)=>{
+  const card=cards.find(c=>c.id===id);await openCard(page,card);await changeContent(page,card);
+  const current=await artwork(page);await files(page);
+  await upload(page,page.locator('.one-workspace-native-files [data-action="load"],.one-workspace-native-files #loadJson'),{name:'broken.json',mimeType:'application/json',buffer:Buffer.from('{broken')});
+  await expect(page.locator('.one-workspace-project-feedback')).toBeVisible();
+  await expect(page.locator('.one-workspace-project-feedback')).toContainText(/失敗|錯誤|無法/);
+  expect(await artwork(page)).toBe(current);
+  if(id==='general'){
+    page.once('dialog',d=>d.dismiss());await page.locator('#reset').click();expect(await artwork(page)).toBe(current);
+    await closeFiles(page);await page.keyboard.press('Control+s');await files(page,'history');
+    page.once('dialog',d=>d.dismiss());await page.locator('[data-action="clear"]').click();
+    await expect(page.locator('[data-action="restore"]')).toBeEnabled();await closeFiles(page);await files(page);
+  }
+  await screenshot(page,info,id+'-file-error-visible');
+});
+
+test('explanation direct edit, keyboard save, order limits and project round trip',async({page},info)=>{
+  const errors=[];page.on('pageerror',e=>errors.push(e.message));page.on('dialog',d=>d.accept());
+  await page.goto('/O-Ne-Tools/explanation-card.html');
+  await expect(page.locator('body')).toHaveClass(/one-workspace-v2/);
+  await expect(page.locator('.title-line .badge')).toHaveText('READY');
+  await page.evaluate(()=>document.fonts.ready);
+  await expect(page.locator('#oneNoteReveal')).toBeHidden();
+  await expect(page.locator('[data-order-action="up"]')).toBeDisabled();
+  await expect(page.locator('[data-order-action="down"]')).toBeDisabled();
+  await expect(page.locator('[data-order-action="del"]')).toBeDisabled();
+  await page.locator('#oneOverlayOutline [data-overlay-block]').first().click();
+  await page.locator('#wordPage .rich[data-kind="title"]').fill('全工具驗收');
+  await page.keyboard.press('Control+s');
+  await expect(page.locator('#oneSaveStatus')).toContainText(/暫存/);
+  await expect(page.locator('#wordPage')).not.toHaveClass(/one-overlay-page/);
+  await page.reload();await expect(page.locator('#oneOverlayOutline')).toContainText('全工具驗收');
+  await page.getByRole('button',{name:'＋新增一項',exact:true}).click();
+  await page.locator('#oneOverlayDone').click();
+  await expect(page.locator('[data-order-action="up"]').first()).toBeDisabled();
+  await expect(page.locator('[data-order-action="down"]').last()).toBeDisabled();
+  await expect(page.locator('[data-order-action="up"]').last()).toBeEnabled();
+  await page.locator('#sequenceEnabled').check();
+  await expect(page.locator('#exportSequenceAll')).toHaveAttribute('aria-label','輸出全部 2 幕 PNG ZIP');
+  const canvas=page.locator('#previewCanvas');
+  const pixels=()=>canvas.evaluate(c=>c.toDataURL());
+  const before=await pixels();
+  await page.getByRole('button',{name:'專案檔案',exact:true}).click();
+  const dialog=page.getByRole('dialog',{name:'專案檔案與本機暫存'});
+  await expect(dialog).toBeVisible();
+  const zip=await download(page,dialog.locator('[data-action="export-package"]'),info,'explanation-editable-project','zip');
+  expect(Object.keys(zipEntries(zip.bytes)).some(n=>n.endsWith('.json'))).toBe(true);
+  await page.locator('#resetAll').click();
+  await upload(page,dialog.locator('[data-action="import-package"]'),zip.target);
+  await dialog.getByRole('button',{name:'關閉',exact:true}).click();
+  await expect.poll(pixels).toBe(before);
+  await expect(page.locator('#exportSequenceAll')).toHaveAttribute('aria-label','輸出全部 2 幕 PNG ZIP');
+  const png=await download(page,page.locator('#exportPng'),info,'explanation-restored-frame','png');assertPNG(png.bytes);
+  await screenshot(page,info,'explanation-audit-desktop');
+  await page.setViewportSize({width:390,height:844});await screenshot(page,info,'explanation-audit-mobile');
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth)).toBeLessThanOrEqual(1);
   expect(errors).toEqual([]);
 });

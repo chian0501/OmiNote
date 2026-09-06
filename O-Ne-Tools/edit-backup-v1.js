@@ -258,6 +258,7 @@
     if (instance.saveButton) instance.saveButton.onclick = function () { save(instance, 'manual'); };
     instance.restoreButton.onclick = function () { restoreSelected(instance); };
     instance.clearButton.onclick = function () {
+      if (!global.confirm('清除這個工具在本機的全部暫存紀錄？目前編輯內容會保留。')) return;
       try {
         global.localStorage.removeItem(storageKey(instance.id));
         refresh(instance);

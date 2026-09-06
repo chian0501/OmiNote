@@ -106,7 +106,7 @@ body[data-one-workspace-ready] {
 .one-workspace-zoom button[aria-pressed=true] {border-color:var(--one-teal);background:#17454a;color:#c2fff6;}
 [data-one-workspace-ready] .one-workspace-stage {
   box-sizing:border-box;display:flex;align-items:center;justify-content:center;position:relative;
-  height:calc(100dvh - 257px);min-height:310px;max-height:920px;width:100%;
+  height:calc(100dvh - 257px);min-height:0!important;max-height:920px;width:100%;
   padding:16px;border-radius:0;overflow:auto;background-color:#252b32;
   background-image:linear-gradient(45deg,#30363d 25%,transparent 25%),linear-gradient(-45deg,#30363d 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#30363d 75%),linear-gradient(-45deg,transparent 75%,#30363d 75%);
   background-size:30px 30px;background-position:0 0,0 15px,15px -15px,-15px 0;
@@ -146,6 +146,14 @@ body[data-one-card-workspace="choice"] .one-workspace-export-actions #download {
 .one-workspace-file-panels [hidden],.one-workspace-editor [hidden],.one-workspace-modebar [hidden] {display:none!important;}
 .one-workspace-file-pane:empty {display:none;}
 .one-workspace-native-files {display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 14px;}
+.one-workspace-file-pane#one-workspace-pane-project {display:flex;flex-direction:column;}
+#one-workspace-pane-project > .one-workspace-hint {order:-2;}
+#one-workspace-pane-project > .one-after-edit-dock {order:-1;}
+.one-workspace-native-files {padding-top:12px;border-top:1px solid var(--one-line);}
+.one-workspace-native-files #reset {flex-basis:100%;margin-top:8px;background:#291d24;border-color:#79515d;color:#f2bec7;}
+.one-workspace-project-feedback {margin:0;font-size:12px;line-height:1.7;color:#9fe3d7;overflow-wrap:anywhere;}
+.one-workspace-project-feedback:empty {display:none;}
+.one-workspace-project-feedback.is-error {color:#ff8780;}
 .one-workspace-hint {color:#a8b7c5;font-size:12px;line-height:1.8;margin:0 0 12px;}
 .one-workspace-dialog .one-after-edit-dock {display:block;width:100%;margin:0;border:0;border-radius:0;background:transparent;box-shadow:none;}
 .one-workspace-dialog .one-after-edit-dock > summary {display:none;}

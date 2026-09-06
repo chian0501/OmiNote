@@ -34,7 +34,7 @@
   }
   function labelText(node) {
     var heading = node.querySelector('.section-title,.group-title,.section-heading,h3');
-    if (heading && heading.matches('.group-title') && heading.querySelector('span')) heading = heading.querySelector('span');
+    if (heading && heading.querySelector('strong,span')) heading = heading.querySelector('strong,span');
     return (heading ? heading.textContent : '').replace(/^\s*\d+\s*[｜|]\s*/, '').replace(/\s+/g, ' ').trim();
   }
   function hideEmptyContainers(root) {
@@ -89,8 +89,11 @@
     state.nativeFiles = element('div', 'one-workspace-native-files');
     state.filePanels.project.appendChild(element('p', 'one-workspace-hint', '跨裝置接續編輯請下載完整專案 ZIP；只需文字與設定時可使用 JSON。'));
     state.filePanels.project.appendChild(state.nativeFiles);
+    state.projectFeedback = element('p', 'one-workspace-project-feedback');
+    state.projectFeedback.setAttribute('role', 'status');
+    state.filePanels.project.appendChild(state.projectFeedback);
     state.filePanels.history.appendChild(element('p', 'one-workspace-hint', '按頂部「暫存」才會保留目前內容；最近 5 次紀錄只存在這台裝置。'));
-    state.filePanels.help.appendChild(element('p', 'one-workspace-hint', '左側編輯內容與設定，右側確認字卡；預覽下方直接輸出 PNG。頂部可暫存、載入專案或查看 AI 格式。'));
+    state.filePanels.help.appendChild(element('p', 'one-workspace-hint', '點字卡文字直接修改，預覽下方輸出 PNG。按 Ctrl／⌘＋S 或頂部「暫存」保留目前內容；跨裝置使用完整專案 ZIP，JSON 僅保存文字與設定。'));
     dialog.append(head, tabs, panels);
     document.body.appendChild(dialog);
     state.dialog = dialog;
@@ -183,12 +186,14 @@
       state.sidebarHidden = !state.sidebarHidden;
       document.body.classList.toggle('one-workspace-sidebar-hidden', state.sidebarHidden);
       toggle.setAttribute('aria-expanded', String(!state.sidebarHidden));
+      toggle.textContent = state.sidebarHidden ? '展開設定' : '收合設定';
       if (state.sidebarHidden && state.editor.contains(document.activeElement)) toggle.focus();
       state.editor.setAttribute('aria-hidden', String(state.sidebarHidden));
       state.editor.inert = state.sidebarHidden;
       fitPreview(state);
     });
     toggle.setAttribute('aria-expanded', 'true');
+    toggle.textContent = '收合設定';
     if (!state.editor.id) state.editor.id = 'one-workspace-editor';
     toggle.setAttribute('aria-controls', state.editor.id);
     bar.appendChild(toggle);
@@ -266,14 +271,22 @@
     });
     title.appendChild(toggle);
     state.editor.insertBefore(title, state.editor.firstChild);
-    state.editor.querySelectorAll(':scope > .section-title').forEach(function (node) { node.classList.add('one-workspace-empty'); });
+    state.editor.querySelectorAll(':scope > .section-title,:scope > h2').forEach(function (node) { node.classList.add('one-workspace-empty'); });
     if (state.id === 'rating') foldRatingGroups(state.editor);
     var sections = state.editor.querySelectorAll(':scope > .section,:scope > .slots > .slot');
     sections.forEach(function (node, index) {
       var open = state.id === 'dialogue' ? true : state.id === 'effect' ? index === 1 : state.id === 'settlement' ? index < 2 : index === 0;
       foldSection(node, open);
     });
-    if (!state.editor.querySelector('details')) toggle.hidden = true;
+    var syncFolds = function () {
+      var items = state.editor.querySelectorAll('details');
+      toggle.hidden = !items.length;
+      var text = Array.prototype.some.call(items, function (item) { return item.open; }) ? '收合全部' : '展開全部';
+      if (toggle.textContent !== text) toggle.textContent = text;
+    };
+    state.editor.addEventListener('toggle', syncFolds, true);
+    state.syncFolds = syncFolds;
+    syncFolds();
     if (state.id === 'dialogue') {
       var swap = state.editor.querySelector('#swap');
       if (swap) { swap.textContent = '⇄ 交換左右角色'; swap.setAttribute('aria-label', '交換左右角色'); }
@@ -285,6 +298,18 @@
     var rect = state.stage.getBoundingClientRect();
     var width = state.canvas.width, height = state.canvas.height;
     if (!width || !height) return;
+    // Measure the real toolbar/footer instead of assuming every card has the same
+    // chrome. Small cards get a short stage; large cards leave room for export.
+    var footer = state.preview.querySelector('.one-workspace-export,.export-bar');
+    var stacked = getComputedStyle(state.workspace).gridTemplateColumns.split(' ').length === 1;
+    var available = stacked ? Math.min(520, global.innerHeight * .48) :
+      Math.max(180, global.innerHeight - (rect.top + global.scrollY) - (footer ? footer.offsetHeight : 84) - 20);
+    var nativeFitHeight = height * Math.min(1, Math.max(1, rect.width - 32) / width) + 48;
+    var stageHeight = Math.round(Math.min(available, Math.max(200, nativeFitHeight)));
+    if (state.id === 'dialogue') stageHeight = Math.min(220, stageHeight);
+    var stageSize = stageHeight + 'px';
+    if (state.stage.style.height !== stageSize) state.stage.style.setProperty('height', stageSize, 'important');
+    rect = state.stage.getBoundingClientRect();
     var size = width + ' × ' + height + ' px';
     if (state.size.textContent !== size) state.size.textContent = size;
     if (rect.width <= 24 || rect.height <= 24) return;
@@ -296,7 +321,7 @@
   }
   function preparePreview(state) {
     state.preview.classList.add('one-workspace-preview');
-    var originalTitle = state.preview.querySelector(':scope > .section-title');
+    var originalTitle = state.preview.querySelector(':scope > .section-title,:scope > h2,:scope > .preview-top');
     if (originalTitle) originalTitle.classList.add('one-workspace-empty');
     var toolbar = element('div', 'one-workspace-preview-heading');
     toolbar.append(element('strong', '', '字卡預覽'));
@@ -325,7 +350,7 @@
     if (state.stage) state.stage.classList.add('one-workspace-stage');
     if (state.canvas) state.canvas.classList.add('one-workspace-canvas');
     var footer = element('footer', 'one-workspace-export');
-    var status = document.getElementById('status');
+    var status = document.getElementById('status') || state.editor.querySelector('.status');
     if (status) footer.appendChild(status);
     var exports = element('div', 'one-workspace-export-actions');
     ['downloadSet', 'download', 'downloadPng', 'downloadWhite', 'downloadOrange', 'downloadBoth'].forEach(function (id) {
@@ -340,6 +365,7 @@
     if (global.ResizeObserver && state.stage) {
       state.resizeObserver = new ResizeObserver(function () { fitPreview(state); });
       state.resizeObserver.observe(state.stage);
+      state.resizeObserver.observe(state.config.react ? state.preview.querySelector('.export-bar') : footer);
     }
     if (state.canvas) {
       state.canvasObserver = new MutationObserver(function () { fitPreview(state); });
@@ -361,6 +387,14 @@
     ['jsonBtn', 'downloadJson', 'reset'].forEach(function (id) {
       var node = document.getElementById(id);
       if (node) { node.classList.add('one-workspace-button'); state.nativeFiles.appendChild(node); }
+      if (node && id === 'reset') {
+        node.textContent = '重設目前內容';
+        node.addEventListener('click', function (event) {
+          if (!global.confirm('重設目前內容？尚未暫存的文字與圖片會被取代。')) {
+            event.preventDefault(); event.stopImmediatePropagation();
+          }
+        }, true);
+      }
     });
     var help = state.filePanels.help;
     state.app.querySelectorAll(':scope > .sub,:scope > .title-row,:scope > .app-header,.one-workspace-editor > .note,.one-workspace-editor > .mini,.formal-note').forEach(function (node) {
@@ -396,7 +430,7 @@
     if (save && state.saveHost && !state.saveHost.contains(save)) {
       save.textContent = '暫存';
       save.setAttribute('aria-label', '暫存目前內容');
-      save.setAttribute('title', '儲存這台裝置最近 5 次不同內容');
+      save.setAttribute('title', '暫存目前內容（Ctrl／⌘＋S）；保留最近 5 次不同內容');
       save.classList.add('one-workspace-button', 'one-workspace-save');
       save.addEventListener('click', function () {
         global.setTimeout(function () {
@@ -410,12 +444,25 @@
       });
       state.saveHost.appendChild(save);
     }
+    var status = document.querySelector('[data-one-backup-ui] .one-edit-backup__status,#historyStatus');
+    if (status && !state.statusObserver) {
+      state.statusObserver = new MutationObserver(function () {
+        var message = status.textContent;
+        state.projectFeedback.textContent = message;
+        state.projectFeedback.classList.toggle('is-error', /失敗|不可用|無法|不支援/.test(message));
+        state.saveFeedback.textContent = message;
+        state.saveFeedback.title = message;
+        state.saveFeedback.classList.toggle('is-error', /失敗|不可用|無法|不支援/.test(message));
+      });
+      state.statusObserver.observe(status, { childList: true, subtree: true, characterData: true });
+    }
   }
 
   function refresh() {
     if (!instance) { mount(); return; }
     routeUtilities(instance);
     if (instance.updateMode) instance.updateMode();
+    if (instance.syncFolds) instance.syncFolds();
   }
   function schedule() {
     if (scheduled) return;
@@ -447,6 +494,14 @@
     routeUtilities(state);
     if (!config.react) hideEmptyContainers(app);
     document.addEventListener('change', function () { if (state.updateMode) state.updateMode(); });
+    document.addEventListener('keydown', function (event) {
+      if (!(event.ctrlKey || event.metaKey) || event.altKey || event.shiftKey || event.key.toLowerCase() !== 's') return;
+      event.preventDefault();
+      if (event.isComposing || document.querySelector('dialog[open]')) return;
+      if (global.ONECardDirectEdit) global.ONECardDirectEdit.finish();
+      var save = state.saveHost.querySelector('button');
+      if (save && !save.disabled) save.click();
+    });
     global.requestAnimationFrame(function () { fitPreview(state); });
   }
   function init() {
@@ -455,7 +510,7 @@
     observer = new MutationObserver(schedule);
     observer.observe(document.body, { childList: true, subtree: true });
   }
-  global.ONECardWorkspace = { version: '1.2.0', refresh: refresh };
+  global.ONECardWorkspace = { version: '1.5.0', refresh: refresh };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
   else init();
 })(window);

@@ -3958,6 +3958,7 @@ if(new URLSearchParams(location.search).get('qa')==='1')setTimeout(()=>{if(!wind
       if(info.mixed){current.textContent='混合字級';current.classList.add('is-mixed');current.title='目前選取包含不同字級';}
       else if(info.style){current.textContent=levelLabel(info.style.size);current.classList.remove('is-mixed');current.title='選擇文字大小級距';}
       else{current.textContent='字級';current.classList.remove('is-mixed');}
+      current.setAttribute('aria-label','文字大小：'+current.textContent);
     }
     if(fontMenu)fontMenu.querySelectorAll('[data-size]').forEach(button=>button.classList.toggle('is-active',!info.mixed&&info.style&&Number(button.dataset.size)===Math.round(info.style.size)));
     const styles=info.styles||[];
@@ -4231,6 +4232,15 @@ body.one-overlay-pilot #wordToolbar{position:relative!important;top:auto!importa
 @media(min-width:1000px){body.one-overlay-pilot .workspace{grid-template-columns:minmax(240px,320px) minmax(0,1fr)!important}}
 
 body.one-overlay-pilot .editor-head small{display:none!important}
+
+body.one-workspace-v2 #oneSaveStatus{display:block;max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#9adbd3;font-size:11px}
+body.one-workspace-v2 .one-compatible-files{display:flex;flex-wrap:wrap;gap:8px;border-top:1px solid #354b5c;margin-top:16px;padding-top:12px}
+body.one-workspace-v2 .one-compatible-files p{flex-basis:100%;margin:0;color:#92a1b0;font-size:12px}
+body.one-workspace-v2 .one-compatible-files #resetAll{flex-basis:100%;margin-top:8px}
+body.one-workspace-v2 #oneNoteEditor [hidden]{display:none!important}
+body.one-workspace-v2 .one-outline-actions button:disabled{opacity:.35;cursor:default}
+body.one-workspace-v2 .badge.is-ready{border-color:#2b686d;background:#12383d;color:#9ff1e7}
+@media(max-width:700px){body.one-workspace-v2 #oneSaveStatus{max-width:160px}}
 </style><script>
 window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{'use strict';
 
@@ -4485,7 +4495,7 @@ window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{'use strict';
   const badge=document.querySelector('.title-line .badge');
   if(badge){badge.textContent='PILOT';badge.classList.remove('is-ready');}
   const liveStatus=document.querySelector('.app-header .status');
-  if(liveStatus)liveStatus.textContent='候選樣品｜未合併／未部署';
+  if(liveStatus)liveStatus.textContent='直接點字卡文字編輯';
   enable();
 })();
 },100));
@@ -4718,6 +4728,7 @@ window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{'use strict';
   function makeDialog(id,title){
     const dialog=document.createElement('dialog');dialog.id=id;dialog.className='one-workspace-dialog';
     const head=document.createElement('header'),h=document.createElement('strong');h.textContent=title;
+    h.id=id+'Title';dialog.setAttribute('aria-labelledby',h.id);
     head.append(h,button('關閉',()=>dialog.close()));dialog.append(head);document.body.append(dialog);
     dialog.addEventListener('click',event=>{if(event.target===dialog){const r=dialog.getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)dialog.close();}});
     return dialog;
@@ -4727,8 +4738,19 @@ window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{'use strict';
   const actions=document.createElement('div');actions.className='one-project-actions';
   const save=button('暫存',()=>{if(!commitField()||!overlay.finish())return;document.querySelector('#quickSaveHost [data-action="save"]')?.click();});save.id='oneQuickSave';
   const saveStatus=document.createElement('span');saveStatus.id='oneSaveStatus';saveStatus.textContent='本機暫存';
+  saveStatus.setAttribute('role','status');saveStatus.setAttribute('aria-live','polite');
+  save.setAttribute('aria-label','暫存目前內容');save.title='暫存目前內容（Ctrl／⌘＋S）';
   actions.append(saveStatus,save,button('專案檔案',()=>{if(commitField()&&overlay.finish())projectDialog.showModal();}),button('內容清單',()=>document.body.classList.toggle('one-outline-collapsed')),button('？',()=>helpDialog.showModal()));
   heading.append(actions);
+  const outlineToggle=actions.querySelectorAll('button')[2];
+  outlineToggle.setAttribute('aria-expanded','true');
+  outlineToggle.onclick=()=>{const collapsed=document.body.classList.toggle('one-outline-collapsed');outlineToggle.setAttribute('aria-expanded',String(!collapsed));outlineToggle.textContent=collapsed?'展開內容清單':'收合內容清單';};
+  actions.lastElementChild.setAttribute('aria-label','使用說明');
+  document.addEventListener('keydown',event=>{
+    if(!(event.ctrlKey||event.metaKey)||event.altKey||event.shiftKey||event.key.toLowerCase()!=='s')return;
+    event.preventDefault();if(!event.isComposing&&!document.querySelector('dialog[open]'))save.click();
+  });
+  document.querySelectorAll('#wordToolbar button[title]').forEach(b=>{if(!b.getAttribute('aria-label'))b.setAttribute('aria-label',b.title);});
   const helpDialog=makeDialog('oneHelpDialog','操作說明');
   const help=document.createElement('p');help.textContent='直接點字卡文字修改；左側清單可新增、排序、設定標記與小提醒。幕次與當幕圖片在成品下方。專案 ZIP 可繼續編輯，全部幕次 PNG ZIP 用於剪片。切換範本會重設文字，操作前會確認。';helpDialog.append(help);
 
@@ -4787,14 +4809,24 @@ window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{'use strict';
   function organizeFiles(){
     const packagePanel=dock.querySelector('[data-one-project-package-ui]');
     if(!packagePanel)return;
-    const row=packagePanel.querySelector('.one-project-package__row');
+    const row=packagePanel.querySelector('.one-compatible-files')||packagePanel.querySelector('.one-project-package__row');
     ['exportProject','importProjectBtn','exportJson','resetAll'].forEach(id=>{const el=$(id);if(el&&el.parentNode!==row)row.append(el);});
     const file=$('projectInput');if(file&&file.parentNode!==packagePanel)packagePanel.append(file);
     const old=dock.querySelector('.legacy-save-tools');if(old)old.hidden=true;
     const title=packagePanel.querySelector('.one-project-package__title');if(title)title.textContent='完整專案 ZIP／相容檔案';
     const reset=$('resetAll');reset.classList.add('one-danger');
+    const legacyFiles=document.createElement('div');legacyFiles.className='one-compatible-files';
+    if(!packagePanel.querySelector('.one-compatible-files')){
+      const label=document.createElement('p');label.textContent='其他格式與重設';legacyFiles.append(label);
+      ['exportProject','importProjectBtn','exportJson','resetAll'].forEach(id=>legacyFiles.append($(id)));
+      packagePanel.append(legacyFiles);
+    }
   }
   organizeFiles();setTimeout(organizeFiles,300);
+  const backupFeedback=document.querySelector('#quickSaveHost .one-edit-backup__status');
+  if(backupFeedback)new MutationObserver(()=>{saveStatus.textContent=backupFeedback.textContent;saveStatus.title=backupFeedback.textContent;}).observe(backupFeedback,{childList:true,subtree:true,characterData:true});
+  const clearBackup=dock.querySelector('[data-action="clear"]');
+  if(clearBackup)clearBackup.addEventListener('click',event=>{if(!confirm('清除說明卡在本機的全部暫存紀錄？目前編輯內容會保留。')){event.preventDefault();event.stopImmediatePropagation();}},true);
   const resetBefore=$('resetAll').onclick;$('resetAll').onclick=()=>{if(confirm('重設目前內容？尚未暫存的文字會被取代。'))resetBefore?.();};
   $('templateButtons').addEventListener('click',event=>{if(event.target.closest('[data-template]')&&!confirm('切換範本會重設文字內容；圖片保留。確定切換？')){event.preventDefault();event.stopImmediatePropagation();}},true);
   document.querySelectorAll('[data-card-mode]').forEach(b=>b.addEventListener('click',event=>{if(b.dataset.cardMode!==state.mode&&!confirm('切換模式會套用對應範本並重設文字。確定切換？')){event.preventDefault();event.stopImmediatePropagation();}},true));
@@ -4832,6 +4864,8 @@ window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{'use strict';
       for(const [text,act] of [['↑','up'],['↓','down'],['×','del']]){
         const action=button(text,()=>{if(!safe()||!commitField()||!overlay.finish())return;const source=$('wordPage').querySelector(`.edit-block[data-id="${CSS.escape(id)}"] [data-act="${act}"]`);source?.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true}));source?.click();schedule();});
         action.title={up:'往前一項',down:'往後一項',del:'刪除此項'}[act];tools.append(action);
+        action.setAttribute('aria-label',action.title+'：第 '+(bodies().findIndex(b=>b.id===id)+1)+' 項');
+        action.dataset.orderAction=act;
       }
       row.append(tools);
     }
@@ -4852,6 +4886,10 @@ window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{'use strict';
     picker.value=wanted||'after';$('oneNotePrevious').checked=state.note.usePreviousImage!==false;previous.hidden=state.note.revealMode==='with';
     note.hidden=state.mode==='gallery';
     $('noteText').disabled=!state.note.enabled;picker.disabled=!state.note.enabled;
+    note.querySelectorAll('button').forEach(b=>{b.hidden=!state.note.enabled;});
+    $('oneNotePrevious').disabled=!state.note.enabled;
+    revealLabel.hidden=!state.note.enabled;noteStyle.hidden=!state.note.enabled;
+    previous.hidden=!state.note.enabled||state.note.revealMode==='with';
     const total=model.items(state).length,count=Number(state.sequence.visibleCount||1);
     const select=$('sequenceVisibleCount');[...select.options].forEach((opt,i)=>{const next=`第 ${i+1} 幕${model.items(state)[i]?.kind==='note'?'｜小提醒':''}`;if(opt.textContent!==next)opt.textContent=next;});
     $('exportSequenceAll').hidden=!isSequence();
@@ -4861,8 +4899,15 @@ window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{'use strict';
       $('dimensionText').textContent=`${canvas.width} × ${canvas.height}px｜累積 ${count}／${total} 幕・固定尺寸`;
       $('sequenceImageTitle').textContent=`第 ${count} 幕${model.items(state)[count-1]?.kind==='note'?'（小提醒）':''}左圖`;
     }
+    $('exportPng').setAttribute('aria-label',$('exportPng').textContent);
+    $('exportSequenceAll').setAttribute('aria-label',$('exportSequenceAll').textContent);
     const noteText=document.querySelector('.export-bar p');if(noteText)noteText.textContent='透明 PNG；累積畫面固定尺寸。專案檔案請由頂部載入或保存。';
-    const backupStatus=document.querySelector('#quickSaveHost .one-edit-backup__status');if(backupStatus&&backupStatus.textContent)$('oneSaveStatus').title=backupStatus.textContent;
+    const backupStatus=document.querySelector('#quickSaveHost .one-edit-backup__status');
+    if(backupStatus&&backupStatus.textContent){
+      $('oneSaveStatus').title=backupStatus.textContent;
+      const message=/尚無/.test(backupStatus.textContent)?'尚未暫存':backupStatus.textContent;
+      if($('oneSaveStatus').textContent!==message)$('oneSaveStatus').textContent=message;
+    }
     // Fit actual card geometry above the sequence/export dock, without changing output pixels.
     if(innerWidth>700){
       const stage=canvas.parentElement;
@@ -4872,8 +4917,15 @@ window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{'use strict';
     }else{canvas.style.removeProperty('width');canvas.style.removeProperty('height');}
     if(fieldSession&&!fieldSession.composing)positionField();
     document.querySelector('[data-card-mode="content"] span').textContent='圖文說明';
+    document.querySelector('[data-card-mode="content"]').setAttribute('aria-label','一般說明');
+    document.querySelector('[data-card-mode="gallery"]').setAttribute('aria-label','純圖片字卡');
     $('contentTemplatePicker').hidden=true;
     decorateOutline();
+    const order=bodies();
+    list.querySelectorAll('[data-order-action]').forEach(b=>{
+      const index=order.findIndex(item=>item.id===b.closest('.one-outline-row').dataset.id),act=b.dataset.orderAction;
+      b.disabled=act==='up'?index<=0:act==='down'?index>=order.length-1:order.length<=1;
+    });
     list.querySelectorAll('.one-outline-row').forEach(row=>{const item=state.blocks.find(b=>b.id===row.dataset.id);const btn=row.querySelector('.one-outline-marker');if(item&&btn)btn.textContent=item.marker.text||'標記';});
   }
   function schedule(){if(!pending){pending=true;requestAnimationFrame(refresh);}}
@@ -5009,7 +5061,8 @@ window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{'use strict';
   const reset=$('resetAll');reset.onclick=()=>{if(!safe()||!commitField()||!overlay.finish())return;if(confirm('重設為預設一般說明卡？文字、標籤與小提醒會重設，逐步畫面關閉；圖片保留。')){core.beginExternalInput();state.label=clone(defaults.label);state.note=clone(defaults.note);applyTemplate('standard',true);}};
   const noteStyleSelect=$('noteSize');noteStyleSelect.addEventListener('change',()=>{state.note.html='';renderCanvas();});
   renderEditor();renderCanvas();refresh();
-  document.title='O-Ne 說明卡｜單一原位編輯 V3（候選）';
+  document.title='O-Ne 說明卡｜直接編輯';
+  const readyBadge=document.querySelector('.title-line .badge');if(readyBadge){readyBadge.textContent='READY';readyBadge.classList.add('is-ready');}
   document.querySelector('.title-line h1').firstChild.textContent='O-Ne 說明卡 ';
   document.querySelector('.title-line h1 span').textContent='單一編輯 V3';
   $('oneOverlayStatus').textContent='直接點字卡改字；大小用級距，畫布自動等比例縮放。';
