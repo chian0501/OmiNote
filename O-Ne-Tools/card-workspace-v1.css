@@ -347,3 +347,9 @@ body[data-one-card-workspace=dialogue][data-one-workspace-ready] .one-workspace-
 
 .one-workspace-react-app .image-slot-heading .toggle span {width:16px;height:16px;}
 .one-workspace-react-app .image-slot-heading .toggle.is-on span {transform:translateX(10px);}
+
+[data-one-card-workspace=rating] #productArrangement .seg-button[aria-checked=true] {background:#29a6a7!important;color:white!important;}
+[data-one-card-workspace=rating] .rating-layout-size {margin-top:12px;border-top:1px solid #2d414f;padding-top:10px;}
+[data-one-card-workspace=rating] .rating-layout-size > summary {cursor:pointer;color:#9db7c6;font-size:12px;padding:4px 0;}
+.one-workspace-react-app .focus-image-actions .image-file-name {display:block!important;flex-basis:100%;}
+.one-workspace-react-app .focus-image-actions button:disabled {opacity:.4;cursor:default;}

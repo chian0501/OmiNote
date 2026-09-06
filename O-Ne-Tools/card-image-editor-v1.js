@@ -21,7 +21,8 @@
   function draw(ctx, img, crop, box) {
     const r = sourceRect(img, crop), scale = Math.min(box.w / r.w, box.h / r.h);
     const w = r.w * scale, h = r.h * scale, x = box.x + (box.w - w) / 2, y = box.y + (box.h - h) / 2;
-    ctx.drawImage(img, r.x, r.y, r.w, r.h, x, y, w, h); return { x, y, w, h };
+    ctx.save(); ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(img, r.x, r.y, r.w, r.h, x, y, w, h); ctx.restore(); return { x, y, w, h };
   }
   let active;
   function open(options) {

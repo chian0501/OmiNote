@@ -157,8 +157,8 @@ test('focus grouped images, compact controls, independent crop and source ZIP re
   await closeFiles(page);await page.locator('.image-remove-button').nth(0).click();await page.locator('.image-remove-button').nth(1).click();
   await files(page);await upload(page,page.locator('[data-action="import-package"]'),zip.target);await closeFiles(page);await expect.poll(()=>artwork(page)).toBe(saved);
   await expandEditor(page);await page.getByRole('switch',{name:'加入標籤',exact:true}).click();await page.locator('.label-text-controls select').selectOption('COST');
-  const stripe=await page.locator(mainCanvas).first().evaluate(c=>Array.from(c.getContext('2d').getImageData(3,Math.round(c.height/2),1,1).data));
-  expect(stripe.slice(0,3)).toEqual([253,69,55]);
+  await page.locator('.label-color-block').getByRole('button',{name:/挑戰紅/}).click();
+  await expect.poll(()=>page.locator(mainCanvas).first().evaluate(c=>Array.from(c.getContext('2d').getImageData(3,Math.round(c.height/2),1,1).data).slice(0,3))).toEqual([253,69,55]);
   for(const width of [1366,390]){await page.setViewportSize({width,height:900});await screenshot(page,info,'focus-grouped-'+width);expect(await page.locator('.editor-scroll').evaluate(el=>el.scrollWidth-el.clientWidth)).toBeLessThanOrEqual(1);}
   expect(errors).toEqual([]);
 });
@@ -168,6 +168,7 @@ test('rating parallel images, individual crop, keyboard selection, transparent P
   await openCard(page,cards.find(c=>c.id==='rating'));
   const background=page.locator('.one-workspace-fold').filter({has:page.locator('#bgAsset')});await expect(background).not.toHaveAttribute('open','');
   await ratingLayout(page,'pair-right');
+  const selected=await page.locator('[data-placement="right"]').evaluate(e=>getComputedStyle(e).backgroundColor),unselected=await page.locator('[data-placement="left"]').evaluate(e=>getComputedStyle(e).backgroundColor);expect(selected).not.toBe(unselected);
   await page.locator('#leftProductUpload').setInputFiles(await patternedImage(page,'first.png',['#ff00ff','#00ff00']));
   await page.locator('#rightProductUpload').setInputFiles(await patternedImage(page,'second.png',['#0000ff','#ffff00']));
   await cropHalf(page,page.locator('#cropLeftProduct'),info,'rating-first-crop');
@@ -186,7 +187,7 @@ test('rating parallel images, individual crop, keyboard selection, transparent P
   await files(page);const json=await download(page,page.locator('#jsonBtn'),info,'rating-crop-settings','json');const payload=JSON.parse(json.bytes);expect(payload.image_adjustments.left_product.crop.cropWidth).toBe(50);expect(payload.image_adjustments.right_product.crop.cropX).toBe(50);
   const zip=await download(page,page.locator('[data-action="export-package"]'),info,'rating-crop-project','zip');await page.locator('#reset').click();await upload(page,page.locator('[data-action="import-package"]'),zip.target);await closeFiles(page);await expect.poll(()=>artwork(page)).toBe(saved);
   await page.setViewportSize({width:390,height:844});await page.locator('#cropRightProduct').click();await screenshot(page,info,'rating-crop-mobile');
-  expect(await page.locator('dialog').evaluate(el=>el.scrollWidth-el.clientWidth)).toBeLessThanOrEqual(1);expect(errors).toEqual([]);
+  expect(await page.locator('.one-image-dialog').evaluate(el=>el.scrollWidth-el.clientWidth)).toBeLessThanOrEqual(1);expect(errors).toEqual([]);
 });
 
 test('rating inline text sizes preserve individual values, cancellation and project settings',async({page},info)=>{
@@ -290,6 +291,7 @@ test('rating stacked images use independent sources and survive JSON, ZIP and la
   for (const mode of ['stack-right', 'stack-left']) {
     await ratingLayout(page, mode);
     for (const width of ['1856', '1500']) {
+      if(await page.locator('#ratingLayoutSize').getAttribute('open')===null)await page.locator('#ratingLayoutSize > summary').click();
       await page.locator('#layoutWidth').fill(width); await page.locator('#layoutWidth').dispatchEvent('input');
       await expect.poll(async () => { const a = await top.boundingBox(), b = await bottom.boundingBox(); return a && b && a.y + a.height <= b.y && Math.abs(a.x + a.width / 2 - b.x - b.width / 2) < 2; }).toBe(true);
       await expect.poll(async () => { const b = await top.boundingBox(); return b ? b.width / b.height : 0; }).toBeCloseTo(160 / 90, 2);
@@ -301,6 +303,7 @@ test('rating stacked images use independent sources and survive JSON, ZIP and la
   await page.locator('#leftProductVisible').uncheck(); await expect(top).toHaveCount(0); await expect(bottom).toBeVisible();
   await page.locator('#leftProductVisible').check(); await expect(top).toBeVisible();
   await ratingLayout(page, 'both'); await ratingLayout(page, 'stack-right');
+  if(await page.locator('#ratingLayoutSize').getAttribute('open')===null)await page.locator('#ratingLayoutSize > summary').click();
   await page.locator('#layoutWidth').fill('1856'); await page.locator('#layoutWidth').dispatchEvent('input');
   const saved = await artwork(page);
   await files(page);
@@ -465,10 +468,11 @@ for (const card of cards) {
       await openCard(page, card);
       if (card.id === 'rating') {
         const groups = page.locator('.one-workspace-editor > .one-workspace-fold');
-        await expect(groups).toHaveCount(4);
+        await expect(groups).toHaveCount(5);
         for (let i = 0; i < 3; i++) await expect(groups.nth(i)).not.toHaveAttribute('open');
         await expect(groups.nth(3)).toHaveAttribute('open');
-        await expect(groups.locator(':scope > summary')).toHaveText(['標籤與店家標題', '評分項目', '價格與心得', '影像']);
+        await expect(groups.nth(4)).not.toHaveAttribute('open');
+        await expect(groups.locator(':scope > summary')).toHaveText(['標籤與店家標題', '評分項目', '價格與心得', '影像', '背景（選用）']);
       }
       if (card.id === 'dialogue') {
         const left = await page.locator('#leftCharacter').boundingBox(), right = await page.locator('#rightCharacter').boundingBox();
