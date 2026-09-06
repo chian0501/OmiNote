@@ -476,6 +476,10 @@ for (const card of cards) {
         for (let i = 0; i < 3; i++) await expect(groups.nth(i)).not.toHaveAttribute('open');
         await expect(groups.nth(3)).toHaveAttribute('open');
         await expect(groups.nth(4)).not.toHaveAttribute('open');
+        await expect(page.locator('#ratingLayoutSize')).not.toHaveAttribute('open');
+        await expect(page.locator('#ratingLayoutSize #layoutWidth')).toHaveCount(1);
+        await expect(groups.nth(0).locator('#tagSize')).toHaveCount(1);
+        await expect(page.locator('#ratingLayoutSize #tagSize')).toHaveCount(0);
         await expect(groups.locator(':scope > summary')).toHaveText(['標籤與店家標題', '評分項目', '價格與心得', '影像', '背景（選用）']);
       }
       if (card.id === 'dialogue') {
