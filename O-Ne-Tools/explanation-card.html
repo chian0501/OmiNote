@@ -4532,14 +4532,17 @@ body.one-workspace-v2 .editor-head{padding:11px 12px}
 body.one-workspace-v2 .editor-head small{display:none}
 body.one-workspace-v2 .editor-scroll{padding:8px}
 body.one-workspace-v2 #oneOverlayOutline{padding:8px;margin:0 0 10px}
-body.one-workspace-v2 .one-overlay-list{gap:7px}
-.one-outline-row{display:flex;flex-direction:column;gap:5px;padding:6px;border:1px solid #304450;border-radius:6px;background:#101b24}
-.one-outline-row>button{min-width:0;width:100%;border:0;padding:5px!important;background:transparent!important;font-size:12px!important}
-.one-outline-actions{display:flex;align-items:center;gap:5px;min-height:28px}
+body.one-workspace-v2 .one-overlay-list{grid-template-columns:minmax(0,1fr);min-width:0;gap:7px}
+.one-outline-row{display:flex;flex-direction:column;min-width:0;max-width:100%;gap:5px;padding:6px;border:1px solid #304450;border-radius:6px;background:#101b24}
+body.one-workspace-v2 .one-outline-row>button{min-width:0;width:100%;max-width:100%;border:0;padding:5px!important;background:transparent!important;font-size:12px!important;white-space:normal;overflow-wrap:anywhere;text-overflow:clip}
+.one-outline-actions{display:grid;grid-template-columns:15px minmax(40px,1fr) repeat(3,28px);align-items:center;gap:4px;min-width:0;min-height:28px}
 .one-outline-actions input[type=checkbox]{width:15px;height:15px;flex:0 0 15px;margin:0;accent-color:#29a6a7}
 .one-outline-actions .one-outline-marker{height:28px;min-width:35px;max-width:80px;font-size:12px;padding:3px 5px}
-.one-outline-actions button{padding:2px 7px;min-height:27px;font-size:12px}
-.one-outline-actions button:first-of-type{margin-left:auto}
+.one-outline-actions button{padding:2px 5px;min-width:0;min-height:28px;font-size:12px;text-align:center}
+.one-outline-actions button:first-of-type{margin-left:0}
+.one-outline-actions [data-order-action=up]{grid-column:3}
+.one-outline-actions [data-order-action=down]{grid-column:4}
+.one-outline-actions [data-order-action=del]{grid-column:5}
 .one-note-editor{padding:10px;border:1px solid #335963;border-radius:7px;background:#112229;font-size:12px}
 .one-note-editor>strong{font-size:12px}.one-note-editor>.setting-body{padding:0}
 #oneAddNote{float:right;padding:2px 6px;font-size:10px;min-height:23px;background:#123a3d;color:#a1ece6;border:1px solid #32676b;border-radius:4px}

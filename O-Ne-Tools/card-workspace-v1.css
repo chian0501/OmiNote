@@ -165,6 +165,13 @@ body[data-one-card-workspace="choice"] .one-workspace-export-actions #download {
 .one-workspace-sidebar-hidden .one-workspace-layout {grid-template-columns:minmax(0,1fr)!important;}
 .one-workspace-sidebar-hidden .one-workspace-editor {display:none!important;}
 /* Focus uses React. Keep its managed controls in place and style the existing shell. */
+/* A switch has its own track geometry; the shared 42px button minimum distorts it. */
+body[data-one-card-workspace=focus] button.toggle {
+  width:40px;min-width:40px;height:24px;min-height:24px;max-height:24px;padding:0;flex:0 0 40px;
+}
+body[data-one-card-workspace=focus] button.toggle::before {content:"";position:absolute;inset:-5px -2px;}
+body[data-one-card-workspace=focus] button.toggle > span {width:16px;height:16px;top:3px;left:3px;}
+body[data-one-card-workspace=focus] button.toggle.is-on > span {transform:translateX(16px);}
 [data-one-workspace-ready] .one-workspace-react-app {padding:0 18px 18px;height:auto;min-height:0;}
 body[data-one-card-workspace=focus] > #root {padding-top:0;}
 body[data-one-card-workspace=focus] .one-workspace-header {padding:12px 0 0;margin:0 18px 10px;}
@@ -288,8 +295,6 @@ body[data-one-card-workspace=rating] .one-workspace-editor .asset button {white-
 .one-workspace-react-app .image-slot-heading strong {font-size:12px;}
 .one-workspace-react-app .image-slot-heading .toggle-control {gap:5px;}
 .one-workspace-react-app .image-slot-heading .toggle-control > span {display:none;}
-.one-workspace-react-app .image-slot-heading [role=switch] {min-width:34px;width:34px;height:24px;min-height:24px;padding:3px;}
-.one-workspace-react-app .image-slot-heading [role=switch]::after {width:16px;height:16px;}
 .one-workspace-react-app .focus-image-card {display:grid;grid-template-columns:70px minmax(0,1fr);gap:9px;min-width:0;}
 .one-workspace-react-app .focus-image-thumb {display:flex;align-items:center;justify-content:center;width:70px;height:90px;min-width:0;padding:0;overflow:hidden;background:#09131c;border:1px solid #3a6673;border-radius:6px;font-size:11px;}
 .one-workspace-react-app .focus-image-thumb img {width:100%;height:100%;object-fit:contain;}
@@ -353,8 +358,6 @@ body[data-one-card-workspace=dialogue][data-one-workspace-ready] .one-workspace-
   body[data-one-card-workspace=dialogue][data-one-workspace-ready] .one-workspace-editor {position:static;}
 }
 
-.one-workspace-react-app .image-slot-heading .toggle span {width:16px;height:16px;}
-.one-workspace-react-app .image-slot-heading .toggle.is-on span {transform:translateX(10px);}
 
 [data-one-card-workspace=rating] #productArrangement .seg-button[aria-checked=true] {background:#29a6a7!important;color:white!important;}
 [data-one-card-workspace=rating] .rating-layout-size {margin-top:12px;border-top:1px solid #2d414f;padding-top:10px;}
