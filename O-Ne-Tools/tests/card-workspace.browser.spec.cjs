@@ -101,6 +101,118 @@ const directFields = {
   challenge: ['開頭文字', '#prefix'], dialogue: ['對話內容', '#dialogue'], rating: ['店家／商品名稱', '#storeName'],
   focus: ['主標題', 'input[placeholder="輸入卡片標題"]'], 'thumbnail-frame': ['角標文字', '#cornerText'], settlement: ['篇章標題', '#chapterTitle']
 };
+
+test('focus inline formatting, COST alignment, composition and project restore', async ({ page }, info) => {
+  const errors = []; page.on('pageerror', error => errors.push(error.message));
+  await openCard(page, cards.find(c => c.id === 'focus'));
+  await page.locator('.preview-switch').getByRole('button', { name: '元件', exact: true }).click();
+  await page.getByRole('switch', { name: '加入標籤', exact: true }).click();
+  await page.locator('.label-text-controls select').selectOption('COST');
+  await page.getByRole('button', { name: '標題前方', exact: true }).click();
+  const title = page.getByRole('button', { name: '編輯：主標題', exact: true });
+  const tag = page.getByRole('button', { name: '編輯：標籤文字', exact: true });
+  await expect(tag).toBeVisible();
+  await expect.poll(async () => {
+    const a = await title.boundingBox(), b = await tag.boundingBox();
+    return a && b ? Math.abs(a.y + a.height / 2 - b.y - b.height / 2) : 999;
+  }).toBeLessThan(8);
+  await title.click();
+  const input = page.getByRole('textbox', { name: '直接編輯：主標題', exact: true });
+  await expect(input).toHaveAttribute('contenteditable', 'plaintext-only');
+  await input.fill('焦點卡直接改字');
+  await page.getByRole('spinbutton', { name: '標題字級', exact: true }).fill('64');
+  await page.getByRole('button', { name: '字色：淺色字', exact: true }).click();
+  await expect.poll(() => input.evaluate(el => parseFloat(getComputedStyle(el).fontSize))).toBeCloseTo(64 * 882 / 1240, 1);
+  const editingBox = await input.boundingBox(), toolBox = await page.locator('.one-direct-editor-head').boundingBox();
+  expect(toolBox.y + toolBox.height).toBeLessThanOrEqual(editingBox.y);
+  expect(editingBox.height).toBeLessThan(70);
+  await screenshot(page, info, 'focus-inline-formatting');
+  await page.locator('.one-direct-editor').getByRole('button', { name: '完成', exact: true }).click();
+  await expect(page.locator('input[placeholder="輸入卡片標題"]')).toHaveValue('焦點卡直接改字');
+  const formatted = await artwork(page);
+  await title.click(); await input.fill('取消格式');
+  await page.getByRole('spinbutton', { name: '標題字級', exact: true }).fill('40');
+  await page.getByRole('button', { name: '字色：高亮黃', exact: true }).click();
+  await input.focus(); await page.keyboard.press('Escape');
+  await expect.poll(() => artwork(page)).toBe(formatted);
+  await title.click(); await input.dispatchEvent('compositionstart'); await input.fill('中文組字');
+  await expect(page.locator('input[placeholder="輸入卡片標題"]')).toHaveValue('焦點卡直接改字');
+  await input.dispatchEvent('compositionend');
+  await expect(page.locator('input[placeholder="輸入卡片標題"]')).toHaveValue('中文組字');
+  await page.keyboard.press('Escape'); await expect.poll(() => artwork(page)).toBe(formatted);
+  await title.click(); await input.fill('選取強調');
+  await input.evaluate(el => { const r = document.createRange(); r.selectNodeContents(el); const s = getSelection(); s.removeAllRanges(); s.addRange(r); });
+  await page.getByRole('button', { name: '強調選字', exact: true }).click();
+  await expect(page.locator('input[placeholder="輸入卡片標題"]')).toHaveValue('【選取強調】');
+  await page.locator('.one-direct-editor').getByRole('button', { name: '完成', exact: true }).click();
+  await expect(title).toBeVisible();
+  for (const mode of ['項目', '步驟', '一般內文']) {
+    await page.locator('.mode-tabs').getByRole('button', { name: mode, exact: true }).click();
+    const name = mode === '一般內文' ? '一般內文' : '項目 1';
+    await page.getByRole('button', { name: '編輯：' + name, exact: true }).click();
+    const editor = page.getByRole('textbox', { name: '直接編輯：' + name, exact: true });
+    await editor.fill(mode + '直接編輯內容');
+    await page.getByRole('spinbutton', { name: '內文／項目字級', exact: true }).fill('38');
+    await page.locator('.one-direct-editor').getByRole('button', { name: '完成', exact: true }).click();
+  }
+  const saved = await artwork(page);
+  await files(page);
+  const json = await download(page, page.locator('.one-workspace-native-files').getByRole('button', { name: '輸出設定 JSON', exact: true }), info, 'focus-inline-settings', 'json');
+  const payload = JSON.parse(json.bytes); expect(payload.label.text).toBe('COST'); expect(payload.style.titleSize).toBe(64); expect(payload.style.contentSize).toBe(38);
+  await closeFiles(page); await title.click(); await input.fill('載入前變更');
+  await page.locator('.one-direct-editor').getByRole('button', { name: '完成', exact: true }).click();
+  await files(page); await upload(page, page.locator('.one-workspace-native-files [data-action="load"]'), json.target); await closeFiles(page);
+  await expect.poll(() => artwork(page)).toBe(saved);
+  await page.locator('.one-workspace-save-host button').click(); await page.reload();
+  await expect.poll(() => artwork(page)).toBe(saved);
+  await screenshot(page, info, 'focus-COST-aligned');
+  await page.setViewportSize({ width: 390, height: 844 });
+  await title.click(); await screenshot(page, info, 'focus-inline-mobile');
+  const toolbar = await page.locator('.one-direct-editor-head').boundingBox(); expect(toolbar.x).toBeGreaterThanOrEqual(0); expect(toolbar.x + toolbar.width).toBeLessThanOrEqual(390);
+  expect(errors).toEqual([]);
+});
+
+test('rating stacked images use independent sources and survive JSON, ZIP and layout changes', async ({ page }, info) => {
+  page.on('dialog', dialog => dialog.accept());
+  const errors = []; page.on('pageerror', error => errors.push(error.message));
+  await openCard(page, cards.find(c => c.id === 'rating'));
+  await page.locator('[data-position="stack-right"]').click();
+  const top = page.getByRole('button', { name: '更換：上方圖片', exact: true });
+  const bottom = page.getByRole('button', { name: '更換：下方圖片', exact: true });
+  for (const [button, name, color, w, h] of [[top, 'top-landscape.png', '#29a6a7', 160, 90], [bottom, 'bottom-portrait.png', '#ffbe37', 80, 120]]) {
+    const buffer = Buffer.from(await page.evaluate(({ color, w, h }) => { const c = document.createElement('canvas'); c.width = w; c.height = h; const ctx = c.getContext('2d'); ctx.fillStyle = color; ctx.fillRect(0, 0, w, h); return c.toDataURL().split(',')[1]; }, { color, w, h }), 'base64');
+    await upload(page, button, { name, mimeType: 'image/png', buffer });
+  }
+  await expect(page.locator('#leftProductName')).toHaveText('top-landscape.png'); await expect(page.locator('#rightProductName')).toHaveText('bottom-portrait.png');
+  for (const mode of ['stack-right', 'stack-left']) {
+    await page.locator('[data-position="' + mode + '"]').click();
+    for (const width of ['1856', '1500']) {
+      await page.locator('#layoutWidth').fill(width); await page.locator('#layoutWidth').dispatchEvent('input');
+      await expect.poll(async () => { const a = await top.boundingBox(), b = await bottom.boundingBox(); return a && b && a.y + a.height <= b.y && Math.abs(a.x + a.width / 2 - b.x - b.width / 2) < 2; }).toBe(true);
+      await expect.poll(async () => { const b = await top.boundingBox(); return b ? b.width / b.height : 0; }).toBeCloseTo(160 / 90, 2);
+      const pixels = await page.evaluate(() => { const l = panelLayout(), ctx = document.querySelector('#c').getContext('2d'); return { panelWidth: l.panelWidth, top: Array.from(ctx.getImageData(l.leftImage.x + l.leftImage.w / 2, l.leftImage.y + l.leftImage.h / 2, 1, 1).data), bottom: Array.from(ctx.getImageData(l.rightImage.x + l.rightImage.w / 2, l.rightImage.y + l.rightImage.h / 2, 1, 1).data) }; });
+      expect(pixels.panelWidth).toBeGreaterThanOrEqual(880); expect(pixels.top).toEqual([41, 166, 167, 255]); expect(pixels.bottom).toEqual([255, 190, 55, 255]);
+    }
+    await screenshot(page, info, 'rating-' + mode);
+  }
+  await page.locator('#leftProductVisible').uncheck(); await expect(top).toHaveCount(0); await expect(bottom).toBeVisible();
+  await page.locator('#leftProductVisible').check(); await expect(top).toBeVisible();
+  await page.locator('[data-position="both"]').click(); await page.locator('[data-position="stack-right"]').click();
+  await page.locator('#layoutWidth').fill('1856'); await page.locator('#layoutWidth').dispatchEvent('input');
+  const saved = await artwork(page);
+  await files(page);
+  const json = await download(page, page.locator('#jsonBtn'), info, 'rating-stacked-settings', 'json');
+  expect(JSON.parse(json.bytes).image_adjustments.product.arrangement).toBe('vertical');
+  const zip = await download(page, page.locator('[data-action="export-package"]'), info, 'rating-stacked-project', 'zip');
+  const entries = zipEntries(zip.bytes); const manifest = JSON.parse(entries[Object.keys(entries).find(name => name.endsWith('.json') && !name.includes('/'))]); expect(manifest.assets).toHaveLength(2);
+  await page.locator('#reset').click(); await upload(page, page.locator('[data-action="import-package"]'), zip.target);
+  await expect(page.locator('.one-project-package__status')).toContainText('專案包載入成功'); await closeFiles(page);
+  await expect.poll(() => artwork(page)).toBe(saved); await expect(top).toBeVisible(); await expect(bottom).toBeVisible();
+  await page.locator('[data-position="left"]').click(); await files(page); await upload(page, page.locator('.one-workspace-native-files [data-action="load"]'), json.target); await closeFiles(page);
+  await expect.poll(() => artwork(page)).toBe(saved);
+  for (const width of [1366, 390]) { await page.setViewportSize({ width, height: 844 }); await screenshot(page, info, 'rating-stacked-' + width); }
+  expect(errors).toEqual([]);
+});
 for (const card of cards) {
   test(`${card.id} direct canvas text editing and cancel`, async ({ page }, info) => {
     const errors = []; page.on('pageerror', e => errors.push(e.message));
@@ -466,6 +578,7 @@ for (const id of ['rating', 'settlement']) {
     expect(alpha, 'exported PNG has actual alpha transparency outside the card').toBe(0);
     await expandEditor(page); await page.locator('#bgVisible').check();
     const base = await context.newPage(); await openCard(base, card, true);
+    await expandEditor(base); await base.locator('#bgVisible').check();
     const withBackground = await artwork(base);
     expect(await artwork(page), 'enabling the background preserves the approved artwork').toBe(withBackground);
     await files(base);

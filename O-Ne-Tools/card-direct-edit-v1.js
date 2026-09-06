@@ -23,7 +23,7 @@
     chapterSubtitle: '篇章副標', summaryText: '單行總結', nextText: 'NEXT 文字', questionHint: '問題提示', viewerQuestion: '觀眾互動問題' };
 
   function enabled() { return document.body && fieldsByTool[document.body.dataset.oneCardWorkspace] && new URL(location.href).searchParams.get('embed') !== '1'; }
-  function normal(value) { return String(value || '').normalize('NFKC').replace(/\s|\*\*|\[\[|\]\]/g, ''); }
+  function normal(value) { return String(value || '').normalize('NFKC').replace(/\s|\*\*|\[\[|\]\]|【|】/g, ''); }
   function transformRect(rect, matrix) {
     var points = [[rect.x, rect.y], [rect.x + rect.w, rect.y], [rect.x, rect.y + rect.h], [rect.x + rect.w, rect.y + rect.h]].map(function (p) {
       return { x: matrix.a * p[0] + matrix.c * p[1] + matrix.e, y: matrix.b * p[0] + matrix.d * p[1] + matrix.f };
@@ -46,8 +46,9 @@
     }
     var ascent = metrics.actualBoundingBoxAscent, descent = metrics.actualBoundingBoxDescent;
     if (!Number.isFinite(ascent) || !Number.isFinite(descent) || ascent + descent < 1) { ascent = size * .8; descent = size * .2; }
-    var rect = transformRect({ x: x - left * factor, y: y - ascent, w: Math.max(1, (left + right) * factor), h: Math.max(1, ascent + descent) }, ctx.getTransform());
-    return { text: String(text), rect: rect, font: ctx.font, color: typeof ctx.fillStyle === 'string' ? ctx.fillStyle : '#fdf3e7', size: size };
+    var matrix = ctx.getTransform();
+    var rect = transformRect({ x: x - left * factor, y: y - ascent, w: Math.max(1, (left + right) * factor), h: Math.max(1, ascent + descent) }, matrix);
+    return { text: String(text), rect: rect, font: ctx.font, color: typeof ctx.fillStyle === 'string' ? ctx.fillStyle : '#fdf3e7', size: size * Math.hypot(matrix.c, matrix.d) };
   }
   // Observe draw commands without changing any pixels. Offscreen canvas text is
   // carried through drawImage so the React focus card uses the same hit testing.
@@ -89,7 +90,7 @@
         var r = record.rect;
         if (r.x + r.w < sx || r.y + r.h < sy || r.x > sx + sw || r.y > sy + sh) return;
         var rect = transformRect({ x: dx + (r.x - sx) * dw / sw, y: dy + (r.y - sy) * dh / sh, w: r.w * dw / sw, h: r.h * dh / sh }, matrix);
-        records.push(Object.assign({}, record, { rect: rect, size: record.size * dh / sh }));
+        records.push(Object.assign({}, record, { rect: rect, size: record.size * dh / sh * Math.hypot(matrix.c, matrix.d) }));
       });
       if (canvas.isConnected) queue();
       return result;
@@ -102,6 +103,11 @@
     return Array.prototype.map.call(document.querySelectorAll(fieldsByTool[document.body.dataset.oneCardWorkspace]), function (input, index) {
       var label = names[input.id], nativeLabel = input.labels && input.labels[0];
       if (input.placeholder === '輸入卡片標題') label = '主標題';
+      if (input.placeholder === '輸入標籤文字') label = '標籤文字';
+      if (document.body.dataset.oneCardWorkspace === 'focus') {
+        if (input.tagName === 'TEXTAREA') label = '一般內文';
+        if (input.closest('.item-row')) label = '項目 ' + (Array.prototype.indexOf.call(document.querySelectorAll('.item-row'), input.closest('.item-row')) + 1);
+      }
       if (input.dataset.action === 'text') label = '選項 ' + (Number(input.dataset.index) + 1);
       if (input.dataset.k === 'station') label = '站點 ' + (Number(input.dataset.i) + 1);
       if (input.dataset.k === 'name') label = '路段 ' + (Number(input.dataset.i) + 1);
@@ -167,7 +173,7 @@
     var session = mounted && mounted.session;
     if (!session) return;
     mounted.session = null;
-    if (cancel) writeField(session.target.key, session.original);
+    if (cancel) { writeField(session.target.key, session.original); if (session.format) session.format.restore(); }
     else writeField(session.target.key, session.input.value);
     session.panel.remove(); mounted.canvas.removeAttribute('data-one-direct-editing');
     refresh();
@@ -180,18 +186,26 @@
     finish(false, false);
     var field = sourceFor(target.key);
     if (!field) return;
-    var panel = document.createElement('div'); panel.className = 'one-direct-editor'; panel.dataset.oneDirectUi = '1';
+    var inline = document.body.dataset.oneCardWorkspace === 'focus';
+    var panel = document.createElement('div'); panel.className = 'one-direct-editor' + (inline ? ' one-direct-inline-editor' : ''); panel.dataset.oneDirectUi = '1';
     var head = document.createElement('div'); head.className = 'one-direct-editor-head';
     var name = document.createElement('strong'); name.textContent = target.label;
     var done = document.createElement('button'); done.type = 'button'; done.textContent = '完成';
     var cancel = document.createElement('button'); cancel.type = 'button'; cancel.textContent = '取消';
     var multiline = field.input.tagName === 'TEXTAREA';
-    var input = document.createElement(multiline ? 'textarea' : 'input'); input.className = 'one-direct-input';
+    var input = document.createElement(inline ? 'div' : multiline ? 'textarea' : 'input'); input.className = 'one-direct-input';
+    if (inline) {
+      input.contentEditable = 'plaintext-only'; input.setAttribute('role', 'textbox'); input.setAttribute('aria-multiline', String(multiline));
+      Object.defineProperty(input, 'value', { get: function () { return input.innerText.replace(/\r/g, ''); }, set: function (value) { input.textContent = value; } });
+      input.select = function () { var range = document.createRange(); range.selectNodeContents(input); var selection = global.getSelection(); selection.removeAllRanges(); selection.addRange(range); };
+    }
     input.setAttribute('aria-label', '直接編輯：' + target.label); input.value = field.value; input.spellcheck = false;
-    if (!multiline) input.type = field.input.type === 'number' ? 'number' : 'text';
+    if (!inline && !multiline) input.type = field.input.type === 'number' ? 'number' : 'text';
     ['maxlength', 'min', 'max', 'step'].forEach(function (key) { if (field.input.hasAttribute(key)) input.setAttribute(key, field.input.getAttribute(key)); });
     head.append(name, done, cancel); panel.append(head, input); mounted.layer.appendChild(panel);
-    mounted.session = { target: target, original: field.value, input: input, panel: panel, multiline: multiline, composing: false };
+    var format = inline && global.ONEFocusTextStyle && global.ONEFocusTextStyle.describe(field.input);
+    mounted.session = { target: target, original: field.value, input: input, panel: panel, multiline: multiline, composing: false, inline: inline, format: format };
+    if (format) addFormatControls(head, input, format);
     mounted.canvas.setAttribute('data-one-direct-editing', '1');
     done.addEventListener('click', function () { finish(false, true); });
     cancel.addEventListener('click', function () { finish(true, true); });
@@ -206,9 +220,52 @@
     panel.addEventListener('focusout', function () { setTimeout(function () { if (mounted.session && mounted.session.panel === panel && !panel.contains(document.activeElement)) finish(false, false); }, 0); });
     positionEditor(); input.focus({ preventScroll: true }); input.select();
   }
+  function addFormatControls(head, input, format) {
+    var controls = document.createElement('div'); controls.className = 'one-direct-format';
+    controls.setAttribute('role', 'toolbar'); controls.setAttribute('aria-label', '文字格式');
+    if (format.size !== null) {
+      var label = document.createElement('label'); label.textContent = format.kind === 'title' ? '標題字級' : '內文／項目字級';
+      var size = document.createElement('input'); size.type = 'number'; size.min = format.min; size.max = format.max; size.value = format.size;
+      size.setAttribute('aria-label', label.textContent); label.appendChild(size); controls.appendChild(label);
+      size.addEventListener('input', function () { if (size.value && size.validity.valid) format.update({ size: Number(size.value) }); });
+    }
+    format.colors.forEach(function (entry) {
+      var button = document.createElement('button'); button.type = 'button'; button.textContent = entry[1];
+      button.setAttribute('aria-label', '字色：' + entry[1]); button.style.setProperty('--text-color', entry[0]);
+      button.setAttribute('aria-pressed', String(format.color.toUpperCase() === entry[0]));
+      button.addEventListener('click', function () {
+        format.update({ color: entry[0] }); controls.querySelectorAll('[aria-pressed]').forEach(function (node) { node.setAttribute('aria-pressed', String(node === button)); });
+      }); controls.appendChild(button);
+    });
+    if (format.kind !== 'label') {
+      var mark = document.createElement('button'); mark.type = 'button'; mark.textContent = '強調選字';
+      mark.addEventListener('pointerdown', function (event) { event.preventDefault(); });
+      mark.addEventListener('click', function () {
+        var selection = global.getSelection(); if (!selection.rangeCount || selection.isCollapsed) return;
+        var range = selection.getRangeAt(0); if (!input.contains(range.commonAncestorContainer)) return;
+        var value = range.toString(); range.deleteContents(); var node = document.createTextNode('【' + value + '】'); range.insertNode(node);
+        range.selectNode(node); selection.removeAllRanges(); selection.addRange(range); input.dispatchEvent(new Event('input', { bubbles: true })); input.focus();
+      }); controls.appendChild(mark);
+    }
+    head.appendChild(controls);
+  }
   function positionEditor() {
     if (!mounted.session) return;
     var session = mounted.session, rect = session.target.rect, box = mounted.canvas.getBoundingClientRect(), scale = box.width / mounted.canvas.width;
+    if (session.inline) {
+      var fontSize = Math.max(16, session.target.style.size * scale), lineHeight = session.format && session.format.kind === 'body' ? 1.45 : 1.18;
+      var inlineWidth = Math.min(box.width, Math.max(120, rect.w * scale + 16));
+      var inlineX = Math.max(0, Math.min(box.width - inlineWidth, rect.x * scale - 4));
+      Object.assign(session.panel.style, { left: inlineX + 'px', top: Math.max(0, rect.y * scale - fontSize * .12 - 4) + 'px', width: inlineWidth + 'px' });
+      Object.assign(session.input.style, { font: session.target.style.font, fontSize: fontSize + 'px', lineHeight: String(lineHeight), color: session.target.style.color, minHeight: Math.max(fontSize * lineHeight, rect.h * scale + 8) + 'px' });
+      var head = session.panel.firstChild, toolbarWidth = Math.min(480, Math.max(0, box.width));
+      head.style.width = toolbarWidth + 'px'; head.style.left = Math.max(-inlineX, Math.min(0, box.width - inlineX - toolbarWidth)) + 'px';
+      var top = parseFloat(session.panel.style.top), headHeight = head.getBoundingClientRect().height;
+      var roomAbove = box.top - mounted.stage.getBoundingClientRect().top + top;
+      head.style.bottom = roomAbove >= headHeight + 8 ? 'calc(100% + 8px)' : 'auto';
+      head.style.top = roomAbove >= headHeight + 8 ? 'auto' : 'calc(100% + 8px)';
+      return;
+    }
     var width = Math.min(box.width, Math.max(240, rect.w * scale + 28)), x = Math.max(0, Math.min(box.width - width, rect.x * scale - 6));
     session.panel.style.left = x + 'px'; session.panel.style.top = Math.max(0, rect.y * scale - 36) + 'px'; session.panel.style.width = width + 'px';
     session.input.style.font = session.target.style.font;
@@ -221,7 +278,13 @@
     var box = mounted.canvas.getBoundingClientRect(), parent = mounted.stage.getBoundingClientRect();
     var sx = box.width / mounted.canvas.width, sy = box.height / mounted.canvas.height;
     Object.assign(mounted.layer.style, { left: box.left - parent.left + mounted.stage.scrollLeft + 'px', top: box.top - parent.top + mounted.stage.scrollTop + 'px', width: box.width + 'px', height: box.height + 'px' });
-    if (mounted.session) { positionEditor(); return; }
+    if (mounted.session) {
+      if (mounted.session.inline) {
+        var current = targets().find(function (target) { return target.key === mounted.session.target.key; });
+        if (current) mounted.session.target = current;
+      }
+      positionEditor(); return;
+    }
     var list = targets(); mounted.targets = list;
     var nodes = list.map(function (target) {
       var node = document.createElement('button'), r = target.rect;
@@ -260,7 +323,7 @@
     new MutationObserver(function (changes) { if (changes.some(function (change) { return !change.target.closest || !change.target.closest('[data-one-direct-ui]'); })) queue(); }).observe(document.body, { childList: true, subtree: true });
   });
   global.ONECardDirectEdit = {
-    version: '1.1.0', refresh: queue, finish: function () { finish(false, false); },
+    version: '1.2.0', refresh: queue, finish: function () { finish(false, false); },
     setImageTargets: function (canvas, targets) {
       imageTargets.set(canvas, targets.filter(function (target) {
         return target.rect && ['x', 'y', 'w', 'h'].every(function (key) { return Number.isFinite(target.rect[key]); }) && target.rect.w > 0 && target.rect.h > 0;
