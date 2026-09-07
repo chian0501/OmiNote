@@ -1,4 +1,4 @@
-/* O-Ne focus card P0 direct-edit UX patch — V0.1.0
+/* O-Ne focus card P0 direct-edit UX patch — V0.1.1
  * Scope: focus-card only. Keeps the existing React renderer, save formats and
  * 【...】 emphasis syntax as the source of truth while making the syntax optional
  * for human editors.
@@ -8,7 +8,7 @@
 
   if (global.ONEFocusP0UX) return;
 
-  var VERSION = '0.1.0';
+  var VERSION = '0.1.1';
   var STYLE_ID = 'one-focus-p0-ux-style';
   var observer = null;
   var pulseTimer = null;
@@ -32,25 +32,8 @@
     return fallback ? directFields()[Number(fallback[1])] || null : null;
   }
 
-  function labelForField(field) {
-    if (!field) return '目前欄位';
-    if (field.tagName === 'TEXTAREA') return '一般內文';
-    if (field.placeholder === '輸入卡片標題') return '主標題';
-    if (field.placeholder === '輸入標籤文字') return '標籤文字';
-    var row = field.closest('.item-row');
-    if (row) {
-      var rows = Array.prototype.slice.call(document.querySelectorAll('.item-row'));
-      var mode = document.querySelector('.mode-tabs button.is-active');
-      var prefix = mode && mode.textContent.trim() === '步驟' ? '步驟' : '項目';
-      return prefix + ' ' + (rows.indexOf(row) + 1);
-    }
-    var fieldLabel = field.closest('label') && field.closest('label').querySelector('.field-label');
-    return fieldLabel && fieldLabel.textContent.trim() || field.getAttribute('aria-label') || '目前欄位';
-  }
-
   function ensureModeForField(field) {
-    if (!field) return;
-    if (field.tagName !== 'TEXTAREA') return;
+    if (!field || field.tagName !== 'TEXTAREA') return;
     var bodyTab = Array.prototype.find.call(document.querySelectorAll('.mode-tabs button'), function (button) {
       return button.textContent.trim() === '一般內文';
     });
@@ -92,7 +75,8 @@
   function directTargetForField(field) {
     if (!field) return null;
     if (field.id) {
-      var target = document.querySelector('.one-direct-target[data-field-key="' + (global.CSS && CSS.escape ? CSS.escape(field.id) : field.id.replace(/"/g, '\\"')) + '"]');
+      var escaped = global.CSS && typeof global.CSS.escape === 'function' ? global.CSS.escape(field.id) : field.id.replace(/"/g, '\\"');
+      var target = document.querySelector('.one-direct-target[data-field-key="' + escaped + '"]');
       if (target) return target;
     }
     var fields = directFields();
@@ -109,9 +93,17 @@
     pulse(target, 'one-focus-canvas-linked', 'canvas');
   }
 
-  function selectedColorLabel(buttons) {
-    var selected = buttons.find(function (button) { return button.getAttribute('aria-pressed') === 'true'; });
-    return selected ? selected.textContent.trim() : '字色';
+  function buttonByLabel(buttons, label) {
+    return buttons.find(function (button) {
+      return button.textContent.trim() === label || (button.getAttribute('aria-label') || '').indexOf(label) >= 0;
+    });
+  }
+
+  function shortenSizeLabel(label) {
+    if (!label) return;
+    Array.prototype.slice.call(label.childNodes).forEach(function (node) {
+      if (node.nodeType === Node.TEXT_NODE && node.nodeValue.trim()) node.nodeValue = '字級 ';
+    });
   }
 
   function decorateToolbar(panel) {
@@ -129,67 +121,73 @@
     if (mark) {
       mark.classList.add('one-focus-emphasis-button');
       mark.textContent = '★ 重點';
-      /* Keep the original accessible name so existing browser regression tests
-       * and keyboard workflows remain backward-compatible. */
+      /* Keep the original accessible name so existing browser tests and
+       * keyboard workflows remain backward-compatible. */
       mark.setAttribute('aria-label', '強調選字');
       mark.title = '先選取文字，再按「重點」。不用手動輸入【】。';
     }
 
     var colorButtons = Array.prototype.slice.call(controls.querySelectorAll('button[aria-label^="字色："]'));
     if (colorButtons.length) {
+      var lightButton = buttonByLabel(colorButtons, '淺色字') || colorButtons[0];
+      var highlightButton = buttonByLabel(colorButtons, '高亮黃') || colorButtons[1] || colorButtons[0];
+      var rememberedStyle = highlightButton;
+
       var normal = document.createElement('button');
       normal.type = 'button';
       normal.className = 'one-focus-normal-button';
       normal.textContent = '一般';
-      normal.setAttribute('aria-label', '一般字色');
+      /* Old automation can keep clicking the old accessible color name while
+       * people see the simpler label. */
+      normal.setAttribute('aria-label', '字色：淺色字');
       normal.title = '切回一般淺色文字';
       normal.addEventListener('pointerdown', function (event) { event.preventDefault(); });
-      normal.addEventListener('click', function () {
-        var light = colorButtons.find(function (button) {
-          return button.textContent.trim() === '淺色字' || /淺色字/.test(button.getAttribute('aria-label') || '');
-        }) || colorButtons[0];
-        light.click();
-      });
+      normal.addEventListener('click', function () { lightButton.click(); });
+
+      var split = document.createElement('span');
+      split.className = 'one-focus-style-split';
+      var applyStyle = document.createElement('button');
+      applyStyle.type = 'button';
+      applyStyle.className = 'one-focus-style-apply';
+      applyStyle.textContent = '樣式';
+      applyStyle.addEventListener('pointerdown', function (event) { event.preventDefault(); });
+      function syncStyleButton() {
+        applyStyle.setAttribute('aria-label', rememberedStyle.getAttribute('aria-label') || '套用目前樣式');
+        applyStyle.title = '套用：' + rememberedStyle.textContent.trim();
+      }
+      applyStyle.addEventListener('click', function () { rememberedStyle.click(); });
 
       var menu = document.createElement('details');
       menu.className = 'one-focus-style-menu';
       var summary = document.createElement('summary');
-      summary.textContent = '樣式';
-      summary.title = '更多文字顏色';
+      summary.textContent = '▾';
+      summary.setAttribute('aria-label', '選擇其他字色');
+      summary.title = '選擇其他字色';
       var body = document.createElement('div');
       body.className = 'one-focus-style-menu__body';
       menu.append(summary, body);
-      colorButtons.forEach(function (button) { body.appendChild(button); });
-      function refreshSummary() {
-        var label = selectedColorLabel(colorButtons);
-        summary.textContent = label && label !== '淺色字' ? '樣式｜' + label : '樣式';
-      }
-      colorButtons.forEach(function (button) { button.addEventListener('click', function () { setTimeout(refreshSummary, 0); }); });
-      refreshSummary();
+      colorButtons.forEach(function (button) {
+        body.appendChild(button);
+        button.addEventListener('click', function () {
+          if (button !== lightButton) rememberedStyle = button;
+          syncStyleButton();
+          menu.open = false;
+        });
+      });
+      syncStyleButton();
+      split.append(applyStyle, menu);
 
       var sizeControl = controls.querySelector('label');
+      shortenSizeLabel(sizeControl);
       controls.innerHTML = '';
       if (sizeControl) controls.appendChild(sizeControl);
       controls.appendChild(normal);
       if (mark) controls.appendChild(mark);
-      controls.appendChild(menu);
+      controls.appendChild(split);
     }
 
     var name = head.querySelector('strong');
     if (name) name.classList.add('one-focus-direct-label');
-
-    requestAnimationFrame(function () { keepToolbarClear(panel); });
-  }
-
-  function keepToolbarClear(panel) {
-    if (!panel || !panel.isConnected) return;
-    var head = panel.querySelector('.one-direct-editor-head');
-    var preview = panel.closest('.one-workspace-preview');
-    if (!head || !preview) return;
-    panel.classList.remove('one-focus-toolbar-below');
-    var headRect = head.getBoundingClientRect();
-    var previewRect = preview.getBoundingClientRect();
-    if (headRect.top < previewRect.top + 6) panel.classList.add('one-focus-toolbar-below');
   }
 
   function injectStyles() {
@@ -199,19 +197,21 @@
     style.textContent = '\n' +
       'body[data-one-card-workspace="focus"] .one-focus-sidebar-linked{outline:2px solid #35c6cb!important;outline-offset:4px;border-radius:8px;box-shadow:0 0 0 5px rgba(53,198,203,.12);transition:outline-color .18s,box-shadow .18s}\n' +
       'body[data-one-card-workspace="focus"] .one-direct-target.one-focus-canvas-linked{outline:2px solid #ffbe37!important;outline-offset:2px;background:rgba(255,190,55,.10)!important}\n' +
-      'body[data-one-card-workspace="focus"] .one-focus-p0-direct-editor .one-direct-editor-head{display:flex!important;flex-wrap:nowrap!important;align-items:center!important;gap:5px!important;padding:6px 7px!important;width:max-content!important;max-width:min(94vw,620px)!important;white-space:nowrap!important;transform:translateY(calc(-100% - 7px));}\n' +
-      'body[data-one-card-workspace="focus"] .one-focus-p0-direct-editor.one-focus-toolbar-below .one-direct-editor-head{top:100%!important;transform:translateY(7px)!important}\n' +
+      'body[data-one-card-workspace="focus"] .one-focus-p0-direct-editor .one-direct-editor-head{display:flex!important;flex-wrap:nowrap!important;align-items:center!important;gap:5px!important;padding:6px 7px!important;width:max-content!important;max-width:min(94vw,480px)!important;white-space:nowrap!important}\n' +
       'body[data-one-card-workspace="focus"] .one-focus-p0-direct-editor .one-direct-format{display:flex!important;flex-wrap:nowrap!important;align-items:center!important;gap:5px!important;width:auto!important}\n' +
       'body[data-one-card-workspace="focus"] .one-focus-p0-direct-editor .one-direct-format label{display:flex!important;align-items:center!important;gap:4px!important;margin:0!important}\n' +
-      'body[data-one-card-workspace="focus"] .one-focus-p0-direct-editor .one-direct-format label input{width:54px!important;min-width:54px!important}\n' +
-      'body[data-one-card-workspace="focus"] .one-focus-p0-direct-editor .one-focus-direct-label{max-width:120px;overflow:hidden;text-overflow:ellipsis}\n' +
+      'body[data-one-card-workspace="focus"] .one-focus-p0-direct-editor .one-direct-format label input{width:50px!important;min-width:50px!important}\n' +
+      'body[data-one-card-workspace="focus"] .one-focus-p0-direct-editor .one-focus-direct-label{max-width:72px;overflow:hidden;text-overflow:ellipsis}\n' +
       'body[data-one-card-workspace="focus"] .one-focus-p0-direct-editor .one-focus-emphasis-button{background:#ffbe37!important;color:#1f1713!important;border-color:#ffcf69!important;font-weight:900!important}\n' +
+      'body[data-one-card-workspace="focus"] .one-focus-style-split{display:inline-flex;align-items:stretch;gap:2px}\n' +
+      'body[data-one-card-workspace="focus"] .one-focus-style-split>.one-focus-style-apply{border-radius:7px 3px 3px 7px!important}\n' +
       'body[data-one-card-workspace="focus"] .one-focus-style-menu{position:relative;margin:0}\n' +
-      'body[data-one-card-workspace="focus"] .one-focus-style-menu>summary{list-style:none;cursor:pointer;border:1px solid #397483;border-radius:7px;padding:5px 7px;background:#15303a;color:#dff9f7;font-size:12px;font-weight:800}\n' +
+      'body[data-one-card-workspace="focus"] .one-focus-style-menu>summary{display:flex;align-items:center;height:100%;list-style:none;cursor:pointer;border:1px solid #397483;border-radius:3px 7px 7px 3px;padding:4px 6px;background:#15303a;color:#dff9f7;font-size:12px;font-weight:900}\n' +
       'body[data-one-card-workspace="focus"] .one-focus-style-menu>summary::-webkit-details-marker{display:none}\n' +
       'body[data-one-card-workspace="focus"] .one-focus-style-menu__body{position:absolute;z-index:12;top:calc(100% + 6px);right:0;display:grid;gap:5px;min-width:108px;padding:6px;border:1px solid #397483;border-radius:8px;background:#101d28;box-shadow:0 8px 24px rgba(0,0,0,.45)}\n' +
       'body[data-one-card-workspace="focus"] .one-focus-style-menu__body button{width:100%;justify-content:flex-start}\n' +
-      'body[data-one-card-workspace="focus"] .one-focus-p0-direct-editor .one-direct-input{position:relative;z-index:2}\n';
+      'body[data-one-card-workspace="focus"] .one-focus-p0-direct-editor .one-direct-input{position:relative;z-index:2}\n' +
+      '@media(max-width:520px){body[data-one-card-workspace="focus"] .one-focus-p0-direct-editor .one-focus-direct-label{display:none}body[data-one-card-workspace="focus"] .one-focus-p0-direct-editor .one-direct-editor-head{max-width:100%!important;gap:3px!important;padding:5px!important}}\n';
     document.head.appendChild(style);
   }
 
@@ -246,10 +246,6 @@
     refresh(document);
     document.addEventListener('click', handleCanvasTargetClick, true);
     document.addEventListener('focusin', handleSidebarFocus, true);
-    global.addEventListener('resize', function () {
-      var panel = document.querySelector('.one-focus-p0-direct-editor');
-      if (panel) requestAnimationFrame(function () { keepToolbarClear(panel); });
-    });
     observer = new MutationObserver(function (changes) {
       changes.forEach(function (change) {
         change.addedNodes.forEach(function (node) {
