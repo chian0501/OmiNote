@@ -1,8 +1,8 @@
-/* O-Ne Tools shared application shell — V1.3.1 */
+/* O-Ne Tools shared application shell — V1.3.2 */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.3.1';
+  var VERSION = '1.3.2';
   var observed = false;
 
   function escapeId(value) {
@@ -152,6 +152,16 @@
     });
   }
 
+  function loadFocusP0UX() {
+    if (!document.body || document.body.dataset.oneCardWorkspace !== 'focus') return;
+    if (global.ONEFocusP0UX || document.getElementById('one-focus-p0-ux-js')) return;
+    var script = document.createElement('script');
+    script.id = 'one-focus-p0-ux-js';
+    script.src = './focus-card-p0-ux-v1.js?v=100';
+    script.async = false;
+    (document.head || document.documentElement).appendChild(script);
+  }
+
   function refresh(root) {
     mergeDuplicateDocks(document.querySelector('.one-after-edit-dock'));
     enhanceLabels(root || document);
@@ -164,6 +174,7 @@
       if (new URL(location.href).searchParams.get('embed') === '1') document.body.classList.add('one-tool-embedded');
     } catch (error) {}
     refresh(document);
+    loadFocusP0UX();
     if (!observed && document.body) {
       observed = true;
       new MutationObserver(function (changes) {
