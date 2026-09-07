@@ -1,8 +1,8 @@
-/* O-Ne shared AI JSON format guide — V1.3.1 */
+/* O-Ne shared AI JSON format guide — V1.3.2 */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.3.1';
+  var VERSION = '1.3.2';
   var mounted = Object.create(null);
 
   var GUIDES = {
@@ -108,8 +108,25 @@
       }
     },
     'explanation-card': {
-      name: '說明卡', code: 'EXPLANATION-CARD', version: 'V0.4.9', file: '說明卡-卡片標題-逐步圖文.json', image: true, projectFile: '完整專案 ZIP（舊 .onecard 相容）',
-      values: ['schema 固定以 o-ne.explanation-card. 開頭', 'mode：content／gallery；content 保留 Word-lite 與左圖右文', 'content 的 sequence.enabled=true 會啟用逐步圖文；sequence.visibleCount 決定目前累積顯示到第幾個 body 段落', 'sequence.frames 依 body blockId 綁定各步驟的 image；每一步可獨立保存圖片名稱、fit、zoom、verticalAlign、offset 與自由裁切百分比', '逐步圖文只切換目前左圖與累積文字；輸出高度依完整 body 段落固定，卡片尺寸與左圖框不會因圖片比例或裁切而變動', '一鍵輸出全部會產生同尺寸 PNG ZIP；完整專案 ZIP 與 .onecard 都會內嵌每一步圖片與各自裁切設定', 'content 的 image.verticalAlign：top／center／bottom；image.zoom 為手動縮放，contain／free 可用 25–300，cover 以自動滿版的 100–300 為基準', 'contain／free 在 zoom=100 時不會自動放大小圖；cover 仍會自動放大到填滿左欄', 'gallery 模式從標題到圖片區都延續同一張 80% 咖啡色卡底；透明圖片區與間距不另鋪第二種底色，且不使用第二層圖片框', 'gallery.layout：single／split／triple／hero-right／hero-bottom／grid，依序使用 1／2／3／3／3／4 張圖', 'gallery.slots 固定最多 4 筆；每筆包含 name、fit（contain／cover／free）、focusX、focusY、cropX、cropY、cropWidth、cropHeight', 'fit=free 時 cropX／cropY／cropWidth／cropHeight 是原圖百分比；每張圖片獨立保存且裁切框不鎖比例', '純設定 JSON 不含圖片位元；要連圖搬移請使用完整專案 ZIP，.onecard 保留舊專案相容'],
+      name: '說明卡', code: 'EXPLANATION-CARD', version: 'V0.4.9', file: '說明卡-卡片標題-逐步圖文.json', image: true, projectFile: '完整專案 ZIP（推薦；舊 .onecard 僅相容）',
+      values: [
+        'schema 固定以 o-ne.explanation-card. 開頭',
+        'mode：content／gallery；content 保留 Word-lite 與左圖右文',
+        'content 的 sequence.enabled=true 會啟用逐步圖文；sequence.visibleCount 決定目前累積顯示到第幾個 body 段落',
+        'sequence.frames 依 body blockId 綁定各步驟的 image；每一步可獨立保存圖片名稱、fit、zoom、verticalAlign、offset 與自由裁切百分比',
+        '逐步圖文只切換目前左圖與累積文字；輸出高度依完整 body 段落固定，卡片尺寸與左圖框不會因圖片比例或裁切而變動',
+        '累積／逐步說明卡固定「1 組內容 = 1 個 project.zip」；不要逐幕各存原始專案',
+        '完整 project.zip 會一次保存全部文字、每一步左圖、各自裁切／縮放／位置與累積順序；重新載入後整組還原',
+        '重新載入 project.zip 後，再按「一鍵輸出全部」即可一次產生全部同尺寸 PNG ZIP',
+        '.onecard 僅保留舊專案相容；新專案不要以 .onecard 作主要交付，舊檔請先載入再重新匯出 project.zip',
+        'content 的 image.verticalAlign：top／center／bottom；image.zoom 為手動縮放，contain／free 可用 25–300，cover 以自動滿版的 100–300 為基準',
+        'contain／free 在 zoom=100 時不會自動放大小圖；cover 仍會自動放大到填滿左欄',
+        'gallery 模式從標題到圖片區都延續同一張 80% 咖啡色卡底；透明圖片區與間距不另鋪第二種底色，且不使用第二層圖片框',
+        'gallery.layout：single／split／triple／hero-right／hero-bottom／grid，依序使用 1／2／3／3／3／4 張圖',
+        'gallery.slots 固定最多 4 筆；每筆包含 name、fit（contain／cover／free）、focusX、focusY、cropX、cropY、cropWidth、cropHeight',
+        'fit=free 時 cropX／cropY／cropWidth／cropHeight 是原圖百分比；每張圖片獨立保存且裁切框不鎖比例',
+        '純設定 JSON 不含圖片位元；要連圖搬移請使用完整 project.zip'
+      ],
       example: {
         schema: 'o-ne.explanation-card.formal.v0.4.9', status: 'READY', generator_version: 'V0.4.9_20260903',
         data: {
@@ -263,6 +280,25 @@
     return panel;
   }
 
+  function syncExplanationProjectUi() {
+    var pkg = document.querySelector('[data-one-project-package-ui]');
+    if (pkg) {
+      var title = pkg.querySelector('.one-project-package__title');
+      var note = pkg.querySelector('.one-project-package__note');
+      var exportButton = pkg.querySelector('[data-action="export-package"]');
+      var importButton = pkg.querySelector('[data-action="import-package"]');
+      if (title) title.textContent = '完整專案 ZIP（推薦）';
+      if (note) note.textContent = '累積／逐步內容 1 組只需保存 1 個 project.zip；會一次保存全部文字、每一步左圖與裁切設定。載入後可直接「一鍵輸出全部」PNG。';
+      if (exportButton) exportButton.textContent = '下載完整 project.zip';
+      if (importButton) importButton.textContent = '載入完整 project.zip';
+    }
+    var legacy = document.getElementById('exportProject');
+    if (legacy) {
+      legacy.textContent = '下載舊版 .onecard（相容）';
+      legacy.title = 'Legacy 相容格式；新專案請使用完整 project.zip。';
+    }
+  }
+
   function directPreviewPanel(host) {
     if (!host || !host.children) return null;
     var children = Array.prototype.slice.call(host.children);
@@ -315,6 +351,7 @@
     if (mounted[id] || !GUIDES[id]) return mounted[id] || null;
     var panel = panelFor(id, GUIDES[id]);
     insertBelowPreview(panel);
+    if (id === 'explanation-card') global.setTimeout(syncExplanationProjectUi, 0);
     mounted[id] = panel;
     return panel;
   }
