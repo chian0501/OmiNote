@@ -201,7 +201,7 @@ test('focus bad ZIPs, missing originals and malformed settings never partially r
 
 test('focus lightweight JSON carries sequence metadata, while legacy JSON opens with cumulative mode off', async ({page},info) => {
   const errors=await open(page,3,'list'); await frame(page,2); await fileMenu(page);
-  const json=await download(page,page.locator('.export-button').filter({hasText:'匯出 JSON'}),info,'settings.json');
+  const json=await download(page,page.getByRole('button',{name:'輸出設定 JSON',exact:true}),info,'settings.json');
   const data=JSON.parse(json.bytes);expect(data.schema).toBe('o-ne.focus-card.ready.v0.6.0');expect(data.content.sequence.step).toBe(2);
   expect(JSON.stringify(data)).not.toContain('data:image/');
   await page.locator('#one-workspace-tab-history').click();

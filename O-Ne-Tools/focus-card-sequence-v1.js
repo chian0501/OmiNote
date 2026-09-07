@@ -125,10 +125,16 @@
       throw Error('焦點卡 JSON 結構不完整。');
     const images = snapshot.images;
     if (images?.placement && !PLACEMENTS.includes(images.placement)) throw Error('圖片位置無效。');
+    if ((snapshot.label.enabled || snapshot.label.text !== undefined) && typeof snapshot.label.text !== 'string')
+      throw Error('標籤文字格式錯誤。');
     for (const mode of ['body', 'list', 'steps']) {
       const c = snapshot.content[mode];
       if (!c) { if (mode === snapshot.mode) throw Error('缺少目前模式的內容。'); continue; }
       if (typeof c.title !== 'string' || mode === 'body' && typeof c.body !== 'string') throw Error('文字欄位格式錯誤。');
+      for (const field of ['cta', 'source']) {
+        if ((c[field + 'Enabled'] || c[field] !== undefined) && typeof c[field] !== 'string')
+          throw Error('行動呼籲／來源文字格式錯誤。');
+      }
       if (mode !== 'body' && (!Array.isArray(c.items) || c.items.length < 1 || c.items.length > 8 || c.items.some(t => typeof t !== 'string')))
         throw Error('項目／步驟必須為 1–8 項文字。');
       if (c.sequence) {
@@ -212,7 +218,16 @@
       return () => clearTimeout(h.timer);
     }, [options.mode, options.contents, options.images, options.label, options.style, options.placement]);
     React.useEffect(() => {
+      // Separate deliberate controls from the short typing batch, including native
+      // row move/delete buttons whose callbacks live in the original React editor.
+      const checkpoint = event => {
+        const target = event.target;
+        if (operation.current || target.closest?.('.one-direct-editor') ||
+            !target.closest?.('.editor-panel,.preview-panel')) return;
+        if (target.closest('button,select,input[type="checkbox"],input[type="range"]')) record();
+      };
       const key = event => {
+        if ((event.key === 'Enter' || event.key === ' ') && !event.repeat) checkpoint(event);
         if (event.defaultPrevented || event.isComposing || event.target.closest?.('.one-direct-editor') || !(event.ctrlKey || event.metaKey) || event.altKey) return;
         const k = event.key.toLowerCase();
         if (k === 'z' || k === 'y' && !event.metaKey) { event.preventDefault(); undo(k === 'y' || event.shiftKey ? 1 : -1); }
@@ -224,8 +239,12 @@
         const i = Array.from(document.querySelectorAll('.item-row')).indexOf(row);
         if (i >= 0 && q.step !== i + 1) o.updateContent({ sequence: { ...q, step: i + 1 } });
       };
+      document.addEventListener('pointerdown', checkpoint, true); document.addEventListener('change', checkpoint, true);
       document.addEventListener('keydown', key); document.addEventListener('focusin', focus);
-      return () => { document.removeEventListener('keydown', key); document.removeEventListener('focusin', focus); };
+      return () => {
+        document.removeEventListener('pointerdown', checkpoint, true); document.removeEventListener('change', checkpoint, true);
+        document.removeEventListener('keydown', key); document.removeEventListener('focusin', focus);
+      };
     }, []);
     const update = patch => {
       record(); const o = latest.current;

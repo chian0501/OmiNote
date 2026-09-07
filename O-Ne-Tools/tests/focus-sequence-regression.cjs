@@ -33,4 +33,8 @@ const invalid=structuredClone(snapshot);invalid.content.steps.sequence.step=9;
 assert.throws(()=>seq.validate(invalid),/累積幕/);
 invalid.content.steps.sequence.step=1;invalid.content.steps.sequence.frames[0].states[0]='invalid';
 assert.throws(()=>seq.validate(invalid),/圖片狀態/);
+for (const patch of [{label:{enabled:true}}, {label:{text:42}},
+  {content:{steps:{...c,ctaEnabled:true,cta:null}}}, {content:{steps:{...c,sourceEnabled:true}}}]) {
+  assert.throws(()=>seq.validate({...snapshot,...patch}),/文字格式/);
+}
 console.log('PASS: sequence visibility, legacy defaults, explicit overrides, frame reordering, nonoverlapping fixed grids and malformed state rejection.');
