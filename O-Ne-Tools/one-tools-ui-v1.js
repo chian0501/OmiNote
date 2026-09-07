@@ -1,8 +1,8 @@
-/* O-Ne Tools shared application shell — V1.3.2 */
+/* O-Ne Tools shared application shell — V1.3.3 */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.3.2';
+  var VERSION = '1.3.3';
   var observed = false;
 
   function escapeId(value) {
@@ -157,7 +157,7 @@
     if (global.ONEFocusP0UX || document.getElementById('one-focus-p0-ux-js')) return;
     var script = document.createElement('script');
     script.id = 'one-focus-p0-ux-js';
-    script.src = './focus-card-p0-ux-v1.js?v=100';
+    script.src = './focus-card-p0-ux-v1.js?v=102';
     script.async = false;
     (document.head || document.documentElement).appendChild(script);
   }
