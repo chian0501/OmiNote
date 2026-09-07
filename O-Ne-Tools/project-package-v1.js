@@ -1,4 +1,4 @@
-/* O-Ne shared project package / smart download names — V1.3.2 */
+/* O-Ne shared project package / smart download names — V1.3.4 */
 (function (global) {
   'use strict';
 
@@ -17,7 +17,7 @@
   }
   ensureSharedUi();
 
-  var VERSION = '1.3.3';
+  var VERSION = '1.3.4';
   var PACKAGE_SCHEMA = 'o-ne.project-package.v1';
   var MAX_PACKAGE_BYTES = 200 * 1024 * 1024;
   var mounts = Object.create(null);
@@ -318,7 +318,7 @@
     var originalClick = global.HTMLAnchorElement.prototype.click;
     global.HTMLAnchorElement.prototype.click = function () {
       try {
-        if (activeMount && this.download) this.download = smartName(activeMount, this.download);
+        if (activeMount && this.download && !this.dataset.onePreserveFilename) this.download = smartName(activeMount, this.download);
       } catch (error) {}
       return originalClick.apply(this, arguments);
     };
@@ -511,7 +511,8 @@
   function readU16(view, offset) { return view.getUint16(offset, true); }
   function readU32(view, offset) { return view.getUint32(offset, true); }
 
-  async function readZip(file) {
+  async function readZip(file, options) {
+    var strict = Boolean(options && options.strict);
     var bytes = new Uint8Array(await file.arrayBuffer());
     var view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
     var entries = Object.create(null);
@@ -533,9 +534,16 @@
       var dataEnd = dataStart + compressedSize;
       if (dataEnd > bytes.length) throw new Error('ZIP 內容不完整。');
       var name = decoder.decode(bytes.slice(nameStart, nameStart + nameLength));
-      entries[name] = bytes.slice(dataStart, dataEnd);
+      var payload = bytes.slice(dataStart, dataEnd);
+      if (strict) {
+        if (!name || name.startsWith('/') || name.includes('\\') || name.split('/').includes('..') || Object.prototype.hasOwnProperty.call(entries, name)) throw new Error('ZIP 路徑重複或無效。');
+        if (readU32(view, offset + 22) !== compressedSize || crc32(payload) !== readU32(view, offset + 14)) throw new Error('ZIP 校驗失敗，檔案可能已損壞。');
+        if (Object.keys(entries).length >= 64) throw new Error('ZIP 檔案數超過焦點卡專案上限。');
+      }
+      entries[name] = payload;
       offset = dataEnd;
     }
+    if (strict && (bytes.length < 22 || readU32(view, bytes.length - 22) !== 0x06054b50 || readU16(view, bytes.length - 12) !== Object.keys(entries).length || readU32(view, bytes.length - 6) !== offset)) throw new Error('ZIP 目錄不完整。');
     return entries;
   }
 
@@ -618,6 +626,10 @@
 
   async function exportPackage(instance) {
     try {
+      if (instance.assetAdapter && instance.assetAdapter.exportPackage) {
+        setStatus(instance, "正在建立專案…", false);
+        setStatus(instance, await instance.assetAdapter.exportPackage(), false); return;
+      }
       if (instance.assetAdapter && typeof instance.assetAdapter.prepareExport === 'function') {
         await instance.assetAdapter.prepareExport();
       }
@@ -687,6 +699,10 @@
   async function importPackage(instance, file) {
     if (!file) return;
     try {
+      if (instance.assetAdapter && instance.assetAdapter.importPackage) {
+        setStatus(instance, "正在載入專案…", false);
+        setStatus(instance, await instance.assetAdapter.importPackage(file), false); return;
+      }
       if (file.size > MAX_PACKAGE_BYTES) throw new Error('ZIP 超過 200 MB。');
       var entries = await readZip(file);
       var jsonNames = Object.keys(entries).filter(function (name) { return /\.json$/i.test(name) && name.indexOf('/') < 0; });
@@ -815,6 +831,7 @@
 
   global.ONEProjectPackage = {
     createZip: makeZip,
+    readZip: readZip,
     mount: mount,
     setAssetAdapter: setAssetAdapter,
     version: VERSION,
@@ -847,10 +864,10 @@
   }
 
   if (typeof document !== 'undefined' && document.readyState === 'loading' && typeof document.write === 'function') {
-    document.write('<script src="./ai-json-guide-v1.js?v=1312"></' + 'script>');
+    document.write('<script src="./ai-json-guide-v1.js?v=1313"></' + 'script>');
   } else if (typeof document !== 'undefined' && document.createElement && document.head) {
     var aiGuideScript = document.createElement('script');
-    aiGuideScript.src = './ai-json-guide-v1.js?v=1312';
+    aiGuideScript.src = './ai-json-guide-v1.js?v=1313';
     aiGuideScript.onload = function () { if (global.ONEAIJsonGuide) global.ONEAIJsonGuide.wrapProjectPackage(); };
     document.head.appendChild(aiGuideScript);
   }

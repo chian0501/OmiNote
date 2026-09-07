@@ -1,0 +1,22 @@
+/* Scoped controls; the exported card continues to use the native canvas renderer. */
+body[data-one-card-workspace="focus"] .preview-panel{display:flex!important;flex-direction:column;min-width:0}
+body[data-one-card-workspace="focus"] .canvas-stage{flex:1;min-height:220px}
+.focus-sequence-toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:12px 16px;border-bottom:1px solid #344154;color:#e6e8eb;background:#17222c;font:600 12px/1.4 "Noto Sans TC","Microsoft JhengHei",sans-serif}
+.focus-sequence-toolbar button,.focus-sequence-toolbar select,.focus-sequence-frame select,.focus-sequence-frame button{font:inherit;min-height:34px;border:1px solid #3c5360;border-radius:7px;background:#101a24;color:#e6edf2;padding:5px 8px;cursor:pointer;max-width:100%}
+.focus-sequence-toolbar button:disabled,.focus-sequence-frame button:disabled{opacity:.4;cursor:not-allowed}
+.focus-sequence-toggle{display:flex;gap:6px;align-items:center;white-space:nowrap;cursor:pointer}
+.focus-sequence-toggle input{accent-color:#29a6a7;width:16px;height:16px}
+.focus-sequence-navigation{display:flex;align-items:center;gap:5px;min-width:0;max-width:100%}
+.focus-sequence-navigation select{width:240px;min-width:100px;text-overflow:ellipsis}
+.focus-sequence-history{display:flex;gap:5px;margin-left:auto}
+.focus-sequence-hint{color:#a2adb8;font-size:11px}
+.focus-sequence-frame{display:grid;gap:12px;font-size:12px;min-width:0}
+.focus-sequence-frame>label{display:grid;gap:6px}
+.focus-sequence-frame>strong{margin-top:3px;color:#ffbe37}
+.focus-sequence-state{display:grid;grid-template-columns:48px minmax(70px,1fr) minmax(90px,1.3fr);gap:5px;align-items:center}
+.focus-sequence-state select{width:100%;min-width:0}
+.focus-sequence-frame-actions{display:flex;flex-wrap:wrap;gap:6px}
+.one-focus-selected-slot{outline:2px solid #29a6a7;outline-offset:3px}
+body[data-one-card-workspace="focus"] .image-placement-tabs{flex-wrap:wrap}
+body[data-one-card-workspace="focus"] .image-placement-tabs button{white-space:normal}
+@media(max-width:620px){.focus-sequence-toolbar{padding:10px}.focus-sequence-navigation{order:2;flex-basis:100%}.focus-sequence-navigation select{flex:1;width:auto}.focus-sequence-history{margin-left:0}.focus-sequence-state{grid-template-columns:42px minmax(65px,1fr) minmax(75px,1.15fr)}}

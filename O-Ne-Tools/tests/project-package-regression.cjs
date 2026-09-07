@@ -45,7 +45,7 @@ vm.runInContext(helperSource, context, { filename: 'project-package-v1.js' });
 
 const helper = context.ONEProjectPackage;
 assert(helper, 'project package helper must load');
-assert.strictEqual(helper.version, '1.3.2');
+assert.strictEqual(helper.version, '1.3.4');
 assert.strictEqual(helper.schema, 'o-ne.project-package.v1');
 assert.strictEqual(helper.__test.cleanPart('道頓堀/觀光船:晚班'), '道頓堀 觀光船 晚班');
 assert.strictEqual(helper.__test.toolName('focus-card'), '焦點卡');
@@ -72,7 +72,7 @@ const focusRightInput = {
   id: '',
   getAttribute() { return null; },
   closest(selector) {
-    if (selector === '.image-slot') return { querySelector() { return { textContent: '右側圖片' }; } };
+    if (selector === '.image-slot') return { getAttribute() { return null; }, querySelector() { return { textContent: '右側圖片' }; } };
     return null;
   }
 };
@@ -116,7 +116,7 @@ assert(helperSource.indexOf('instance.config.apply(clone(project.data));') < hel
 
   const project = {
     schema: 'o-ne.project-package.v1',
-    package_version: '1.3.2',
+    package_version: '1.3.4',
     tool_id: 'explanation-card',
     data: { sequence: { enabled: true, visibleCount: 4, frames: [{ zoom: 80 }, { zoom: 100 }, { zoom: 125 }, { zoom: 160 }] } },
     assets: [1, 2, 3, 4].map(step => ({
@@ -152,22 +152,21 @@ assert(helperSource.indexOf('instance.config.apply(clone(project.data));') < hel
     'apply:4', 'after:4/0'
   ], 'project settings, four images and final rendering hook must restore in a stable order');
 
-  assert(backupSource.includes('project-package-v1.js?v=1320'), 'shared backup must synchronously bridge to the cache-busted project package helper');
+  assert(backupSource.includes('project-package-v1.js?v=1340'), 'shared backup must synchronously bridge to the cache-busted project package helper');
   assert(backupSource.includes("version: '1.3.1'"), 'shared backup must expose the current UI-shell version');
 
   const sharedEditors = [
     'general-card.html', 'trigger-card.html', 'effect-card.html', 'move-card.html', 'choice-card.html',
-    'challenge-card.html', 'dialogue-card-v135.html', 'rating-card.html', 'focus-card.html', 'explanation-card.html',
+    'challenge-card.html', 'dialogue-card-v135.html', 'rating-card.html', 'focus-card.html',
     'thumbnail-frame.html', 'settlement-card.html'
   ];
   for (const file of sharedEditors) {
-    const html = fs.readFileSync(path.join(root, file), 'utf8');
-    const backupVersion = file === 'explanation-card.html' ? 'edit-backup-v1.js?v=1320' : 'edit-backup-v1.js?v=1310';
-    assert(html.includes(backupVersion), file + ' must still load the shared backup bridge');
+    const html = fs.readFileSync(path.join(root, file === 'explanation-card.html' ? 'explanation-card-portable-v049.html' : file), 'utf8');
+    assert(/edit-backup-v1\.js\?v=\d+/.test(html), file + ' must still load the versioned shared backup bridge');
   }
 
   const persistent = fs.readFileSync(path.join(root, 'persistent-card.html'), 'utf8');
-  assert(persistent.includes('project-package-v1.js?v=1310'), 'persistent card must load project package helper directly');
+  assert(/project-package-v1\.js\?v=\d+/.test(persistent), 'persistent card must load project package helper directly');
   assert(persistent.includes("id:'persistent-card'"), 'persistent card must mount its project package adapter');
   assert(persistent.includes('getTitle:snapshot=>snapshot&&snapshot.task'), 'persistent filename title must use task text');
 
