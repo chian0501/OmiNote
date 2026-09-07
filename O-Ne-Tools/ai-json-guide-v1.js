@@ -2,7 +2,7 @@
 (function (global) {
   'use strict';
 
-  var VERSION = '1.3.2';
+  var VERSION = '1.3.3';
   var mounted = Object.create(null);
 
   var GUIDES = {
@@ -97,10 +97,10 @@
       }
     },
     'focus-card': {
-      name: '焦點內容卡', code: 'FOCUS-CARD', version: 'V0.5.15', file: '焦點卡-卡片標題-步驟-含字.json', image: true,
-      values: ['schema 固定 o-ne.focus-card.ready.v0.5.11', 'mode：body／list／steps', 'body 模式 content 使用 body；list／steps 模式改用 items 陣列', 'titleColor：highlight／light；itemFrameStates：none／focus／idle', '圖片 fit：contain／cover／free；cover 可設 zoom 100–300、offsetX／offsetY -100–100；free 使用 cropX／cropY／cropWidth／cropHeight 0–100 百分比', '舊 JSON 沒有自由裁切欄位時會預設整張圖片', 'JSON 不含圖片位元；有商品圖請用 O-Ne 專案 ZIP'],
+      name: '焦點內容卡', code: 'FOCUS-CARD', version: 'V0.6.0', file: '焦點卡-卡片標題-步驟-含字.json', image: true,
+      values: ['schema 固定 o-ne.focus-card.ready.v0.6.0', 'mode：body／list／steps', 'body 模式 content 使用 body；list／steps 模式改用 items 陣列', 'titleColor：highlight／light；itemFrameStates：none／focus／idle', '圖片 fit：contain／cover／free；cover 可設 zoom 100–300、offsetX／offsetY -100–100；free 使用 cropX／cropY／cropWidth／cropHeight 0–100 百分比', '舊 JSON 沒有自由裁切欄位時會預設整張圖片', 'images.placement：left／right／both／stack-left／stack-right／pair-left／pair-right／triple-top-left／triple-top-right／triple-side-left／triple-side-right／grid-left／grid-right；圖片槽位 left／right／third／fourth', '累積只用於 list／steps：content.sequence={enabled:true,step:1,imageMode:accumulate,effect:frame,frames:[每項一幕]}', 'imageMode：all／accumulate／single；effect：frame／badge／spotlight／none', '每幕 states 與 effects 均為 4 格陣列，對應 left／right／third／fourth；states：auto／hidden／show／focus／dim；effects：inherit 或任一 effect', '舊 JSON 無 sequence 時累積關閉；JSON 保存目前模式與全幕設定，不含圖片位元；完整專案 ZIP 保存所有模式、全部幕 PNG 與 1–4 張原圖並可完整讀回'],
       example: {
-        schema: 'o-ne.focus-card.ready.v0.5.11', status: 'READY', mode: 'body', component: { placement: 'centerLower' },
+        schema: 'o-ne.focus-card.ready.v0.6.0', status: 'READY', mode: 'body', component: { placement: 'centerLower' },
         style: { accentColor: '#29A6A7', cardSize: 'large', customWidth: 882, titleSize: 56, contentSize: 36 },
         label: { enabled: false, text: '', position: 'above', background: '#29A6A7', color: '#FFFFFF' },
         images: { placement: 'right', scale: 32, left: { enabled: false, name: '', fit: 'contain', zoom: 100, offsetX: 0, offsetY: 0, cropX: 0, cropY: 0, cropWidth: 100, cropHeight: 100 }, right: { enabled: false, name: '', fit: 'free', zoom: 100, offsetX: 0, offsetY: 0, cropX: 12, cropY: 8, cropWidth: 76, cropHeight: 68 } },

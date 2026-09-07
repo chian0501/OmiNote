@@ -32,7 +32,7 @@ vm.runInContext(guideSource, context, { filename: 'ai-json-guide-v1.js' });
 
 const guide = context.ONEAIJsonGuide;
 assert(guide, 'AI JSON guide must load');
-assert.strictEqual(guide.version, '1.3.1');
+assert.strictEqual(guide.version, '1.3.3');
 const ids = ['general-card','trigger-card','persistent-card','effect-card','move-card','choice-card','challenge-card','dialogue-card','rating-card','focus-card','explanation-card','thumbnail-frame','settlement-card'];
 assert.deepStrictEqual(Object.keys(guide.guides), ids);
 for (const id of ids) {
@@ -54,7 +54,7 @@ assert.strictEqual(guide.example('move-card').component_id, 'NAV-01');
 assert.strictEqual(guide.example('choice-card').component_id, 'SELECT-CARD');
 assert.strictEqual(guide.example('dialogue-card').component_id, 'DIALOGUE-CARD');
 assert.strictEqual(guide.example('rating-card').component_id, 'COL-02');
-assert.strictEqual(guide.guides['focus-card'].version, 'V0.5.15');
+assert.strictEqual(guide.guides['focus-card'].version, 'V0.6.0');
 assert.strictEqual(guide.example('focus-card').images.right.fit, 'free');
 assert.strictEqual(guide.example('focus-card').images.right.cropWidth, 76);
 assert(guide.guides['focus-card'].values.some(value => value.includes('cropX／cropY／cropWidth／cropHeight')));
@@ -77,10 +77,10 @@ assert(guide.guides['explanation-card'].values.some(value => value.includes('seq
 assert(guide.guides['explanation-card'].values.some(value => value.includes('sequence.frames')));
 assert(guide.guides['explanation-card'].values.some(value => value.includes('卡片尺寸與左圖框不會')));
 assert(guide.guides['explanation-card'].values.some(value => value.includes('同尺寸 PNG ZIP')));
-assert(guide.guides['explanation-card'].values.some(value => value.includes('內嵌每一步圖片')));
+assert(guide.guides['explanation-card'].values.some(value => value.includes('每一步左圖')));
 for (const id of ['rating-card','focus-card','explanation-card','thumbnail-frame','settlement-card']) {
   assert.strictEqual(guide.guides[id].image, true, id + ' must warn that image binaries require project ZIP');
-  if (id === 'explanation-card') assert(guide.prompt(id).includes('完整專案 ZIP 與 .onecard 都會內嵌每一步圖片') && guide.prompt(id).includes('舊專案相容'), id + ' must explain that ZIP now embeds every step image while .onecard remains compatible');
+  if (id === 'explanation-card') assert(guide.prompt(id).includes('每一步左圖') && guide.prompt(id).includes('舊專案相容'), id + ' must explain that ZIP now embeds every step image while .onecard remains compatible');
   else assert(guide.prompt(id).includes('專案 ZIP'), id + ' must mention project ZIP for image handoff');
 }
 assert(guideSource.includes('給 AI 的 JSON 格式'));
@@ -92,6 +92,6 @@ assert(guideSource.includes('<details><summary>JSON 範例｜需要時再展開'
 assert(!guideSource.includes('<details open>'), 'large JSON preview must not consume initial editor space');
 assert(guideSource.includes('ONEEditBackup.__aiJsonGuideWrapped'), 'shared edit-backup tools must mount the AI guide');
 assert(guideSource.includes('ONEProjectPackage.__aiJsonGuideWrapped'), 'persistent/project-package path must mount the AI guide');
-assert(packageSource.includes('ai-json-guide-v1.js?v=1312'), 'project package must synchronously load the cache-busted AI JSON guide');
+assert(packageSource.includes('ai-json-guide-v1.js?v=1313'), 'project package must synchronously load the cache-busted AI JSON guide');
 new Function(guideSource);
 console.log('PASS: 13 AI JSON schemas, raw JSON handoff instructions, image ZIP notes, completion-dock placement and syntax.');

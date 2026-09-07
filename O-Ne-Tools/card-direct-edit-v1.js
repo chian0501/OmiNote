@@ -297,6 +297,7 @@
       Object.assign(node.style, { left: x + 'px', top: y + 'px', width: Math.max(12, Math.min(box.width - x, r.w * sx + padding * 2)) + 'px', height: Math.max(16, r.h * sy + padding * 2) + 'px' });
       node.addEventListener('click', function () {
         if (!isImage) { edit(target); return; }
+        if (typeof target.onSelect === 'function') { target.onSelect(); return; }
         var input = document.getElementById(target.inputId);
         if (input && !input.disabled) {
           // Clear only the picker so choosing the same file again fires change.
