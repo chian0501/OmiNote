@@ -122,8 +122,8 @@
         'content 的 image.verticalAlign：top／center／bottom；image.zoom 為手動縮放，contain／free 可用 25–300，cover 以自動滿版的 100–300 為基準',
         'contain／free 在 zoom=100 時不會自動放大小圖；cover 仍會自動放大到填滿左欄',
         'gallery 模式從標題到圖片區都延續同一張 80% 咖啡色卡底；透明圖片區與間距不另鋪第二種底色，且不使用第二層圖片框',
-        'gallery.layout：single／split／triple／hero-right／hero-bottom／grid，依序使用 1／2／3／3／3／4 張圖',
-        'gallery.slots 固定最多 4 筆；每筆包含 name、fit（contain／cover／free）、focusX、focusY、cropX、cropY、cropWidth、cropHeight',
+        'gallery.count：1–10；圖片張數獨立於排列。gallery.layout：auto／rows／stack／hero／single／split／triple／hero-right／hero-bottom／grid；gallery.columns：1–5；gallery.weights 保存分隔比例',
+        'gallery.slots 最多 10 筆；每筆包含 name、fit（contain／cover／free）、focusX、focusY、cropX、cropY、cropWidth、cropHeight',
         'fit=free 時 cropX／cropY／cropWidth／cropHeight 是原圖百分比；每張圖片獨立保存且裁切框不鎖比例',
         '純設定 JSON 不含圖片位元；要連圖搬移請使用完整 project.zip'
       ],
