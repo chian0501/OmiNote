@@ -75,7 +75,7 @@ test('ten gallery images retain crops, order, divider sizes and PNG through proj
   await dialog.getByRole('button',{name:'關閉',exact:true}).click();
   await page.locator('.gallery-slot.is-selected [data-gallery-remove]').click();
   await page.getByRole('button',{name:'專案檔案',exact:true}).click();
-  await dialog.locator('[data-one-project-package-ui] input[type="file"]').setInputFiles(zipPath);
+  await dialog.locator('[data-one-project-package-ui] input[accept=".zip,application/zip"]').setInputFiles(zipPath);
   await expect(dialog.locator('.one-project-package__status')).toContainText('載入成功');
   await dialog.getByRole('button',{name:'關閉',exact:true}).click();
   await expect.poll(galleryState.bind(null,page)).toEqual(snap);
