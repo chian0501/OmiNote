@@ -60,6 +60,8 @@ test('ten gallery images retain crops, order, divider sizes and PNG through proj
   await page.locator('[data-gallery-action="down"][data-index="0"]').click();
   expect((await galleryState(page)).slots[1].name).toBe('replacement.png');
   expect((await galleryState(page)).slots[1].focusX).toBe(30);
+  await page.locator('[data-gallery-index="1"] .gallery-thumb').dragTo(page.locator('[data-gallery-index="3"] .gallery-thumb'));
+  expect((await galleryState(page)).slots[3].name).toBe('replacement.png');
   // A click on the actual rendered image must locate its own settings card.
   const hit=await page.locator('#previewCanvas').evaluate(c=>{
     const r=c.getBoundingClientRect();return{x:r.x+r.width*.85,y:r.y+r.height*.55};
@@ -83,6 +85,20 @@ test('ten gallery images retain crops, order, divider sizes and PNG through proj
   await expect(page.locator('#galleryCount')).toContainText('已放 10 張');
   const pngDownload=page.waitForEvent('download');await page.locator('#exportPng').click();
   const png=await pngDownload;await png.saveAs(info.outputPath('gallery-ten-export.png'));
+  // Missing originals must fail before the imported snapshot can replace the card.
+  const zipBytes=Array.from(await require('node:fs/promises').readFile(zipPath));
+  const broken=await page.evaluate(async bytes=>{
+    const api=window.ONEProjectPackage.__test;
+    const entries=await api.readZip(new File([new Uint8Array(bytes)],'original.zip'));
+    const missing=Object.keys(entries).find(n=>n.startsWith('assets/'));
+    const blob=await api.makeZip(Object.entries(entries).filter(([n])=>n!==missing).map(([name,data])=>({name,data})));
+    return Array.from(new Uint8Array(await blob.arrayBuffer()));
+  },zipBytes);
+  await page.getByRole('button',{name:'專案檔案',exact:true}).click();
+  await dialog.locator('[data-one-project-package-ui] input[accept=".zip,application/zip"]').setInputFiles({name:'missing-image.zip',mimeType:'application/zip',buffer:Buffer.from(broken)});
+  await expect(dialog.locator('.one-project-package__status')).toContainText('載入失敗');
+  await dialog.getByRole('button',{name:'關閉',exact:true}).click();
+  expect(await galleryState(page)).toEqual(snap);expect(await pixels()).toBe(before);
   await page.screenshot({path:info.outputPath('gallery-ten-desktop.png'),fullPage:true});
   await page.setViewportSize({width:390,height:844});
   await page.screenshot({path:info.outputPath('gallery-ten-mobile.png'),fullPage:true});
