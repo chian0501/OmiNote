@@ -1,0 +1,72 @@
+(()=>{
+  'use strict';
+  const PROJECTS=[
+    {id:'26TW-01-1',name:'九份伴手禮',aliases:['台灣伴手禮九份開箱','TWR-01','九份'],keywords:['伴手禮','外國旅客','九份','台灣'],links:{root:'https://drive.google.com/drive/folders/1LpG5Y-k0HA3OH286zUpmSVNImtlN3k70',brief:'https://docs.google.com/document/d/1htyCPplLM81bOzVv6RBbLLzc6SFZDQyWMpP_VR1bWhA/edit',p01:'https://drive.google.com/drive/folders/1qBzSob0S1TPdakDy7lUCcUNw6jda9MH0',p02:'https://drive.google.com/drive/folders/1yjHIhPMXzCTYXcl3n8neNS3R1EPjenZX',p03:'https://drive.google.com/drive/folders/1-mgdLcgfWHkCZP8KN9MTz4JTwvvWtLuQ',p04:'https://drive.google.com/drive/folders/1Tpz9RNmjzpizB0Z1ACW1Gyj8ir6OLEiF',thumb:'https://drive.google.com/drive/folders/1U6yRXrHpOyFmSFA8L5HNhsc9Gwa082yN'}},
+    {id:'26TW-02-1',name:'3COINS 台灣首店',aliases:['3COINS','3CO-01','台灣首店'],keywords:['3COINS','西門','台日價差','開箱'],links:{root:'https://drive.google.com/drive/folders/1N6PGFHyMGxhpeLhCzRHcVcP_HCvb9Wc3',brief:'https://docs.google.com/document/d/1Ad8NWxeOI7MwAD58p2t8u10cCwTOUPKk9EnaBcNlPKM/edit',p01:'https://drive.google.com/drive/folders/10wri6IAxk3Woc_S8yZlIUrTpbLdM5Wgs',p02:'https://drive.google.com/drive/folders/1DzLjpCbXA6wG_r0prBetCryePTBLOCxF',p03:'https://drive.google.com/drive/folders/1O5Rmc2A6A8g-7IDt91gw4mOLWDZCz7jG',p04:'https://drive.google.com/drive/folders/1fwspeiD3mqYRjk3Sc9FjmJ63Isri0K75',thumb:'https://drive.google.com/drive/folders/1iXea9ajaIFjGAtIPg7DvN3rA7Tmaq0mC'}},
+    {id:'26TW-03-1',name:'大稻埕',aliases:['日本人為什麼愛大稻埕','DAD-01','大稻埕'],keywords:['大稻埕','日本攻略','台灣味','踩點'],links:{root:'https://drive.google.com/drive/folders/1m_SltPJvttrJXWtVMxRqiIfLReMll8fv',brief:'https://docs.google.com/document/d/1TBeOAIlDjZRl3vXBJZrzmN-hi-8QOLJHroMwjBUjPlo/edit',p01:'https://drive.google.com/drive/folders/1Z5o5eOeetzbf216MPRlUxcvj-KxtKulh',p02:'https://drive.google.com/drive/folders/1qIGnr2ZXO9QRHHeW-7fF8gsqB_RFp7s_',p03:'https://drive.google.com/drive/folders/1HptE0geuntlahAZLXJZfWgZEGVgPy31i',p04:'https://drive.google.com/drive/folders/1Nzj1QK2kpsVtxj1R6iIX31pk8puTXj9l',thumb:'https://drive.google.com/drive/folders/1gUQUDOrNZ87PRbiM8Bvfp28D5cNlEt2s'}},
+    {id:'26JP-01-1',name:'USJ 大阪環球',aliases:['USJ','VID-001','大阪環球'],keywords:['USJ','環球影城','大阪','已結案'],links:{root:'https://drive.google.com/drive/folders/1O9pjGGglTFp2G5NF1uVrhrq4c-Utnlh5',p01:'https://drive.google.com/drive/folders/13SmDrBzy5fxR6-TGRPfu_s29QZdotWYe',p02:'https://drive.google.com/drive/folders/1x6-Slz5KerIXQYcYZPdNAv_E_b_YM1bQ',p03:'https://drive.google.com/drive/folders/13UnluxcFrJLLsMaliJKfEkYLpHo2UtbU',p04:'https://drive.google.com/drive/folders/1NjMeANuEF8v9KxTNTMbaqf_EbRGuyDeY',thumb:'https://drive.google.com/drive/folders/1Vdg-84v7FtrkCRCJ0k8QEVJxAhg-EHzf'},exceptions:{brief:'已結案・不補建'}},
+    {id:'26JP-01-2',name:'京都一日',aliases:['京都','VID-002','京阪電車'],keywords:['京都','清水寺','京阪','一日券'],links:{root:'https://drive.google.com/drive/folders/1IVomDBBVZy12MSK5PsN6ibu4sIhmBgnl',brief:'https://docs.google.com/document/d/1snRsKwpyZFmG62skxLq8CHZCxVTj0KBmmVLZs7z5SmY/edit',p01:'https://drive.google.com/drive/folders/1ElrG4BM8lSbjZNyldQ6NYCOEbSPmG2bv',p02:'https://drive.google.com/drive/folders/1osTbT3jMR1TOU8RoJaNkp3YcGYKxthwE',p03:'https://drive.google.com/drive/folders/1dIfQumxK6kn0RVEi3S41luB6m2jWCoT5',p04:'https://drive.google.com/drive/folders/1IHMPLre_QC9n0yocA_oIHVYZz100Nlns',thumb:'https://drive.google.com/drive/folders/1lKl3EGw29yPWtIJO4mPHIp1AymplC8Ut'}},
+    {id:'26JP-01-3',name:'大阪 D1D2',aliases:['大阪市區','VID-003','D1D2'],keywords:['大阪','D1','D2','今昔館','大阪城'],links:{root:'https://drive.google.com/drive/folders/1Y_QTkHWHdU9VHQRHEK0Focr5FREMUkx-',brief:'https://docs.google.com/document/d/1hjJUpSjf2klRup9hUYEDN-DATkWlYAbPXFFO0AETfuo/edit',p01:'https://drive.google.com/drive/folders/19L93wXBEOzy72A2fBv1F5nvCdyMBvb-q',p02:'https://drive.google.com/drive/folders/1BINXqfrfz8DuEsTVG2fOQiWYNNtcsnnn',p03:'https://drive.google.com/drive/folders/1udSfR1SeQfGP0LlrXhp-lvMPEti8txmA',p04:'https://drive.google.com/drive/folders/1Z6JLIidEKJ3Jw4Oj99VkqZ0OtOUNVqT3',thumb:'https://drive.google.com/drive/folders/10ZQBgUMjVX5V9JWE5694Oo7mUjyzd5_A'}},
+    {id:'26JP-01-4',name:'大阪 D5D6',aliases:['大阪最後巡禮','VID-004','D5D6'],keywords:['大阪','D5','D6','臨空城','誤機'],links:{root:'https://drive.google.com/drive/folders/1q0gLtMQa_fBB9biAGi0u28r9UGXLB8oK',brief:'https://docs.google.com/document/d/1qXuTNXWEVTFJV5GnBAMEdO85qPtKrRf-bDbFCk8fMPc/edit',p01:'https://drive.google.com/drive/folders/1eYV4I6WX2YAPsxt30QBnQv9WGGc6xaVD',p02:'https://drive.google.com/drive/folders/1UdByrLpsd37z2hMTwXE93fSYR21vK2eF',p03:'https://drive.google.com/drive/folders/1LD7Ra2IWEdXhlTIDAd5B6LvUZBqJZ1z9',p04:'https://drive.google.com/drive/folders/1jkQsM8QzwdvqkPd1gt0aBKoYcKPgb2j5'},exceptions:{thumb:'尚未建立'}},
+    {id:'25CRU-01-1',name:'郵輪舊片前導',aliases:['2025 郵輪','郵輪前導'],keywords:['郵輪','舊片','前導','宮古島'],links:{root:'https://drive.google.com/drive/folders/1WbrhxKCSxVhTebUrHbemWqi7M2Wxw32I',brief:'https://docs.google.com/document/d/1LxjmNyQ8RBk1gDpLCdyLQcUt8NzXP01DmibP4SzLtFQ/edit?usp=drivesdk',p01:'https://drive.google.com/drive/folders/140147LVeACVYKhqQv3_I0C6UQw-wqDEy',p02:'https://drive.google.com/drive/folders/1jJBjSzYLAvjKCMCb_yFBvs2x_hU9ReFI',p03:'https://drive.google.com/drive/folders/1Y2HfYmothbSdosFb-YL0tjxB8AcjOnM3',p04:'https://drive.google.com/drive/folders/1aafJ-rvQFWy6hCraJ3CVofg7w6_epJcA',thumb:'https://drive.google.com/drive/folders/1ygUi2B_OHT7UnO6MgDiwKzQdriU9XpIq'}},
+    {id:'26CRU-01-1',name:'探索星號郵輪',aliases:['CRU-01','探索星號','郵輪'],keywords:['郵輪','基隆','沖繩','石垣島'],links:{root:'https://drive.google.com/drive/folders/10Dagedodb83BiLjJbZTEYXTGLjoMAYu_',brief:'https://docs.google.com/document/d/1atA6220XV1nQ50KJHeiJrOzvlxNDDYSnGPvl36EUQpI/edit',p01:'https://drive.google.com/drive/folders/182DZoO8SCbeXWmYv386jREVjlrMKMcru',p02:'https://drive.google.com/drive/folders/1LWF25uKNz_yPEqsd0EsbYOQ7QJBKWFRG',p03:'https://drive.google.com/drive/folders/1t6CypOZ1AwAGy8HokIuHsrtYgqbZ5MKf',p04:'https://drive.google.com/drive/folders/13-TjDXdOtSblPbVojTvwMwc9hrk7ny9i',thumb:'https://drive.google.com/drive/folders/1n7XRHazIgx0I2xSiy_uqQHINkLEmvfGo'}}
+  ];
+
+  const SHARED=[
+    {id:'shared-root',group:'主入口',name:'共用素材總入口',keywords:['共用','素材','總入口'],url:'https://drive.google.com/drive/folders/1O3QkpF69bewE4jUSsWz1dd9igf6wV6qh'},
+    {id:'brand-root',group:'主入口',name:'品牌與角色',keywords:['品牌','角色','VIS'],url:'https://drive.google.com/drive/folders/130d9ImQoUglE0yAtno3l6OemWyF-OKb4'},
+    {id:'real-photos',group:'主入口',name:'真人照片',keywords:['照片','真人','Omi','涅特'],url:'https://drive.google.com/drive/folders/1GUFul6aTeYBDfZ7d37ucrWGLfEqs-msF'},
+    {id:'ui-root',group:'主入口',name:'共用 UI',keywords:['UI','字卡','母版'],url:'https://drive.google.com/drive/folders/18SJ0NuBAM6cxRXVJLfLDZAS6ds1V1i5M'},
+    {id:'audio-root',group:'主入口',name:'音樂音效',keywords:['音樂','音效','BGM','SFX'],url:'https://drive.google.com/drive/folders/1XRuuuHHC1O0c4hTzWON-lbszyaYgOvf3'},
+    {id:'license-root',group:'主入口',name:'授權資料',keywords:['授權','license','來源'],url:'https://drive.google.com/drive/folders/1NDPPTIs6EqJ9NrQ-hnlFTYtenwlCsPi9'},
+    {id:'vis-index',group:'品牌與角色',name:'VIS／角色總入口',keywords:['VIS','角色','總入口'],url:'https://docs.google.com/document/d/1JsF5vQkos7TLU6Ycqf2qZe4c-HK8OCmR4AwthYTUEyM/edit?usp=drivesdk'},
+    {id:'omi-ref',group:'品牌與角色',name:'Omi 角色 REF',keywords:['Omi','REF','角色'],url:'https://drive.google.com/file/d/1HNuZgpTjRVOvI7h0KYAdumIVf29jhQm0/view'},
+    {id:'niete-ref',group:'品牌與角色',name:'涅特角色 REF',keywords:['涅特','Niete','REF','角色'],url:'https://drive.google.com/file/d/1Y7aGJTgFRReQVc-comwQLTLRzvCtxz4V/view'},
+    {id:'kuma-ref',group:'品牌與角色',name:'Kuma REF',keywords:['Kuma','REF','角色'],url:'https://drive.google.com/file/d/1tpeQfFdytnXYRiVy4WwVgsvnfUGo-ndx/view'},
+    {id:'nomi-ref',group:'品牌與角色',name:'Nomi REF',keywords:['Nomi','REF','角色'],url:'https://drive.google.com/file/d/1yFMRG2m5U80Dbganh-QerA4AQf2QwkSv/view'},
+    {id:'logo',group:'品牌與角色',name:'Logo',keywords:['Logo','品牌'],url:'https://drive.google.com/file/d/1qV0kWMGvfmuFWX1pKN0KOMSxovcryMzi/view'},
+    {id:'logo-no-zh',group:'品牌與角色',name:'Logo 無中文',keywords:['Logo','無中文','品牌'],url:'https://drive.google.com/file/d/1JxwiBytNJXqyredXmlgjGbiVvIKbSDcN/view'},
+    {id:'watermark',group:'品牌與角色',name:'頻道浮水印',keywords:['浮水印','watermark','Logo'],url:'https://drive.google.com/file/d/1T9L3U9-eKg8TJewBAQ8yTsX_6pJmUziB/view'},
+    {id:'outfit-prompt',group:'品牌與角色',name:'角色換裝／場景 Prompt',keywords:['換裝','角色','Prompt','場景'],url:'https://docs.google.com/document/d/1Vz6fmBHKEtIqPQ04KUT8-67_zV_kdCDKoXi6D4xv-60/edit?usp=drivesdk'},
+    {id:'ui-index',group:'共用 UI',name:'UI 正式總入口',keywords:['UI','正式','總入口'],url:'https://docs.google.com/document/d/13WqrOXo6NSEAPv-gTyAdluB-5PVNqQX9mhuxQsp-tuo'},
+    {id:'ui-editable',group:'共用 UI',name:'修改卡',keywords:['修改卡','PSD','字卡'],url:'https://drive.google.com/drive/folders/1KL6L4ADtXX6_gKyRGsqYyoceKUKjOyF3'},
+    {id:'ui-fixed',group:'共用 UI',name:'固定卡',keywords:['固定卡','PSD','字卡'],url:'https://drive.google.com/drive/folders/11-mXINBGZX8UyDGElik7hgSa-0yAJRcT'},
+    {id:'fonts',group:'共用 UI',name:'字型',keywords:['字型','font','Noto'],url:'https://drive.google.com/drive/folders/1WHdxYF4iLqTUuh3h4M1JnSy0CqIkWdN8'},
+    {id:'ui-deck',group:'共用 UI',name:'UI 規範簡報',keywords:['UI','規範','簡報'],url:'https://docs.google.com/presentation/d/1c2n5muAjwF2Oq80niGwt3G6tkdpfkRQnbxj7_DSuf_w'},
+    {id:'visual-qa',group:'共用 UI',name:'VIS／UI 輸出 QA',keywords:['QA','VIS','UI','輸出'],url:'https://docs.google.com/document/d/1O47t537NcP7pZApgqUyaXuVglltBA9CRcio_BV6Hiv0'},
+    {id:'visual-generation',group:'共用 UI',name:'拆圖／生成指令庫',keywords:['拆圖','生成','AI','指令庫'],url:'https://docs.google.com/document/d/18m1L0rP6IWENMHcs-mbOn1-dsDyiq4qkwZmVS57EgqQ'},
+    {id:'thumb-prompt',group:'共用 UI',name:'YouTube 封面 Prompt',keywords:['縮圖','封面','YouTube','Prompt'],url:'https://docs.google.com/document/d/1PUP5GxJzeopLcGDOg6wlfZQalivvLO8VSmGQLTJTfH4/edit?usp=drivesdk'},
+    {id:'gemini-music',group:'音樂音效',name:'Gemini AI 音樂',keywords:['Gemini','AI','音樂','BGM'],url:'https://drive.google.com/drive/folders/1j4SNLmY1IRDAsupktJdr-S7zXV53J4Xq'},
+    {id:'gemini-sfx',group:'音樂音效',name:'Gemini 效果音',keywords:['Gemini','效果音','SFX','音效'],url:'https://drive.google.com/drive/folders/1-6yJgcqHMPq6-TdKzjbmpQYgY7AAS7Ox'}
+  ];
+
+  const AI_ACTIONS=[
+    {id:'edit-analysis',title:'分析剪輯',desc:'看結構、節奏、拖點與故事是否成立。',audience:['niete'],scope:'video',keywords:['剪輯','審片','節奏'],prompt:'分析這支影片目前剪輯。請用實際畫面與企劃目標判斷開頭、節奏、重複、支線、證據推進與結尾回答，最後分成必改、推薦改、不用改。'},
+    {id:'long-to-shorts',title:'長片拆 Shorts',desc:'找能獨立成立的短片，不是把長片硬裁短。',audience:['all'],scope:'video',keywords:['Shorts','拆短片','導流'],prompt:'從這支長片找 3 到 5 個能獨立成立的 Shorts。每支列核心事件、鉤子、故事推進、畫面證據、結尾與是否需要導回長片。'},
+    {id:'cut-shorts',title:'直接剪 Shorts',desc:'先把故事與直式畫面想清楚，再進施工。',audience:['niete'],scope:'video',keywords:['直接剪','Shorts','9:16'],prompt:'幫我直接規劃這支 Shorts 的可施工版本。先確認題目、開頭對象、因果、證據與答案，再逐鏡規劃 9:16 主體重構、字幕與必要 UI；缺任何關鍵資訊就標出，不要用橫片完整塞進直式畫布。'},
+    {id:'hook',title:'開頭鉤子',desc:'把前 3 秒、前 10 秒與前 30 秒鎖成同一件事。',audience:['omi'],scope:'video',keywords:['鉤子','開場','前30秒'],prompt:'替這支影片設計開頭鉤子。請先鎖定觀眾最想知道的問題，再給前 3 秒、前 10 秒與前 30 秒的畫面與對白，三段要承諾同一件事且能由影片真實內容兌現。'},
+    {id:'jokes',title:'找梗爆點',desc:'從真人素材找反差、吐槽、意外與角色化瞬間。',audience:['niete'],scope:'video',keywords:['找梗','爆點','反應'],prompt:'從這支影片實際素材找可保留的爆點、吐槽、反差、意外、沉默與真實反應。每個候選列畫面、為什麼有效、建議剪法與是否需要字卡或效果。'},
+    {id:'factcheck',title:'資料查證',desc:'價格、交通、營業規則與歷史資訊用最新來源重查。',audience:['omi'],scope:'video',keywords:['查證','交通','票價','營業'],prompt:'查證這支影片會公開使用的時效資訊與事實。優先官方最新來源，分開實際拍攝紀錄、官方資料、推論與實際支付，最後標示可直接上片、需保守寫法、仍待證據。'},
+    {id:'cards',title:'規劃字卡',desc:'從正式 O-Ne UI 選卡，不自創。',audience:['omi'],scope:'video',keywords:['字卡','UI','規劃'],prompt:'盤點這支影片需要的 O-Ne 字卡。依時間順序分必做、推薦、不需要，從現有正式 UI 選擇卡型，列完整文字、圖片需求、出現時機與需要查證的資訊。'},
+    {id:'explanation',title:'累積說明卡',desc:'把故事拆成逐幕累積圖文。',audience:['omi'],scope:'video',keywords:['累積卡','說明卡','逐幕'],prompt:'把這段內容做成 O-Ne 累積說明卡。右側每幕只增加一個可掃讀重點，左側圖片同步累積或變化；如果不看旁白也要能從圖像理解故事。請給逐幕文字、左圖構成與必要素材。'},
+    {id:'thumb-diagnosis',title:'縮圖診斷',desc:'檢查 CTR 動機、資訊重複與手機／TV 可讀性。',audience:['omi'],scope:'video',keywords:['縮圖','診斷','CTR'],prompt:'診斷這支影片目前縮圖。檢查與標題是否重複、第一眼主體、點擊理由、手機小尺寸、TV 遠距、人物表情、商品或地標可讀性，以及是否有誤導；最後給保留、刪除、加強。'},
+    {id:'thumb-design',title:'設計縮圖',desc:'依真實內容做 3 個方向，最後選一個首選。',audience:['omi'],scope:'video',keywords:['縮圖','封面','設計'],prompt:'依這支影片真實內容設計 3 組 YouTube 縮圖方向。每組給主字、人物位置與表情、核心畫面、商品或地標安排與點擊理由；最後只選一個首選，並遵守 O-Ne 正式品牌框與安全區。'},
+    {id:'youtube-pack',title:'YouTube 上架包',desc:'標題、說明、Hashtag、Tags、留言與必要多語。',audience:['omi'],scope:'video',keywords:['YouTube','SEO','上架','文案'],prompt:'幫我做這支影片完整 YouTube 上架包。先完成繁中標題、說明、章節、公開 Hashtags、後台 Tags、置頂留言與內部上架設定；繁中確認後再依本片啟用語言做自然在地化。'},
+    {id:'final-qc',title:'成片 QC',desc:'檢查實際成片的故事、聲畫、字幕與技術。',audience:['niete'],scope:'video',keywords:['成片','QC','字幕','黑格'],prompt:'對這支確定要交付的成片做完整 QC。請從頭到尾檢查故事鉤子與答案、聲畫對應、直式或橫式構圖、字幕同步、音訊、黑格、錯夾、短鏡頭、freeze 候選與完整解碼；每項分 PASS、FAIL 或未驗證。'},
+    {id:'subtitle-correct',title:'校正字幕',desc:'繁中錯字、數字單位、時間碼與斷行。',audience:['niete'],scope:'video',keywords:['字幕','校正','SRT'],prompt:'校正這支影片的繁中字幕。保留正確時間碼，修正錯字、口誤標註、數字單位、標點與語意斷行；時間與價錢用數字表示，完成後做 SRT 結構與同步檢查。'},
+    {id:'multi-subtitles',title:'多語字幕',desc:'依繁中主版自然在地化，不做逐字機翻。',audience:['all'],scope:'video',keywords:['多語','字幕','英文','日文','韓文'],prompt:'用最新版繁中字幕作為文字與時間碼主版，依本片啟用語言製作自然在地化字幕，不逐字翻譯；完成跨語言段數、時間碼、最多兩行與文化語意 QA。'},
+    {id:'find-footage',title:'找畫面／素材',desc:'從專案素材找指定畫面、照片、字卡或參考檔。',audience:['niete'],scope:'video',keywords:['找畫面','找素材','照片','素材'],prompt:'在這個影片專案的正式素材範圍內幫我找需要的畫面或檔案。請優先搜尋 02_素材與本片既有輸出，列出名稱、位置、用途與是否可直接使用；不要建立平行素材庫。'},
+    {id:'progress',title:'目前做到哪',desc:'用正式主資料整理已完成、進行中、卡點與下一步。',audience:['niete'],scope:'video',keywords:['進度','目前做到哪','下一步'],prompt:'告訴我這支影片現在做到哪裡。先讀正式企劃卡與營運主資料，只整理現行已完成、進行中、卡點、待核准與下一個最小動作，不要被歷史施工紀錄覆蓋。'},
+    {id:'organize-folder',title:'整理這個資料夾',desc:'找重複、過時、錯位置與可封存項目，先不刪。',audience:['all'],scope:'system',keywords:['整理','資料夾','重複','封存'],prompt:'整理我指定的 O-Ne 資料夾。先盤點內容，找重複、過時版本、錯位置、命名不一致與可封存候選；以正式主資料與現行規則判斷，先提出整理方案，不刪除、不搬移、不覆蓋。'},
+    {id:'tool-check',title:'工具檢查',desc:'檢查 O-Ne Tools 的功能、版本、入口與回歸風險。',audience:['all'],scope:'system',keywords:['工具','檢查','QA','O-Ne Tools'],prompt:'檢查 O-Ne Tools 指定工具或整體工具狀況。先核對正式 Registry、版本與入口，再檢查功能、桌面／手機操作、輸出、專案存載、回歸與隱私邊界；只把有證據通過的項目標 PASS。'}
+  ];
+
+  window.ONE_CC_V1={
+    version:'V1.0 CANDIDATE',
+    designRevision:'FIND_FILES_PROMPTS_V1',
+    projects:PROJECTS,
+    shared:SHARED,
+    aiActions:AI_ACTIONS,
+    linkFields:[['root','母專案'],['brief','影片總控'],['p01','企劃'],['p02','素材'],['p03','長片'],['p04','Shorts'],['thumb','縮圖']]
+  };
+})();

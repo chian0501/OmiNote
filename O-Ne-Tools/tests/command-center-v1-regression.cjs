@@ -1,0 +1,24 @@
+const fs=require('fs'),vm=require('vm'),path=require('path');
+const root=path.resolve(__dirname,'..');
+const data=fs.readFileSync(path.join(root,'command-center-v1-data.js'),'utf8');
+const html=fs.readFileSync(path.join(root,'command-center.html'),'utf8');
+const css=fs.readFileSync(path.join(root,'command-center-v1.css'),'utf8');
+const app=fs.readFileSync(path.join(root,'command-center-v1.js'),'utf8');
+const registry=JSON.parse(fs.readFileSync(path.join(root,'one-tools-registry-v1.json'),'utf8'));
+function ok(v,m){if(!v)throw new Error(m)}
+const box={window:{}};vm.createContext(box);vm.runInContext(data,box);const D=box.window.ONE_CC_V1;
+ok(D.projects.length===9,'project count');
+ok(D.shared.length===25,'shared count');
+ok(D.aiActions.length===18,'AI action count');
+const linkCount=D.projects.reduce((n,p)=>n+D.linkFields.filter(([k])=>Boolean(p.links[k])).length,0);ok(linkCount===61,'project shortcut count');
+ok(registry.tools.filter(t=>t.status==='ready'&&t.href).length===13,'Maker Tools ready count');
+const usj=D.projects.find(p=>p.id==='26JP-01-1');ok(!usj.links.brief&&usj.exceptions.brief==='已結案・不補建','USJ historical exception');
+const d56=D.projects.find(p=>p.id==='26JP-01-4');ok(!d56.links.thumb&&d56.exceptions.thumb==='尚未建立','D5D6 thumbnail exception');
+ok(html.includes('data-tab="find"')&&html.includes('data-tab="tools"')&&html.includes('data-tab="ai"')&&html.includes('data-tab="manage"'),'four tabs');
+ok(html.indexOf('data-tab="find"')<html.indexOf('data-tab="tools"'),'find is first tab');
+ok(css.includes('@media(max-width:560px)'),'mobile CSS');
+ok(app.includes("one.cc.v1.pinned")&&app.includes("one.cc.v1.recent")&&app.includes('localStorage'),'local storage only pins/recent');
+ok(app.includes("fetch('./one-tools-registry-v1.json"),'canonical Maker Tools registry fetch');
+const all=[html,data,css,app].join('\n');
+for(const bad of ['1P7NnzUaPWvJNxY-Fma003KrsPMNFnLik5jAfCOdmBVY','app.notion.com','API_KEY','SECRET_KEY','Bearer ','BEGIN PRIVATE KEY','client_secret','refresh_token','publish_gate=','SHORTS_STORY_LOCK_GATE','VERTICAL_REFRAME_GATE']) ok(!all.includes(bad),'privacy token '+bad);
+console.log(JSON.stringify({projects:D.projects.length,links:linkCount,shared:D.shared.length,ai:D.aiActions.length,makerTools:13,privacy:'PASS'},null,2));
