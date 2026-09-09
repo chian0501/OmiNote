@@ -143,6 +143,34 @@
     if (!state.dialog.open) state.dialog.showModal();
     state.fileTabs[key].focus();
   }
+  function projectAction(action) {
+    var panel = document.querySelector('[data-one-project-package-ui]');
+    return panel && panel.querySelector('[data-action="' + action + '"]');
+  }
+  function makeProjectQuickButton(state, action, text) {
+    var className = state.config.react ? 'export-button outline' : 'one-workspace-export-button secondary';
+    var proxy;
+    proxy = button(text, className, function () {
+      var target = projectAction(action);
+      if (target) { target.click(); return; }
+      state.projectFeedback.textContent = '專案功能仍在載入，請稍後再試。';
+      openFiles(state, 'project', proxy);
+    });
+    proxy.setAttribute('data-one-project-quick', action === 'export-package' ? 'download' : 'upload');
+    proxy.setAttribute('aria-label', text + '（完整 project.zip）');
+    proxy.setAttribute('title', text + '完整 project.zip');
+    return proxy;
+  }
+  function ensureProjectQuickActions(state) {
+    if (!projectAction('export-package') || !projectAction('import-package')) return false;
+    var exports = state.config.react ?
+      (state.preview.querySelector('.export-actions') || state.app.querySelector('.export-actions')) :
+      state.preview.querySelector('.one-workspace-export-actions');
+    if (!exports) return false;
+    if (!exports.querySelector('[data-one-project-quick="download"]')) exports.appendChild(makeProjectQuickButton(state, 'export-package', '下載專案'));
+    if (!exports.querySelector('[data-one-project-quick="upload"]')) exports.appendChild(makeProjectQuickButton(state, 'import-package', '載入專案'));
+    return true;
+  }
 
   function makeHeader(state) {
     var header = element('header', 'one-workspace-header');
@@ -364,6 +392,7 @@
     });
     if (exports.children.length) footer.appendChild(exports);
     if (!state.config.react) state.preview.appendChild(footer);
+    ensureProjectQuickActions(state);
     if (global.ResizeObserver && state.stage) {
       state.resizeObserver = new ResizeObserver(function () { fitPreview(state); });
       state.resizeObserver.observe(state.stage);
@@ -463,6 +492,7 @@
   function refresh() {
     if (!instance) { mount(); return; }
     routeUtilities(instance);
+    ensureProjectQuickActions(instance);
     if (instance.updateMode) instance.updateMode();
     if (instance.syncFolds) instance.syncFolds();
   }
@@ -494,6 +524,7 @@
     preparePreview(state);
     moveNativeFiles(state);
     routeUtilities(state);
+    ensureProjectQuickActions(state);
     if (!config.react) hideEmptyContainers(app);
     document.addEventListener('change', function () { if (state.updateMode) state.updateMode(); });
     document.addEventListener('keydown', function (event) {
@@ -512,7 +543,7 @@
     observer = new MutationObserver(schedule);
     observer.observe(document.body, { childList: true, subtree: true });
   }
-  global.ONECardWorkspace = { version: '1.5.0', refresh: refresh };
+  global.ONECardWorkspace = { version: '1.6.1', refresh: refresh };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
   else init();
 })(window);
