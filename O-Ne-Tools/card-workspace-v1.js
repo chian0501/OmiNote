@@ -148,8 +148,7 @@
     return panel && panel.querySelector('[data-action="' + action + '"]');
   }
   function makeProjectQuickButton(state, action, text) {
-    var template = state.config.react && (state.preview.querySelector('.export-actions .export-button.primary,.export-actions .export-button') || state.app.querySelector('.export-actions .export-button.primary,.export-actions .export-button'));
-    var className = template ? template.className : 'one-workspace-export-button secondary';
+    var className = state.config.react ? 'export-button outline' : 'one-workspace-export-button secondary';
     var proxy;
     proxy = button(text, className, function () {
       var target = projectAction(action);
@@ -157,10 +156,6 @@
       state.projectFeedback.textContent = '專案功能仍在載入，請稍後再試。';
       openFiles(state, 'project', proxy);
     });
-    if (state.config.react) {
-      proxy.classList.remove('primary');
-      proxy.classList.add('secondary');
-    }
     proxy.setAttribute('data-one-project-quick', action === 'export-package' ? 'download' : 'upload');
     proxy.setAttribute('aria-label', text + '（完整 project.zip）');
     proxy.setAttribute('title', text + '完整 project.zip');
@@ -548,7 +543,7 @@
     observer = new MutationObserver(schedule);
     observer.observe(document.body, { childList: true, subtree: true });
   }
-  global.ONECardWorkspace = { version: '1.6.0', refresh: refresh };
+  global.ONECardWorkspace = { version: '1.6.1', refresh: refresh };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
   else init();
 })(window);
