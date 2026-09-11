@@ -1,0 +1,94 @@
+/* Application chrome only; card artwork remains in the measured Canvas renderer. */
+body.one-workspace-v2 .app-shell{padding:12px 18px;max-width:1920px;margin:auto}
+body.one-workspace-v2 .app-header{min-height:40px;padding:0 2px 8px;margin-bottom:0}
+body.one-workspace-v2 .app-header h1{font-size:20px}
+body.one-workspace-v2 .app-header .title-block p,body.one-workspace-v2 .app-header .status,body.one-workspace-v2 .app-header .badge{display:none}
+#oneProjectBar{display:flex;align-items:center;gap:10px;min-height:48px;padding:8px 12px;background:#101b25;border:1px solid #344b5b;border-radius:9px;position:sticky;top:0;z-index:35;margin-bottom:12px;font-size:13px}
+#oneProjectBar>strong{white-space:nowrap}#oneProjectBar>strong small{font-size:11px;color:#8fded9;margin-left:8px}#oneSaveState{margin-left:auto;font-size:11px;color:#93aaa8}
+#oneProjectBar button,#oneProjectBar summary,#oneReminderTools button{border:1px solid #375463;color:#ddefef;background:#152732;border-radius:6px;min-height:32px;padding:6px 10px;cursor:pointer;font:inherit;white-space:nowrap}
+#oneProjectBar details{position:relative}#oneProjectBar summary{list-style:none}#oneProjectBar summary::-webkit-details-marker{display:none}
+#oneProjectBar .one-popover{position:absolute;right:0;top:calc(100% + 8px);width:min(820px,88vw);max-height:72vh;overflow:auto;padding:14px;border:1px solid #3b5666;border-radius:10px;background:#0c1721;box-shadow:0 15px 45px #000a;z-index:40}
+#oneHelpMenu .one-popover{width:340px;line-height:1.8;white-space:normal}
+#oneProjectFiles .legacy-save-tools{border:0;padding:0;margin:0}#oneProjectFiles .save-file-actions,#oneProjectFiles .one-project-package__row,#oneProjectFiles .one-project-package__actions{display:flex!important;flex-wrap:wrap;gap:7px}
+#oneProjectFiles .one-edit-backup__note,#oneProjectFiles .project-file-note{font-size:11px}
+#oneProjectFiles #resetAll{margin-left:auto;border-color:#8c5c4b;color:#ffd0b6}
+body.one-workspace-v2 .workspace{grid-template-columns:300px minmax(0,1fr)!important;align-items:start;gap:12px}
+body.one-workspace-v2 .editor-panel{position:sticky;top:68px;height:calc(100dvh - 125px);min-height:0}
+body.one-workspace-v2 .editor-head{padding:10px 12px;min-height:0}
+body.one-workspace-v2 .editor-head>strong{font-size:14px}
+body.one-workspace-v2 .editor-scroll{padding-bottom:10px}
+body.one-workspace-v2 .mode-strip{padding:10px 12px}
+body.one-workspace-v2 .step-heading{margin-bottom:8px}
+body.one-workspace-v2 .mode-buttons{display:flex;flex-direction:column;gap:6px}
+body.one-workspace-v2 .mode-btn{display:flex;align-items:center;justify-content:space-between;gap:5px;padding:8px;min-height:36px}
+body.one-workspace-v2 .mode-btn b{font-size:12px}body.one-workspace-v2 .mode-btn span{font-size:10px;white-space:nowrap}
+body.one-workspace-v2 #contentTemplatePicker .ui-fold-summary{display:flex;align-items:center;flex-wrap:wrap;padding:8px;gap:5px}
+body.one-workspace-v2 #contentTemplatePicker .ui-fold-summary-copy{min-width:0;flex:1}
+body.one-workspace-v2 #contentTemplatePicker .ui-fold-summary-copy strong{font-size:11px}
+body.one-workspace-v2 #contentTemplatePicker .ui-fold-help{margin:0;padding:0;font-size:9px}
+body.one-workspace-v2 .template-buttons{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
+body.one-workspace-v2 .template-btn{min-width:0!important;min-height:34px!important;height:auto;padding:5px 2px!important;font-size:10px!important;line-height:1.4}
+body.one-workspace-v2 .template-presets{margin-top:7px}
+body.one-workspace-v2 .one-replaced,body.one-workspace-v2 .save-dock[hidden],body.one-workspace-v2 #stylePreset,body.one-workspace-v2 #fontSizeSelect{display:none!important}
+body.one-workspace-v2 .word-page-wrap{padding:6px 10px}
+body.one-workspace-v2 .one-overlay-controls{padding:7px 10px;gap:8px;font-size:12px}
+body.one-workspace-v2 #oneOverlayStatus{font-size:11px}
+body.one-workspace-v2 #oneOverlayDone,body.one-workspace-v2 #oneOverlayFallback{padding:5px 8px;font-size:11px}
+body.one-workspace-v2 #wordToolbar{margin:0!important;padding:8px!important;border:1px solid #334b5d;border-radius:8px}
+body.one-workspace-v2 #wordToolbar .toolbar-heading{margin:0 0 6px;padding:0 0 5px;align-items:center}
+body.one-workspace-v2 #wordToolbar .toolbar-heading .toolbar-history{margin-left:auto}
+body.one-workspace-v2 .one-format-row{display:flex;align-items:center;gap:5px;flex-wrap:nowrap;width:100%;min-width:0}
+body.one-workspace-v2 .one-format-row .tool-btn{height:32px!important;min-width:30px!important;width:30px;padding:0 5px!important;font-size:12px!important;flex:none}
+body.one-workspace-v2 .font-size-current{height:32px;min-width:72px;padding:0 8px;font-size:12px}
+body.one-workspace-v2 .toolbar-swatches{display:flex;gap:4px;flex:none}
+body.one-workspace-v2 .toolbar-swatch{width:19px!important;height:28px!important;min-width:19px!important;padding:0!important}
+body.one-workspace-v2 .format-painter-group{margin-left:auto;gap:4px;display:flex;flex:none}
+body.one-workspace-v2 .format-painter-group .tool-btn{width:auto;min-width:58px!important;font-size:11px!important}
+body.one-workspace-v2 .preview-stack{gap:8px;position:sticky;top:68px;min-width:0}
+body.one-workspace-v2 .preview-toolbar{min-height:38px;padding:8px 12px}
+body.one-workspace-v2 .canvas-stage{padding:14px;min-height:0}
+body.one-workspace-v2 .preview-canvas{width:100%;max-width:100%;max-height:calc(100dvh - 360px);object-fit:contain}
+/* Do not use object-fit's letterboxed element box for overlay coordinates. Canvas is sized by JS. */
+body.one-workspace-v2 .preview-canvas{max-height:none;width:100%;height:auto}
+body.one-workspace-v2 .export-bar{padding:8px 12px}
+body.one-workspace-v2 .export-button{min-height:38px}
+body.one-workspace-v2 .export-bar p{margin:0 0 6px;font-size:10px}
+body.one-workspace-v2 .sequence-strip{margin:0;padding:10px;border:1px solid #385260;border-radius:8px;background:#0d1922;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+body.one-workspace-v2 .sequence-main{flex:1;min-width:260px}
+body.one-workspace-v2 .sequence-image-controls{width:100%;margin:0;padding-top:6px}
+body.one-workspace-v2 #openImageDrawer{margin-left:auto;font-size:11px;min-height:34px}
+body.one-workspace-v2 #oneOverlayOutline{margin:4px 0;padding:8px}
+body.one-workspace-v2 .one-overlay-list{gap:6px}
+.one-structure-row{display:flex;align-items:center;gap:4px;min-width:0}
+.one-structure-row>[data-overlay-block]{flex:1;min-width:0;font-size:11px;padding:7px 5px}
+.one-structure-row>input[type=checkbox]{width:15px;height:15px;padding:0;margin:0;flex:none;accent-color:#29a6a7}
+.one-structure-row>.one-structure-marker{width:48px;height:28px;min-width:0;flex:none;font-size:11px;padding:0 4px;border-color:#29a6a7}
+.one-structure-actions{display:flex;gap:2px}.one-structure-actions>button{padding:3px!important;width:23px;height:28px;font-size:12px}
+#oneReminderTools{font-size:12px;margin:8px 0;padding:10px;border:1px solid #36505e;border-radius:7px;background:#111f27}
+#oneReminderTools input[type=checkbox]{width:16px;height:16px;margin:0 6px 0 0;accent-color:#29a6a7;vertical-align:middle}
+#oneReminderDetail{display:grid;gap:8px;margin-top:10px}#oneReminderDetail[hidden]{display:none}#oneReminderDetail small{font-size:10px;color:#98adb5;line-height:1.5}
+#oneReminderStyle{display:flex;gap:8px}#oneReminderStyle label{min-width:0;flex:1}
+body.one-workspace-v2 .edit-block{align-items:center!important}
+body.one-workspace-v2 .marker-control{align-self:center;align-items:center;padding-top:0!important;margin:0!important;min-width:0}
+body.one-workspace-v2 .marker-control>input[type=checkbox]{margin:0!important;flex:none;align-self:center}
+body.one-workspace-v2 .edit-block:not(.has-marker) .marker-control{border-right:0;padding-right:0!important}
+body.one-workspace-v2 .edit-block .block-actions{align-self:center}
+body.one-workspace-v2 .one-reminder-block{border-color:#29a6a7;background:#112529}
+body.one-workspace-v2 .one-reminder-block>.marker-control{display:none}
+body.one-workspace-v2 .image-drawer{width:min(1540px,96vw);height:min(90dvh,980px)}
+.one-image-grid{display:grid;grid-template-columns:minmax(280px,44%) minmax(0,1fr);flex:1;min-height:0;overflow:hidden}
+.one-image-grid>.drawer-scroll{min-height:0;overflow-y:auto;padding:12px}
+.one-image-grid>.one-image-result{margin:12px 12px 12px 0;align-self:start;min-width:0;max-height:100%;overflow:auto}
+.one-image-result .image-live-canvas{max-height:none;width:100%;height:auto}
+.one-workspace-v2 .one-dragover{outline:3px solid #29a6a7;outline-offset:3px}
+body.one-workspace-v2:not(.one-overlay-pilot) .workspace{grid-template-columns:minmax(460px,1fr) minmax(0,1fr)!important}
+body.one-workspace-v2:not(.one-overlay-pilot) .editor-panel{width:auto}
+@media(min-width:1500px){body.one-workspace-v2 .workspace{grid-template-columns:350px minmax(0,1fr)!important}body.one-workspace-v2 .template-btn{font-size:11px!important}}
+@media(max-width:1100px){body.one-workspace-v2 .workspace{grid-template-columns:270px minmax(0,1fr)!important}.one-format-row{flex-wrap:wrap!important}body.one-workspace-v2 .format-painter-group{margin-left:0}#oneProjectBar>strong{display:none}}
+@media(max-width:760px){body.one-workspace-v2 .workspace,body.one-workspace-v2:not(.one-overlay-pilot) .workspace{display:flex;flex-direction:column}body.one-workspace-v2 .editor-panel,body.one-workspace-v2 .preview-stack{position:static;width:100%;height:auto}body.one-workspace-v2 .editor-scroll{max-height:320px}#oneProjectBar{flex-wrap:wrap;position:relative}#oneSaveState{font-size:10px;margin-left:0;flex:1}.one-image-grid{grid-template-columns:1fr;overflow:auto}.one-image-grid>.drawer-scroll{overflow:visible}.one-image-grid>.one-image-result{margin:12px}body.one-workspace-v2 .template-btn{font-size:12px!important}.one-structure-row>[data-overlay-block]{font-size:13px}}
+body.one-workspace-v2 .step-heading small,body.one-workspace-v2 .toolbar-heading small,body.one-workspace-v2 .one-after-edit-dock[hidden]{display:none!important}
+body.one-workspace-v2 #contentTemplatePicker .ui-fold-summary{flex-wrap:nowrap;gap:5px}
+body.one-workspace-v2 #contentTemplatePicker .ui-fold-summary-copy{flex-wrap:nowrap;gap:5px}
+body.one-workspace-v2 #contentTemplatePicker .ui-fold-summary-copy strong{white-space:nowrap}
+body.one-workspace-v2 #contentTemplatePicker .ui-fold-help{white-space:nowrap;max-width:95px;overflow:hidden}
+body.one-workspace-v2 .mode-strip .step-heading{display:none}
