@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="color-scheme" content="dark">
-<title>O-Ne 工作台 V1.1 Candidate</title>
+<title>O-Ne 工作台 V1.2 READY</title>
 <link rel="stylesheet" href="./command-center-v1.css?v=100rc1">
 <link rel="stylesheet" href="./command-center-skills-v1.css?v=110c1">
 </head>
@@ -16,15 +16,14 @@
       <h1>O-Ne 工作台</h1>
       <p>找專案、找素材、開製作工具、查看目前可用的 ChatGPT Skills。Google Drive 仍是正式主資料，這一頁只做導航與工作入口。</p>
     </div>
-    <div class="hero-badges"><span class="pill candidate">V1.1 CANDIDATE</span><span class="pill">SKILLS_CLASSIFIED_V1</span><span class="pill">唯讀</span></div>
+    <div class="hero-badges"><span class="pill">V1.2 READY</span><span class="pill">FILE_ORGANIZER_NESTED_V1</span><span class="pill">唯讀</span></div>
   </header>
 
-  <nav class="tabs tabs-five" aria-label="Command Center 主功能">
+  <nav class="tabs" aria-label="Command Center 主功能">
     <button class="tab active" data-tab="find">📁 專案與素材</button>
     <button class="tab" data-tab="tools">🛠 製作工具</button>
     <button class="tab" data-tab="skills">🧩 ChatGPT Skills</button>
     <button class="tab" data-tab="ai">✨ AI 常用工作</button>
-    <button class="tab" data-tab="manage">⚙️ 進階管理</button>
   </nav>
 
   <main>
@@ -37,6 +36,19 @@
         <div class="card" id="projectDetail"></div>
       </div>
       <div class="subsection"><div class="section-head" style="margin-bottom:10px"><div><h2 style="font-size:18px">共用素材</h2><p>品牌、角色、正式 UI、字型、音樂音效、授權與常用規範。</p></div><span class="pill" id="assetCount">25 / 25</span></div><div class="asset-grid" id="assetGrid"></div></div>
+
+      <details class="card subsection file-organizer" id="fileOrganizer">
+        <summary><strong>📦 檔案整理</strong>｜檔案放哪裡／怎麼命名</summary>
+        <div style="margin-top:16px">
+          <div class="section-head"><div><h2 style="font-size:18px">檔案整理</h2><p>低頻工具收在專案與素材裡。只提供位置與命名建議，不搬檔、不回寫。</p></div><span class="pill">READ ONLY</span></div>
+          <div class="manage-grid"><select class="field" id="manageProject" style="max-width:420px"></select></div>
+          <div class="manage-layout">
+            <article class="card"><h3 style="margin-top:0">這個檔案放哪裡？</h3><label class="label" for="placeType">檔案類型</label><select class="field" id="placeType"><option value="card">片中字卡／動畫</option><option value="music">本片音樂音效</option><option value="edit">剪輯工程</option><option value="review">毛片／審片／Pilot／RC</option><option value="export">長片正式出帶</option><option value="cover">縮圖</option><option value="metadata">長片上架文案</option><option value="cc">長片字幕 CC</option><option value="shorts">Shorts 成品／文案／字幕</option></select><div class="result" id="placeResult"></div></article>
+            <article class="card"><h3 style="margin-top:0">命名檢查</h3><div class="form-grid"><div><label class="label">類型</label><input class="field" id="nameType" value="RatingCard"></div><div><label class="label">主題</label><input class="field" id="nameTopic" value="燒肉"></div><div><label class="label">版本</label><input class="field" id="nameVer" value="V1"></div><div><label class="label">狀態</label><input class="field" id="nameStatus" value="RC"></div></div><div class="result" id="nameResult"></div></article>
+          </div>
+          <div class="notice" style="margin-top:14px;margin-bottom:0"><strong>唯讀邊界：</strong>未選專案不猜下一個 ID；沒有正式縮圖入口就顯示「尚未建立」；歷史結案專案不補造影片總控。所有登入、權限、API、Webhook、排程、部署與外部同步都不在這版執行。</div>
+        </div>
+      </details>
     </section>
 
     <section class="screen" id="screen-tools">
@@ -87,19 +99,9 @@
       <div class="ai-grid" id="aiGrid"></div>
       <div class="prompt-box" id="promptBox" hidden><div class="prompt-meta"><b id="promptTitle">AI 指令</b><button class="button secondary" id="copyPrompt">複製指令</button></div><textarea id="promptText" readonly></textarea></div>
     </section>
-
-    <section class="screen" id="screen-manage">
-      <div class="section-head"><div><h2>進階管理</h2><p>低頻治理集中在這裡。只提供位置與命名建議，不搬檔、不回寫。</p></div><span class="pill">READ ONLY</span></div>
-      <div class="manage-grid"><select class="field" id="manageProject" style="max-width:420px"></select></div>
-      <div class="manage-layout">
-        <article class="card"><h3 style="margin-top:0">這個檔案放哪裡？</h3><label class="label" for="placeType">檔案類型</label><select class="field" id="placeType"><option value="card">片中字卡／動畫</option><option value="music">本片音樂音效</option><option value="edit">剪輯工程</option><option value="review">毛片／審片／Pilot／RC</option><option value="export">長片正式出帶</option><option value="cover">縮圖</option><option value="metadata">長片上架文案</option><option value="cc">長片字幕 CC</option><option value="shorts">Shorts 成品／文案／字幕</option></select><div class="result" id="placeResult"></div></article>
-        <article class="card"><h3 style="margin-top:0">命名檢查</h3><div class="form-grid"><div><label class="label">類型</label><input class="field" id="nameType" value="RatingCard"></div><div><label class="label">主題</label><input class="field" id="nameTopic" value="燒肉"></div><div><label class="label">版本</label><input class="field" id="nameVer" value="V1"></div><div><label class="label">狀態</label><input class="field" id="nameStatus" value="RC"></div></div><div class="result" id="nameResult"></div></article>
-      </div>
-      <div class="notice" style="margin-top:14px"><strong>候選版邊界：</strong>未選專案不猜下一個 ID；沒有正式縮圖入口就顯示「尚未建立」；歷史結案專案不補造影片總控。所有登入、權限、API、Webhook、排程、部署與外部同步都不在這版執行。</div>
-    </section>
   </main>
 
-  <footer class="footer">V1.1 Candidate｜Google Drive 仍是正式主資料｜最近使用、釘選與目前專案只保存在這台瀏覽器 localStorage。</footer>
+  <footer class="footer">V1.2 READY｜Google Drive 仍是正式主資料｜最近使用、釘選與目前專案只保存在這台瀏覽器 localStorage。</footer>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script src="./command-center-v1-data.js?v=100rc1"></script>

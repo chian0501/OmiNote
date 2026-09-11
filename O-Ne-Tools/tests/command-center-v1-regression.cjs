@@ -22,8 +22,14 @@ const linkCount=D.projects.reduce((n,p)=>n+D.linkFields.filter(([k])=>Boolean(p.
 ok(registry.tools.filter(t=>t.status==='ready'&&t.href).length===13,'Maker Tools ready count');
 const usj=D.projects.find(p=>p.id==='26JP-01-1');ok(!usj.links.brief&&usj.exceptions.brief==='已結案・不補建','USJ historical exception');
 const d56=D.projects.find(p=>p.id==='26JP-01-4');ok(!d56.links.thumb&&d56.exceptions.thumb==='尚未建立','D5D6 thumbnail exception');
-for(const tab of ['find','tools','skills','ai','manage'])ok(html.includes(`data-tab="${tab}"`),'missing tab '+tab);
+for(const tab of ['find','tools','skills','ai'])ok(html.includes(`data-tab="${tab}"`),'missing tab '+tab);
+ok(!html.includes('data-tab="manage"'),'advanced management must not remain a top-level tab');
+ok(!html.includes('id="screen-manage"'),'advanced management screen must be removed');
 ok(html.indexOf('data-tab="find"')<html.indexOf('data-tab="tools"'),'find is first tab');
+ok((html.match(/data-tab="/g)||[]).length===4,'top-level tab count must be four');
+ok(html.includes('id="fileOrganizer"')&&html.includes('📦 檔案整理'),'file organizer nested under projects/assets');
+ok(html.indexOf('id="fileOrganizer"')>html.indexOf('id="assetGrid"')&&html.indexOf('id="fileOrganizer"')<html.indexOf('id="screen-tools"'),'file organizer must live inside find screen after shared assets');
+ok(html.includes('id="manageProject"')&&html.includes('id="placeType"')&&html.includes('id="nameResult"'),'placement and naming controls preserved');
 ok(html.includes('AI 常用工作')&&html.includes('ChatGPT Skills'),'AI shortcuts and skills must be visibly distinct');
 ok(html.includes('command-center-skills-v1-data.js')&&html.includes('command-center-skills-v1.js'),'skills assets wired');
 ok(css.includes('@media(max-width:560px)')&&skillsCss.includes('@media(max-width:560px)'),'mobile CSS');
@@ -33,4 +39,4 @@ ok(skillsUi.includes('data-copy-skill')&&skillsUi.includes('navigator.clipboard'
 const ids=new Set(S.userSkills.map(x=>x.id));ok(ids.size===9,'skill ids unique');
 const all=[html,data,skillsData,skillsUi,skillsCss,css,app].join('\n');
 for(const bad of ['1P7NnzUaPWvJNxY-Fma003KrsPMNFnLik5jAfCOdmBVY','app.notion.com','API_KEY','SECRET_KEY','Bearer ','BEGIN PRIVATE KEY','client_secret','refresh_token','publish_gate=','SHORTS_STORY_LOCK_GATE','VERTICAL_REFRAME_GATE']) ok(!all.includes(bad),'privacy token '+bad);
-console.log(JSON.stringify({projects:D.projects.length,links:linkCount,shared:D.shared.length,ai:D.aiActions.length,skills:S.userSkills.length,skillCategories:S.categories.length,internalRoleSkills:31,makerTools:13,privacy:'PASS'},null,2));
+console.log(JSON.stringify({projects:D.projects.length,links:linkCount,shared:D.shared.length,ai:D.aiActions.length,skills:S.userSkills.length,skillCategories:S.categories.length,internalRoleSkills:31,makerTools:13,topTabs:4,fileOrganizer:'NESTED',privacy:'PASS'},null,2));
