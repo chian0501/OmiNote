@@ -4,30 +4,32 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="color-scheme" content="dark">
-<title>O-Ne Command Center V1.0 Candidate</title>
+<title>O-Ne 工作台 V1.1 Candidate</title>
 <link rel="stylesheet" href="./command-center-v1.css?v=100rc1">
+<link rel="stylesheet" href="./command-center-skills-v1.css?v=110c1">
 </head>
 <body>
 <div class="app">
   <header class="hero">
     <div>
       <div class="eyebrow">O-NE COMMAND CENTER</div>
-      <h1>先找得到，再開始做。</h1>
-      <p>找影片、素材、共用資產、Maker Tools 與 AI 常用工作都集中在同一頁。這是候選版，不會寫入 Drive、Dashboard 或任何平台。</p>
+      <h1>O-Ne 工作台</h1>
+      <p>找專案、找素材、開製作工具、查看目前可用的 ChatGPT Skills。Google Drive 仍是正式主資料，這一頁只做導航與工作入口。</p>
     </div>
-    <div class="hero-badges"><span class="pill candidate">V1.0 CANDIDATE</span><span class="pill">FIND_FILES_PROMPTS_V1</span><span class="pill">唯讀</span></div>
+    <div class="hero-badges"><span class="pill candidate">V1.1 CANDIDATE</span><span class="pill">SKILLS_CLASSIFIED_V1</span><span class="pill">唯讀</span></div>
   </header>
 
-  <nav class="tabs" aria-label="Command Center 主功能">
-    <button class="tab active" data-tab="find">📁 找檔</button>
+  <nav class="tabs tabs-five" aria-label="Command Center 主功能">
+    <button class="tab active" data-tab="find">📁 專案與素材</button>
     <button class="tab" data-tab="tools">🛠 製作工具</button>
-    <button class="tab" data-tab="ai">🤖 AI 助手</button>
-    <button class="tab" data-tab="manage">⚙️ 專案管理</button>
+    <button class="tab" data-tab="skills">🧩 ChatGPT Skills</button>
+    <button class="tab" data-tab="ai">✨ AI 常用工作</button>
+    <button class="tab" data-tab="manage">⚙️ 進階管理</button>
   </nav>
 
   <main>
     <section class="screen active" id="screen-find">
-      <div class="section-head"><div><h2>找檔</h2><p>選專案後，第二步就能直接開素材、長片、Shorts、縮圖或其他正式入口。</p></div><div class="stats"><div class="stat"><b id="projectStat">9</b><span>影片專案</span></div><div class="stat"><b id="linkStat">61</b><span>專案快捷</span></div><div class="stat"><b id="sharedStat">25</b><span>共用素材</span></div></div></div>
+      <div class="section-head"><div><h2>專案與素材</h2><p>選專案後，第二步就能直接開素材、長片、Shorts、縮圖或其他正式入口。</p></div><div class="stats"><div class="stat"><b id="projectStat">9</b><span>影片專案</span></div><div class="stat"><b id="linkStat">61</b><span>專案快捷</span></div><div class="stat"><b id="sharedStat">25</b><span>共用素材</span></div></div></div>
       <div class="searchbar"><input class="search" id="findSearch" type="search" placeholder="搜尋：3COINS、D6、郵輪、縮圖、Logo、音樂、SFX、授權…"><button class="soft" id="clearSearch">清除</button></div>
       <div class="quick-strip" id="quickStrip"></div>
       <div class="find-layout">
@@ -43,8 +45,43 @@
       <div class="tool-grid" id="toolGrid"><div class="empty">正在讀取 Maker Tools Registry…</div></div>
     </section>
 
+    <section class="screen" id="screen-skills">
+      <div class="section-head">
+        <div>
+          <h2>ChatGPT Skills</h2>
+          <p>只列目前帳號已安裝的 O-Ne Skills。這些是你可以直接叫的能力入口，不是 31 個內部角色技能。</p>
+        </div>
+        <span class="pill skill-installed-count" id="skillInstalledCount">9 / 9 已安裝</span>
+      </div>
+
+      <div class="notice skill-note">
+        <strong>最簡單的用法：</strong>直接在 ChatGPT 說你要做什麼即可。你不需要先選 ROLE 或記 R1-S03 之類的編號，系統會自己路由。
+      </div>
+
+      <div class="skill-toolbar">
+        <input class="search" id="skillSearch" type="search" placeholder="搜尋：腳本、反方總編、縮圖、角色、UI、字幕、發布、QC…">
+        <button class="filter active" data-skill-filter="all">全部 9</button>
+        <button class="filter" data-skill-filter="planning">企劃／剪輯</button>
+        <button class="filter" data-skill-filter="visual">視覺／包裝</button>
+        <button class="filter" data-skill-filter="publish">發布／多語</button>
+        <button class="filter" data-skill-filter="qc">成片／驗收</button>
+      </div>
+
+      <div id="skillGroups"></div>
+
+      <details class="skill-other card">
+        <summary>其他 Skill 狀態｜不是目前 9/9</summary>
+        <div id="skillOther"></div>
+      </details>
+
+      <details class="skill-other card">
+        <summary>內部 31 個角色技能｜不用手動選</summary>
+        <div id="internalRoleSummary"></div>
+      </details>
+    </section>
+
     <section class="screen" id="screen-ai">
-      <div class="section-head"><div><h2>AI 助手</h2><p>前台只講人話。影片型工作會自動帶入目前專案，不需要記角色或技能編號。</p></div><span class="pill" id="aiCount">18 / 18</span></div>
+      <div class="section-head"><div><h2>AI 常用工作</h2><p>這裡是工作捷徑，會幫你組好可複製指令；它不是 ChatGPT Skills 清單。</p></div><span class="pill" id="aiCount">18 / 18</span></div>
       <div class="notice"><strong id="aiContext">影片型 AI 工作需要先選一個專案。</strong><br>產生的是可複製指令，不會直接呼叫 API，也不會自動修改正式資料。</div>
       <div class="ai-toolbar"><select class="field" id="aiProject" style="max-width:360px"></select><input class="search" id="aiSearch" type="search" placeholder="搜尋：剪輯、縮圖、字卡、字幕、查證…" style="max-width:430px"><button class="filter active" data-audience="all">全部 18</button><button class="filter" data-audience="niete">涅特常用</button><button class="filter" data-audience="omi">Omi 常用</button></div>
       <div class="ai-grid" id="aiGrid"></div>
@@ -52,7 +89,7 @@
     </section>
 
     <section class="screen" id="screen-manage">
-      <div class="section-head"><div><h2>專案管理</h2><p>低頻治理集中在這裡。只提供位置與命名建議，不搬檔、不回寫。</p></div><span class="pill">READ ONLY</span></div>
+      <div class="section-head"><div><h2>進階管理</h2><p>低頻治理集中在這裡。只提供位置與命名建議，不搬檔、不回寫。</p></div><span class="pill">READ ONLY</span></div>
       <div class="manage-grid"><select class="field" id="manageProject" style="max-width:420px"></select></div>
       <div class="manage-layout">
         <article class="card"><h3 style="margin-top:0">這個檔案放哪裡？</h3><label class="label" for="placeType">檔案類型</label><select class="field" id="placeType"><option value="card">片中字卡／動畫</option><option value="music">本片音樂音效</option><option value="edit">剪輯工程</option><option value="review">毛片／審片／Pilot／RC</option><option value="export">長片正式出帶</option><option value="cover">縮圖</option><option value="metadata">長片上架文案</option><option value="cc">長片字幕 CC</option><option value="shorts">Shorts 成品／文案／字幕</option></select><div class="result" id="placeResult"></div></article>
@@ -62,10 +99,12 @@
     </section>
   </main>
 
-  <footer class="footer">Candidate only｜Google Drive 仍是正式主資料｜最近使用、釘選與目前專案只保存在這台瀏覽器 localStorage。</footer>
+  <footer class="footer">V1.1 Candidate｜Google Drive 仍是正式主資料｜最近使用、釘選與目前專案只保存在這台瀏覽器 localStorage。</footer>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script src="./command-center-v1-data.js?v=100rc1"></script>
 <script src="./command-center-v1.js?v=100rc1"></script>
+<script src="./command-center-skills-v1-data.js?v=110c1"></script>
+<script src="./command-center-skills-v1.js?v=110c1"></script>
 </body>
 </html>
