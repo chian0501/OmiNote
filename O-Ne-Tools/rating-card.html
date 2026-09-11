@@ -35,7 +35,8 @@
   <div class="hint">每列可選 0–5 分或文字結果；至少 1 項、最多 8 項。4 項為正式母版預設。</div>
 
   <div class="group-title"><span>價格與心得</span><span class="tag">06_RESULT_PANEL</span></div>
-  <div class="preset-grid"><div><label for="priceBadgePreset">價格徽章預設</label><select id="priceBadgePreset"><option value="$">$</option><option value="NT$">NT$</option><option value="¥">¥</option><option value="₩">₩</option><option value="€">€</option><option value="HK$">HK$</option><option value="免費">免費</option><option value="custom">自訂</option></select></div><div><label for="priceBadgeText">價格徽章自由輸入／修改</label><input id="priceBadgeText" maxlength="8" value="$"></div></div>
+  <div class="preset-grid"><div><label for="priceBadgePreset">金額標籤預設</label><select id="priceBadgePreset"><option value="金額">金額</option><option value="$">$</option><option value="NT$">NT$</option><option value="¥">¥</option><option value="₩">₩</option><option value="€">€</option><option value="HK$">HK$</option><option value="免費">免費</option><option value="custom">自訂</option></select></div><div><label for="priceBadgeText">金額標籤自由輸入／修改</label><input id="priceBadgeText" maxlength="8" value="金額"></div></div>
+  <div class="hint">一般情況固定使用「補給品鑑定」與「金額」；只有特殊情境才修改。</div>
   <div class="two"><div><label for="priceText">價格／份量（最多 2 行）</label><textarea id="priceText" rows="2">吃到飽一人
 5000日圓</textarea></div><div><label for="reviewText">心得（最多 2 行）</label><textarea id="reviewText" rows="2">上菜速度很快，90分鐘很夠用
 牛舌好吃</textarea></div></div>
@@ -56,7 +57,7 @@
 
   <div id="status" class="status loading">LOADING｜載入正式示例影像</div>
   <div class="buttons"><button id="download" disabled>輸出 1920×1080 PNG</button><button id="jsonBtn" class="secondary">輸出欄位 JSON</button><button id="reset" class="secondary">回復正式示例</button></div>
-  <div class="mini"><b class="lock">🔒 固定：</b>1920×1080、切角／外框、面板 80%、正式色彩與價格／心得資訊層級。<br><b>生成器可改：</b>1–8 列評分、分數／文字結果、價格徽章、標籤文字與字級、底圖、版面總寬、商品圖大小，以及左圖／右圖／左右雙圖／不顯示。正式 PSD 與 UI ID 不會被修改。</div>
+  <div class="mini"><b class="lock">🔒 固定：</b>1920×1080、切角／外框、面板 80%、正式色彩與價格／心得資訊層級。<br><b>一般固定：</b>上方標籤「補給品鑑定」、金額區標籤「金額」；只有特殊情境才修改。<br><b>生成器可改：</b>1–8 列評分、分數／文字結果、底圖、版面總寬、商品圖大小，以及左圖／右圖／左右雙圖／不顯示。正式 PSD 與 UI ID 不會被修改。</div>
 </div>
 <div class="panel"><div class="section-title">02｜正式母版即時預覽</div><div class="preview-wrap"><canvas id="c" width="1920" height="1080"></canvas></div></div>
 </div>
@@ -67,7 +68,7 @@ const VERSION='1.3.1',GENERATOR_VERSION='V1.3.1_20260826';
 const canvas=document.getElementById('c'),ctx=canvas.getContext('2d'),$=id=>document.getElementById(id);
 const C={panel:'rgba(31,23,19,.80)',cream:'#FDF3E7',white:'#FFFFFF',orange:'#FFBE37',teal:'#29A6A7',dark:'#3B170C',row:'rgba(67,58,53,.6745)',result:'rgba(67,58,53,.698)',track:'rgba(253,243,231,.22)',grade:'rgba(9,7,6,.094)'};
 const PANEL_Y=82,PANEL_H=795,IMAGE_Y=83,IMAGE_H=847,LAYOUT_GAP=24,MIN_PANEL_WIDTH=880;
-const defaults={tagText:'補給品鑑定',tagSize:'32',storeName:'燒肉力丸 道頓堀店',address:'地址：Osaka, Chuo Ward, Dotonbori, 1 Chome-9-1ベルスードビル 5F·6F',priceBadgeText:'$',priceText:'吃到飽一人\n5000日圓',reviewText:'上菜速度很快，90分鐘很夠用\n牛舌好吃',layoutWidth:'1856',bgScale:'1',bgX:'0',bgY:'0',productImageSize:'28',ratings:[{label:'味道',type:'score',value:'4.2'},{label:'CP 值',type:'score',value:'4.3'},{label:'排隊速度',type:'text',value:'5點無預約，約等20分鐘'},{label:'補血值',type:'score',value:'5.0'}]};
+const defaults={tagText:'補給品鑑定',tagSize:'32',storeName:'燒肉力丸 道頓堀店',address:'地址：Osaka, Chuo Ward, Dotonbori, 1 Chome-9-1ベルスードビル 5F·6F',priceBadgeText:'金額',priceText:'吃到飽一人\n5000日圓',reviewText:'上菜速度很快，90分鐘很夠用\n牛舌好吃',layoutWidth:'1856',bgScale:'1',bgX:'0',bgY:'0',productImageSize:'28',ratings:[{label:'味道',type:'score',value:'4.2'},{label:'CP 值',type:'score',value:'4.3'},{label:'排隊速度',type:'text',value:'5點無預約，約等20分鐘'},{label:'補血值',type:'score',value:'5.0'}]};
 let rowSerial=0,ratings=[],productPosition='right',ratingTextStyles={};
 const imageCrops={leftProduct:ONECardImageEditor.normalize(),rightProduct:ONECardImageEditor.normalize()};
 const imageState={bg:null,leftProduct:null,rightProduct:null},imageNames={leftProduct:'正式示例圖',rightProduct:'正式示例圖'},imageObjectUrls={bg:null,leftProduct:null,rightProduct:null},loaded={bg:false,leftProduct:false,rightProduct:false};
@@ -179,7 +180,7 @@ window.ONERatingTextStyle={describe(input){
   const rowHeight=Math.floor(Math.min(75,(294-(ratings.length-1)*(ratings.length>=7?4:ratings.length>=5?6:8))/ratings.length));
   const spec=row?[row[1]==='label'?(rowHeight>=65?28:rowHeight>=50?24:rowHeight>=40?21:18):(rowHeight>=65?34:rowHeight>=50?29:rowHeight>=40?24:20),14,Math.floor(Math.min(row[1]==='label'?36:40,rowHeight*.7))]:defaults[id];
   if(!spec)return null;const prior=JSON.parse(JSON.stringify(row?item.formats||{}:ratingTextStyles)),priorTag=$('tagSize').value;
-  return{kind:id==='storeName'?'title':'body',sizeLabel:'文字大小',size:ratingFontSize(id,spec[0]),min:spec[1],max:spec[2],colors:[],emphasis:false,update(p){if(p.size==null)return;const value={size:clamp(Number(p.size),spec[1],spec[2])};if(id==='tagText'){$('tagSize').value=value.size;syncTagSizeInput()}else if(row)item.formats={...item.formats,[row[1]]:value};else ratingTextStyles[id]=value;render()},restore(){if(row)item.formats=prior;else ratingTextStyles=prior;$('tagSize').value=priorTag;syncTagSizeInput();render()}};
+  return{kind:id==='storeName'?'title':'body',sizeLabel:'文字大小',size:ratingFontSize(id,spec[0]),min:spec[1],max:spec[2],colors:[],emphasis:false,update(p){if(p.size==null)return;const value={size:clamp(Number(p.size),spec[1],spec[2])};if(id==='tagText'){$('tagSize').value=value.size;syncTagSizeInput()}else if(row)item.formats={...item.formats,[row[1]]:value};else ratingTextStyles[id]=value;render()},restore(){if(row)item.formats=prior;else ratingTextStyles[id]=prior;$('tagSize').value=priorTag;syncTagSizeInput();render()}};
 }};
 for(const side of ['left','right']){const cap=side[0].toUpperCase()+side.slice(1);$('crop'+cap+'Product').onclick=()=>editProductCrop(side);const thumb=$(side+'ProductPreview');thumb.tabIndex=0;thumb.setAttribute('role','button');thumb.setAttribute('aria-label','編輯裁切：'+productImageLabel(side));thumb.onclick=()=>editProductCrop(side);thumb.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();editProductCrop(side)}}}
 ONEEditBackup.mount({id:'rating-card',generatorVersion:GENERATOR_VERSION,anchor:document.querySelector('.buttons'),imageNote:true,capture:ratingSnapshot,apply:applyRatingSnapshot,fromJSON:importRating});
