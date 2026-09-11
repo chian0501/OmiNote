@@ -1,0 +1,47 @@
+.tabs-five{grid-template-columns:repeat(5,minmax(0,1fr))}
+.skill-installed-count{border-color:#2b6f69;background:#153535;color:#98dfd9}
+.skill-note{border-color:#315f5d;background:#122c2d;color:#bfe3e0}
+.skill-note strong{color:#e9fffd}
+.skill-toolbar{display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin-bottom:18px}
+.skill-toolbar .search{max-width:520px}
+.skill-group{margin-top:20px}
+.skill-group-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-end;margin-bottom:10px}
+.skill-group-head h3{margin:0 0 4px;font-size:18px}
+.skill-group-head p{margin:0;color:var(--muted);font-size:13px;line-height:1.5}
+.skill-group-head>span{font-size:12px;color:#8fd4cf;font-weight:900;white-space:nowrap}
+.skill-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.skill-card{display:flex;flex-direction:column;min-width:0;border:1px solid var(--line);background:linear-gradient(180deg,#171e29,#121923);border-radius:15px;padding:15px}
+.skill-card-top{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.skill-status,.skill-audience{display:inline-flex;align-items:center;border-radius:999px;padding:4px 8px;font-size:10px;font-weight:900}
+.skill-status{background:#153535;color:#9fe0da}
+.skill-audience{background:#202a38;color:#c8d5e3}
+.skill-card h4{margin:9px 0 7px;font-size:17px;line-height:1.4}
+.skill-desc{margin:0;color:var(--muted);font-size:13px;line-height:1.6}
+.skill-when,.skill-say{margin-top:11px;padding:10px 11px;border-radius:10px;font-size:12px;line-height:1.6}
+.skill-when{background:#101720;border:1px solid #2c3745;color:#cbd5df}
+.skill-say{background:#201a0f;border:1px solid #5b4722;color:#f1d99e}
+.skill-say b{color:#ffe19a}
+.skill-say span{display:block;margin-top:3px;color:#f8edcf}
+.skill-actions{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-top:auto;padding-top:12px}
+.skill-route{font-size:12px;color:#9eabb9}
+.skill-route summary{cursor:pointer;color:#9bcfcd}
+.skill-route small{display:block;margin-top:6px;max-width:260px;line-height:1.5}
+.skill-other{margin-top:16px;padding:0;overflow:hidden}
+.skill-other>summary{cursor:pointer;padding:14px 16px;font-weight:900;color:#dce6f0}
+.skill-other[open]>summary{border-bottom:1px solid var(--line)}
+#skillOther,#internalRoleSummary{padding:14px 16px}
+.other-skill-row{display:flex;justify-content:space-between;gap:14px;padding:11px 0;border-bottom:1px solid #27313e}
+.other-skill-row:last-child{border-bottom:0}
+.other-skill-row b{font-size:14px}
+.other-skill-row p{margin:4px 0 0;color:var(--muted);font-size:12px;line-height:1.55}
+.other-skill-row>span{height:max-content;border:1px solid #5b4b27;background:#2b2413;color:#f0d580;border-radius:999px;padding:5px 8px;font-size:10px;font-weight:900;white-space:nowrap}
+.internal-intro{margin:0 0 12px;color:var(--muted);font-size:13px}
+.role-summary{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.role-summary>div{border:1px solid #2d3847;background:#111821;border-radius:11px;padding:10px;text-align:center}
+.role-summary b,.role-summary span,.role-summary strong{display:block}
+.role-summary b{font-size:11px;color:#8fd4cf}
+.role-summary span{margin-top:4px;color:#cbd5df;font-size:12px}
+.role-summary strong{margin-top:5px;font-size:20px;color:white}
+@media(max-width:1120px){.skill-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.role-summary{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:860px){.tabs-five{grid-template-columns:repeat(5,minmax(0,1fr))}.skill-toolbar .search{max-width:none;flex-basis:100%}}
+@media(max-width:560px){.tabs-five{grid-template-columns:repeat(5,minmax(0,1fr));overflow-x:auto}.tabs-five .tab{min-width:78px}.skill-grid{grid-template-columns:1fr}.skill-toolbar{align-items:stretch}.skill-toolbar .filter{flex:1 1 auto}.skill-group-head{align-items:flex-start}.role-summary{grid-template-columns:repeat(2,minmax(0,1fr))}.other-skill-row{flex-direction:column}}
