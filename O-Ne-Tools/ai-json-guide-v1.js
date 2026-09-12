@@ -1,390 +1,199 @@
-/* O-Ne shared AI JSON format guide — V1.3.2 */
+/* O-Ne shared AI JSON format guide + Canonical import — V1.4.0 */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.3.3';
+  var VERSION = '1.4.0';
+  var CANONICAL_SCHEMA = 'o-ne.card.canonical.v1';
   var mounted = Object.create(null);
 
-  var GUIDES = {
-    'general-card': {
-      name: '一般卡', code: 'GENERAL-CARD', version: 'V1.2.1', file: '一般卡-卡片標題-HERE.json',
-      values: ['mode：HERE／GET／COST／CUSTOM', 'HERE=地點定位；GET=獲得；COST=花費；CUSTOM=自訂標籤'],
-      example: {
-        component_id: 'HERE-01', mapping_status: 'MAPPED', generator_version: 'V1.2.1_20260826', panel_fill_opacity: 0.8,
-        mode: 'HERE', variant: 'HERE', label: { text: 'HERE', color: '#29A6A7', text_color: '#FFFFFF', custom: false },
-        title: '臨空城華盛頓飯店', subtitle: '計畫外多住的一晚'
-      }
-    },
-    'trigger-card': {
-      name: '觸發卡', code: 'TRIGGER-CARD', version: 'V1.0.2', file: '觸發卡-卡片標題-事件.json',
-      values: ['component_id 固定 TRIGGER-CARD', 'state：EVENT／DONE／FAIL', 'progress 例如 0/1、1/1'],
-      example: {
-        component_id: 'TRIGGER-CARD', formal_ref: 'TRIGGER-CARD', generator_version: 'V1.0.2_20260826', panel_fill_opacity: 0.8,
-        state: 'EVENT', title: '在機場看煙火', subtitle: '關西國際機場 (KIX) 看到煙火', progress: '0/1'
-      }
-    },
-    'persistent-card': {
-      name: '常駐卡', code: 'PERSISTENT-MISSION', version: 'V1.1.2', file: '常駐卡-任務標題-任務中.json',
-      values: ['component_id 固定 PERSISTENT-MISSION', 'tool 固定 persistent-card', 'state：MISSION／DONE／FAIL', '字級為數字，font_size_mode 固定 manual'],
-      example: {
-        component_id: 'PERSISTENT-MISSION', tool: 'persistent-card', schema_version: '1.2', formal_ref: 'PERSISTENT-MISSION',
-        generator_version: 'V1.1.2_20260827', panel_fill_opacity: 0.8, state: 'MISSION', task_text: '準備返台', progress: '0/1',
-        task_font_size: 21, progress_font_size: 20, font_size_mode: 'manual'
-      }
-    },
-    'effect-card': {
-      name: '效果卡', code: 'STA-02', version: 'V0.3.1', file: '效果卡-效果標題-可愛.json',
-      values: [
-        'schema 固定以 o-ne.effect-card.formal. 開頭', 'state 建議 BUFF／DEBUFF',
-        'text_style：white／accent／gold；decoration_density：light／standard',
-        'decoration：delicious／cute／love／praised／badTaste／shock／backstab／sick／none',
-        'atmosphere：none／loveBubbles／mintMist／scarletTrap／electricBurst／cottonCandy／goldenCelebration'
-      ],
-      example: {
-        schema: 'o-ne.effect-card.formal.v0.3.1', version: '0.3.1', status: 'FORMAL', preset: 'delicious', state: 'BUFF',
-        title: '好吃到爆！', subtitle: '幸福感 +999', title_font_size: 42, content_font_size: 22, content_visible: true,
-        accent: '#FFBE37', text_style: 'white', decoration: 'delicious', decoration_density: 'standard', decoration_visible: true, atmosphere: 'none'
-      }
-    },
-    'move-card': {
-      name: '移動卡', code: 'NAV-01', version: 'V1.0.7', file: '移動卡-起點到終點-白色.json',
-      values: ['component_id 固定 NAV-01', 'state：white／orange', 'stations 必須 2–8 站', 'segments 數量必須等於 stations 數量 − 1', 'segment.style：solid／dashed'],
-      example: {
-        component_id: 'NAV-01', generator_version: 'V1.0.7_20260826', panel_fill_opacity: 0.8, title: '一蘭 → 關西機場', state: 'white',
-        stations: ['一蘭', '飯店拿行李', '梅田', '大阪站（JR）', '關西機場'],
-        segments: [
-          { name: '步行', style: 'solid' }, { name: '移動', style: 'solid' }, { name: '步行', style: 'solid' }, { name: 'JR', style: 'solid' }
-        ]
-      }
-    },
-    'choice-card': {
-      name: '選項卡', code: 'SELECT-CARD', version: 'V1.0.1', file: '選項卡-問題標題-高亮選項.json',
-      values: ['component_id 固定 SELECT-CARD', 'options 每項要有 index、text、state', 'option.state：BRIGHT／DIM；可以同時多項 BRIGHT'],
-      example: {
-        component_id: 'SELECT-CARD', generator_version: 'V1.0.1_20260826', formal_ref: 'SELECT-CARD',
-        title: '關西國際機場 (KIX) → 住宿飯店', question: '選擇的交通工具？',
-        options: [{ index: 1, text: '關空特急 HARUKA', state: 'DIM' }, { index: 2, text: '南海電鐵', state: 'BRIGHT' }]
-      }
-    },
-    'challenge-card': {
-      name: '挑戰卡', code: 'CHALLENGE-CARD', version: 'V0.1.1', file: '挑戰卡-挑戰標題-接受-YES.json',
-      values: ['schema 固定 o-ne.challenge-card.ready.v0.1.1', 'mode：accept／abandon', 'selected：yes／no', 'copy.prefix／emphasis／suffix 與 YES／NO 按鈕文字可替換'],
-      example: {
-        schema: 'o-ne.challenge-card.ready.v0.1.1', status: 'READY', generator_version: 'V0.1.1_20260826', approved_by: 'Omi', approved_on: '2026-08-21',
-        mode: 'accept', selected: 'yes', copy: { prefix: '確認', emphasis: '接受', suffix: '挑戰任務？', yes: 'YES', no: 'NO' },
-        formal_ref: 'CHALLENGE-CARD',
-        visual_rules: { panel_fill_opacity: 0.8, select_label_locked: true }
-      }
-    },
-    'dialogue-card': {
-      name: '對話卡', code: 'DIALOGUE-CARD', version: 'V1.3.8', file: '對話卡-對話摘要-Omi疑惑-涅特無奈.json',
-      values: ['component_id 固定 DIALOGUE-CARD', 'character：NONE／Omi／NieTe／Kuma／Nomi／NPC', '表情：一般／大笑／驚訝／生氣／委屈哭／疑惑／無奈（NPC 不使用頭像表情）', 'left／right 都要保留 character、expression、name'],
-      example: {
-        component_id: 'DIALOGUE-CARD', generator_version: 'V1.3.8_20260906',
-        left: { character: 'Omi', expression: '疑惑', name: 'Omi' }, right: { character: 'NieTe', expression: '無奈', name: 'Nie Te' },
-        dialogue: '你不是說走這條比較快嗎？'
-      }
-    },
-    'rating-card': {
-      name: '評分卡', code: 'COL-02', version: 'V1.3.1', file: '評分卡-店家或商品名稱-評分4.5.json', image: true,
-      values: ['component_id 固定 COL-02；schema 以 o-ne.rating-card.ready. 開頭', 'ratings 1–8 項；type=score 時填 score，type=text 時填 result', 'layout.mode：left／right／both／none', 'JSON 不含圖片位元；要連商品圖／背景一起交付請使用 O-Ne 專案 ZIP'],
-      example: {
-        schema: 'o-ne.rating-card.ready.v1.3.1', status: 'READY', component_id: 'COL-02', generator_version: 'V1.3.1_20260826',
-        layout: { mode: 'none', requested_width_px: 1856 }, label: { text: '美食評分', size_px: 32 }, store_name: '燒肉力丸 道頓堀店', address: '大阪・道頓堀',
-        ratings: [{ label: '好吃度', type: 'score', score: 4.8 }, { label: 'CP 值', type: 'score', score: 4.5 }, { label: '結論', type: 'text', result: '值得再訪' }],
-        price_badge: '¥', price: '一人 5000 日圓', review: '上菜速度快，牛舌好吃',
-        image_adjustments: { background: { visible: false, scale: 1, x: 0, y: 0 }, product: { position: 'none', size_percent: 28 }, left_product: { visible: false }, right_product: { visible: false } }
-      }
-    },
-    'focus-card': {
-      name: '焦點內容卡', code: 'FOCUS-CARD', version: 'V0.6.0', file: '焦點卡-卡片標題-步驟-含字.json', image: true,
-      values: ['schema 固定 o-ne.focus-card.ready.v0.6.0', 'mode：body／list／steps', 'body 模式 content 使用 body；list／steps 模式改用 items 陣列', 'titleColor：highlight／light；itemFrameStates：none／focus／idle', '圖片 fit：contain／cover／free；cover 可設 zoom 100–300、offsetX／offsetY -100–100；free 使用 cropX／cropY／cropWidth／cropHeight 0–100 百分比', '舊 JSON 沒有自由裁切欄位時會預設整張圖片', 'images.placement：left／right／both／stack-left／stack-right／pair-left／pair-right／triple-top-left／triple-top-right／triple-side-left／triple-side-right／grid-left／grid-right；圖片槽位 left／right／third／fourth', '累積只用於 list／steps：content.sequence={enabled:true,step:1,imageMode:accumulate,effect:frame,frames:[每項一幕]}', 'imageMode：all／accumulate／single；effect：frame／badge／spotlight／none', '每幕 states 與 effects 均為 4 格陣列，對應 left／right／third／fourth；states：auto／hidden／show／focus／dim；effects：inherit 或任一 effect', '舊 JSON 無 sequence 時累積關閉；JSON 保存目前模式與全幕設定，不含圖片位元；完整專案 ZIP 保存所有模式、全部幕 PNG 與 1–4 張原圖並可完整讀回'],
-      example: {
-        schema: 'o-ne.focus-card.ready.v0.6.0', status: 'READY', mode: 'body', component: { placement: 'centerLower' },
-        style: { accentColor: '#29A6A7', cardSize: 'large', customWidth: 882, titleSize: 56, contentSize: 36 },
-        label: { enabled: false, text: '', position: 'above', background: '#29A6A7', color: '#FFFFFF' },
-        images: { placement: 'right', scale: 32, left: { enabled: false, name: '', fit: 'contain', zoom: 100, offsetX: 0, offsetY: 0, cropX: 0, cropY: 0, cropWidth: 100, cropHeight: 100 }, right: { enabled: false, name: '', fit: 'free', zoom: 100, offsetX: 0, offsetY: 0, cropX: 12, cropY: 8, cropWidth: 76, cropHeight: 68 } },
-        content: { titleEnabled: true, title: '道頓堀觀光船', titleColor: 'highlight', divider: true, body: '從河面看道頓堀招牌，是另一種視角。', ctaEnabled: false, cta: '', sourceEnabled: false, source: '' }
-      }
-    },
-    'explanation-card': {
-      name: '說明卡', code: 'EXPLANATION-CARD', version: 'V0.4.9', file: '說明卡-卡片標題-逐步圖文.json', image: true, projectFile: '完整專案 ZIP（推薦；舊 .onecard 僅相容）',
-      values: [
-        'schema 固定以 o-ne.explanation-card. 開頭',
-        'mode：content／gallery；content 保留 Word-lite 與左圖右文',
-        'content 的 sequence.enabled=true 會啟用逐步圖文；sequence.visibleCount 決定目前累積顯示到第幾個 body 段落',
-        'sequence.frames 依 body blockId 綁定各步驟的 image；每一步可獨立保存圖片名稱、fit、zoom、verticalAlign、offset 與自由裁切百分比',
-        '逐步圖文只切換目前左圖與累積文字；輸出高度依完整 body 段落固定，卡片尺寸與左圖框不會因圖片比例或裁切而變動',
-        '累積／逐步說明卡固定「1 組內容 = 1 個 project.zip」；不要逐幕各存原始專案',
-        '完整 project.zip 會一次保存全部文字、每一步左圖、各自裁切／縮放／位置與累積順序；重新載入後整組還原',
-        '重新載入 project.zip 後，再按「一鍵輸出全部」即可一次產生全部同尺寸 PNG ZIP',
-        '.onecard 僅保留舊專案相容；新專案不要以 .onecard 作主要交付，舊檔請先載入再重新匯出 project.zip',
-        'content 的 image.verticalAlign：top／center／bottom；image.zoom 為手動縮放，contain／free 可用 25–300，cover 以自動滿版的 100–300 為基準',
-        'contain／free 在 zoom=100 時不會自動放大小圖；cover 仍會自動放大到填滿左欄',
-        'gallery 模式從標題到圖片區都延續同一張 80% 咖啡色卡底；透明圖片區與間距不另鋪第二種底色，且不使用第二層圖片框',
-        'gallery.count：1–10；圖片張數獨立於排列。gallery.layout：auto／rows／stack／hero／single／split／triple／hero-right／hero-bottom／grid；gallery.columns：1–5；gallery.weights 保存分隔比例',
-        'gallery.slots 最多 10 筆；每筆包含 name、fit（contain／cover／free）、focusX、focusY、cropX、cropY、cropWidth、cropHeight',
-        'fit=free 時 cropX／cropY／cropWidth／cropHeight 是原圖百分比；每張圖片獨立保存且裁切框不鎖比例',
-        '純設定 JSON 不含圖片位元；要連圖搬移請使用完整 project.zip'
-      ],
-      example: {
-        schema: 'o-ne.explanation-card.formal.v0.4.9', status: 'READY', generator_version: 'V0.4.9_20260903',
-        data: {
-          mode: 'content', templateId: 'steps',
-          label: { text: '兌換', color: '#FFBE37', textColor: '#1F1713' },
-          blocks: [
-            { id: 'title-1', kind: 'title', marker: { enabled: false, text: '' }, align: 'left', html: 'HARUKA｜還要換實體票' },
-            { id: 'subtitle-1', kind: 'subtitle', marker: { enabled: false, text: '' }, align: 'left', html: '豪華版紙票流程：掃票券 QR、也要掃 IC 護照' },
-            { id: 'step-1', kind: 'body', marker: { enabled: true, text: '01' }, align: 'left', html: 'App 取得 E-TICKET' },
-            { id: 'step-2', kind: 'body', marker: { enabled: true, text: '02' }, align: 'left', html: '找指定 JR 售票機' },
-            { id: 'step-3', kind: 'body', marker: { enabled: true, text: '03' }, align: 'left', html: '掃 QR＋護照並取票' }
-          ],
-          image: { name: '步驟1.png', fit: 'free', verticalAlign: 'center', zoom: 100, offsetX: 0, offsetY: 0, cropX: 8, cropY: 10, cropWidth: 70, cropHeight: 82 },
-          sequence: {
-            enabled: true, visibleCount: 1,
-            frames: [
-              { blockId: 'step-1', image: { name: '步驟1.png', fit: 'free', verticalAlign: 'center', zoom: 100, offsetX: 0, offsetY: 0, cropX: 8, cropY: 10, cropWidth: 70, cropHeight: 82 } },
-              { blockId: 'step-2', image: { name: '步驟2.png', fit: 'contain', verticalAlign: 'bottom', zoom: 100, offsetX: 0, offsetY: 0, cropX: 0, cropY: 0, cropWidth: 100, cropHeight: 100 } },
-              { blockId: 'step-3', image: { name: '步驟3.png', fit: 'cover', verticalAlign: 'top', zoom: 120, offsetX: 0, offsetY: -15, cropX: 0, cropY: 0, cropWidth: 100, cropHeight: 100 } }
-            ]
-          }
-        }
-      }
-    },
-    'thumbnail-frame': {
-      name: '縮圖品牌框', code: 'THUMBNAIL-FRAME', version: 'V1.2.6', file: '縮圖品牌框-封面名稱-含底圖.json', image: true,
-      values: ['component_id 固定 THUMBNAIL-FRAME；schema 以 o-ne.thumbnail-frame.ready. 開頭', 'source_image.mode：cover／contain', 'corner.content：logo／text／image／none', 'corner.position：top-left／top-right／bottom-left／bottom-right', 'JSON 不含底圖或自訂角標圖片；完整交付請用 O-Ne 專案 ZIP'],
-      example: {
-        schema: 'o-ne.thumbnail-frame.ready.v1.2.6', status: 'READY', component_id: 'THUMBNAIL-FRAME', generator_version: 'V1.2.6_20260826', canvas: [1920, 1080],
-        source_image: { embedded: false, present: false, mode: 'cover', zoom_percent: 100, position_x: 0, position_y: 0, background_color: '#000000' },
-        corner: { content: 'logo', position: 'top-right', text: '', text_color: '#FFFFFF', custom_image_embedded: false, custom_image_present: false }
-      }
-    },
-    'settlement-card': {
-      name: '片尾結算卡', code: 'QST-03', version: 'V0.1.3', file: '片尾結算卡-章節標題-提問.json', image: true,
-      values: ['component_id 固定 QST-03；schema 固定 o-ne.settlement-card.ready.v0.1.3', 'rows 支援 1–8 列', 'row.icon 可用 check／list／location／star／plus／money／count／time／question／heart／none／custom', 'left_panel.mode 可使用 question／image／empty（依工具當前選項）', 'JSON 不含使用者上傳圖片；完整交付請用 O-Ne 專案 ZIP'],
-      example: {
-        schema: 'o-ne.settlement-card.ready.v0.1.3', status: 'READY', generator_version: '0.1.3', component_id: 'QST-03', semantic_id: 'settlement_panel_16x9',
-        content: {
-          chapter_title: '大阪任務結算', chapter_subtitle: 'DAY 5 RESULT',
-          rows: [{ icon: 'check', title: '任務進度', value: '100%', accent: false }, { icon: 'star', title: '今日 MVP', value: '燒肉力丸', accent: true }],
-          summary: '本日任務完成', next_text: '下一集：返台危機', viewer_question: { hint: '留言告訴我們', text: '你最想挑戰哪一個？' }
-        },
-        assets: {
-          background: { visible: true, source: 'formal', file_name: '正式背景', scale: 1, x: 0, y: 0 },
-          left_panel: { mode: 'question', file_name: '尚未上傳', scale: 1, x: 0, y: 0 },
-          subscribe: { visible: false, file_name: '尚未上傳', scale: 1, x: 0, y: 0 }
-        }
-      }
-    }
+  var META = {
+    'general-card': { name:'一般卡', code:'GENERAL-CARD', version:'V1.2.1', file:'一般卡-臨空城華盛頓飯店-HERE.card.json', native:{ generator_version:'V1.2.1_20260826' }, values:['mode：HERE／GET／COST／CUSTOM','HERE=地點定位；GET=獲得；COST=花費；CUSTOM=自訂標籤'] },
+    'trigger-card': { name:'觸發卡', code:'TRIGGER-CARD', version:'V1.0.2', file:'觸發卡-機場煙火-EVENT.card.json', native:{ generator_version:'V1.0.2_20260826' }, values:['state：EVENT／DONE／FAIL','progress 例如 0/1、1/1'] },
+    'persistent-card': { name:'常駐卡', code:'PERSISTENT-MISSION', version:'V1.1.2', file:'常駐卡-準備返台-MISSION.card.json', native:{ target_version:'1.2', generator_version:'V1.1.2_20260827' }, values:['state：MISSION／DONE／FAIL','字級由 appearance.tool.task_font_size／progress_font_size 控制'] },
+    'effect-card': { name:'效果卡', code:'STA-02', version:'V0.3.1', file:'效果卡-好吃到爆-BUFF.card.json', native:{ target_schema:'o-ne.effect-card.formal.v0.3.1', target_version:'0.3.1', generator_version:'V0.3.1_20260826', renderer_status:'FORMAL' }, values:['state 建議 BUFF／DEBUFF','preset／text_style／decoration／atmosphere 放 appearance.tool'] },
+    'move-card': { name:'移動卡', code:'NAV-01', version:'V1.0.7', file:'移動卡-一蘭到關西機場-white.card.json', native:{ generator_version:'V1.0.7_20260826' }, values:['stations 必須 2–8 站','segments 數量必須等於 stations 數量 − 1','segment.style：solid／dashed'] },
+    'choice-card': { name:'選項卡', code:'SELECT-CARD', version:'V1.0.1', file:'選項卡-交通工具-高亮選項.card.json', native:{ generator_version:'V1.0.1_20260826' }, values:['options 使用 content.items','item.state：BRIGHT／DIM；可以同時多項 BRIGHT'] },
+    'challenge-card': { name:'挑戰卡', code:'CHALLENGE-CARD', version:'V0.1.1', file:'挑戰卡-接受挑戰-YES.card.json', native:{ target_schema:'o-ne.challenge-card.ready.v0.1.1', generator_version:'V0.1.1_20260826', renderer_status:'READY' }, values:['card.mode：accept／abandon','content.confirmation.selected：yes／no','prefix／emphasis／suffix／YES／NO 文字放 content.confirmation'] },
+    'dialogue-card': { name:'對話卡', code:'DIALOGUE-CARD', version:'V1.3.8', file:'對話卡-Omi疑惑-涅特無奈.card.json', native:{ generator_version:'V1.3.8_20260906' }, values:['character：NONE／Omi／NieTe／Kuma／Nomi／NPC','表情：一般／大笑／驚訝／生氣／委屈哭／疑惑／無奈'] },
+    'rating-card': { name:'評分卡', code:'COL-02', version:'V1.3.1', file:'評分卡-燒肉力丸-補給品鑑定.card.json', image:true, native:{ target_schema:'o-ne.rating-card.ready.v1.3.1', generator_version:'V1.3.1_20260826', renderer_status:'READY' }, values:['content.items 1–8 項；type=score 填 score，type=text 填 result','content.price.badge／text 對應金額','圖片只記 assets 引用；完整搬移使用專案 ZIP'] },
+    'focus-card': { name:'焦點內容卡', code:'FOCUS-CARD', version:'V0.6.0', file:'焦點卡-道頓堀觀光船-body.card.json', image:true, native:{ target_schema:'o-ne.focus-card.ready.v0.6.0', renderer_status:'READY' }, values:['card.mode：body／list／steps','自由裁切放 assets.crop；fit 可 contain／cover／free','累積狀態統一放 sequence；完整圖片交付使用專案 ZIP'] },
+    'explanation-card': { name:'說明卡', code:'EXPLANATION-CARD', version:'V0.4.9', file:'說明卡-退稅流程-逐步圖文.card.json', image:true, native:{ target_schema:'o-ne.explanation-card.formal.v0.4.9', generator_version:'V0.4.9_20260903', renderer_status:'READY' }, values:['card.mode：content／gallery','逐步圖文以 content.body 的 block id 綁 sequence.steps.content_refs','每一步左圖各自放 assets，asset slot 與 sequence.steps.asset_slots 對應','image.verticalAlign 對應 assets.vertical_align：top／center／bottom','自由裁切使用 crop.x／y／width／height；cover 仍會自動放大到填滿左欄','版型 single／split／triple／hero-right／hero-bottom／grid 放 appearance.tool','逐步輸出不改卡片尺寸與左圖框；完整 project.zip 可保存每一步左圖；.onecard 僅舊專案相容'] },
+    'thumbnail-frame': { name:'縮圖品牌框', code:'THUMBNAIL-FRAME', version:'V1.2.6', file:'縮圖品牌框-封面名稱-含底圖.card.json', image:true, native:{ target_schema:'o-ne.thumbnail-frame.ready.v1.2.6', generator_version:'V1.2.6_20260826', renderer_status:'READY' }, values:['canvas.width／height 為畫布尺寸','底圖放 assets background；角標設定放 appearance.tool.corner','完整圖片交付使用專案 ZIP'] },
+    'settlement-card': { name:'片尾結算卡', code:'QST-03', version:'V0.1.3', file:'片尾結算卡-大阪任務結算-提問.card.json', image:true, native:{ target_schema:'o-ne.settlement-card.ready.v0.1.3', generator_version:'0.1.3', renderer_status:'READY' }, values:['content.items 支援 1–8 列','row icon 可 check／list／location／star／plus／money／count／time／question／heart／none／custom','背景、左側圖、subscribe 圖只記 assets；完整交付使用專案 ZIP'] }
   };
 
-  function escapeHtml(value) {
-    return String(value == null ? '' : value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  var COMPONENTS = {
+    'trigger-card':'TRIGGER-CARD','persistent-card':'PERSISTENT-MISSION','effect-card':'STA-02','move-card':'NAV-01','choice-card':'SELECT-CARD','challenge-card':'CHALLENGE-CARD','dialogue-card':'DIALOGUE-CARD','rating-card':'COL-02','focus-card':'FOCUS-CARD','explanation-card':'EXPLANATION-CARD','thumbnail-frame':'THUMBNAIL-FRAME','settlement-card':'QST-03'
+  };
+
+  function clone(v){ return v == null ? v : JSON.parse(JSON.stringify(v)); }
+  function merge(a,b){ var out=clone(a||{}); Object.keys(b||{}).forEach(function(k){ out[k]=(out[k]&&typeof out[k]==='object'&&!Array.isArray(out[k])&&b[k]&&typeof b[k]==='object'&&!Array.isArray(b[k]))?merge(out[k],b[k]):clone(b[k]); }); return out; }
+  function base(toolId){
+    var meta=META[toolId]||{};
+    return {
+      schema:CANONICAL_SCHEMA,schema_version:'1.0',tool_id:toolId,
+      card:{component_id:COMPONENTS[toolId]||null,mode:null,variant:null,state:null},
+      canvas:{width:null,height:null},
+      content:{label:{enabled:false,text:''},title:'',subtitle:'',body:[],items:[],progress:'',question:'',confirmation:null,dialogue:null,route:null,price:null,review:'',summary:'',next_text:''},
+      appearance:{placement:null,panel_opacity:null,accent_color:null,card_size:null,width_px:null,title_size:null,content_size:null,tool:{}},
+      assets:[],sequence:{enabled:false,mode:'single',current_step:1,effect:'none',steps:[]},
+      native:{target_schema:(meta.native||{}).target_schema||null,target_version:(meta.native||{}).target_version||null,generator_version:(meta.native||{}).generator_version||null,passthrough:(meta.native||{}).renderer_status?{status:(meta.native||{}).renderer_status}:{}},
+      meta:{status:'DRAFT',source:'chatgpt',source_note:''}
+    };
+  }
+  function ex(toolId,patch){ return merge(base(toolId),patch||{}); }
+  function asset(slot,name,fit,crop,transform,vertical){ return {slot:slot,visible:true,source:{kind:name?'file':'none',name:name||'',ref:null},fit:fit||'contain',crop:crop||{x:0,y:0,width:100,height:100},transform:transform||{zoom:100,offset_x:0,offset_y:0,scale:1},vertical_align:vertical||null}; }
+
+  var EXAMPLES = {
+    'general-card': ex('general-card',{card:{component_id:'HERE-01',mode:'HERE',variant:'HERE',state:null},content:{label:{enabled:true,text:'HERE',color:'#29A6A7',text_color:'#FFFFFF',custom:false},title:'臨空城華盛頓飯店',subtitle:'計畫外多住的一晚'}}),
+    'trigger-card': ex('trigger-card',{card:{state:'EVENT'},content:{title:'機場居然看得到煙火？！',subtitle:'關西機場意外解鎖隱藏事件',progress:'0/1'}}),
+    'persistent-card': ex('persistent-card',{card:{state:'MISSION'},content:{title:'準備返台',progress:'0/1'},appearance:{tool:{task_font_size:21,progress_font_size:20,font_size_mode:'manual',tool:'persistent-card'}}}),
+    'effect-card': ex('effect-card',{card:{state:'BUFF'},content:{title:'好吃到爆！',subtitle:'幸福感 +999'},appearance:{accent_color:'#FFBE37',title_size:42,content_size:22,tool:{preset:'delicious',text_style:'white',decoration:'delicious',decoration_density:'standard',decoration_visible:true,atmosphere:'none',content_visible:true}}}),
+    'move-card': ex('move-card',{card:{state:'white'},content:{title:'一蘭 → 關西機場',route:{stations:['一蘭','飯店拿行李','梅田','大阪站（JR）','關西機場'],segments:[{name:'步行',style:'solid'},{name:'移動',style:'solid'},{name:'步行',style:'solid'},{name:'JR',style:'solid'}]}}}),
+    'choice-card': ex('choice-card',{content:{title:'關西國際機場 (KIX) → 住宿飯店',question:'選擇的交通工具？',items:[{id:'item-1',index:1,text:'關空特急 HARUKA',state:'DIM'},{id:'item-2',index:2,text:'南海電鐵',state:'BRIGHT'}]}}),
+    'challenge-card': ex('challenge-card',{card:{mode:'accept'},content:{confirmation:{prefix:'確認',emphasis:'接受',suffix:'挑戰任務？',yes:'YES',no:'NO',selected:'yes'}},appearance:{tool:{visual_rules:{panel_fill_opacity:.8,select_label_locked:true}}}}),
+    'dialogue-card': ex('dialogue-card',{content:{dialogue:{left:{character:'Omi',expression:'疑惑',name:'Omi'},right:{character:'NieTe',expression:'無奈',name:'Nie Te'},text:'你不是說走這條比較快嗎？'}}}),
+    'rating-card': ex('rating-card',{content:{label:{enabled:true,text:'補給品鑑定',size_px:32},title:'燒肉力丸 道頓堀店',subtitle:'大阪・道頓堀',items:[{id:'item-1',label:'好吃度',type:'score',score:4.8},{id:'item-2',label:'CP 值',type:'score',score:4.5},{id:'item-3',label:'結論',type:'text',result:'值得再訪'}],price:{badge:'金額',text:'一人 5000 日圓'},review:'上菜速度快，牛舌好吃'},appearance:{width_px:1856,tool:{layout:{mode:'none',requested_width_px:1856},image_adjustments:{background:{visible:false,scale:1,x:0,y:0},product:{position:'none',size_percent:28},left_product:{visible:false},right_product:{visible:false}}}}}),
+    'focus-card': ex('focus-card',{card:{mode:'body'},content:{label:{enabled:false,text:'',position:'above',background:'#29A6A7',color:'#FFFFFF'},title:'道頓堀觀光船',body:[{id:'body-1',type:'paragraph',text:'從河面看道頓堀招牌，是另一種視角。',level:1,emphasis:false}]},appearance:{placement:'centerLower',accent_color:'#29A6A7',card_size:'large',width_px:882,title_size:56,content_size:36,tool:{component:{placement:'centerLower'},style:{accentColor:'#29A6A7',cardSize:'large',customWidth:882,titleSize:56,contentSize:36},images_meta:{placement:'right',scale:32}}},assets:[asset('right','道頓堀.png','free',{x:12,y:8,width:76,height:68},{zoom:100,offset_x:0,offset_y:0,scale:1})]}),
+    'explanation-card': ex('explanation-card',{card:{mode:'content',variant:'steps'},content:{label:{enabled:true,text:'兌換',color:'#FFBE37',textColor:'#1F1713'},title:'退稅流程',subtitle:'三步驟',body:[{id:'step-1',type:'paragraph',text:'先結帳',level:1,emphasis:false},{id:'step-2',type:'paragraph',text:'再辦退稅',level:1,emphasis:false},{id:'step-3',type:'paragraph',text:'確認退款',level:1,emphasis:false}]},assets:[asset('step-1','步驟1.png','free',{x:8,y:10,width:70,height:82},{zoom:100,offset_x:0,offset_y:0,scale:1},'center'),asset('step-2','步驟2.png','contain',null,{zoom:110,offset_x:2,offset_y:3,scale:1},'bottom'),asset('step-3','步驟3.png','cover',null,{zoom:100,offset_x:0,offset_y:0,scale:1},'center')],sequence:{enabled:true,mode:'accumulate',current_step:1,effect:'none',steps:[{id:'step-1',content_refs:['step-1'],asset_slots:['step-1'],states:[],effects:[]},{id:'step-2',content_refs:['step-2'],asset_slots:['step-2'],states:[],effects:[]},{id:'step-3',content_refs:['step-3'],asset_slots:['step-3'],states:[],effects:[]}]},appearance:{tool:{component:{placement:'centerLower'},data_extras:{templateId:'steps'}}}}),
+    'thumbnail-frame': ex('thumbnail-frame',{canvas:{width:1920,height:1080},appearance:{tool:{source_image:{embedded:false,present:false,mode:'cover',zoom_percent:100,position_x:0,position_y:0,background_color:'#000000'},corner:{content:'logo',position:'top-right',text:'',text_color:'#FFFFFF',custom_image_embedded:false,custom_image_present:false}}},assets:[asset('background','', 'cover')]}),
+    'settlement-card': ex('settlement-card',{content:{title:'大阪任務結算',subtitle:'DAY 5 RESULT',items:[{id:'item-1',icon:'check',title:'任務進度',value:'100%',accent:false},{id:'item-2',icon:'star',title:'今日 MVP',value:'燒肉力丸',accent:true}],summary:'本日任務完成',next_text:'下一集：返台危機',question:'你最想挑戰哪一個？'},appearance:{tool:{viewer_question:{hint:'留言告訴我們',text:'你最想挑戰哪一個？'},assets_meta:{background:{visible:true,source:'formal',file_name:'正式背景',scale:1,x:0,y:0},left_panel:{mode:'question',file_name:'尚未上傳',scale:1,x:0,y:0},subscribe:{visible:false,file_name:'尚未上傳',scale:1,x:0,y:0}}}},assets:[asset('background','正式背景','contain')]})
+  };
+
+  var GUIDES = {};
+  Object.keys(META).forEach(function(id){ var m=clone(META[id]); m.example=clone(EXAMPLES[id]); GUIDES[id]=m; });
+
+  function ensureCanonicalRuntime(callback){
+    if(global.ONE_CARD_CANONICAL){ if(callback) callback(); return; }
+    if(typeof document==='undefined') return;
+    var existing=document.getElementById&&document.getElementById('one-card-canonical-v1');
+    if(existing){ if(callback) existing.addEventListener&&existing.addEventListener('load',callback,{once:true}); return; }
+    if(document.readyState==='loading' && typeof document.write==='function'){
+      document.write('<script id="one-card-canonical-v1" src="./card-canonical-v1.js?v=100"></'+'script>');
+      if(callback) callback();
+      return;
+    }
+    if(document.createElement && document.head){
+      var s=document.createElement('script'); s.id='one-card-canonical-v1'; s.src='./card-canonical-v1.js?v=100'; s.onload=function(){ if(callback) callback(); }; document.head.appendChild(s);
+    }
   }
 
-  function exampleJson(guide) { return JSON.stringify(guide.example, null, 2); }
+  function prepareImport(toolId, parsed){
+    if(!parsed || typeof parsed!=='object') return parsed;
+    if(parsed.schema!==CANONICAL_SCHEMA) return parsed;
+    if(parsed.tool_id!==toolId) throw new Error('這份 Canonical JSON 屬於其他工具（'+(parsed.tool_id||'未知')+'）。');
+    if(!global.ONE_CARD_CANONICAL) throw new Error('Canonical adapter 尚未載入。');
+    var errors=global.ONE_CARD_CANONICAL.validate(parsed);
+    if(errors.length) throw new Error('Canonical JSON 驗證失敗：'+errors.join('、'));
+    var nativePayload=global.ONE_CARD_CANONICAL.toNative(parsed);
+    var rendererStatus=parsed.native&&parsed.native.passthrough&&parsed.native.passthrough.status;
+    if(rendererStatus && nativePayload && nativePayload.status==='DRAFT') nativePayload.status=rendererStatus;
+    return nativePayload;
+  }
 
-  function aiPrompt(guide) {
-    var lines = [
-      '你要製作 O-Ne「' + guide.name + '」的 JSON 設定檔。',
-      '請依我接下來提供的內容，把資料填入下方格式；不要自行重新設計欄位，不要刪除固定識別欄位。',
+  function aiPrompt(guide){
+    var imageNote=guide.image?'\n9. 圖片位元不放進 Canonical JSON；完整圖片與可編輯專案請使用 O-Ne 專案 ZIP。':'';
+    if(guide===GUIDES['explanation-card']) imageNote+='\n10. 逐步說明卡的每一步左圖以 assets＋sequence 綁定；.onecard 只保留舊專案相容。';
+    return [
+      '你要製作 O-Ne「'+guide.name+'」的 Canonical JSON 設定檔。',
+      '請使用統一 schema：'+CANONICAL_SCHEMA+'。不要改成各工具舊版 Native JSON。',
       '',
       '交付規則：',
-      '1. 請回傳 UTF-8 的 .json 檔，建議檔名：' + guide.file,
+      '1. 請回傳 UTF-8 的 .json 檔，建議檔名：'+guide.file,
       '2. 如果目前介面不能直接建立附件，就只輸出「純 JSON 原文」。',
       '3. 不要使用 ```json 程式碼框，不要在 JSON 前後加說明、標題、註解或 Markdown。',
-      '4. 不知道的內容不要猜；保留原值、空字串或先詢問我。',
-      '5. JSON 必須可被 JSON.parse() 直接解析；不可有 trailing comma。'
-    ];
-    if (guide.image) lines.push('6. 這是圖片型工具：JSON 不包含圖片本體；若需要把圖片一起搬移，請使用' + (guide.projectFile || ' O-Ne Tools「專案 ZIP」') + '。');
-    lines.push('', '欄位規則：');
-    guide.values.forEach(function (item) { lines.push('- ' + item); });
-    lines.push('', '請使用這個 JSON 結構：', exampleJson(guide));
-    return lines.join('\n');
+      '4. JSON 必須可被 JSON.parse() 直接解析。',
+      '5. schema 固定 '+CANONICAL_SCHEMA+'；schema_version 固定 1.0。',
+      '6. tool_id 固定 '+Object.keys(GUIDES).find(function(id){return GUIDES[id]===guide;})+'。',
+      '7. meta.status 固定 DRAFT；不得自行寫 FORMAL 或 APPROVED。',
+      '8. 不知道的事實不要猜；保留空值或使用我提供的資料。'+imageNote,
+      '',
+      '此卡型重要限制：',
+      guide.values.map(function(v){return '- '+v;}).join('\n'),
+      '',
+      'Canonical JSON 範例：',
+      JSON.stringify(guide.example,null,2)
+    ].join('\n');
   }
 
-  function copyText(text, done) {
-    if (global.navigator && global.navigator.clipboard && global.navigator.clipboard.writeText) {
-      global.navigator.clipboard.writeText(text).then(function () { done(true); }).catch(function () { fallbackCopy(text, done); });
-    } else fallbackCopy(text, done);
+  function copyText(text){
+    if(global.navigator&&global.navigator.clipboard&&global.navigator.clipboard.writeText) return global.navigator.clipboard.writeText(text);
+    if(typeof document==='undefined') return Promise.resolve(false);
+    var t=document.createElement('textarea'); t.value=text; document.body.appendChild(t); t.select(); var ok=document.execCommand&&document.execCommand('copy'); t.remove(); return Promise.resolve(ok);
   }
-
-  function fallbackCopy(text, done) {
-    try {
-      var area = document.createElement('textarea');
-      area.value = text; area.setAttribute('readonly', '');
-      area.style.cssText = 'position:fixed;left:-9999px;top:-9999px';
-      document.body.appendChild(area); area.select();
-      var ok = document.execCommand('copy'); area.remove(); done(Boolean(ok));
-    } catch (error) { done(false); }
+  function downloadJson(file,obj){
+    if(typeof document==='undefined' || typeof Blob==='undefined') return;
+    var blob=new Blob([JSON.stringify(obj,null,2)],{type:'application/json;charset=utf-8'}),a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=file; a.click(); global.setTimeout(function(){URL.revokeObjectURL(a.href);},1000);
   }
-
-  function downloadExample(guide) {
-    var blob = new Blob([exampleJson(guide) + '\n'], { type: 'application/json;charset=utf-8' });
-    var url = URL.createObjectURL(blob); var a = document.createElement('a');
-    a.href = url; a.download = guide.file; a.click();
-    global.setTimeout(function () { URL.revokeObjectURL(url); }, 1200);
-  }
-
-  function ensureStyles() {
-    if (document.getElementById('one-ai-json-guide-style')) return;
-    var style = document.createElement('style');
-    style.id = 'one-ai-json-guide-style';
-    style.textContent = [
-      '.one-ai-json-guide{min-width:0;width:100%;margin:0;padding:16px;border:1px solid #354052;border-radius:14px;background:#111923;color:#d8dee7;font-family:"Noto Sans TC","Microsoft JhengHei",sans-serif;box-shadow:0 12px 28px rgba(0,0,0,.18)}',
-      '.one-ai-json-guide__head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}.one-ai-json-guide__head strong{color:#f0a8cf;font-size:14px}.one-ai-json-guide__badge{padding:4px 8px;border-radius:999px;background:#21363b;color:#8fe0d7;font-size:10px;font-weight:800}',
-      '.one-ai-json-guide__note{margin:0 0 10px;color:#9ba6b4;font-size:11px;line-height:1.65}',
-      '.one-ai-json-guide__rules{margin:0 0 10px;padding-left:19px;color:#c9d1db;font-size:11px;line-height:1.65}',
-      '.one-ai-json-guide__buttons{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}.one-ai-json-guide button{min-height:38px;border:1px solid #3a4658;border-radius:8px;padding:7px 11px;background:#18212d;color:#f5f1ea;font:700 12px/1.2 inherit;cursor:pointer}.one-ai-json-guide button[data-action="copy-prompt"]{border-color:#29a6a7;background:#12383d;color:#8fe0d7}',
-      '.one-ai-json-guide__file{margin:0 0 9px;color:#8fd4c8;font-size:10px}.one-ai-json-guide details{border:1px solid #2c3545;border-radius:9px;background:#0d141d}.one-ai-json-guide summary{cursor:pointer;padding:9px 11px;color:#d9dee5;font-size:11px;font-weight:800}.one-ai-json-guide pre{max-height:380px;overflow:auto;margin:0;padding:12px;border-top:1px solid #2c3545;color:#d6e4ef;background:#0b1118;font:11px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:pre-wrap;word-break:break-word}',
-      '.one-ai-json-guide__status{min-height:17px;margin-top:8px;color:#8fd4c8;font-size:11px}.one-ai-json-guide__status.error{color:#ff7770}',
-      '.one-ai-json-guide-stack{min-width:0;width:100%;display:flex;flex-direction:column;gap:14px;align-self:start}.one-ai-json-guide-stack>.panel,.one-ai-json-guide-stack>.preview-panel{width:100%}.app-shell.one-ai-json-guide-enabled{height:auto;min-height:100dvh}',
-      '@media(max-width:680px){.one-ai-json-guide{padding:13px}.one-ai-json-guide__head{align-items:flex-start;flex-direction:column}}'
-    ].join('');
-    document.head.appendChild(style);
-  }
-
-  function setStatus(panel, message, error) {
-    var node = panel.querySelector('.one-ai-json-guide__status');
-    if (!node) return;
-    node.textContent = message || '';
-    node.classList.toggle('error', Boolean(error));
-  }
-
-  function panelFor(id, guide) {
-    ensureStyles();
-    var panel = document.createElement('section');
-    panel.className = 'one-ai-json-guide';
-    panel.setAttribute('data-one-ai-json-guide', id);
-    panel.innerHTML =
-      '<div class="one-ai-json-guide__head"><strong>給 AI 的 JSON 格式｜' + escapeHtml(guide.name) + '</strong><span class="one-ai-json-guide__badge">' + escapeHtml(guide.code + ' · ' + guide.version) + '</span></div>' +
-      '<p class="one-ai-json-guide__note">把「完整 AI 指令」貼給 AI，就會知道這張卡要回什麼欄位與怎麼交檔。AI 應回傳 .json 檔；不能建立附件時，只回純 JSON，不要加 Markdown。</p>' +
-      '<div class="one-ai-json-guide__file">建議檔名：' + escapeHtml(guide.file) + (guide.image ? ' ｜ 有圖片時完整搬移請用' + escapeHtml(guide.projectFile || ' O-Ne 專案 ZIP') : '') + '</div>' +
-      '<ul class="one-ai-json-guide__rules">' + guide.values.map(function (item) { return '<li>' + escapeHtml(item) + '</li>'; }).join('') + '</ul>' +
-      '<div class="one-ai-json-guide__buttons">' +
-        '<button type="button" data-action="copy-prompt">複製完整 AI 指令</button>' +
-        '<button type="button" data-action="copy-json">複製 JSON 範例</button>' +
-        '<button type="button" data-action="download-json">下載 JSON 範例</button>' +
-      '</div>' +
-      '<details><summary>JSON 範例｜需要時再展開</summary><pre></pre></details>' +
-      '<div class="one-ai-json-guide__status" aria-live="polite"></div>';
-    panel.querySelector('pre').textContent = exampleJson(guide);
-    panel.querySelector('[data-action="copy-prompt"]').onclick = function () {
-      copyText(aiPrompt(guide), function (ok) { setStatus(panel, ok ? '已複製完整 AI 指令。' : '複製失敗，請手動選取文字。', !ok); });
-    };
-    panel.querySelector('[data-action="copy-json"]').onclick = function () {
-      copyText(exampleJson(guide), function (ok) { setStatus(panel, ok ? '已複製 JSON 範例。' : '複製失敗，請手動選取 JSON。', !ok); });
-    };
-    panel.querySelector('[data-action="download-json"]').onclick = function () { downloadExample(guide); setStatus(panel, 'JSON 範例已下載。', false); };
+  function panelFor(id,guide){
+    var panel=document.createElement('section'); panel.className='one-ai-json-guide'; panel.setAttribute('data-one-ai-json-guide',id);
+    panel.innerHTML='<div class="one-ai-json-guide__title">給 AI 的 JSON 格式 <span>Canonical V1</span></div>'+
+      '<div class="one-ai-json-guide__note">AI 只產生 <b>'+CANONICAL_SCHEMA+'</b>；工具會自動轉成原生格式。舊 Native JSON 仍可直接載入。</div>'+
+      '<div class="one-ai-json-guide__values">'+guide.values.map(function(v){return '<div>• '+String(v).replace(/</g,'&lt;')+'</div>';}).join('')+'</div>'+
+      '<div class="one-ai-json-guide__buttons"><button type="button" data-action="prompt">複製完整 AI 指令</button><button type="button" data-action="example">複製 JSON 範例</button><button type="button" data-action="download">下載 JSON 範例</button></div>'+
+      '<details><summary>JSON 範例｜需要時再展開</summary><pre></pre></details><div class="one-ai-json-guide__status"></div>';
+    var pre=panel.querySelector('pre'); if(pre) pre.textContent=JSON.stringify(guide.example,null,2);
+    var status=panel.querySelector('.one-ai-json-guide__status');
+    panel.querySelector('[data-action="prompt"]').onclick=function(){copyText(aiPrompt(guide)).then(function(){if(status)status.textContent='已複製完整 Canonical AI 指令';});};
+    panel.querySelector('[data-action="example"]').onclick=function(){copyText(JSON.stringify(guide.example,null,2)).then(function(){if(status)status.textContent='已複製 Canonical JSON 範例';});};
+    panel.querySelector('[data-action="download"]').onclick=function(){downloadJson(guide.file,guide.example);if(status)status.textContent='已下載 Canonical JSON 範例';};
     return panel;
   }
-
-  function syncExplanationProjectUi() {
-    var pkg = document.querySelector('[data-one-project-package-ui]');
-    if (pkg) {
-      var title = pkg.querySelector('.one-project-package__title');
-      var note = pkg.querySelector('.one-project-package__note');
-      var exportButton = pkg.querySelector('[data-action="export-package"]');
-      var importButton = pkg.querySelector('[data-action="import-package"]');
-      if (title) title.textContent = '完整專案 ZIP（推薦）';
-      if (note) note.textContent = '累積／逐步內容 1 組只需保存 1 個 project.zip；會一次保存全部文字、每一步左圖與裁切設定。載入後可直接「一鍵輸出全部」PNG。';
-      if (exportButton) exportButton.textContent = '下載完整 project.zip';
-      if (importButton) importButton.textContent = '載入完整 project.zip';
-    }
-    var legacy = document.getElementById('exportProject');
-    if (legacy) {
-      legacy.textContent = '下載舊版 .onecard（相容）';
-      legacy.title = 'Legacy 相容格式；新專案請使用完整 project.zip。';
-    }
+  function insertBelowPreview(panel){
+    var id=panel.getAttribute('data-one-ai-json-guide')||'tool';
+    var utilities=document.querySelectorAll?document.querySelectorAll('[data-one-project-package-ui],[data-one-backup-ui],[data-one-batch-render-ui]'):[];
+    var utilityAnchor=utilities&&utilities.length?utilities[utilities.length-1]:null;
+    if(global.ONEAfterEditDock){global.ONEAfterEditDock.place(id,panel,{anchor:utilityAnchor});return;}
+    var host=document.querySelector&&document.querySelector('.workspace,.grid,.app');
+    if(host&&host.appendChild)host.appendChild(panel);else if(document.body)document.body.appendChild(panel);
+  }
+  function mountGuide(id){
+    if(mounted[id]||!GUIDES[id]||typeof document==='undefined')return mounted[id]||null;
+    var panel=panelFor(id,GUIDES[id]); insertBelowPreview(panel); mounted[id]=panel; return panel;
   }
 
-  function directPreviewPanel(host) {
-    if (!host || !host.children) return null;
-    var children = Array.prototype.slice.call(host.children);
-    for (var i = 0; i < children.length; i++) {
-      var child = children[i];
-      if (!child || !child.querySelector) continue;
-      if (child.classList && child.classList.contains('preview-panel')) return child;
-      if (child.querySelector('.preview-wrap,.stage,.canvas-stage,canvas')) return child;
-    }
-    return null;
-  }
-
-  function insertBelowPreview(panel) {
-    var id = panel.getAttribute('data-one-ai-json-guide') || 'tool';
-    var utilities = document.querySelectorAll('[data-one-project-package-ui],[data-one-backup-ui],[data-one-batch-render-ui]');
-    var utilityAnchor = utilities.length ? utilities[utilities.length - 1] : null;
-    if (global.ONEAfterEditDock) {
-      global.ONEAfterEditDock.place(id, panel, { anchor: utilityAnchor });
-      return;
-    }
-    var workspace = document.querySelector('.workspace');
-    var grid = document.querySelector('.grid');
-    var host = workspace || grid;
-    var previewPanel = directPreviewPanel(host);
-
-    // The stack replaces the preview panel at the exact same grid position. This means
-    // two-column tools keep it in the right column, while each tool's own responsive
-    // breakpoint can naturally collapse the same stack to one column without hardcoding widths.
-    if (host && previewPanel && previewPanel.parentNode === host) {
-      var stack = document.createElement('div');
-      stack.className = 'one-ai-json-guide-stack';
-      host.insertBefore(stack, previewPanel);
-      stack.appendChild(previewPanel);
-      stack.appendChild(panel);
-      var shell = host.closest ? host.closest('.app-shell') : null;
-      if (shell && shell.classList) shell.classList.add('one-ai-json-guide-enabled');
-      return;
-    }
-
-    var preview = document.querySelector('.preview-panel') || document.querySelector('.preview-wrap') || document.querySelector('.stage') || document.querySelector('.canvas-stage');
-    var container = preview && preview.classList && preview.classList.contains('preview-panel') ? preview : (preview && preview.parentNode);
-    if (container && container.parentNode) {
-      container.parentNode.insertBefore(panel, container.nextSibling);
-      return;
-    }
-    (document.querySelector('.app') || document.body).appendChild(panel);
-  }
-
-  function mountGuide(id) {
-    if (mounted[id] || !GUIDES[id]) return mounted[id] || null;
-    var panel = panelFor(id, GUIDES[id]);
-    insertBelowPreview(panel);
-    if (id === 'explanation-card') global.setTimeout(syncExplanationProjectUi, 0);
-    mounted[id] = panel;
-    return panel;
-  }
-
-  function wrapMounts() {
-    if (global.ONEEditBackup && global.ONEEditBackup.mount && !global.ONEEditBackup.__aiJsonGuideWrapped) {
-      var originalEditMount = global.ONEEditBackup.mount;
-      global.ONEEditBackup.mount = function (config) {
-        var api = originalEditMount(config);
-        if (config && config.id && GUIDES[config.id]) global.setTimeout(function () { mountGuide(config.id); }, 0);
+  function wrapMounts(){
+    if(global.ONEEditBackup&&global.ONEEditBackup.mount&&!global.ONEEditBackup.__aiJsonGuideWrapped){
+      var originalEditMount=global.ONEEditBackup.mount;
+      global.ONEEditBackup.mount=function(config){
+        var next=config||{};
+        if(config&&config.id&&GUIDES[config.id]){
+          next=Object.assign({},config);
+          var originalFrom=config.fromJSON;
+          next.fromJSON=function(parsed){var nativePayload=prepareImport(config.id,parsed);return originalFrom?originalFrom(nativePayload):nativePayload;};
+        }
+        var api=originalEditMount(next);
+        if(config&&config.id&&GUIDES[config.id])global.setTimeout(function(){mountGuide(config.id);},0);
         return api;
       };
-      global.ONEEditBackup.__aiJsonGuideWrapped = true;
+      global.ONEEditBackup.__aiJsonGuideWrapped=true;
     }
-    if (global.ONEProjectPackage && global.ONEProjectPackage.mount && !global.ONEProjectPackage.__aiJsonGuideWrapped) {
-      var originalProjectMount = global.ONEProjectPackage.mount;
-      global.ONEProjectPackage.mount = function (config) {
-        var api = originalProjectMount(config);
-        if (config && config.id && GUIDES[config.id]) global.setTimeout(function () { mountGuide(config.id); }, 0);
-        return api;
-      };
-      global.ONEProjectPackage.__aiJsonGuideWrapped = true;
+    if(global.ONEProjectPackage&&global.ONEProjectPackage.mount&&!global.ONEProjectPackage.__aiJsonGuideWrapped){
+      var originalProjectMount=global.ONEProjectPackage.mount;
+      global.ONEProjectPackage.mount=function(config){var api=originalProjectMount(config);if(config&&config.id&&GUIDES[config.id])global.setTimeout(function(){mountGuide(config.id);},0);return api;};
+      global.ONEProjectPackage.__aiJsonGuideWrapped=true;
     }
   }
 
-  global.ONEAIJsonGuide = {
-    version: VERSION,
-    guides: GUIDES,
-    mount: mountGuide,
-    prompt: function (id) { return GUIDES[id] ? aiPrompt(GUIDES[id]) : ''; },
-    example: function (id) { return GUIDES[id] ? JSON.parse(JSON.stringify(GUIDES[id].example)) : null; },
-    wrapProjectPackage: wrapMounts
-  };
+  function installPersistentImport(){
+    if(typeof document==='undefined'||!document.addEventListener||global.__onePersistentCanonicalImport)return;
+    global.__onePersistentCanonicalImport=true;
+    document.addEventListener('change',function(event){
+      var target=event.target;
+      if(!target||target.id!=='jsonFile'||!document.body||document.body.getAttribute('data-one-card-workspace')!=='persistent')return;
+      var file=target.files&&target.files[0];if(!file)return;
+      event.preventDefault();event.stopImmediatePropagation();
+      if(file.size>256*1024){if(global.showImportError)global.showImportError('檔案超過 256 KB');target.value='';return;}
+      Promise.resolve(file.text()).then(function(raw){
+        var parsed=JSON.parse(raw),nativePayload=prepareImport('persistent-card',parsed);
+        if(typeof global.parseImportPayload!=='function'||typeof global.applySnapshot!=='function')throw new Error('常駐卡匯入器尚未就緒');
+        var snapshot=global.parseImportPayload(nativePayload);global.applySnapshot(snapshot);
+        if(typeof global.refreshHistory==='function')global.refreshHistory('JSON 載入成功；目前尚未暫存，需要保留時請按「暫存目前內容」');
+      }).catch(function(error){if(global.showImportError)global.showImportError(error&&error.name==='SyntaxError'?'JSON 格式錯誤':(error&&error.message?error.message:'無法讀取檔案'));}).finally(function(){target.value='';});
+    },true);
+  }
 
-  wrapMounts();
+  global.ONEAIJsonGuide={version:VERSION,schema:CANONICAL_SCHEMA,guides:GUIDES,mount:mountGuide,prompt:function(id){return GUIDES[id]?aiPrompt(GUIDES[id]):'';},example:function(id){return GUIDES[id]?clone(GUIDES[id].example):null;},prepareImport:prepareImport,wrapProjectPackage:wrapMounts,__test:{prepareImport:prepareImport}};
+  ensureCanonicalRuntime(function(){wrapMounts();});
+  wrapMounts();installPersistentImport();
 })(window);
