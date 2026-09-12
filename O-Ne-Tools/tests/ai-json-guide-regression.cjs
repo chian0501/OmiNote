@@ -56,7 +56,7 @@ for (const id of ids) {
   assert.strictEqual(example.schema_version, '1.0', id + ' must emit canonical version');
   assert.strictEqual(example.tool_id, id, id + ' tool id mismatch');
   assert.strictEqual(example.meta.status, 'DRAFT', id + ' AI content must remain DRAFT');
-  assert.deepStrictEqual(canonical.validate(example), [], id + ' canonical example invalid');
+  assert.strictEqual(Array.from(canonical.validate(example)).length, 0, id + ' canonical example invalid');
   assert.doesNotThrow(() => canonical.toNative(example), id + ' canonical example must adapt to native');
   const prompt = guide.prompt(id);
   assert(prompt.includes('UTF-8 的 .json 檔'), id + ' prompt must request a JSON file');
