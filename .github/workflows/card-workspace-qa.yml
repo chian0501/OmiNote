@@ -35,6 +35,10 @@ jobs:
           node-version: '24'
           cache: npm
       - run: npm ci --ignore-scripts
+      - name: Run Canonical schema and AI guide regressions
+        run: |
+          node O-Ne-Tools/tests/card-canonical-regression.cjs
+          node O-Ne-Tools/tests/ai-json-guide-regression.cjs
       - name: Install Chromium and Traditional Chinese fonts
         run: |
           npx playwright install --with-deps chromium

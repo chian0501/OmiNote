@@ -1,0 +1,34 @@
+const assert=require('assert');
+const C=require('../card-canonical-v1.js');
+const fixtures={
+'general-card':{component_id:'HERE-01',mapping_status:'MAPPED',generator_version:'V1.2.1_20260826',panel_fill_opacity:.8,mode:'HERE',variant:'HERE',label:{text:'HERE',color:'#29A6A7',text_color:'#FFFFFF',custom:false},title:'臨空城華盛頓飯店',subtitle:'計畫外多住的一晚'},
+'trigger-card':{component_id:'TRIGGER-CARD',formal_ref:'TRIGGER-CARD',generator_version:'V1.0.2_20260826',panel_fill_opacity:.8,state:'EVENT',title:'在機場看煙火',subtitle:'KIX 看到煙火',progress:'0/1'},
+'persistent-card':{component_id:'PERSISTENT-MISSION',tool:'persistent-card',schema_version:'1.2',formal_ref:'PERSISTENT-MISSION',generator_version:'V1.1.2_20260827',panel_fill_opacity:.8,state:'MISSION',task_text:'準備返台',progress:'0/1',task_font_size:21,progress_font_size:20,font_size_mode:'manual'},
+'effect-card':{schema:'o-ne.effect-card.formal.v0.3.1',version:'0.3.1',status:'FORMAL',preset:'delicious',state:'BUFF',title:'好吃到爆！',subtitle:'幸福感 +999',title_font_size:42,content_font_size:22,content_visible:true,accent:'#FFBE37',text_style:'white',decoration:'delicious',decoration_density:'standard',decoration_visible:true,atmosphere:'none'},
+'move-card':{component_id:'NAV-01',generator_version:'V1.0.7_20260826',panel_fill_opacity:.8,title:'A → C',state:'white',stations:['A','B','C'],segments:[{name:'步行',style:'solid'},{name:'JR',style:'solid'}]},
+'choice-card':{component_id:'SELECT-CARD',generator_version:'V1.0.1_20260826',formal_ref:'SELECT-CARD',title:'交通工具',question:'選哪個？',options:[{index:1,text:'A',state:'DIM'},{index:2,text:'B',state:'BRIGHT'}]},
+'challenge-card':{schema:'o-ne.challenge-card.ready.v0.1.1',status:'READY',generator_version:'V0.1.1_20260826',approved_by:'Omi',approved_on:'2026-08-21',mode:'accept',selected:'yes',copy:{prefix:'確認',emphasis:'接受',suffix:'挑戰任務？',yes:'YES',no:'NO'},formal_ref:'CHALLENGE-CARD',visual_rules:{panel_fill_opacity:.8,select_label_locked:true}},
+'dialogue-card':{component_id:'DIALOGUE-CARD',generator_version:'V1.3.8_20260906',left:{character:'Omi',expression:'疑惑',name:'Omi'},right:{character:'NieTe',expression:'無奈',name:'Nie Te'},dialogue:'你不是說走這條比較快嗎？'},
+'rating-card':{schema:'o-ne.rating-card.ready.v1.3.1',status:'READY',component_id:'COL-02',generator_version:'V1.3.1_20260826',layout:{mode:'none',requested_width_px:1856},label:{text:'補給品鑑定',size_px:32},store_name:'燒肉力丸',address:'大阪',ratings:[{label:'好吃度',type:'score',score:4.8},{label:'結論',type:'text',result:'值得再訪'}],price_badge:'金額',price:'¥5000',review:'牛舌好吃',image_adjustments:{background:{visible:false,scale:1,x:0,y:0},product:{position:'none',size_percent:28},left_product:{visible:false},right_product:{visible:false}}},
+'focus-card':{schema:'o-ne.focus-card.ready.v0.6.0',status:'READY',mode:'body',component:{placement:'centerLower'},style:{accentColor:'#29A6A7',cardSize:'large',customWidth:882,titleSize:56,contentSize:36},label:{enabled:false,text:'',position:'above',background:'#29A6A7',color:'#FFFFFF'},images:{placement:'right',scale:32,left:{enabled:false,name:'',fit:'contain',zoom:100,offsetX:0,offsetY:0,cropX:0,cropY:0,cropWidth:100,cropHeight:100},right:{enabled:true,name:'a.png',fit:'free',zoom:100,offsetX:0,offsetY:0,cropX:12,cropY:8,cropWidth:76,cropHeight:68}},content:{titleEnabled:true,title:'道頓堀觀光船',titleColor:'highlight',divider:true,body:'從河面看道頓堀招牌',ctaEnabled:false,cta:'',sourceEnabled:false,source:''}},
+'explanation-card':{schema:'o-ne.explanation-card.formal.v0.4.9',status:'READY',generator_version:'V0.4.9_20260903',component:{placement:'centerLower'},data:{mode:'content',templateId:'steps',label:{text:'兌換',color:'#FFBE37',textColor:'#1F1713'},title:'退稅流程',subtitle:'三步驟',body:{blocks:[{id:'step-1',type:'paragraph',text:'先結帳'},{id:'step-2',type:'paragraph',text:'再退稅'}]},sequence:{enabled:true,visibleCount:1,frames:[{blockId:'step-1',image:{name:'1.png',fit:'free',verticalAlign:'center',zoom:100,offsetX:0,offsetY:0,cropX:8,cropY:10,cropWidth:70,cropHeight:82}},{blockId:'step-2',image:{name:'2.png',fit:'contain',verticalAlign:'bottom',zoom:110,offsetX:2,offsetY:3,cropX:0,cropY:0,cropWidth:100,cropHeight:100}}]}}},
+'thumbnail-frame':{schema:'o-ne.thumbnail-frame.ready.v1.2.6',status:'READY',component_id:'THUMBNAIL-FRAME',generator_version:'V1.2.6_20260826',canvas:[1920,1080],source_image:{embedded:false,present:false,mode:'cover',zoom_percent:100,position_x:0,position_y:0,background_color:'#000000'},corner:{content:'logo',position:'top-right',text:'',text_color:'#FFFFFF',custom_image_embedded:false,custom_image_present:false}},
+'settlement-card':{schema:'o-ne.settlement-card.ready.v0.1.3',status:'READY',generator_version:'0.1.3',component_id:'QST-03',semantic_id:'settlement_panel_16x9',content:{chapter_title:'大阪任務結算',chapter_subtitle:'DAY 5 RESULT',rows:[{icon:'check',title:'任務進度',value:'100%',accent:false},{icon:'star',title:'今日 MVP',value:'燒肉力丸',accent:true}],summary:'本日任務完成',next_text:'下一集：返台危機',viewer_question:{hint:'留言告訴我們',text:'你最想挑戰哪一個？'}},assets:{background:{visible:true,source:'formal',file_name:'正式背景',scale:1,x:0,y:0},left_panel:{mode:'question',file_name:'尚未上傳',scale:1,x:0,y:0},subscribe:{visible:false,file_name:'尚未上傳',scale:1,x:0,y:0}}}
+};
+assert.deepStrictEqual(C.toolIds,Object.keys(fixtures));
+for(const [id,native] of Object.entries(fixtures)){
+ const canonical=C.fromNative(id,native);
+ assert.deepStrictEqual(C.validate(canonical),[],id+' canonical invalid');
+ const native2=C.toNative(canonical);
+ if(id==='focus-card'){
+  assert.strictEqual(native2.images.left.enabled,false,'focus left image enabled=false must survive');
+  assert.strictEqual(native2.images.right.enabled,true,'focus right image enabled=true must survive');
+ }
+ const canonical2=C.fromNative(id,native2);
+ assert.deepStrictEqual(C.validate(canonical2),[],id+' reimport invalid');
+ canonical2.meta.source=canonical.meta.source;
+ assert.deepStrictEqual(canonical2,canonical,id+' canonical round-trip drift');
+}
+assert.throws(()=>C.toNative(C.canonical('move-card',{content:{route:{stations:['A'],segments:[]}}})),/BAD_STATIONS/);
+assert.throws(()=>C.toNative(C.canonical('trigger-card',{card:{state:'WHAT'}})),/BAD_STATE/);
+console.log('PASS card-canonical-v1: 13/13 adapters + validator + canonical round-trip');
