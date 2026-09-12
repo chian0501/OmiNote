@@ -38,11 +38,17 @@ for (const [toolId, file] of tools) {
       };
     });
 
-    await page.getByRole('button', { name: '專案檔案', exact: true }).click();
-    const dialog = page.getByRole('dialog', { name: '專案檔案與本機暫存' });
-    await expect(dialog).toBeVisible();
-    const load = dialog.locator('.one-workspace-native-files [data-action="load"],.one-workspace-native-files #loadJson').first();
-    await expect(load, toolId + ' JSON load control').toBeVisible();
+    let load;
+    if (toolId === 'explanation-card') {
+      load = page.locator('#quickSaveHost .one-edit-backup [data-action="load"]').first();
+      await expect(load, 'explanation-card JSON load control').toBeVisible();
+    } else {
+      await page.locator('.one-workspace-header-actions').getByRole('button', { name: '專案檔案', exact: true }).click();
+      await expect(page.locator('#one-workspace-files')).toBeVisible();
+      load = page.locator('.one-workspace-native-files [data-action="load"],.one-workspace-native-files #loadJson').first();
+      await expect(load, toolId + ' JSON load control').toBeVisible();
+    }
+
     const chooser = page.waitForEvent('filechooser');
     await load.click();
     await (await chooser).setFiles({
@@ -52,7 +58,7 @@ for (const [toolId, file] of tools) {
     });
 
     await expect.poll(() => page.evaluate(() => window.__canonicalImportCount)).toBeGreaterThan(0);
-    const failure = dialog.locator('text=/載入失敗|Canonical JSON 驗證失敗|其他工具/');
+    const failure = page.locator('text=/載入失敗|Canonical JSON 驗證失敗|其他工具/');
     await expect(failure).toHaveCount(0);
     expect(errors).toEqual([]);
   });
