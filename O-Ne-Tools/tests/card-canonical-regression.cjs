@@ -20,6 +20,10 @@ for(const [id,native] of Object.entries(fixtures)){
  const canonical=C.fromNative(id,native);
  assert.deepStrictEqual(C.validate(canonical),[],id+' canonical invalid');
  const native2=C.toNative(canonical);
+ if(id==='focus-card'){
+  assert.strictEqual(native2.images.left.enabled,false,'focus left image enabled=false must survive');
+  assert.strictEqual(native2.images.right.enabled,true,'focus right image enabled=true must survive');
+ }
  const canonical2=C.fromNative(id,native2);
  assert.deepStrictEqual(C.validate(canonical2),[],id+' reimport invalid');
  canonical2.meta.source=canonical.meta.source;
