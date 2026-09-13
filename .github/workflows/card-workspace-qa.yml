@@ -43,8 +43,10 @@ jobs:
         run: |
           npx playwright install --with-deps chromium
           sudo apt-get install -y fonts-noto-cjk
-      - name: Run 13-tool visual and interaction checks
-        run: npm run test:workspace:browser
+      - name: Run 13-tool Canonical import Gate
+        run: npx playwright test O-Ne-Tools/tests/card-canonical-import.browser.spec.cjs --config O-Ne-Tools/tests/playwright.workspace.config.cjs
+      - name: Run existing visual and interaction checks
+        run: npx playwright test O-Ne-Tools/tests/card-workspace.browser.spec.cjs O-Ne-Tools/tests/explanation-project-ui.browser.spec.cjs O-Ne-Tools/tests/focus-sequence.browser.spec.cjs O-Ne-Tools/tests/project-quick-actions.browser.spec.cjs --config O-Ne-Tools/tests/playwright.workspace.config.cjs
       - name: Preserve screenshots, downloads, traces, and report
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
