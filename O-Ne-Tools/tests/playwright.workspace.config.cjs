@@ -5,7 +5,7 @@ const root = path.resolve(__dirname, '../..');
 
 module.exports = defineConfig({
   testDir: __dirname,
-  testMatch: ['card-workspace.browser.spec.cjs', 'explanation-project-ui.browser.spec.cjs', 'focus-sequence.browser.spec.cjs', 'project-quick-actions.browser.spec.cjs'],
+  testMatch: ['card-workspace.browser.spec.cjs', 'card-canonical-import.browser.spec.cjs', 'explanation-project-ui.browser.spec.cjs', 'focus-sequence.browser.spec.cjs', 'project-quick-actions.browser.spec.cjs'],
   timeout: 120000,
   expect: { timeout: 15000 },
   fullyParallel: true,
