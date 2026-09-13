@@ -54,11 +54,11 @@ Command Center V0.9.4 也會讀取同一份 canonical registry，並顯示全部
 - 未按暫存就重新整理或關閉時，會回到最後一筆已暫存內容；載入 JSON 後也要再按一次「暫存目前內容」才會寫入紀錄。
 - 關閉視窗或重新開機不會刪除暫存；清除該網站的瀏覽器資料、無痕模式結束或換裝置則不會保留。
 - 共用介面的「暫存紀錄」內提供最近編輯，JSON 載入放在「專案檔案」。從暫存清單選一筆後按「還原」，即可回到該次內容。
-- 要跨裝置備份時，可繼續使用工具原有的「輸出／下載設定 JSON」；之後在同一種工具按「載入 JSON」並選擇該檔案。
+- 要跨裝置備份時，可繼續使用工具原有的 Native JSON；AI 新產生或 AI 編修的設定統一使用 Canonical `*.card.json`，兩者都由同一工具載入入口驗證。
 - 載入檔限制 1 MB，且必須是同一工具的 JSON。格式錯誤、工具不符或欄位無效時會拒絕載入，畫面目前內容不會被覆蓋。
 - 評分卡、焦點卡、說明卡、縮圖品牌框與片尾結算卡的單獨 JSON 只保存文字與圖片調整設定，不直接嵌入圖片位元；若要連圖片一起搬移，優先使用「專案檔案」的 ZIP 專案包。說明卡仍保留 `.onecard` 載入／下載，供既有專案相容使用。
 
-共用行為由 `edit-backup-v1.js` V1.3.1 與 `one-tools-ui-v1.js` V1.3.1 提供；各工具仍保留自己的正式 JSON schema 與驗證規則。常駐卡沿用既有本機暫存鍵值，其餘工具也不更換原鍵值，因此升級前的最近紀錄不會被清除。
+共用行為由 `edit-backup-v1.js` V1.3.1 與 `one-tools-ui-v1.js` V1.3.1 提供；各工具仍保留自己的正式 Native JSON schema 與驗證規則。Canonical 只作 AI exchange contract，不取代 renderer contract。常駐卡沿用既有本機暫存鍵值，其餘工具也不更換原鍵值，因此升級前的最近紀錄不會被清除。
 
 ## 智慧檔名與完整 ZIP 專案包
 
@@ -71,7 +71,7 @@ Command Center V0.9.4 也會讀取同一份 canonical registry，並顯示全部
 - 圖片回填使用穩定欄位 ID／名稱／語意位置；焦點卡這類動態左右圖片欄位會先還原版面狀態，再把原圖回填到正確側，最後重新套用裁切／縮放設定。
 - 專案包目前上限 200 MB，採自包含 ZIP，不依賴外部 CDN；舊 JSON 與最近 5 次暫存機制維持相容。
 
-共用專案包與檔名由 `project-package-v1.js` V1.3.2 提供。使用共用備份的工具由 `edit-backup-v1.js` 自動接入；常駐卡保留既有暫存資料格式。共用編輯介面將既有完成後區塊移入「專案檔案」視窗，不重建原生控制項。
+共用專案包與檔名由 `project-package-v1.js` V1.3.4 提供。使用共用備份的工具由 `edit-backup-v1.js` 自動接入；常駐卡保留既有暫存資料格式。共用編輯介面將既有完成後區塊移入「專案檔案」視窗，不重建原生控制項。
 
 片尾結算卡的欄位與安全框定義另見 `settlement-card-mapping.json`；挑戰卡四個 state 與正式 PSD／PNG 對照見 `challenge-card-mapping.json`。正式 PSD 只作來源，生成器不會覆蓋 Drive 母檔。
 
@@ -87,12 +87,13 @@ Command Center V0.9.4 也會讀取同一份 canonical registry，並顯示全部
 
 ## 給 AI 的 JSON 格式提示
 
-- 共用 `ai-json-guide-v1.js` V1.3.1 的工具，可從「專案檔案 → AI 格式」開啟「給 AI 的 JSON 格式」，JSON 範例預設折疊。說明卡以完整專案 ZIP 搬移圖片，並維持舊 `.onecard` 載入相容。
-- 格式直接依目前各工具真正的 JSON exporter／importer 整理，不另造第二套 schema。
+- 共用 `ai-json-guide-v1.js` V1.4.0 的工具，可從「專案檔案 → AI 格式」開啟「給 AI 的 JSON 格式」；13 種卡型都使用唯一 AI exchange schema：`o-ne.card.canonical.v1`，JSON 範例預設折疊。
+- AI 不再記 13 套 Native 頂層格式。Canonical JSON 會依 `tool_id` 經 adapter 轉成對應工具既有 Native settings，再交給原生 importer／renderer；既有 Native JSON 仍可直接載入，兩層不得混為同一 schema。
+- AI 新產出的 `meta.status` 固定 `DRAFT`，不得自行寫 `FORMAL`／`APPROVED`；建議檔名使用 `*.card.json`。
 - 每張卡提供「複製完整 AI 指令」「複製 JSON 範例」「下載 JSON 範例」；完整 AI 指令會要求 AI 回傳 UTF-8 `.json` 檔，若介面不能建立附件則只回 raw JSON，不加 Markdown 程式碼框或解說。
-- 說明區會列出固定 component/schema、重要 enum、陣列數量與其他必要限制；移動卡等結構型工具也會提示站點／路段等相依規則。
-- 評分卡、焦點卡、說明卡、縮圖品牌框與片尾結算卡會明確標示：JSON 不包含使用者置入圖片位元；需要連圖片一起交付時使用 O-Ne 專案 ZIP。
-- AI 產生的 JSON 仍必須由對應工具「載入 JSON」驗證；格式錯誤或卡種不符時，不得視為正式可用檔。
+- 說明區會列出固定 component、重要 enum、陣列數量與相依規則；移動卡會檢查站點／路段，累積卡以 `sequence` 綁定，格式錯誤或卡種不符會拒絕套用，不覆蓋目前畫面。
+- 評分卡、焦點卡、說明卡、縮圖品牌框與片尾結算卡的 Canonical JSON 不包含圖片位元；需要連圖片與可編輯設定一起交付時使用 `project.zip`。`.onecard` 僅保留 Legacy 相容。
+- `tests/card-canonical-import.browser.spec.cjs` 已透過 13 個真實工具的 JSON 載入入口驗證 Canonical → Native → 原生 importer，Gate 為 PASS 13/13。
 
 ## 全工具視覺硬規則
 - **主底板／卡體底色固定 80% 透明度（opacity = 0.80）。**
@@ -112,9 +113,11 @@ Command Center V0.9.4 也會讀取同一份 canonical registry，並顯示全部
 
 ## 共用編輯介面瀏覽器驗收
 
-GitHub Actions 的 `Card workspace browser QA` 使用鎖定版本 Chromium／Playwright，共 74 項檢查：12 個工具 × 1920／1366／390 px 的 36 組版面與鍵盤測試；12 組編輯、JSON 往返、暫存還原、專案 ZIP 往返、PNG 與批次 ZIP 實際下載；12 組直接改字、取消與原圖還原；選項完整套圖與重複選項文字、評分窄欄編輯，以及說明卡 3 種視窗的最大縮放。新增評分／結算透明 PNG、重設與前版背景設定相容，以及評分卡直接換圖、左右獨立、比例與含雙圖專案往返；三種寬度另檢查對話角色並排與評分預設收合。本輪另驗證焦點卡原位編輯、COST 對齊、格式取消、中文組字與 JSON／暫存，以及評分上下雙圖的獨立來源、兩種側位／寬度和 JSON／雙圖 ZIP。固定基準 `5184afc7c508c04e548dba4b14faf0d151c95cc8` 為 PR #72 已通過驗收的上線版；背景開／關使用相同狀態比對原生 Canvas 像素，不以預設值改變掩蓋卡體變更，也不可默默改以候選版為基準。
+GitHub Actions 的 `Card workspace browser QA` 使用鎖定版本 Chromium／Playwright。Canonical 驗收已拆成獨立「Run 13-tool Canonical import Gate」，逐一打開 13 個真實工具並從實際 JSON 載入入口匯入 Canonical；既有視覺／互動測試則另跑，不讓舊 baseline 問題混淆 Canonical Gate。
 
-流程僅有 `contents: read`，不含發布權限或密鑰，保留 30 天截圖、下載樣本、失敗 trace 與 HTML／JSON 報告。測試入口為 `tests/card-workspace.browser.spec.cjs`，隔離的靜態服務只在 runner loopback 提供工具檔案。**工作流程全綠不等於視覺核准**：合併前必須打開 artifact 檢視實際畫面，核對字型、溢出、卡面、控制項與手機捲動，再依既有核准決定合併；失敗或缺少證據時保持未合併。
+既有視覺 QA 包含 12 個共用工具的桌面／窄螢幕版面與鍵盤、編輯、JSON／ZIP／PNG 往返、直接改字、評分與焦點圖片裁切、說明卡 gallery／project.zip、焦點卡累積輸出與底部專案快捷等檢查。固定 artwork baseline 仍由既有核准流程管理，不得為了讓 CI 變綠而默默改成候選版。
+
+流程僅有 `contents: read`，不含發布權限或密鑰，保留 30 天截圖、下載樣本、失敗 trace 與 HTML／JSON 報告。**Canonical Gate 全綠不等於視覺核准，也不等於可部署**：合併前仍須檢查既有視覺 QA 與 artifact；合併 main／GitHub Pages 部署維持 Niete Gate。
 
 ## 維護規則
 - 後續新工具或版本更新，直接更新 `O-Ne-Tools/` 內對應檔案。
