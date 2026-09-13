@@ -39,15 +39,16 @@ for (const [toolId, file] of tools) {
     });
 
     await page.getByRole('button', { name: '專案檔案', exact: true }).click();
-    const dialog = page.getByRole('dialog', { name: '專案檔案與本機暫存' });
-    await expect(dialog).toBeVisible();
 
     let load;
     if (toolId === 'explanation-card') {
+      const dialog = page.getByRole('dialog', { name: '專案檔案與本機暫存' });
+      await expect(dialog).toBeVisible();
       load = dialog.locator('[data-one-backup-ui] [data-action="load"]').first();
     } else {
-      await expect(page.locator('#one-workspace-files')).toBeVisible();
-      load = dialog.locator('.one-workspace-native-files [data-action="load"],.one-workspace-native-files #loadJson').first();
+      const files = page.locator('#one-workspace-files');
+      await expect(files).toBeVisible();
+      load = files.locator('.one-workspace-native-files [data-action="load"],.one-workspace-native-files #loadJson').first();
     }
     await expect(load, toolId + ' JSON load control').toBeVisible();
 
