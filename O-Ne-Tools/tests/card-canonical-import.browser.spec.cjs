@@ -38,16 +38,18 @@ for (const [toolId, file] of tools) {
       };
     });
 
+    await page.getByRole('button', { name: '專案檔案', exact: true }).click();
+    const dialog = page.getByRole('dialog', { name: '專案檔案與本機暫存' });
+    await expect(dialog).toBeVisible();
+
     let load;
     if (toolId === 'explanation-card') {
-      load = page.locator('#quickSaveHost .one-edit-backup [data-action="load"]').first();
-      await expect(load, 'explanation-card JSON load control').toBeVisible();
+      load = dialog.locator('[data-one-backup-ui] [data-action="load"]').first();
     } else {
-      await page.locator('.one-workspace-header-actions').getByRole('button', { name: '專案檔案', exact: true }).click();
       await expect(page.locator('#one-workspace-files')).toBeVisible();
-      load = page.locator('.one-workspace-native-files [data-action="load"],.one-workspace-native-files #loadJson').first();
-      await expect(load, toolId + ' JSON load control').toBeVisible();
+      load = dialog.locator('.one-workspace-native-files [data-action="load"],.one-workspace-native-files #loadJson').first();
     }
+    await expect(load, toolId + ' JSON load control').toBeVisible();
 
     const chooser = page.waitForEvent('filechooser');
     await load.click();
