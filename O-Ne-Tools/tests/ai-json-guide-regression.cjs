@@ -8,6 +8,7 @@ const path = require('path');
 const root = path.join(__dirname, '..');
 const guideSource = fs.readFileSync(path.join(root, 'ai-json-guide-v1.js'), 'utf8');
 const canonicalSource = fs.readFileSync(path.join(root, 'card-canonical-v1.js'), 'utf8');
+const packageSource = fs.readFileSync(path.join(root, 'project-package-v1.js'), 'utf8');
 
 const context = {
   console, JSON, Blob, URL, Date, Promise, setTimeout, clearTimeout,
@@ -96,5 +97,7 @@ assert(!guideSource.includes('<details open>'), 'large JSON preview must not con
 assert(guideSource.includes('ONEEditBackup.__aiJsonGuideWrapped'), 'shared edit-backup tools must accept canonical import');
 assert(guideSource.includes('ONEProjectPackage.__aiJsonGuideWrapped'), 'persistent/project-package path must mount the AI guide');
 assert(guideSource.includes('__onePersistentCanonicalImport'), 'persistent custom JSON loader must be bridged');
+assert(packageSource.includes('ai-json-guide-v1.js?v=1400'), 'project package must cache-bust the Canonical AI guide V1.4.0');
+assert(!packageSource.includes('ai-json-guide-v1.js?v=1313'), 'legacy AI guide cache key must not return');
 new Function(guideSource);
-console.log('PASS: 13 Canonical AI JSON examples, prompt contract, adapter handoff, and import bridge.');
+console.log('PASS: 13 Canonical AI JSON examples, prompt contract, adapter handoff, import bridge, and V1.4 cache key.');
