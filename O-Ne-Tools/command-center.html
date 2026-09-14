@@ -4,9 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="color-scheme" content="dark">
-<title>O-Ne 工作台 V1.2 READY</title>
+<title>O-Ne 工作台 V1.3 CANDIDATE</title>
 <link rel="stylesheet" href="./command-center-v1.css?v=100rc1">
 <link rel="stylesheet" href="./command-center-skills-v1.css?v=110c1">
+<link rel="stylesheet" href="./command-center-project-groups-v1.css?v=130c1">
 </head>
 <body>
 <div class="app">
@@ -16,7 +17,7 @@
       <h1>O-Ne 工作台</h1>
       <p>找專案、找素材、開製作工具、查看目前可用的 ChatGPT Skills。Google Drive 仍是正式主資料，這一頁只做導航與工作入口。</p>
     </div>
-    <div class="hero-badges"><span class="pill">V1.2 READY</span><span class="pill">FILE_ORGANIZER_NESTED_V1</span><span class="pill">唯讀</span></div>
+    <div class="hero-badges"><span class="pill candidate">V1.3 CANDIDATE</span><span class="pill">PROJECT_GROUPS_V1</span><span class="pill">FILE_ORGANIZER_NESTED_V1</span><span class="pill">唯讀</span></div>
   </header>
 
   <nav class="tabs" aria-label="Command Center 主功能">
@@ -28,11 +29,11 @@
 
   <main>
     <section class="screen active" id="screen-find">
-      <div class="section-head"><div><h2>專案與素材</h2><p>選專案後，第二步就能直接開素材、長片、Shorts、縮圖或其他正式入口。</p></div><div class="stats"><div class="stat"><b id="projectStat">9</b><span>影片專案</span></div><div class="stat"><b id="linkStat">61</b><span>專案快捷</span></div><div class="stat"><b id="sharedStat">25</b><span>共用素材</span></div></div></div>
+      <div class="section-head"><div><h2>專案與素材</h2><p>選專案後，第二步就能直接開素材、長片、Shorts、縮圖或其他正式入口。</p></div><div class="stats"><div class="stat"><b id="projectStat">10</b><span>影片專案</span></div><div class="stat"><b id="linkStat">68</b><span>專案快捷</span></div><div class="stat"><b id="sharedStat">25</b><span>共用素材</span></div></div></div>
       <div class="searchbar"><input class="search" id="findSearch" type="search" placeholder="搜尋：3COINS、D6、郵輪、縮圖、Logo、音樂、SFX、授權…"><button class="soft" id="clearSearch">清除</button></div>
       <div class="quick-strip" id="quickStrip"></div>
       <div class="find-layout">
-        <div class="card"><div class="subsection" style="margin-top:0"><h3>影片專案</h3><div class="project-list" id="projectList"></div></div></div>
+        <div class="card"><div class="subsection" style="margin-top:0"><h3>影片專案｜折疊分類</h3><div class="project-list" id="projectList"></div></div></div>
         <div class="card" id="projectDetail"></div>
       </div>
       <div class="subsection"><div class="section-head" style="margin-bottom:10px"><div><h2 style="font-size:18px">共用素材</h2><p>品牌、角色、正式 UI、字型、音樂音效、授權與常用規範。</p></div><span class="pill" id="assetCount">25 / 25</span></div><div class="asset-grid" id="assetGrid"></div></div>
@@ -101,11 +102,14 @@
     </section>
   </main>
 
-  <footer class="footer">V1.2 READY｜Google Drive 仍是正式主資料｜最近使用、釘選與目前專案只保存在這台瀏覽器 localStorage。</footer>
+  <footer class="footer">V1.3 CANDIDATE｜Google Drive 仍是正式主資料｜最近使用、釘選、折疊狀態與目前專案只保存在這台瀏覽器 localStorage。</footer>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script src="./command-center-v1-data.js?v=100rc1"></script>
+<script src="./command-center-project-links-direct-v1.js?v=130c1"></script>
+<script src="./command-center-project-patch-v13.js?v=130c1"></script>
 <script src="./command-center-v1.js?v=100rc1"></script>
+<script src="./command-center-project-groups-v1.js?v=130c1"></script>
 <script src="./command-center-skills-v1-data.js?v=110c1"></script>
 <script src="./command-center-skills-v1.js?v=110c1"></script>
 </body>

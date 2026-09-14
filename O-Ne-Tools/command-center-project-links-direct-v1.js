@@ -58,6 +58,15 @@
       p03:'https://drive.google.com/drive/folders/1HptE0geuntlahAZLXJZfWgZEGVgPy31i',
       p04:'https://drive.google.com/drive/folders/1Nzj1QK2kpsVtxj1R6iIX31pk8puTXj9l'
     },
+    '26TW-04-1':{
+      root:'https://drive.google.com/drive/folders/112t0ZEcNe47Y9PN83NZhr-lzXIeAdlRK',
+      brief:'https://docs.google.com/document/d/1PqPVZ1XZ3-LEUvQSRKLCyH6EbloNHITFpINFpGaNIi0/edit',
+      p01:'https://drive.google.com/drive/folders/1hoaLd108STIaXc8wGjxilnGNkGFHZ_3Y',
+      p02:'https://drive.google.com/drive/folders/1X_0dJHM1XYu-6XGoCi74I3fm1ne9ICsH',
+      p03:'https://drive.google.com/drive/folders/1ta2FlZg4CBQpaarQrz_EY6AbDnIVofwT',
+      p04:'https://drive.google.com/drive/folders/1NIUnwtkYK_J7KBfnL68KC-Uwve5VIy1q',
+      thumb:'https://drive.google.com/drive/folders/15MnUunLy3lvc_DmMolSwTIAQFnPv4Y9A'
+    },
     '26CRU-01-1':{
       root:'https://drive.google.com/drive/folders/10Dagedodb83BiLjJbZTEYXTGLjoMAYu_',
       brief:'https://docs.google.com/document/d/1atA6220XV1nQ50KJHeiJrOzvlxNDDYSnGPvl36EUQpI/edit',
