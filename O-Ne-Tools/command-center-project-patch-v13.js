@@ -23,6 +23,12 @@
     {id:'jp',label:'🇯🇵 日本',caption:'2026',pattern:'^26JP-'},
     {id:'cru',label:'🚢 郵輪',caption:'2025–2026',pattern:'CRU-'}
   ];
-  D.version='V1.3 CANDIDATE';
+  D.version='V1.3 READY';
   D.designRevision='PROJECT_GROUPS_V1';
+
+  document.title='O-Ne 工作台 V1.3 READY';
+  document.querySelectorAll('.hero-badges .pill,.footer').forEach(node=>{
+    node.textContent=node.textContent.replace('V1.3 CANDIDATE','V1.3 READY');
+    node.classList.remove('candidate');
+  });
 })();
