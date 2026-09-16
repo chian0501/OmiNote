@@ -1,11 +1,11 @@
 (function () {
   'use strict';
 
-  var WRAPPER_VERSION = '0.1.5-beige-bg-asset-fix';
+  var WRAPPER_VERSION = '0.1.6-beige-bg-small-asset';
   var CORE_SRC = './settlement-card-v011-core-v013.js?v=015-bgfix';
   var OVERLAY_TOKEN = 'settlement-background-overlay-v010.png';
   var BACKGROUND_TOKEN = 'settlement-background-v010.jpg';
-  var BACKGROUND_SRC = './assets/settlement-background-v011.jpg?v=011';
+  var BACKGROUND_SRC = './assets/settlement-background-v011.jpg?v=012';
   var backgroundOpacity = 100;
 
   function $(id) { return document.getElementById(id); }
