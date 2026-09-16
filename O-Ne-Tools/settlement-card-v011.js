@@ -1,9 +1,11 @@
 (function () {
   'use strict';
 
-  var WRAPPER_VERSION = '0.1.4-beige-bg-opacity';
-  var CORE_SRC = './settlement-card-v011-core-v013.js?v=013-core';
+  var WRAPPER_VERSION = '0.1.5-beige-bg-asset-fix';
+  var CORE_SRC = './settlement-card-v011-core-v013.js?v=015-bgfix';
   var OVERLAY_TOKEN = 'settlement-background-overlay-v010.png';
+  var BACKGROUND_TOKEN = 'settlement-background-v010.jpg';
+  var BACKGROUND_SRC = './assets/settlement-background-v011.jpg?v=011';
   var backgroundOpacity = 100;
 
   function $(id) { return document.getElementById(id); }
@@ -49,6 +51,26 @@
     $('backgroundOpacity').addEventListener('input', function () {
       syncOpacityUI(this.value, true);
     });
+  }
+
+  function patchImageSource() {
+    var proto = window.HTMLImageElement && window.HTMLImageElement.prototype;
+    if (!proto || proto.__oneSettlementBackgroundSourcePatched) return;
+    var descriptor = Object.getOwnPropertyDescriptor(proto, 'src');
+    if (!descriptor || typeof descriptor.set !== 'function') return;
+
+    Object.defineProperty(proto, 'src', {
+      configurable: descriptor.configurable,
+      enumerable: descriptor.enumerable,
+      get: descriptor.get,
+      set: function (value) {
+        if (typeof value === 'string' && value.indexOf(BACKGROUND_TOKEN) !== -1) {
+          value = BACKGROUND_SRC;
+        }
+        return descriptor.set.call(this, value);
+      }
+    });
+    proto.__oneSettlementBackgroundSourcePatched = true;
   }
 
   function patchCanvasDrawImage() {
@@ -265,6 +287,7 @@
   }
 
   installOpacityControl();
+  patchImageSource();
   patchCanvasDrawImage();
   patchEditBackup();
   if ($('bgVisible')) $('bgVisible').checked = true;
