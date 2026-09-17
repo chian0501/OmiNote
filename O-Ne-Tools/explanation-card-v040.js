@@ -537,7 +537,8 @@
   }
 
   function layoutGalleryCard(context){
-    const outer=28,headerTop=30,labelH=48,bottomEdge=3;
+    const inset=(typeof window!=='undefined'&&window.ONEExplanationWorkspace?.galleryInset)||3;
+    const outer=28,headerTop=30,labelH=48,bottomEdge=inset;
     context.font='800 32px "Noto Sans TC","Microsoft JhengHei",sans-serif';
     const labelW=Math.max(150,context.measureText(state.label.text||'GET!').width+40);
     const title=state.blocks.find(item=>item.kind==='title')||block('title','');
@@ -548,9 +549,9 @@
     const labelY=headerTop+(headerH-labelH)/2;
     const titleY=headerTop+Math.max(0,(labelH-titleLayout.height)/2);
     const dividerY=headerTop+headerH+18;
-    const galleryY=dividerY+3;
-    const galleryX=3;
-    const galleryW=CARD_WIDTH-6;
+    const galleryY=dividerY+inset;
+    const galleryX=inset;
+    const galleryW=CARD_WIDTH-inset*2;
     const galleryH=state.gallery.height;
     const height=Math.ceil(galleryY+galleryH+bottomEdge);
     const rects=galleryRects(state.gallery.layout,galleryX,galleryY,galleryW,galleryH,state.gallery.gap);

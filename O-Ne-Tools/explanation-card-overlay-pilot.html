@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>說明卡｜截圖需求整合候選 V2</title>
+<style>html,body{margin:0;height:100%;background:#0c131b;color:#d9ecec;font:14px system-ui}body{display:flex;flex-direction:column}header{padding:8px 16px;display:flex;gap:16px;align-items:center;flex-wrap:wrap}header b{color:#ffbe37}header a{color:#8fdfdb}iframe{flex:1;width:100%;border:0;min-height:0}</style></head>
+<body><header><b>截圖需求整合候選 V2｜未上線</b><span id="loadStatus">載入原生成器與修正版…</span><a href="./explanation-card.html">開啟原版</a></header>
+<iframe id="app" title="說明卡截圖需求整合修正版"></iframe>
+<script>
+'use strict';
+const frame=document.getElementById('app'),status=document.getElementById('loadStatus'),revision='screenshot-repair-v2-20260905';
+function load(d,tag,url){return new Promise((resolve,reject)=>{const n=d.createElement(tag);if(tag==='link'){n.rel='stylesheet';n.href=url;}else{n.src=url;n.async=false;}n.onload=resolve;n.onerror=()=>reject(new Error('無法載入 '+url));(tag==='link'?d.head:d.body).append(n);});}
+frame.addEventListener('load',async()=>{
+  if(!frame.hasAttribute('srcdoc'))return;
+  try{
+    const w=frame.contentWindow,d=frame.contentDocument;
+    for(let i=0;!w.ONEExplanationFormatCore&&i<100;i++)await new Promise(r=>setTimeout(r,50));
+    if(!w.ONEExplanationFormatCore)throw new Error('未讀到原格式核心');
+    await Promise.all(['explanation-card-overlay-pilot-v1.css','explanation-card-workspace-v2.css'].map(f=>load(d,'link','./'+f+'?repair='+revision)));
+    await load(d,'script','./explanation-card-workspace-v2.js?repair='+revision);
+    await load(d,'script','./explanation-card-overlay-pilot-v1.js?repair='+revision);
+    if(!w.ONEExplanationWorkspace||!w.ONEExplanationOverlayPilot)throw new Error('修正版未啟用');
+    status.textContent='已啟用：提醒累積、原位改字、精簡介面、圖片內距與設定並排';
+  }catch(error){status.textContent=error.message+'；請使用候選分支本機 HTTP 或可下載的單檔 HTML。';}
+});
+(async()=>{
+  try{
+    if(location.protocol==='file:')throw new Error('這是儲存庫入口，請使用本機 HTTP；離線直接開啟請用交付的單檔 HTML');
+    const response=await fetch('./explanation-card.html?repair='+revision,{cache:'no-store'});if(!response.ok)throw new Error('原生成器 HTTP '+response.status);
+    let html=await response.text();
+    html=html.replace(/(src|href)="(\.\/[^" ]+\.(?:js|css))(?:\?[^" ]*)?"/g,(_,a,p)=>a+'="'+p+'?repair='+revision+'"');
+    const base=new URL('./',location.href).href.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+    html=html.replace('<head>','<head><base href="'+base+'">');
+    const preload='<link id="one-tools-ui-css" rel="stylesheet" href="./one-tools-ui-v1.css?repair='+revision+'"><script id="one-tools-ui-js" src="./one-tools-ui-v1.js?repair='+revision+'"><'+'/script>';
+    html=html.replace('</head>',preload+'</head>');frame.srcdoc=html;
+  }catch(error){status.textContent=error.message;}
+})();
+</script></body></html>
