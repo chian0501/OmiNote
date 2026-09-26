@@ -61,7 +61,7 @@ assert(sequenceImageSource.includes('defaults.sequence={...(defaults.sequence||{
 assert(sequenceImageSource.includes('if(sequenceIsActive())return null'), 'per-step image dimensions must not drive card height');
 assert(sequenceImageSource.includes('payload.assets.sequence_images=(state.sequence.frames||[]).map(sequenceAssetPayload)'), 'onecard must embed every step image');
 assert(sequenceImageSource.includes('content_sequence_per_step_crop_settings:true'), 'formal JSON must declare independent crop settings per step');
-assert(sequenceImageSource.includes('content_sequence_export_all_png_zip:true'), 'formal JSON must declare one-click PNG ZIP export');
+assert(sequenceImageSource.includes('content_sequence_export_all_png_direct:true'), 'formal JSON must declare one-click direct PNG export');
 assert(sequenceImageSource.includes('content_sequence_project_zip_embeds_all_images:true'), 'formal JSON must declare complete per-step project ZIP assets');
 assert(sequenceImageSource.includes('async function exportAllSequencePngs()'), 'sequence mode must provide a one-click batch PNG export');
 assert(sequenceImageSource.includes("excludeKeys:['id:explanationImage']"), 'project ZIP must replace the single active file input with per-step assets');
