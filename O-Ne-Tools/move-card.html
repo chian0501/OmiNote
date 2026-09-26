@@ -5,7 +5,7 @@
 <script src="./card-direct-edit-v1.js?v=1400"></script>
 <script src="./card-workspace-v1.js?v=1500" defer></script>
 </head><body data-one-card-workspace="move">
-<div class="app"><a class="tool-home-link" href="./" style="min-width:118px;height:44px;display:inline-flex;align-items:center;color:#53ced0;font-size:14px;font-weight:800;text-decoration:none">回工具入口</a><h1>O-Ne 移動卡生成器 <span style="font-size:12px;color:#8c96a5">V1.0.7</span></h1><div class="sub">主底板 #1F1713 固定 80% 透明；白框、MOVE、藍條、文字與節點維持實色。</div><div class="grid"><div class="panel"><div class="section-title">01｜內容輸入</div><div class="note">站點 2～8 站；可增減。每段可切實線／虛線，並輸出白色版／橘色版。</div><label>預覽狀態</label><select id="previewState"><option value="white">WHITE｜白色版</option><option value="orange">ORANGE｜橘色版</option></select><label>標題</label><input id="title" value="關西國際機場(KIX) → 北浜"><div class="buttons"><button id="addStation" class="small">＋ 增加站點</button><button id="removeStation" class="small secondary">－ 刪除最後站點</button></div><div class="listbox"><div class="item-head"><div>站點與路段設定</div><div class="dim">站點數：<span id="countBadge">4</span></div></div><div id="stationList"></div></div><div id="status" class="status">READY｜可輸出</div><div class="buttons"><button id="downloadWhite">輸出白色版 PNG</button><button id="downloadOrange" class="orange">輸出橘色版 PNG</button><button id="downloadBoth" class="secondary">下載兩版 PNG ZIP</button><button id="jsonBtn" class="secondary">輸出欄位 JSON</button><button id="reset" class="secondary">回復示例</button></div></div><div class="panel"><div class="section-title">02｜正式母版即時預覽</div><div class="preview-wrap"><canvas id="c" width="721" height="126"></canvas></div></div></div></div>
+<div class="app"><a class="tool-home-link" href="./" style="min-width:118px;height:44px;display:inline-flex;align-items:center;color:#53ced0;font-size:14px;font-weight:800;text-decoration:none">回工具入口</a><h1>O-Ne 移動卡生成器 <span style="font-size:12px;color:#8c96a5">V1.0.7</span></h1><div class="sub">主底板 #1F1713 固定 80% 透明；白框、MOVE、藍條、文字與節點維持實色。</div><div class="grid"><div class="panel"><div class="section-title">01｜內容輸入</div><div class="note">站點 2～8 站；可增減。每段可切實線／虛線，並輸出白色版／橘色版。</div><label>預覽狀態</label><select id="previewState"><option value="white">WHITE｜白色版</option><option value="orange">ORANGE｜橘色版</option></select><label>標題</label><input id="title" value="關西國際機場(KIX) → 北浜"><div class="buttons"><button id="addStation" class="small">＋ 增加站點</button><button id="removeStation" class="small secondary">－ 刪除最後站點</button></div><div class="listbox"><div class="item-head"><div>站點與路段設定</div><div class="dim">站點數：<span id="countBadge">4</span></div></div><div id="stationList"></div></div><div id="status" class="status">READY｜可輸出</div><div class="buttons"><button id="downloadWhite">輸出白色版 PNG</button><button id="downloadOrange" class="orange">輸出橘色版 PNG</button><button id="downloadBoth" class="secondary">輸出兩版 PNG</button><button id="jsonBtn" class="secondary">輸出欄位 JSON</button><button id="reset" class="secondary">回復示例</button></div></div><div class="panel"><div class="section-title">02｜正式母版即時預覽</div><div class="preview-wrap"><canvas id="c" width="721" height="126"></canvas></div></div></div></div>
 <script src="./edit-backup-v1.js?v=1312"></script>
 <script>
 const canvas=document.getElementById('c'),ctx=canvas.getContext('2d'),$=id=>document.getElementById(id);
@@ -32,9 +32,13 @@ $('downloadBoth').onclick=async()=>{
       return {name:`O-Ne_NAV-01_MOVE_${mode.toUpperCase()}.png`,data:new Blob([bytes],{type:'image/png'})};
     });
     render();
-    const zip=await ONEProjectPackage.createZip(entries),url=URL.createObjectURL(zip),a=document.createElement('a');
-    a.href=url;a.download='O-Ne_MOVE_白色與橘色.zip';a.click();setTimeout(()=>URL.revokeObjectURL(url),1500);
-    $('status').textContent='已輸出 2 張 PNG ZIP｜白色版＋橘色版';
+    for(const entry of entries){
+      const url=URL.createObjectURL(entry.data),a=document.createElement('a');
+      a.href=url;a.download=entry.name;a.click();
+      setTimeout(()=>URL.revokeObjectURL(url),1500);
+      await new Promise(resolve=>setTimeout(resolve,120));
+    }
+    $('status').textContent='已輸出 2 張 PNG｜白色版＋橘色版';
   }catch(error){render();$('status').className='status error';$('status').textContent='輸出失敗｜'+error.message;}
   finally{exportingBoth=false;$('downloadBoth').disabled=false;}
 };$('jsonBtn').onclick=()=>{let p={component_id:'NAV-01',generator_version:'V1.0.7_20260826',panel_fill_opacity:.8,title:$('title').value,state:$('previewState').value,stations:data.stations,segments:data.segments};let u=URL.createObjectURL(new Blob([JSON.stringify(p,null,2)],{type:'application/json'})),a=document.createElement('a');a.href=u;a.download='O-Ne_MOVE_data_v107.json';a.click();setTimeout(()=>URL.revokeObjectURL(u),1000)};$('reset').onclick=()=>{data=JSON.parse(JSON.stringify(defaults));$('previewState').value='white';$('title').value=defaults.title;renderForm();render()};renderForm();render();
