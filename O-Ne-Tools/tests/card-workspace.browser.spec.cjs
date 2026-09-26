@@ -673,13 +673,11 @@ for (const card of cards) {
     await upload(page, page.locator('[data-one-batch-render-ui] [data-action="select"]'), project.target);
     const run = page.locator('[data-one-batch-render-ui] [data-action="run"]');
     await expect(run).toBeEnabled();
-    const batch = await download(page, run, info, 'batch-pngs', 'zip');
-    const outputs = Object.entries(zipEntries(batch.bytes));
-    expect(outputs).toHaveLength(1);
-    expect(outputs[0][0]).toMatch(/\.png$/i);
-    assertPNG(outputs[0][1]);
+    const batch = await download(page, run, info, 'batch-png', 'png');
+    expect(batch.name).toMatch(/\.png$/i);
+    assertPNG(batch.bytes);
     // Native refreshList restores the ready-count status after completion.
-    // The per-file result and actual downloaded PNG ZIP prove completion.
+    // The per-file result and actual direct PNG download prove completion.
     await expect(page.locator('.one-batch-render__item')).toHaveCount(1);
     await expect(page.locator('.one-batch-render__item')).toContainText('已輸出');
     await expect(page.locator('.one-batch-render__item')).not.toHaveClass(/error/);
