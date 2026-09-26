@@ -98,12 +98,22 @@ test('focus cumulative text and all PNG frames keep dimensions, order and curren
   }
   expect(new Set(outputs).size).toBe(4);
   await frame(page,2); const current = await artwork(page);
-  const zip = await download(page,page.getByRole('button',{name:'輸出全部幕 PNG ZIP',exact:true}),info,'all-frames.zip');
-  const entries = entriesOf(zip.bytes), names = Object.keys(entries);
-  expect(names).toHaveLength(4); expect(names.map(n => n.match(/-(\d\d)\.png$/)[1])).toEqual(['01','02','03','04']);
+  const downloads = [];
+  page.on('download', item => downloads.push(item));
+  await page.getByRole('button',{name:'輸出全部幕 PNG',exact:true}).click();
+  await expect.poll(() => downloads.length, { timeout: 10000 }).toBe(4);
+  const files = [];
+  for (let i=0;i<downloads.length;i++) {
+    const name = downloads[i].suggestedFilename();
+    const target = info.outputPath('all-frame-' + name);
+    await downloads[i].saveAs(target);
+    files.push({ name, bytes: await fs.readFile(target) });
+  }
+  files.sort((a,b) => a.name.localeCompare(b.name));
+  expect(files.map(item => item.name.match(/-(\d\d)\.png$/)[1])).toEqual(['01','02','03','04']);
   for (let i=0;i<4;i++) {
-    expect([entries[names[i]].readUInt32BE(16),entries[names[i]].readUInt32BE(20)]).toEqual(dimensions);
-    expect(entries[names[i]]).toEqual(Buffer.from(outputs[i].split(',')[1],'base64'));
+    expect([files[i].bytes.readUInt32BE(16),files[i].bytes.readUInt32BE(20)]).toEqual(dimensions);
+    expect(files[i].bytes).toEqual(Buffer.from(outputs[i].split(',')[1],'base64'));
   }
   expect(await artwork(page)).toBe(current); await expect(page.getByLabel('目前累積幕')).toHaveValue('2');
   await screenshot(page,info,'focus-cumulative-text'); expect(errors).toEqual([]);
