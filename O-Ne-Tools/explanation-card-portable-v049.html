@@ -5000,7 +5000,7 @@ window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{'use strict';
   });
   document.querySelectorAll('#wordToolbar button[title]').forEach(b=>{if(!b.getAttribute('aria-label'))b.setAttribute('aria-label',b.title);});
   const helpDialog=makeDialog('oneHelpDialog','操作說明');
-  const help=document.createElement('p');help.textContent='直接點字卡文字修改；左側清單可新增、排序、設定標記與小提醒。幕次與當幕圖片在成品下方。專案 ZIP 可繼續編輯，全部幕次 PNG ZIP 用於剪片。切換範本會重設文字，操作前會確認。';helpDialog.append(help);
+  const help=document.createElement('p');help.textContent='直接點字卡文字修改；左側清單可新增、排序、設定標記與小提醒。幕次與當幕圖片在成品下方。專案 ZIP 可繼續編輯，全部幕次 PNG 會逐張直接下載，用於剪片。切換範本會重設文字，操作前會確認。';helpDialog.append(help);
 
   const strip=document.querySelector('.mode-strip');heading.after(strip);
   const settings=document.querySelector('.settings');const labels=$('labelSettings');if(labels)strip.append(labels);
@@ -5143,7 +5143,7 @@ window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{'use strict';
     $('exportSequenceAll').hidden=!isSequence();
     $('exportPng').textContent=isSequence()?`輸出目前第 ${count} 幕 PNG`:'輸出說明卡 PNG';
     if(isSequence()){
-      $('exportSequenceAll').textContent=`輸出全部 ${total} 幕 PNG ZIP`;
+      $('exportSequenceAll').textContent=`輸出全部 ${total} 幕 PNG`;
       $('dimensionText').textContent=`${canvas.width} × ${canvas.height}px｜累積 ${count}／${total} 幕・固定尺寸`;
       $('sequenceImageTitle').textContent=`第 ${count} 幕${model.items(state)[count-1]?.kind==='note'?'（小提醒）':''}左圖`;
     }
