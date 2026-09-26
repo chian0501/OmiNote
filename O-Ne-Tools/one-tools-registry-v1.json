@@ -443,7 +443,7 @@
         "content_progressive_reveal_per_step_crop_settings",
         "content_progressive_reveal_image_independent_height_lock",
         "content_progressive_reveal_step_filename",
-        "content_progressive_reveal_export_all_png_zip",
+        "content_progressive_reveal_export_all_png_direct_files",
         "content_progressive_reveal_onecard_embeds_all_images",
         "content_progressive_reveal_project_zip_embeds_all_images",
         "image_only_gallery_mode",
@@ -508,7 +508,7 @@
         "content_progressive_reveal_per_step_image_regression": "pass_independent_image_and_crop_per_body_block",
         "content_progressive_reveal_project_regression": "pass_onecard_embeds_all_step_images_and_settings",
         "content_progressive_reveal_project_zip_regression": "pass_four_assets_restore_to_matching_steps_and_settings",
-        "content_progressive_reveal_batch_export_regression": "pass_same_size_png_zip",
+        "content_progressive_reveal_batch_export_regression": "pass_same_size_direct_png_files",
         "primary_instruction_legibility_regression": "pass_editor12px_mode15px_helper11px_advanced13px",
         "browser_visual": "pass_public_v049_project_zip_run_311",
         "browser_interaction": "pass_3_per_step_images_restore_and_same_1552x724",
@@ -672,7 +672,7 @@
     "image_restore_policy": "text_and_settings_restore; uploaded_image_files_must_be_selected_again"
   },
   "shared_project_package": {
-    "version": "V1.3.2_20260903",
+    "version": "V1.3.5_20260926",
     "tool_count": 13,
     "filename_pattern": "{card_category}-{title}-{state}.{ext}",
     "brand_prefix_in_filename": false,
@@ -688,15 +688,15 @@
     "per_step_asset_restore": true
   },
   "shared_batch_render": {
-    "version": "V1.3.1_20260901",
-    "mode": "same_tool_json_zip_to_png_zip",
+    "version": "V1.3.2_20260926",
+    "mode": "same_tool_json_zip_to_direct_png_files",
     "max_files": 20,
     "max_total_bytes": 209715200,
     "mixed_json_zip_input": true,
     "image_tool_json_policy": "zip_project_package_required",
     "zip_embedded_png_fast_path": true,
     "isolated_worker_render_fallback": true,
-    "output": "single_png_zip",
+    "output": "direct_png_files",
     "stop_supported": true
   },
   "shared_ai_json_guide": {
@@ -713,13 +713,15 @@
     "left_controls_untouched": true
   },
   "shared_ui_shell": {
-    "version": "V1.3.1_20260901",
+    "version": "V1.7.0_20260926",
     "minimum_helper_text_px": 13,
     "minimum_control_height_px": 42,
     "after_edit_tools_collapsed": true,
     "single_completion_dock_per_page": true,
     "long_repeated_editors_collapsible": true,
     "accessible_label_enhancement": true,
-    "embedded_editor_completion_tools_hidden": true
+    "embedded_editor_completion_tools_hidden": true,
+    "preview_json_quick_actions": true,
+    "project_zip_only_compressed_output": true
   }
 }
