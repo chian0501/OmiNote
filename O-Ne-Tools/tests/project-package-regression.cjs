@@ -45,7 +45,7 @@ vm.runInContext(helperSource, context, { filename: 'project-package-v1.js' });
 
 const helper = context.ONEProjectPackage;
 assert(helper, 'project package helper must load');
-assert.strictEqual(helper.version, '1.3.4');
+assert.strictEqual(helper.version, '1.3.5');
 assert.strictEqual(helper.schema, 'o-ne.project-package.v1');
 assert.strictEqual(helper.__test.cleanPart('道頓堀/觀光船:晚班'), '道頓堀 觀光船 晚班');
 assert.strictEqual(helper.__test.toolName('focus-card'), '焦點卡');
@@ -116,7 +116,7 @@ assert(helperSource.indexOf('instance.config.apply(clone(project.data));') < hel
 
   const project = {
     schema: 'o-ne.project-package.v1',
-    package_version: '1.3.4',
+    package_version: '1.3.5',
     tool_id: 'explanation-card',
     data: { sequence: { enabled: true, visibleCount: 4, frames: [{ zoom: 80 }, { zoom: 100 }, { zoom: 125 }, { zoom: 160 }] } },
     assets: [1, 2, 3, 4].map(step => ({

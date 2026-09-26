@@ -308,7 +308,7 @@ function render(snapshot,outputCanvas){
     st.textContent='BLOCKED｜有文字長到超出正式安全範圍，請縮短內容';
     st.className='status error';
   }else{
-    st.textContent=`${n} 個選項｜整組 ${n+1} 張：全部暗＋每項各自亮，下載為 ZIP`;
+    st.textContent=`${n} 個選項｜整組 ${n+1} 張：全部暗＋每項各自亮，直接下載 PNG`;
     st.className='status';
   }
   return blocked;
@@ -354,9 +354,13 @@ $('downloadSet').onclick=async()=>{
       const state=step===0?'全部暗':`選項${step}亮`;
       entries.push({name:`選項卡-${name}-${String(step).padStart(2,'0')}-${state}.png`,data:blob});
     }
-    const zip=await ONEProjectPackage.createZip(entries),url=URL.createObjectURL(zip),a=document.createElement('a');
-    a.href=url;a.download=`選項卡-${name}-全狀態.zip`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1500);
-    exportingSet=false;render();$('status').textContent=`已輸出 ${entries.length} 張 PNG｜全部暗＋逐項亮；編輯內容與亮暗狀態保留`;
+    for(const entry of entries){
+      const url=URL.createObjectURL(entry.data),a=document.createElement('a');
+      a.href=url;a.download=entry.name;a.click();
+      setTimeout(()=>URL.revokeObjectURL(url),1500);
+      await new Promise(resolve=>setTimeout(resolve,120));
+    }
+    exportingSet=false;render();$('status').textContent=`已輸出 ${entries.length} 張 PNG｜全部暗＋逐項亮；檔案直接下載，編輯內容與亮暗狀態保留`;
   }catch(error){exportingSet=false;render();$('status').className='status error';$('status').textContent='輸出失敗｜'+error.message;}
 };
 $('jsonBtn').onclick=()=>{

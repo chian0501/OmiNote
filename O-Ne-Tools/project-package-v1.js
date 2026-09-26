@@ -1,4 +1,4 @@
-/* O-Ne shared project package / smart download names — V1.3.4 */
+/* O-Ne shared project package / smart download names — V1.3.5 */
 (function (global) {
   'use strict';
 
@@ -17,7 +17,7 @@
   }
   ensureSharedUi();
 
-  var VERSION = '1.3.4';
+  var VERSION = '1.3.5';
   var PACKAGE_SCHEMA = 'o-ne.project-package.v1';
   var MAX_PACKAGE_BYTES = 200 * 1024 * 1024;
   var mounts = Object.create(null);
@@ -603,8 +603,8 @@
     panel.innerHTML =
       '<div class="one-project-package__title">完整專案包</div>' +
       '<div class="one-project-package__row">' +
-        '<button type="button" data-action="export-package">下載專案包 ZIP</button>' +
-        '<button type="button" data-action="import-package">載入專案包 ZIP</button>' +
+        '<button type="button" data-action="export-package">導出專案 ZIP</button>' +
+        '<button type="button" data-action="import-package">載入專案 ZIP</button>' +
       '</div>' +
       '<input type="file" accept=".zip,application/zip" hidden>' +
       '<div class="one-project-package__note">ZIP 會一起保存目前 PNG、編輯設定 JSON 與已置入圖片；檔名統一為「卡片分類-標題-狀態」，不加 O-Ne。舊 JSON 仍可照原方式使用。</div>' +
@@ -856,10 +856,10 @@
   wrapEditBackup();
 
   if (typeof document !== 'undefined' && document.readyState === 'loading' && typeof document.write === 'function') {
-    document.write('<script src="./batch-render-v1.js?v=1310"></' + 'script>');
+    document.write('<script src="./batch-render-v1.js?v=1320"></' + 'script>');
   } else if (typeof document !== 'undefined' && document.createElement && document.head) {
     var batchScript = document.createElement('script');
-    batchScript.src = './batch-render-v1.js?v=1310';
+    batchScript.src = './batch-render-v1.js?v=1320';
     document.head.appendChild(batchScript);
   }
 
