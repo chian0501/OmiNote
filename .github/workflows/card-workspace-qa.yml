@@ -55,6 +55,8 @@ jobs:
         run: npx playwright test O-Ne-Tools/tests/card-canonical-import.browser.spec.cjs --config O-Ne-Tools/tests/playwright.workspace.config.cjs
       - name: Compare all 13 native Canvas renders to exact main commit
         run: npx playwright test O-Ne-Tools/tests/card-native-equivalence.browser.spec.cjs --config O-Ne-Tools/tests/playwright.workspace.config.cjs
+      - name: Audit Maker Hub navigation, accessibility and responsive layout
+        run: npx playwright test O-Ne-Tools/tests/maker-hub.browser.spec.cjs --config O-Ne-Tools/tests/playwright.workspace.config.cjs
       - name: Run existing visual and interaction checks
         run: npx playwright test O-Ne-Tools/tests/card-workspace.browser.spec.cjs O-Ne-Tools/tests/explanation-project-ui.browser.spec.cjs O-Ne-Tools/tests/focus-sequence.browser.spec.cjs O-Ne-Tools/tests/project-quick-actions.browser.spec.cjs --config O-Ne-Tools/tests/playwright.workspace.config.cjs
       - name: Preserve screenshots, downloads, traces, and report
