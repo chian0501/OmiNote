@@ -9,6 +9,82 @@
 :root{--bg:#0e1117;--panel:#151a23;--panel2:#101620;--border:#2a3240;--text:#f5efe7;--muted:#aeb8c5;--teal:#29A6A7;--purple:#70518a;--yellow:#FFBE37}
 *{box-sizing:border-box}body{margin:0;min-height:100vh;background:var(--bg);color:var(--text);font-family:"Noto Sans TC","Microsoft JhengHei",sans-serif}.app{max-width:1380px;margin:auto;padding:32px}.hero{display:flex;justify-content:space-between;gap:24px;align-items:flex-start;margin-bottom:20px}.hero-copy{max-width:850px}h1{margin:0 0 8px;font-size:30px}.sub{color:var(--muted);font-size:15px;line-height:1.7}.hero-side{display:grid;gap:10px;min-width:205px}.stat{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:13px 16px}.stat b{display:block;font-size:24px;color:var(--teal)}.stat span{font-size:13px;color:var(--muted)}.command-link{display:flex;align-items:center;justify-content:center;min-height:44px;border:1px solid #4f6075;border-radius:11px;background:#202b39;color:#edf4fb;text-decoration:none;font-size:14px;font-weight:900}.command-link:hover{border-color:var(--teal)}.notice{margin-bottom:22px;padding:15px 17px;border:1px solid #4a3653;background:#201927;border-radius:13px;color:#dbcde0;font-size:14px;line-height:1.7}.notice b{color:#fff}.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:22px}.search{flex:1;min-width:260px;border:1px solid #445066;border-radius:10px;background:var(--panel2);color:white;padding:11px 13px;font-size:15px;outline:none}.filter{border:1px solid #445066;border-radius:999px;background:#171e29;color:#c6cfda;padding:9px 13px;font-size:13px;font-weight:800;cursor:pointer}.filter.active{background:var(--teal);color:#fff;border-color:var(--teal)}.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.card{background:linear-gradient(180deg,#171d27,#131923);border:1px solid var(--border);border-radius:15px;padding:17px;min-height:236px;display:flex;flex-direction:column;position:relative;overflow:hidden}.card:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:#3b4453}.card.ready{border-color:#2b7777}.card.ready:before{background:var(--teal)}.card.candidate{border-color:#8b6b24}.card.candidate:before{background:var(--yellow)}.meta{display:flex;justify-content:space-between;gap:8px;margin-bottom:12px}.group{font-size:13px;color:#b4becb}.badge{padding:4px 9px;border-radius:999px;font-size:11px;font-weight:900}.badge.ready{background:#14312e;color:#8fd4c8}.badge.candidate{background:#3b2d12;color:#ffd978}.title{font-size:20px;font-weight:900;margin-bottom:6px}.family{font-size:13px;color:#7fc5d8;margin-bottom:10px}.desc{font-size:14px;color:#bdc6d1;line-height:1.6;flex:1}.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px}.action{display:flex;align-items:center;justify-content:center;min-height:44px;border:0;border-radius:10px;padding:9px;font-weight:900;text-decoration:none;font-size:14px}.direct{background:var(--teal);color:#fff}.ai{background:#3a2942;color:#f0caef;border:1px solid #60416b}.built-in{border:1px dashed #435064;background:#171e29;color:#b7c1ce;font-size:12px;text-align:center}.empty{grid-column:1/-1;padding:30px;border:1px dashed #3a4557;border-radius:14px;color:var(--muted);text-align:center}.footer{margin-top:24px;padding:15px 17px;background:var(--panel);border:1px solid var(--border);border-radius:13px;font-size:14px;color:#b7c0cb;line-height:1.7}.footer b{color:#fff}.error{color:#ff8d86}
 @media(max-width:1100px){.grid{grid-template-columns:repeat(3,1fr)}}@media(max-width:820px){.grid{grid-template-columns:repeat(2,1fr)}.hero{flex-direction:column}.hero-side{width:100%;grid-template-columns:1fr 1fr}}@media(max-width:580px){.grid{grid-template-columns:1fr}.app{padding:20px}.hero-side{grid-template-columns:1fr}.actions{grid-template-columns:1fr}.filter{flex:1 1 auto}}
+
+
+/* Maker Lab UI V2: presentation only; card artwork stays unchanged. */
+.visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
+body{background:radial-gradient(ellipse 74% 40% at 82% -8%,rgba(41,166,167,.14),transparent 74%),radial-gradient(ellipse 45% 25% at 1% 12%,rgba(154,128,209,.11),transparent 78%),#0d121a;}
+.app{max-width:1450px;padding:28px 32px 40px}
+.hero{align-items:center;gap:28px;margin-bottom:24px;padding:25px 29px;border:1px solid #334a5d;border-radius:22px;background:linear-gradient(118deg,rgba(29,62,73,.75),#151e2b 49%,rgba(54,37,71,.68));box-shadow:0 16px 50px rgba(0,0,0,.19);position:relative;overflow:hidden}
+.hero:after{content:"";position:absolute;right:-105px;top:-140px;width:360px;height:360px;border:1px solid #ffffff10;border-radius:50%;pointer-events:none;box-shadow:0 0 0 62px #ffffff04,0 0 0 125px #ffffff02}
+.hero-copy,.hero-side{position:relative;z-index:1}
+.eyebrow{display:flex;align-items:center;gap:9px;margin-bottom:13px;color:#a9dada;font-size:12px;font-weight:900;letter-spacing:.14em}
+.eyebrow-star{color:#ffbe37;font-size:22px;line-height:1}
+.eyebrow-pill{border:1px solid #537077;border-radius:999px;padding:5px 10px;background:#1b3940;color:#b8f5ec;letter-spacing:.04em}
+.hero h1{font-size:clamp(30px,3.2vw,46px);font-weight:950;line-height:1.24;letter-spacing:-.02em}
+.headline-accent{color:#ffbe37}
+.headline-emoji{display:inline-block;margin-left:12px;font-size:.72em;transform:rotate(-8deg)}
+.hero .sub{max-width:670px;line-height:1.85;color:#c1cdd4;font-size:15px}
+.hero-tags{display:flex;gap:9px;flex-wrap:wrap;margin-top:18px}
+.hero-tags span{padding:7px 11px;border:1px solid #405566;border-radius:9px;background:#152633;color:#cce3e5;font-size:12px;font-weight:700}
+.hero-side{min-width:240px;max-width:265px}
+.hero .stat{padding:17px 18px;border:1px solid #447279;border-radius:14px;background:linear-gradient(115deg,#13353a,#152631)}
+.hero .stat b{color:#70e0d3;font-size:29px}
+.hero .command-link{border-radius:12px;background:#29213b;border-color:#5e5079;color:#e8defb;transition:background .18s ease,border-color .18s ease,transform .18s ease}
+.hero .command-link:hover{background:#3c2d54;border-color:#af8ce1;transform:translateY(-1px)}
+.start-steps{display:flex;align-items:stretch;gap:10px;margin-bottom:22px}
+.start-step{display:flex;gap:12px;align-items:center;flex:1;min-width:0;padding:13px 14px;border:1px solid #33495d;border-radius:13px;background:#131f2b}
+.step-symbol{display:grid;place-items:center;flex:0 0 38px;width:38px;height:38px;border-radius:10px;background:#24464b;color:#abf4e8;font:900 15px/1 ui-monospace,monospace}
+.start-step:nth-of-type(3) .step-symbol{background:#4f4023;color:#ffdc82}
+.start-step strong{display:block;margin-bottom:3px;font-size:14px;color:#f6f3ec}
+.start-step small{display:block;font-size:12px;color:#aabac7;line-height:1.5}
+.start-arrow{display:flex;align-items:center;color:#6fbfbc;font-size:18px;font-weight:900}
+.recent{margin:5px 0 20px;padding:14px 17px;border:1px solid #425a65;border-radius:14px;background:linear-gradient(95deg,#192531,#182135)}
+.recent[hidden]{display:none!important}
+.recent-heading{display:flex;gap:10px;flex-wrap:wrap;align-items:baseline;margin-bottom:12px}
+.recent-heading strong{font-size:14px;color:#f8eee1}
+.recent-heading span{font-size:11px;color:#a2b5c3}
+.recent-items{display:flex;flex-wrap:wrap;gap:8px}
+.recent-link{display:flex;align-items:center;gap:9px;min-height:38px;padding:7px 12px;border:1px solid #385c68;border-radius:10px;background:#152f3b;color:#e3f7f6;text-decoration:none;font-size:13px;font-weight:800}
+.recent-link:hover,.recent-link:focus-visible{background:#1c4550;border-color:#76d4ce}
+.recent-link span:last-child{color:#ffcf6a}
+.toolbar{align-items:center;gap:8px;margin-bottom:12px}
+.search{min-height:48px;border:1px solid #56707b;border-radius:12px;background:#172633;padding:11px 15px;font-size:15px}
+.search:focus{outline:2px solid #5ccacb;outline-offset:1px;border-color:#5ccacb}
+.search-clear{min-height:44px;padding:8px 12px;border:1px solid #41576b;border-radius:11px;background:#172431;color:#c5d6dd;font-weight:800;cursor:pointer}
+.search-clear:hover{border-color:#66c7c1}
+.filter{min-height:40px;padding:9px 12px;border-radius:11px;background:#17212d;transition:background .14s ease,border-color .14s ease}
+.filter:hover{background:#233448;border-color:#659d9f}
+.filter.active{background:#1c5156;color:#e8fffc;border-color:#4cc0bd;box-shadow:inset 0 -2px 0 #58d7d0}
+.results-summary{margin:0 0 14px;font-size:12px;font-weight:700;color:#a5bfcb}
+.grid{gap:16px}
+.card{min-height:255px;padding:20px 19px;border-radius:17px;border-color:#34495b;background:linear-gradient(158deg,#192633,#121c28 75%);box-shadow:0 8px 22px rgba(0,0,0,.1);transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
+.card:hover,.card:focus-within{transform:translateY(-3px);border-color:#589b9e;box-shadow:0 14px 30px rgba(0,0,0,.22)}
+.card:before{width:4px;background:#526580}
+.card.ready:before{background:linear-gradient(180deg,#ffbe37,#29a6a7)}
+.card[data-group="對話／角色"]:before{background:#b293e8}
+.card[data-group="效果／狀態"]:before{background:#efab61}
+.card[data-group="路線／導航"]:before{background:#6bb5f2}
+.card-title-row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.card-icon{display:grid;place-items:center;flex:0 0 45px;width:45px;height:45px;border:1px solid #406c70;border-radius:12px;background:#1c3a45;font-size:21px}
+.card[data-group="對話／角色"] .card-icon{background:#312643;border-color:#5d4c79}
+.card[data-group="效果／狀態"] .card-icon{background:#402c26;border-color:#70523c}
+.card[data-group="路線／導航"] .card-icon{background:#1c3145;border-color:#345a7d}
+.title{margin:0;font-size:20px;line-height:1.35}
+.family{margin-bottom:8px;color:#a4dee5}
+.desc{line-height:1.7}
+.card .actions{margin-top:20px}
+.action{border-radius:10px;min-height:45px;transition:filter .15s ease,transform .15s ease}
+.action:hover,.action:focus-visible{filter:brightness(1.12);transform:translateY(-1px)}
+.action.direct{background:linear-gradient(125deg,#2da9a8,#23868e);color:#fff}
+.action.ai{background:#322341;border-color:#73588c}
+.card:focus-visible,.action:focus-visible,.filter:focus-visible,.search-clear:focus-visible,.command-link:focus-visible{outline:2px solid #82ebe2;outline-offset:3px}
+@media(max-width:1100px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}.app{padding:24px}}
+@media(max-width:900px){.start-arrow{display:none}.start-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}.start-step{align-items:flex-start;flex-direction:column}}
+@media(max-width:820px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.hero{padding:22px}.hero-side{max-width:none;min-width:0;width:100%;display:grid;grid-template-columns:1fr 1fr}.start-step{min-height:100px}}
+@media(max-width:580px){.app{padding:14px}.hero{padding:22px 18px;gap:18px;margin-bottom:16px}.hero h1{font-size:29px}.hero-side{grid-template-columns:1fr}.start-steps{grid-template-columns:1fr;gap:8px}.start-step{flex-direction:row;min-height:0}.toolbar{gap:8px}.search{min-width:0;flex-basis:calc(100% - 75px)}.filter{flex:1 1 auto}.grid{grid-template-columns:1fr;gap:12px}.card{min-height:220px}.actions{grid-template-columns:repeat(2,minmax(0,1fr))}.recent-link{flex:1 1 auto}}
+@media(prefers-reduced-motion:reduce){.card,.action,.filter,.hero .command-link{transition:none!important}.card:hover,.card:focus-within,.action:hover,.action:focus-visible,.hero .command-link:hover{transform:none!important}}
+
 </style>
 <script src="./one-tools-ui-v1.js?v=1310"></script>
 </head>
@@ -16,17 +92,31 @@
 <div class="app">
   <header class="hero">
     <div class="hero-copy">
-      <h1>O-Ne 字卡工具</h1>
-      <div class="sub">先選卡型，直接進編輯器；版型、文字與圖片都在同一頁完成。暫存與專案檔案放在頂部；PNG 輸出固定在預覽下方。</div>
+      <div class="eyebrow"><span class="eyebrow-star" aria-hidden="true">✦</span> O-NE MAKER LAB <span class="eyebrow-pill">工具工坊</span></div>
+      <h1>今天要做哪張<span class="headline-accent">字卡？</span><span aria-hidden="true" class="headline-emoji">🎮</span></h1>
+      <div class="sub">把旅途任務、評分、對話和情報變成 O-Ne 字卡。挑一種卡型，直接修改內容，看著預覽完成作品。</div>
+      <div class="hero-tags"><span>✦ 正式模板</span><span>▣ 即時預覽</span><span>⇩ PNG 與專案包</span></div>
     </div>
     <div class="hero-side">
       <div class="stat"><b id="statNum">載入中</b><span>目前可用 Maker Tools</span></div>
       <a class="command-link" href="./command-center.html">開啟 Command Center</a>
     </div>
   </header>
-  <div class="notice"><b>最簡單的使用方式：</b>① 開啟工具 → ② 在左側編輯並看右側預覽 → ③ 在預覽下方輸出 PNG，或從頂部保存專案。每個工具內都有可複製的 AI JSON 指令；五種常用卡另有 AI 助手可直接套用。</div>
+  <section class="start-steps" aria-label="三步完成字卡">
+    <div class="start-step"><span class="step-symbol" aria-hidden="true">01</span><span><strong>選一張卡</strong><small>從任務、路線、對話等類型開始</small></span></div>
+    <div class="start-arrow" aria-hidden="true">→</div>
+    <div class="start-step"><span class="step-symbol" aria-hidden="true">02</span><span><strong>改字、換圖、預覽</strong><small>內容設定與卡面直接編輯</small></span></div>
+    <div class="start-arrow" aria-hidden="true">→</div>
+    <div class="start-step"><span class="step-symbol" aria-hidden="true">03</span><span><strong>完成輸出</strong><small>PNG、JSON 或完整專案 ZIP</small></span></div>
+  </section>
+  <section id="recentSection" class="recent" aria-label="最近使用的工具" hidden>
+    <div class="recent-heading"><strong>↗ 最近打開</strong><span>只記錄在這台瀏覽器</span></div>
+    <div id="recentItems" class="recent-items"></div>
+  </section>
   <div class="toolbar" aria-label="工具篩選">
-    <input id="search" class="search" type="search" placeholder="搜尋工具或用途，例如：圖片、評分、移動、對話">
+    <label for="search" class="visually-hidden">搜尋字卡工具</label>
+    <input id="search" class="search" type="search" placeholder="🔎 搜尋卡種／用途，例如：評分、移動、對話" autocomplete="off">
+    <button type="button" id="clearSearch" class="search-clear" aria-label="清除搜尋">清除</button>
     <button class="filter active" data-group="全部">全部</button>
     <button class="filter" data-group="任務／事件">任務／事件</button>
     <button class="filter" data-group="路線／導航">路線／導航</button>
@@ -37,6 +127,7 @@
     <button class="filter" data-group="效果／狀態">效果／狀態</button>
     <button class="filter" data-group="結算／結果">結算／結果</button>
   </div>
+  <p id="resultsSummary" class="results-summary" role="status" aria-live="polite">選擇卡片類型，開始製作。</p>
   <main id="grid" class="grid" aria-live="polite"><div class="empty">正在讀取工具清單…</div></main>
   <div class="footer"><b>共用規則：</b>卡體主底色維持正式 80% 透明規則，前景、文字與框線不整張淡化。公開工具只使用語意代號，不包含內部 Drive／Docs 識別碼。</div>
 </div>
@@ -47,35 +138,88 @@
   var group='全部';
   var grid=document.getElementById('grid');
   var search=document.getElementById('search');
+  var clearSearch=document.getElementById('clearSearch');
+  var resultsSummary=document.getElementById('resultsSummary');
+  var recentSection=document.getElementById('recentSection');
+  var recentItems=document.getElementById('recentItems');
+  var recentKey='one-maker-recent-v1';
+  var groupIcons={'任務／事件':'⚡','路線／導航':'🧭','選擇／確認':'🎯','對話／角色':'💬','資訊／閱讀':'📖','縮圖／品牌':'🖼','效果／狀態':'✨','結算／結果':'🏁'};
+  var recentIds=[];
+  try{var raw=JSON.parse(localStorage.getItem(recentKey)||'[]');if(Array.isArray(raw))recentIds=raw.filter(function(id){return typeof id==='string'}).slice(0,4)}catch(e){}
+  function renderRecent(){
+    recentItems.innerHTML='';
+    var found=recentIds.map(function(id){return tools.find(function(tool){return tool.id===id})}).filter(Boolean);
+    recentSection.hidden=!found.length;
+    found.forEach(function(tool){
+      var link=document.createElement('a');link.className='recent-link';link.href=tool.href;
+      var icon=document.createElement('span');icon.setAttribute('aria-hidden','true');icon.textContent=groupIcons[tool.group]||'✦';
+      var name=document.createElement('span');name.textContent=tool.name;
+      var arrow=document.createElement('span');arrow.setAttribute('aria-hidden','true');arrow.textContent='↗';
+      link.append(icon,name,arrow);link.addEventListener('click',function(){remember(tool.id)});
+      recentItems.appendChild(link);
+    });
+  }
+  function remember(id){
+    recentIds=[id].concat(recentIds.filter(function(item){return item!==id})).slice(0,4);
+    try{localStorage.setItem(recentKey,JSON.stringify(recentIds))}catch(e){}
+    renderRecent();
+  }
   function text(value){return String(value==null?'':value)}
   function action(label,href,className){var a=document.createElement('a');a.className='action '+className;a.href=href;a.textContent=label;return a}
   function render(){
     var q=search.value.trim().toLowerCase();
     var shown=tools.filter(function(tool){var hay=[tool.name,tool.family,tool.group,tool.desc,(tool.features||[]).join(' ')].join(' ').toLowerCase();return(group==='全部'||tool.group===group)&&(!q||hay.indexOf(q)>=0)});
     grid.innerHTML='';
-    if(!shown.length){var empty=document.createElement('div');empty.className='empty';empty.textContent='找不到符合的工具，換個關鍵字試試看。';grid.appendChild(empty);return}
+    resultsSummary.textContent=shown.length?'找到 '+shown.length+' 款可用工具'+(q?'，符合「'+search.value.trim()+'」':'')+'。選一張開始製作吧！':'目前沒有符合的工具';
+    if(!shown.length){var empty=document.createElement('div');empty.className='empty';empty.textContent='沒有找到符合的卡型。試試「評分」「任務」「圖片」等關鍵字。';grid.appendChild(empty);return}
     shown.forEach(function(tool){
       var card=document.createElement('article');card.className='card '+tool.status;
+      card.dataset.group=tool.group;card.dataset.toolId=tool.id;
       var meta=document.createElement('div');meta.className='meta';
       var groupNode=document.createElement('span');groupNode.className='group';groupNode.textContent=text(tool.group);
       var badge=document.createElement('span');badge.className='badge '+tool.status;badge.textContent=tool.status==='ready'?'可使用':'候選測試';meta.append(groupNode,badge);
       var title=document.createElement('div');title.className='title';title.textContent=text(tool.name);
+      var icon=document.createElement('span');icon.className='card-icon';icon.setAttribute('aria-hidden','true');icon.textContent=groupIcons[tool.group]||'✦';
+      var titleRow=document.createElement('div');titleRow.className='card-title-row';titleRow.append(icon,title);
       var family=document.createElement('div');family.className='family';family.textContent=text(tool.family);
       var desc=document.createElement('div');desc.className='desc';desc.textContent=text(tool.desc||'開啟工具查看可編輯內容。');
       var actions=document.createElement('div');actions.className='actions';actions.appendChild(action('開啟'+text(tool.name),tool.href,'direct'));
       if(tool.ai_href) actions.appendChild(action('AI 助手',tool.ai_href,'ai'));
       else {var built=document.createElement('div');built.className='action built-in';built.textContent='內建 AI JSON 格式';actions.appendChild(built)}
-      card.append(meta,title,family,desc,actions);grid.appendChild(card);
+      card.append(meta,titleRow,family,desc,actions);grid.appendChild(card);
     });
   }
   fetch('./one-tools-registry-v1.json?v=2370',{cache:'no-store'}).then(function(response){if(!response.ok)throw new Error('HTTP '+response.status);return response.json()}).then(function(registry){
     tools=(registry.tools||[]).filter(function(tool){return (tool.status==='ready'||tool.status==='candidate')&&tool.href});
     document.getElementById('statNum').textContent=tools.length+' 個';
     document.documentElement.setAttribute('data-registry-version',registry.version||'unknown');
-    render();
+    render();renderRecent();
   }).catch(function(error){grid.innerHTML='';var empty=document.createElement('div');empty.className='empty error';empty.textContent='工具清單暫時讀取失敗，請重新整理頁面。'+text(error.message);grid.appendChild(empty);document.getElementById('statNum').textContent='讀取失敗'});
   search.addEventListener('input',render);
-  document.querySelectorAll('.filter').forEach(function(button){button.addEventListener('click',function(){document.querySelectorAll('.filter').forEach(function(item){item.classList.remove('active')});button.classList.add('active');group=button.dataset.group;render()})});
+  clearSearch.addEventListener('click',function(){search.value='';render();search.focus()});
+  grid.addEventListener('click',function(event){
+    var link=event.target.closest('a.action.direct');
+    var card=link&&link.closest('.card');
+    if(card&&card.dataset.toolId)remember(card.dataset.toolId);
+  });
+  document.querySelectorAll('.filter').forEach(function(button){
+    button.setAttribute('aria-pressed',String(button.classList.contains('active')));
+    button.addEventListener('click',function(){
+      document.querySelectorAll('.filter').forEach(function(item){
+        var active=item===button;item.classList.toggle('active',active);item.setAttribute('aria-pressed',String(active));
+      });
+      group=button.dataset.group;render();
+    });
+  });
+  document.addEventListener('keydown',function(event){
+    if(event.isComposing||event.altKey||event.shiftKey)return;
+    var active=document.activeElement;
+    var typing=active&&/^(INPUT|TEXTAREA|SELECT)$/.test(active.tagName);
+    if(((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==='k')||(!typing&&!event.ctrlKey&&!event.metaKey&&event.key==='/')){
+      event.preventDefault();search.focus();search.select();
+    }
+    if(event.key==='Escape'&&active===search&&search.value){search.value='';render()}
+  });
 })();
 </script>
 </body>
