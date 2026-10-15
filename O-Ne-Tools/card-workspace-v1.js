@@ -358,6 +358,18 @@
     }
     state.app.addEventListener('input', markUnsaved, true);
     state.app.addEventListener('change', markUnsaved, true);
+    // Dynamic card data also changes through buttons (add row, switch modes,
+    // toggle options, swap characters) without any native input/change event.
+    // Observe these only in the actual editor and ignore navigation, tooltips,
+    // fold controls, crop-dialog openers and preview-only actions.
+    state.app.addEventListener('click', function (event) {
+      var control = event.target && event.target.closest && event.target.closest('button');
+      if (!control || !state.editor.contains(control) || control.disabled) return;
+      if (control.closest('.one-workspace-editor-heading,.one-workspace-section-jump')) return;
+      if (control.matches('.one-workspace-text-button,[aria-haspopup="dialog"],.image-crop-button,[id^="crop"]')) return;
+      if (control.id === 'transparentView' || control.id === 'darkView') return;
+      markUnsaved(event);
+    }, true);
   }
 
   function foldSection(node, open) {
