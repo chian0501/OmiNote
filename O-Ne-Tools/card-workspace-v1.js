@@ -370,6 +370,13 @@
       if (control.id === 'transparentView' || control.id === 'darkView') return;
       markUnsaved(event);
     }, true);
+    // Image cropping uses a modal attached to document.body, outside the
+    // card editor. Applying a crop must also show the manual-save reminder.
+    document.addEventListener('click', function (event) {
+      if (event.target && event.target.closest && event.target.closest('.one-image-dialog [data-apply]')) {
+        markUnsaved(event);
+      }
+    }, true);
   }
 
   function foldSection(node, open) {
