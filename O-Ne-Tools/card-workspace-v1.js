@@ -223,12 +223,14 @@
     });
     toggle.setAttribute('aria-expanded', 'true');
     toggle.textContent = '收合設定';
+    state.sidebarToggle = toggle;
     if (!state.editor.id) state.editor.id = 'one-workspace-editor';
     toggle.setAttribute('aria-controls', state.editor.id);
     bar.appendChild(toggle);
     var summary = element('span', 'one-workspace-mode-hint', '點字卡文字直接編輯｜預覽最多 100%，只縮小');
     if (state.id === 'rating') summary.textContent = '點文字編輯・點圖片更換｜預覽最多 100%，只縮小';
     bar.appendChild(summary);
+    makeStepNavigator(state, bar);
     if (state.config.mode) {
       var control = document.getElementById(state.config.mode);
       if (control) {
@@ -259,6 +261,122 @@
     }
     state.workspace.parentNode.insertBefore(bar, state.workspace);
     state.modebar = bar;
+  }
+
+
+  /* Process shortcuts navigate existing controls, never replace native events. */
+  function makeStepNavigator(state, bar) {
+    var nav = element('nav', 'one-workspace-steps');
+    nav.setAttribute('aria-label', '製作流程快速導覽');
+    var buttons = {};
+    var steps = [
+      ['content', '① 編輯', function () {
+        if (state.sidebarHidden && state.sidebarToggle) state.sidebarToggle.click();
+        state.editor.scrollIntoView({ block: 'nearest' });
+        var field = state.editor.querySelector('select,input:not([type=hidden]):not([type=file]),textarea');
+        if (field && !field.disabled && field.getClientRects().length) field.focus({ preventScroll: true });
+      }],
+      ['preview', '② 預覽', function () {
+        state.preview.scrollIntoView({ block: 'nearest' });
+        var head = state.preview.querySelector('.one-workspace-preview-heading,.preview-toolbar');
+        if (head) { head.tabIndex = -1; head.focus({ preventScroll: true }); }
+      }],
+      ['export', '③ 輸出', function () {
+        var target = state.preview.querySelector('.one-workspace-export,.export-bar,.export-actions') || state.preview;
+        target.scrollIntoView({ block: 'nearest' });
+        var control = target.querySelector('button:not(:disabled),a[href]');
+        if (control) control.focus({ preventScroll: true });
+      }]
+    ];
+    state.activateStep = function (name) {
+      Object.keys(buttons).forEach(function (key) {
+        if (key === name) buttons[key].setAttribute('aria-current', 'step');
+        else buttons[key].removeAttribute('aria-current');
+      });
+    };
+    steps.forEach(function (entry) {
+      var node = button(entry[1], '', function () {
+        entry[2]();
+        state.activateStep(entry[0]);
+      });
+      node.setAttribute('title', entry[0] === 'export' ? '前往下載與專案區，不會自動下載' : '快速移至' + entry[1]);
+      buttons[entry[0]] = node;
+      nav.appendChild(node);
+    });
+    bar.appendChild(nav);
+    state.activateStep('content');
+  }
+
+  function makeSectionJump(state) {
+    if (state.config.react) return;
+    var headings = Array.prototype.slice.call(state.editor.querySelectorAll('details.one-workspace-fold > summary'));
+    if (headings.length < 2) return;
+    var host = element('div', 'one-workspace-section-jump');
+    var label = element('label', '', '☰ 快速跳到設定');
+    var select = element('select', '', '');
+    select.id = 'one-workspace-section-select';
+    label.htmlFor = select.id;
+    var empty = element('option', '', '選擇要調整的項目…');
+    empty.value = '';
+    select.appendChild(empty);
+    headings.forEach(function (summary, index) {
+      var name = (summary.textContent || '').replace(/\s+/g, ' ').trim();
+      var option = element('option', '', name || ('設定 ' + (index + 1)));
+      option.value = String(index);
+      select.appendChild(option);
+    });
+    select.addEventListener('change', function () {
+      if (!select.value) return;
+      var target = headings[Number(select.value)];
+      if (!target || !target.parentNode) return;
+      target.parentNode.open = true;
+      target.scrollIntoView({ block: 'nearest' });
+      if (state.sidebarHidden && state.sidebarToggle) state.sidebarToggle.click();
+      if (state.activateStep) state.activateStep('content');
+      select.value = '';
+    });
+    host.append(label, select);
+    var header = state.editor.querySelector('.one-workspace-editor-heading');
+    if (header) header.insertAdjacentElement('afterend', host);
+    else state.editor.insertBefore(host, state.editor.firstChild);
+  }
+
+  function trackUnsaved(state) {
+    state.dirty = false;
+    if (state.saveFeedback && !state.saveFeedback.textContent.trim()) {
+      state.saveFeedback.textContent = '手動暫存 · 修改後記得儲存';
+      state.saveFeedback.title = '內容只會在按下暫存後保留在此瀏覽器';
+    }
+    function markUnsaved(event) {
+      var target = event.target;
+      if (!target || !target.closest) return;
+      if (target.closest('.one-workspace-dialog,.one-workspace-section-jump,[data-one-backup-ui],[data-one-project-package-ui]')) return;
+      state.dirty = true;
+      state.saveFeedback.textContent = '● 有尚未暫存的修改';
+      state.saveFeedback.dataset.oneUnsaved = 'true';
+      state.saveFeedback.classList.remove('is-error');
+    }
+    state.app.addEventListener('input', markUnsaved, true);
+    state.app.addEventListener('change', markUnsaved, true);
+    // Dynamic card data also changes through buttons (add row, switch modes,
+    // toggle options, swap characters) without any native input/change event.
+    // Observe these only in the actual editor and ignore navigation, tooltips,
+    // fold controls, crop-dialog openers and preview-only actions.
+    state.app.addEventListener('click', function (event) {
+      var control = event.target && event.target.closest && event.target.closest('button');
+      if (!control || !state.editor.contains(control) || control.disabled) return;
+      if (control.closest('.one-workspace-editor-heading,.one-workspace-section-jump')) return;
+      if (control.matches('.one-workspace-text-button,[aria-haspopup="dialog"],.image-crop-button,[id^="crop"]')) return;
+      if (control.id === 'transparentView' || control.id === 'darkView') return;
+      markUnsaved(event);
+    }, true);
+    // Image cropping uses a modal attached to document.body, outside the
+    // card editor. Applying a crop must also show the manual-save reminder.
+    document.addEventListener('click', function (event) {
+      if (event.target && event.target.closest && event.target.closest('.one-image-dialog [data-apply]')) {
+        markUnsaved(event);
+      }
+    }, true);
   }
 
   function foldSection(node, open) {
@@ -316,6 +434,7 @@
     state.editor.addEventListener('toggle', syncFolds, true);
     state.syncFolds = syncFolds;
     syncFolds();
+    makeSectionJump(state);
     if (state.id === 'dialogue') {
       var swap = state.editor.querySelector('#swap');
       if (swap) { swap.textContent = '⇄ 交換左右角色'; swap.setAttribute('aria-label', '交換左右角色'); }
@@ -484,6 +603,10 @@
         state.saveFeedback.textContent = message;
         state.saveFeedback.title = message;
         state.saveFeedback.classList.toggle('is-error', /失敗|不可用|無法|不支援/.test(message));
+        if (/^(已暫存目前內容|已自動暫存|目前內容與最新暫存相同)/.test(message)) {
+          state.dirty = false;
+          delete state.saveFeedback.dataset.oneUnsaved;
+        }
       });
       state.statusObserver.observe(status, { childList: true, subtree: true, characterData: true });
     }
@@ -525,6 +648,7 @@
     moveNativeFiles(state);
     routeUtilities(state);
     ensureProjectQuickActions(state);
+    trackUnsaved(state);
     if (!config.react) hideEmptyContainers(app);
     document.addEventListener('change', function () { if (state.updateMode) state.updateMode(); });
     document.addEventListener('keydown', function (event) {
@@ -543,7 +667,7 @@
     observer = new MutationObserver(schedule);
     observer.observe(document.body, { childList: true, subtree: true });
   }
-  global.ONECardWorkspace = { version: '1.6.1', refresh: refresh };
+  global.ONECardWorkspace = { version: '1.7.0', refresh: refresh };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
   else init();
 })(window);

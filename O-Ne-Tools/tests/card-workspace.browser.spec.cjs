@@ -10,9 +10,12 @@ const cards = registry.tools.filter(tool => tool.href && tool.id !== 'explanatio
 const PNG = Buffer.from('89504e470d0a1a0a', 'hex');
 const mainCanvas = '.preview-wrap canvas,.stage canvas,.preview-canvas';
 
-function cardURL(card, baseline = false) {
+function cardURL(card, reference = false) {
   const file = card.id === 'dialogue' ? 'dialogue-card-v135.html' : card.href.replace(/^\.\//, '').split('?')[0];
-  return (baseline ? '/baseline' : '') + '/O-Ne-Tools/' + file;
+  // 'main' is the exact current main at this PR's merge base; the older
+  // /baseline remains the approved historical snapshot for unaffected cards.
+  const prefix = reference === 'main' ? '/main' : reference ? '/baseline' : '';
+  return prefix + '/O-Ne-Tools/' + file;
 }
 async function openCard(page, card, baseline = false) {
   await page.goto(cardURL(card, baseline));
@@ -538,12 +541,15 @@ for (const card of cards) {
       await expect(page.locator('.one-workspace-dialog')).toHaveCount(1);
       if (width === 1366) {
         const base = await context.newPage();
-        await openCard(base, card, true);
-        if (['rating', 'settlement'].includes(card.id)) {
-          await expandEditor(base);
-          await base.locator('#bgVisible').uncheck();
-        }
-        expect(await artwork(page), 'unchanged approved renderer pixels').toBe(await artwork(base));
+        const currentMainCard = ['rating', 'settlement'].includes(card.id);
+        await openCard(base, card, currentMainCard ? 'main' : true);
+        // Rating and settlement generators gained approved background/image
+        // behavior since the older artwork baseline. Never mutate the
+        // reference state to manufacture a match. Compare the same native
+        // defaults against the exact current main instead.
+        expect(await artwork(page), currentMainCard ?
+          'unchanged current-main native renderer pixels' :
+          'unchanged approved historic renderer pixels').toBe(await artwork(base));
         await base.close();
       }
       const toggle = page.locator('.one-workspace-modebar > button');
@@ -821,7 +827,15 @@ for (const id of ['rating', 'settlement']) {
     page.on('dialog', dialog => dialog.accept());
     const card = cards.find(c => c.id === id);
     await openCard(page, card);
-    await expect(page.locator('#bgVisible')).not.toBeChecked();
+    const expectedDefaultVisible = id === 'settlement';
+    // Rating defaults transparent; settlement's 2026-09-16 LIVE fix
+    // explicitly defaults to the beige background shown at 100% opacity.
+    if (expectedDefaultVisible) await expect(page.locator('#bgVisible')).toBeChecked();
+    else await expect(page.locator('#bgVisible')).not.toBeChecked();
+    // Inspect the actual transparent export in both tools without changing
+    // the settlement card's official default.
+    await expandEditor(page);
+    if (expectedDefaultVisible) await page.locator('#bgVisible').uncheck();
     const initial = await artwork(page);
     const png = await download(page, page.locator('.one-workspace-export-button').first(), info, id + '-transparent', 'png');
     assertPNG(png.bytes);
@@ -833,10 +847,10 @@ for (const id of ['rating', 'settlement']) {
     }, png.bytes.toString('base64'));
     expect(alpha, 'exported PNG has actual alpha transparency outside the card').toBe(0);
     await expandEditor(page); await page.locator('#bgVisible').check();
-    const base = await context.newPage(); await openCard(base, card, true);
+    const base = await context.newPage(); await openCard(base, card, 'main');
     await expandEditor(base); await base.locator('#bgVisible').check();
     const withBackground = await artwork(base);
-    expect(await artwork(page), 'enabling the background preserves the approved artwork').toBe(withBackground);
+    expect(await artwork(page), 'enabling the background preserves exact current-main artwork').toBe(withBackground);
     await files(base);
     const oldJSON = await download(base, base.locator('.one-workspace-native-files #jsonBtn,.one-workspace-native-files #downloadJson'), info, id + '-previous-version', 'json');
     await base.close();
@@ -850,9 +864,14 @@ for (const id of ['rating', 'settlement']) {
     await expect(page.locator('#bgVisible')).toBeChecked();
     await expect.poll(() => artwork(page)).toBe(withBackground);
     await files(page); await page.locator('.one-workspace-native-files #reset').click(); await closeFiles(page);
-    await expect(page.locator('#bgVisible')).not.toBeChecked();
-    await expect.poll(() => artwork(page)).toBe(initial);
-    await screenshot(page, info, id + '-transparent-reset');
+    if (expectedDefaultVisible) {
+      await expect(page.locator('#bgVisible')).toBeChecked();
+      await expect.poll(() => artwork(page)).toBe(withBackground);
+    } else {
+      await expect(page.locator('#bgVisible')).not.toBeChecked();
+      await expect.poll(() => artwork(page)).toBe(initial);
+    }
+    await screenshot(page, info, id + '-official-default-reset');
   });
 }
 
@@ -1153,4 +1172,69 @@ test('focus GET capsule matches explanation size and exports without title overl
   await page.locator('input[placeholder="輸入卡片標題"]').fill('梅田到 HARUKA｜跟著 5 步走');
   await expect.poll(async()=>{const a=await title.boundingBox(),b=await tag.boundingBox();return a.x>=b.x+b.width;}).toBe(true);
   await screenshot(page,info,'focus-long-label-before-title');
+});
+
+
+// UI WORKBENCH V2: the native card still works after shared navigation.
+for (const card of cards) {
+  test(card.id + ' UI V2 step navigation preserves renderer and export access', async ({ page }) => {
+    const errors = [];
+    page.on('pageerror',error => errors.push(error.message));
+    await openCard(page,card);
+    const before = await artwork(page);
+    const nav = page.getByRole('navigation',{name:'製作流程快速導覽'});
+    await expect(nav).toBeVisible();
+    const steps = ['① 編輯','② 預覽','③ 輸出'];
+    for (const label of steps) {
+      const step = nav.getByRole('button',{name:label,exact:true});
+      await step.click();
+      await expect(step).toHaveAttribute('aria-current','step');
+    }
+    await nav.getByRole('button',{name:'① 編輯',exact:true}).click();
+    await expect(page.locator('.one-workspace-editor')).toBeVisible();
+    const jump=page.locator('#one-workspace-section-select');
+    if (await jump.count()) {
+      await jump.selectOption('0');
+      await expect(jump).toHaveValue('');
+    }
+    await expect(page.locator('#one-workspace-files')).toHaveCount(1);
+    expect(await artwork(page),'Navigation may not change native artwork').toBe(before);
+    expect(errors).toEqual([]);
+  });
+}
+
+for (const example of [
+  {id:'general',action:'input',selector:'#title'},
+  {id:'move',action:'click',selector:'#addStation'},
+  {id:'choice',action:'click',selector:'#allBright'}
+]) {
+  test(example.id + ' UI V2 shows pending changes and clears them only after manual save',async({page})=>{
+    const card=cards.find(x=>x.id===example.id);
+    await openCard(page,card);
+    const control=page.locator(example.selector);
+    if (example.action==='input') await control.fill('統一工作台功能驗收');
+    else await control.click();
+    const feedback=page.locator('.one-workspace-save-feedback');
+    await expect(feedback).toHaveAttribute('data-one-unsaved','true');
+    await page.locator('.one-workspace-save-host button').click();
+    await expect(feedback).not.toHaveAttribute('data-one-unsaved','true');
+  });
+}
+
+
+// UI V2: apply/cancel crop updates the dirty indicator without touching native image handling.
+test('rating crop cancel is non-mutating while apply requires manual save', async ({page})=>{
+  await openCard(page,cards.find(c=>c.id==='rating'));
+  await expandEditor(page);
+  const feedback=page.locator('.one-workspace-save-feedback');
+  const opener=page.locator('#cropRightProduct');
+  await opener.click();
+  const dialog=page.getByRole('dialog',{name:/編輯裁切/});
+  await expect(dialog).toBeVisible();
+  await dialog.getByRole('button',{name:'取消',exact:true}).click();
+  await expect(feedback).not.toHaveAttribute('data-one-unsaved','true');
+  await opener.click();
+  await expect(dialog).toBeVisible();
+  await dialog.getByRole('button',{name:'套用裁切',exact:true}).click();
+  await expect(feedback).toHaveAttribute('data-one-unsaved','true');
 });
