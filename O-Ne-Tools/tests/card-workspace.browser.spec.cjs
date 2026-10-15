@@ -1201,3 +1201,21 @@ for (const example of [
     await expect(feedback).not.toHaveAttribute('data-one-unsaved','true');
   });
 }
+
+
+// UI V2: apply/cancel crop updates the dirty indicator without touching native image handling.
+test('rating crop cancel is non-mutating while apply requires manual save', async ({page})=>{
+  await openCard(page,cards.find(c=>c.id==='rating'));
+  await expandEditor(page);
+  const feedback=page.locator('.one-workspace-save-feedback');
+  const opener=page.locator('#cropLeftProduct');
+  await opener.click();
+  const dialog=page.getByRole('dialog',{name:/編輯裁切/});
+  await expect(dialog).toBeVisible();
+  await dialog.getByRole('button',{name:'取消',exact:true}).click();
+  await expect(feedback).not.toHaveAttribute('data-one-unsaved','true');
+  await opener.click();
+  await expect(dialog).toBeVisible();
+  await dialog.getByRole('button',{name:'套用裁切',exact:true}).click();
+  await expect(feedback).toHaveAttribute('data-one-unsaved','true');
+});
