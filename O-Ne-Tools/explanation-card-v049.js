@@ -439,11 +439,6 @@
       toast(`請先設定第 ${missing.join('、')} 項左圖，再一次輸出。`,true);
       return;
     }
-    const helper=window.ONEProjectPackage&&window.ONEProjectPackage.__test;
-    if(!helper||typeof helper.makeZip!=='function'){
-      toast('ZIP 輸出元件尚未完成載入，請稍後再按一次。',true);
-      return;
-    }
     const originalIndex=activeFrameIndex();
     const total=contentBlocks().length;
     const button=$('exportSequenceAll');
@@ -459,9 +454,11 @@
         const step=String(index+1).padStart(2,'0');
         entries.push({name:`說明卡-${titlePlain()}-STEP${step}-of-${String(total).padStart(2,'0')}.png`,data:blob});
       }
-      const zip=await helper.makeZip(entries);
-      download(zip,`說明卡-${titlePlain()}-逐步畫面-${String(total).padStart(2,'0')}張.zip`);
-      toast(`全部 ${total} 張已輸出：文字逐步增加、左圖逐步切換，尺寸完全一致。`);
+      for(const entry of entries){
+        download(entry.data,entry.name);
+        await new Promise(resolve=>setTimeout(resolve,120));
+      }
+      toast(`全部 ${total} 張已輸出：PNG 直接下載，文字逐步增加、左圖逐步切換，尺寸完全一致。`);
     }catch(error){
       toast(error&&error.message||'逐步 PNG 輸出失敗。',true);
     }finally{
@@ -497,7 +494,7 @@
         content_sequence_per_step_crop_settings:true,
         content_sequence_height_independent_from_step_images:true,
         content_sequence_stable_left_image_frame:true,
-        content_sequence_export_all_png_zip:true,
+        content_sequence_export_all_png_direct:true,
         content_sequence_project_zip_embeds_all_images:true,
         content_image_vertical_align:['top','center','bottom'],
         content_image_manual_zoom_range:[25,300],

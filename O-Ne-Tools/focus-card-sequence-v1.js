@@ -299,8 +299,11 @@
     const exportFrames = async () => {
       try { await locked(async o => {
         const entries = await pngEntries(o);
-        download(await global.ONEProjectPackage.createZip(entries), '焦點卡-' + cleanName(o.contents[o.mode].title) + '-全部幕.png.zip');
-        o.notify('已輸出 ' + entries.length + ' 幕 PNG，尺寸一致。');
+        for (const entry of entries) {
+          download(entry.data, entry.name);
+          await new Promise(resolve => setTimeout(resolve, 120));
+        }
+        o.notify('已輸出 ' + entries.length + ' 幕 PNG｜直接下載，尺寸一致。');
       }); } catch (e) { latest.current.notify(e.message); }
     };
     const exportPackage = async () => locked(async o => {
@@ -375,7 +378,7 @@
           c.items.map((text, i) => h('option', { key: i, value: i + 1 }, (i + 1) + ' / ' + c.items.length + '　' + text.replace(/[【】]/g, '').slice(0, 20)))),
         button('→', () => r.setStep(q.step + 1), q.step >= c.items.length, '下一幕'))
         : h('span', { className: 'focus-sequence-hint' }, r.mode === 'body' ? '切到「項目／步驟」可累積' : '開啟後逐項亮起'),
-      q.enabled && button('輸出全部幕 PNG ZIP', r.exportFrames, false),
+      q.enabled && button('輸出全部幕 PNG', r.exportFrames, false),
       h('div', { className: 'focus-sequence-history' }, button('↶ 復原', r.undo, !r.canUndo, '復原整張卡（Ctrl/Cmd+Z）'),
         button('↷ 重做', r.redo, !r.canRedo, '重做整張卡（Ctrl/Cmd+Shift+Z）')),
       r.busy && h('span', { role: 'status' }, '正在處理…'));

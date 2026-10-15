@@ -673,13 +673,11 @@ for (const card of cards) {
     await upload(page, page.locator('[data-one-batch-render-ui] [data-action="select"]'), project.target);
     const run = page.locator('[data-one-batch-render-ui] [data-action="run"]');
     await expect(run).toBeEnabled();
-    const batch = await download(page, run, info, 'batch-pngs', 'zip');
-    const outputs = Object.entries(zipEntries(batch.bytes));
-    expect(outputs).toHaveLength(1);
-    expect(outputs[0][0]).toMatch(/\.png$/i);
-    assertPNG(outputs[0][1]);
+    const batch = await download(page, run, info, 'batch-png', 'png');
+    expect(batch.name).toMatch(/\.png$/i);
+    assertPNG(batch.bytes);
     // Native refreshList restores the ready-count status after completion.
-    // The per-file result and actual downloaded PNG ZIP prove completion.
+    // The per-file result and actual direct PNG download prove completion.
     await expect(page.locator('.one-batch-render__item')).toHaveCount(1);
     await expect(page.locator('.one-batch-render__item')).toContainText('已輸出');
     await expect(page.locator('.one-batch-render__item')).not.toHaveClass(/error/);
@@ -980,7 +978,7 @@ test('explanation direct edit, keyboard save, order limits and project round tri
   await expect(page.locator('[data-order-action="down"]').last()).toBeDisabled();
   await expect(page.locator('[data-order-action="up"]').last()).toBeEnabled();
   await page.locator('#sequenceEnabled').check();
-  await expect(page.locator('#exportSequenceAll')).toHaveAttribute('aria-label','輸出全部 2 幕 PNG ZIP');
+  await expect(page.locator('#exportSequenceAll')).toHaveAttribute('aria-label','輸出全部 2 幕 PNG');
   for (const [index, colors] of [['1',['#ff00ff','#00ff00']],['2',['#0000ff','#ffff00']]]) {
     await page.locator('#sequenceVisibleCount').selectOption(index);
     await page.locator('#openImageDrawer').click();
@@ -1000,11 +998,19 @@ test('explanation direct edit, keyboard save, order limits and project round tri
   await upload(page,dialog.locator('[data-action="import-package"]'),zip.target);
   await dialog.getByRole('button',{name:'關閉',exact:true}).click();
   await expect.poll(pixels).toBe(before);
-  await expect(page.locator('#exportSequenceAll')).toHaveAttribute('aria-label','輸出全部 2 幕 PNG ZIP');
+  await expect(page.locator('#exportSequenceAll')).toHaveAttribute('aria-label','輸出全部 2 幕 PNG');
   const png=await download(page,page.locator('#exportPng'),info,'explanation-restored-frame','png');assertPNG(png.bytes);
-  const sequence=await download(page,page.locator('#exportSequenceAll'),info,'explanation-restored-sequence','zip');
-  const frames=Object.values(zipEntries(sequence.bytes));expect(frames).toHaveLength(2);
-  frames.forEach(assertPNG);expect(frames[0].equals(frames[1])).toBe(false);
+  const sequenceDownloads=[];
+  page.on('download',item=>sequenceDownloads.push(item));
+  await page.locator('#exportSequenceAll').click();
+  await expect.poll(()=>sequenceDownloads.length,{timeout:10000}).toBe(2);
+  const frames=[];
+  for(let i=0;i<sequenceDownloads.length;i++){
+    const target=info.outputPath('explanation-restored-sequence-'+String(i+1).padStart(2,'0')+'.png');
+    await sequenceDownloads[i].saveAs(target);
+    const bytes=await fs.readFile(target);assertPNG(bytes);frames.push(bytes);
+  }
+  expect(frames[0].equals(frames[1])).toBe(false);
   await expect.poll(pixels).toBe(before);
   await screenshot(page,info,'explanation-audit-desktop');
   await page.setViewportSize({width:390,height:844});await screenshot(page,info,'explanation-audit-mobile');

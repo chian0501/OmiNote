@@ -157,8 +157,8 @@
       openFiles(state, 'project', proxy);
     });
     proxy.setAttribute('data-one-project-quick', action === 'export-package' ? 'download' : 'upload');
-    proxy.setAttribute('aria-label', text + '（完整 project.zip）');
-    proxy.setAttribute('title', text + '完整 project.zip');
+    proxy.setAttribute('aria-label', text);
+    proxy.setAttribute('title', text + '｜唯一會打包成 ZIP 的輸出');
     return proxy;
   }
   function ensureProjectQuickActions(state) {
@@ -167,8 +167,40 @@
       (state.preview.querySelector('.export-actions') || state.app.querySelector('.export-actions')) :
       state.preview.querySelector('.one-workspace-export-actions');
     if (!exports) return false;
-    if (!exports.querySelector('[data-one-project-quick="download"]')) exports.appendChild(makeProjectQuickButton(state, 'export-package', '下載專案'));
-    if (!exports.querySelector('[data-one-project-quick="upload"]')) exports.appendChild(makeProjectQuickButton(state, 'import-package', '載入專案'));
+    if (!exports.querySelector('[data-one-project-quick="download"]')) exports.appendChild(makeProjectQuickButton(state, 'export-package', '導出專案 ZIP'));
+    if (!exports.querySelector('[data-one-project-quick="upload"]')) exports.appendChild(makeProjectQuickButton(state, 'import-package', '載入專案 ZIP'));
+    return true;
+  }
+
+  function jsonImportAction() {
+    return document.querySelector('[data-one-backup-ui] [data-action="load"],#loadJson');
+  }
+  function jsonExportAction(state) {
+    if (state.config.react) return state.app.querySelector('.export-actions .export-button.secondary');
+    return document.getElementById('jsonBtn') || document.getElementById('downloadJson') || document.getElementById('exportJson');
+  }
+  function makeJsonQuickButton(state, kind, text) {
+    var className = state.config.react ? 'export-button outline' : 'one-workspace-export-button secondary';
+    var proxy;
+    proxy = button(text, className, function () {
+      var target = kind === 'import' ? jsonImportAction() : jsonExportAction(state);
+      if (target) { target.click(); return; }
+      state.projectFeedback.textContent = 'JSON 功能仍在載入，請稍後再試。';
+      openFiles(state, 'project', proxy);
+    });
+    proxy.setAttribute('data-one-json-quick', kind);
+    proxy.setAttribute('aria-label', text);
+    proxy.setAttribute('title', kind === 'import' ? '載入單一 JSON 設定檔' : '直接下載單一 JSON 設定檔');
+    return proxy;
+  }
+  function ensureJsonQuickActions(state) {
+    if (!jsonImportAction() || !jsonExportAction(state)) return false;
+    var exports = state.config.react ?
+      (state.preview.querySelector('.export-actions') || state.app.querySelector('.export-actions')) :
+      state.preview.querySelector('.one-workspace-export-actions');
+    if (!exports) return false;
+    if (!exports.querySelector('[data-one-json-quick="import"]')) exports.appendChild(makeJsonQuickButton(state, 'import', '載入 JSON'));
+    if (!exports.querySelector('[data-one-json-quick="export"]')) exports.appendChild(makeJsonQuickButton(state, 'export', '導出 JSON'));
     return true;
   }
 
@@ -392,6 +424,7 @@
     });
     if (exports.children.length) footer.appendChild(exports);
     if (!state.config.react) state.preview.appendChild(footer);
+    ensureJsonQuickActions(state);
     ensureProjectQuickActions(state);
     if (global.ResizeObserver && state.stage) {
       state.resizeObserver = new ResizeObserver(function () { fitPreview(state); });
@@ -492,6 +525,7 @@
   function refresh() {
     if (!instance) { mount(); return; }
     routeUtilities(instance);
+    ensureJsonQuickActions(instance);
     ensureProjectQuickActions(instance);
     if (instance.updateMode) instance.updateMode();
     if (instance.syncFolds) instance.syncFolds();
@@ -524,6 +558,7 @@
     preparePreview(state);
     moveNativeFiles(state);
     routeUtilities(state);
+    ensureJsonQuickActions(state);
     ensureProjectQuickActions(state);
     if (!config.react) hideEmptyContainers(app);
     document.addEventListener('change', function () { if (state.updateMode) state.updateMode(); });
@@ -543,7 +578,7 @@
     observer = new MutationObserver(schedule);
     observer.observe(document.body, { childList: true, subtree: true });
   }
-  global.ONECardWorkspace = { version: '1.6.1', refresh: refresh };
+  global.ONECardWorkspace = { version: '1.7.0', refresh: refresh };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
   else init();
 })(window);

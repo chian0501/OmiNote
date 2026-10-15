@@ -24,25 +24,48 @@ const outputSelector = [
 ].join(',');
 
 for (const [name, url] of tools) {
-  test(`${name} 專案下載與載入和 PNG 放在同一輸出列`, async ({ page }) => {
+  test(`${name} JSON／專案 ZIP 與 PNG 放在同一輸出列`, async ({ page }) => {
     const errors = [];
     page.on('pageerror', error => errors.push(error.message));
     await page.goto(url);
+    const importJson = page.locator('[data-one-json-quick="import"]');
+    const exportJson = page.locator('[data-one-json-quick="export"]');
     const downloadProject = page.locator('[data-one-project-quick="download"]');
     const uploadProject = page.locator('[data-one-project-quick="upload"]');
+    await expect(importJson).toBeVisible();
+    await expect(exportJson).toBeVisible();
     await expect(downloadProject).toBeVisible();
     await expect(uploadProject).toBeVisible();
-    await expect(downloadProject).toHaveText('下載專案');
-    await expect(uploadProject).toHaveText('載入專案');
+    await expect(importJson).toHaveText('載入 JSON');
+    await expect(exportJson).toHaveText('導出 JSON');
+    await expect(downloadProject).toHaveText('導出專案 ZIP');
+    await expect(uploadProject).toHaveText('載入專案 ZIP');
     const sameRow = downloadProject.locator('..');
+    await expect(sameRow.locator('[data-one-json-quick="import"]')).toHaveCount(1);
+    await expect(sameRow.locator('[data-one-json-quick="export"]')).toHaveCount(1);
     await expect(sameRow.locator('[data-one-project-quick="upload"]')).toHaveCount(1);
     expect(await sameRow.locator(outputSelector).count()).toBeGreaterThan(0);
     expect(errors).toEqual([]);
   });
 }
 
-test('一般卡底部下載／載入專案直接代理完整 project.zip', async ({ page }, info) => {
+test('一般卡底部 JSON 直出直入，專案仍使用 project.zip', async ({ page }, info) => {
   await page.goto('/O-Ne-Tools/general-card.html');
+
+  const jsonDownloading = page.waitForEvent('download');
+  await page.locator('[data-one-json-quick="export"]').click();
+  const jsonDownload = await jsonDownloading;
+  expect(jsonDownload.suggestedFilename()).toMatch(/\.json$/i);
+  const jsonTarget = info.outputPath('general-quick.json');
+  await jsonDownload.saveAs(jsonTarget);
+  expect((await fs.stat(jsonTarget)).size).toBeGreaterThan(20);
+
+  const jsonChoosing = page.waitForEvent('filechooser');
+  await page.locator('[data-one-json-quick="import"]').click();
+  const jsonChooser = await jsonChoosing;
+  await jsonChooser.setFiles(jsonTarget);
+  await expect(page.locator('.one-edit-backup__status')).toContainText('JSON 載入成功');
+
   const downloading = page.waitForEvent('download');
   await page.locator('[data-one-project-quick="download"]').click();
   const download = await downloading;

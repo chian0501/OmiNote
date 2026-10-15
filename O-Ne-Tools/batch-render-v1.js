@@ -1,8 +1,8 @@
-/* O-Ne shared same-tool batch renderer — V1.3.1 */
+/* O-Ne shared same-tool batch renderer — V1.3.2 */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.3.1';
+  var VERSION = '1.3.2';
   var MAX_BATCH_FILES = 20;
   var MAX_BATCH_BYTES = 200 * 1024 * 1024;
   var WORKER_PARAM = '__one_batch_worker';
@@ -341,7 +341,7 @@
       '</div>' +
       '<input type="file" accept=".json,.zip,application/json,application/zip" multiple hidden>' +
       '<div class="one-batch-render__list"></div>' +
-      '<div class="one-batch-render__note">純文字卡可批次讀 JSON；評分卡、焦點卡、縮圖品牌框、片尾結算卡等圖片型工具請用 ZIP 專案包，避免輸出少圖版本。結果會一次下載為 PNG ZIP。</div>' +
+      '<div class="one-batch-render__note">純文字卡可批次讀 JSON；評分卡、焦點卡、縮圖品牌框、片尾結算卡等圖片型工具請用 ZIP 專案包，避免輸出少圖版本。結果會逐張直接下載 PNG，不另外包 ZIP。</div>' +
       '<div class="one-batch-render__status" aria-live="polite"></div>';
     return panel;
   }
@@ -467,17 +467,18 @@
         refreshList(instance);
       }
       if (!outputs.length) throw new Error(instance.abort ? '批次已停止，沒有完成的 PNG。' : '沒有成功產生 PNG。');
-      var zip = await helper().makeZip(outputs);
-      var name = [toolName(instance.adapter.id), '批次輸出', todayStamp()].map(function (part) {
-        return cleanPart(part, '未命名');
-      }).join('-') + '.zip';
-      var url = URL.createObjectURL(zip);
-      var a = document.createElement('a');
-      a.href = url;
-      a.download = name;
-      a.click();
-      global.setTimeout(function () { URL.revokeObjectURL(url); }, 1500);
-      setStatus(instance, (instance.abort ? '已停止｜' : '完成｜') + outputs.length + ' 張 PNG 已打包下載' + (failures ? '；失敗 ' + failures + ' 份' : '') + '。', Boolean(failures));
+      for (var outputIndex = 0; outputIndex < outputs.length; outputIndex++) {
+        var output = outputs[outputIndex];
+        var blob = new Blob([output.data], { type: 'image/png' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = output.name;
+        a.click();
+        global.setTimeout((function (targetUrl) { return function () { URL.revokeObjectURL(targetUrl); }; })(url), 1500);
+        await delay(120);
+      }
+      setStatus(instance, (instance.abort ? '已停止｜' : '完成｜') + outputs.length + ' 張 PNG 已直接下載' + (failures ? '；失敗 ' + failures + ' 份' : '') + '。', Boolean(failures));
     } catch (error) {
       setStatus(instance, error.message || '批次輸出失敗。', true);
     } finally {
