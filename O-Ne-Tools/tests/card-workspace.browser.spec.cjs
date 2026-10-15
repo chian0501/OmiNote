@@ -1154,3 +1154,50 @@ test('focus GET capsule matches explanation size and exports without title overl
   await expect.poll(async()=>{const a=await title.boundingBox(),b=await tag.boundingBox();return a.x>=b.x+b.width;}).toBe(true);
   await screenshot(page,info,'focus-long-label-before-title');
 });
+
+
+// UI WORKBENCH V2: the native card still works after shared navigation.
+for (const card of cards) {
+  test(card.id + ' UI V2 step navigation preserves renderer and export access', async ({ page }) => {
+    const errors = [];
+    page.on('pageerror',error => errors.push(error.message));
+    await openCard(page,card);
+    const before = await artwork(page);
+    const nav = page.getByRole('navigation',{name:'製作流程快速導覽'});
+    await expect(nav).toBeVisible();
+    const steps = ['① 編輯','② 預覽','③ 輸出'];
+    for (const label of steps) {
+      const step = nav.getByRole('button',{name:label,exact:true});
+      await step.click();
+      await expect(step).toHaveAttribute('aria-current','step');
+    }
+    await nav.getByRole('button',{name:'① 編輯',exact:true}).click();
+    await expect(page.locator('.one-workspace-editor')).toBeVisible();
+    const jump=page.locator('#one-workspace-section-select');
+    if (await jump.count()) {
+      await jump.selectOption('0');
+      await expect(jump).toHaveValue('');
+    }
+    await expect(page.locator('#one-workspace-files')).toHaveCount(1);
+    expect(await artwork(page),'Navigation may not change native artwork').toBe(before);
+    expect(errors).toEqual([]);
+  });
+}
+
+for (const example of [
+  {id:'general',action:'input',selector:'#title'},
+  {id:'move',action:'click',selector:'#addStation'},
+  {id:'choice',action:'click',selector:'#allBright'}
+]) {
+  test(example.id + ' UI V2 shows pending changes and clears them only after manual save',async({page})=>{
+    const card=cards.find(x=>x.id===example.id);
+    await openCard(page,card);
+    const control=page.locator(example.selector);
+    if (example.action==='input') await control.fill('統一工作台功能驗收');
+    else await control.click();
+    const feedback=page.locator('.one-workspace-save-feedback');
+    await expect(feedback).toHaveAttribute('data-one-unsaved','true');
+    await page.locator('.one-workspace-save-host button').click();
+    await expect(feedback).not.toHaveAttribute('data-one-unsaved','true');
+  });
+}
