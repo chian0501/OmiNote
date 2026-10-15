@@ -57,6 +57,13 @@ jobs:
         run: npx playwright test O-Ne-Tools/tests/card-native-equivalence.browser.spec.cjs --config O-Ne-Tools/tests/playwright.workspace.config.cjs
       - name: Audit Maker Hub navigation, accessibility and responsive layout
         run: npx playwright test O-Ne-Tools/tests/maker-hub.browser.spec.cjs --config O-Ne-Tools/tests/playwright.workspace.config.cjs
+      - name: Preserve Maker Hub screenshots before next Playwright suite
+        run: |
+          mkdir -p maker-hub-review
+          find test-results -type f -name 'maker-hub-*.png' -exec cp -n {} maker-hub-review/ \;
+          cp test-results/results.json maker-hub-review/results.json
+          test -f maker-hub-review/maker-hub-390px.png
+          test -f maker-hub-review/maker-hub-1366px.png
       - name: Run existing visual and interaction checks
         run: npx playwright test O-Ne-Tools/tests/card-workspace.browser.spec.cjs O-Ne-Tools/tests/explanation-project-ui.browser.spec.cjs O-Ne-Tools/tests/focus-sequence.browser.spec.cjs O-Ne-Tools/tests/project-quick-actions.browser.spec.cjs --config O-Ne-Tools/tests/playwright.workspace.config.cjs
       - name: Preserve screenshots, downloads, traces, and report
@@ -67,5 +74,6 @@ jobs:
           path: |
             playwright-report/
             test-results/
+            maker-hub-review/
           retention-days: 30
           if-no-files-found: error
