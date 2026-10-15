@@ -10,9 +10,12 @@ const cards = registry.tools.filter(tool => tool.href && tool.id !== 'explanatio
 const PNG = Buffer.from('89504e470d0a1a0a', 'hex');
 const mainCanvas = '.preview-wrap canvas,.stage canvas,.preview-canvas';
 
-function cardURL(card, baseline = false) {
+function cardURL(card, reference = false) {
   const file = card.id === 'dialogue' ? 'dialogue-card-v135.html' : card.href.replace(/^\.\//, '').split('?')[0];
-  return (baseline ? '/baseline' : '') + '/O-Ne-Tools/' + file;
+  // 'main' is the exact current main at this PR's merge base; the older
+  // /baseline remains the approved historical snapshot for unaffected cards.
+  const prefix = reference === 'main' ? '/main' : reference ? '/baseline' : '';
+  return prefix + '/O-Ne-Tools/' + file;
 }
 async function openCard(page, card, baseline = false) {
   await page.goto(cardURL(card, baseline));
@@ -538,12 +541,15 @@ for (const card of cards) {
       await expect(page.locator('.one-workspace-dialog')).toHaveCount(1);
       if (width === 1366) {
         const base = await context.newPage();
-        await openCard(base, card, true);
-        if (['rating', 'settlement'].includes(card.id)) {
-          await expandEditor(base);
-          await base.locator('#bgVisible').uncheck();
-        }
-        expect(await artwork(page), 'unchanged approved renderer pixels').toBe(await artwork(base));
+        const currentMainCard = ['rating', 'settlement'].includes(card.id);
+        await openCard(base, card, currentMainCard ? 'main' : true);
+        // Rating and settlement generators gained approved background/image
+        // behavior since the older artwork baseline. Never mutate the
+        // reference state to manufacture a match. Compare the same native
+        // defaults against the exact current main instead.
+        expect(await artwork(page), currentMainCard ?
+          'unchanged current-main native renderer pixels' :
+          'unchanged approved historic renderer pixels').toBe(await artwork(base));
         await base.close();
       }
       const toggle = page.locator('.one-workspace-modebar > button');
@@ -821,7 +827,15 @@ for (const id of ['rating', 'settlement']) {
     page.on('dialog', dialog => dialog.accept());
     const card = cards.find(c => c.id === id);
     await openCard(page, card);
-    await expect(page.locator('#bgVisible')).not.toBeChecked();
+    const expectedDefaultVisible = id === 'settlement';
+    // Rating defaults transparent; settlement's 2026-09-16 LIVE fix
+    // explicitly defaults to the beige background shown at 100% opacity.
+    if (expectedDefaultVisible) await expect(page.locator('#bgVisible')).toBeChecked();
+    else await expect(page.locator('#bgVisible')).not.toBeChecked();
+    // Inspect the actual transparent export in both tools without changing
+    // the settlement card's official default.
+    await expandEditor(page);
+    if (expectedDefaultVisible) await page.locator('#bgVisible').uncheck();
     const initial = await artwork(page);
     const png = await download(page, page.locator('.one-workspace-export-button').first(), info, id + '-transparent', 'png');
     assertPNG(png.bytes);
@@ -833,10 +847,10 @@ for (const id of ['rating', 'settlement']) {
     }, png.bytes.toString('base64'));
     expect(alpha, 'exported PNG has actual alpha transparency outside the card').toBe(0);
     await expandEditor(page); await page.locator('#bgVisible').check();
-    const base = await context.newPage(); await openCard(base, card, true);
+    const base = await context.newPage(); await openCard(base, card, 'main');
     await expandEditor(base); await base.locator('#bgVisible').check();
     const withBackground = await artwork(base);
-    expect(await artwork(page), 'enabling the background preserves the approved artwork').toBe(withBackground);
+    expect(await artwork(page), 'enabling the background preserves exact current-main artwork').toBe(withBackground);
     await files(base);
     const oldJSON = await download(base, base.locator('.one-workspace-native-files #jsonBtn,.one-workspace-native-files #downloadJson'), info, id + '-previous-version', 'json');
     await base.close();
@@ -850,9 +864,14 @@ for (const id of ['rating', 'settlement']) {
     await expect(page.locator('#bgVisible')).toBeChecked();
     await expect.poll(() => artwork(page)).toBe(withBackground);
     await files(page); await page.locator('.one-workspace-native-files #reset').click(); await closeFiles(page);
-    await expect(page.locator('#bgVisible')).not.toBeChecked();
-    await expect.poll(() => artwork(page)).toBe(initial);
-    await screenshot(page, info, id + '-transparent-reset');
+    if (expectedDefaultVisible) {
+      await expect(page.locator('#bgVisible')).toBeChecked();
+      await expect.poll(() => artwork(page)).toBe(withBackground);
+    } else {
+      await expect(page.locator('#bgVisible')).not.toBeChecked();
+      await expect.poll(() => artwork(page)).toBe(initial);
+    }
+    await screenshot(page, info, id + '-official-default-reset');
   });
 }
 
