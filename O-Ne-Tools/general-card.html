@@ -17,6 +17,7 @@ canvas{width:min(100%,900px);height:auto;filter:drop-shadow(0 8px 18px rgba(0,0,
 </style>
 <link rel="stylesheet" href="./card-workspace-v1.css?v=1500">
 <script src="./card-direct-edit-v1.js?v=1400"></script>
+<script src="./general-card-subtitle-colors.js?v=1"></script>
 <script src="./card-workspace-v1.js?v=1500" defer></script>
 </head>
 <body data-one-card-workspace="general"><div class="app"><a class="tool-home-link" href="./" style="min-width:118px;height:44px;display:inline-flex;align-items:center;color:#53ced0;font-size:14px;font-weight:800;text-decoration:none">回工具入口</a>
@@ -24,14 +25,20 @@ canvas{width:min(100%,900px);height:auto;filter:drop-shadow(0 8px 18px rgba(0,0,
 <div class="sub">同一工具切換 HERE／GET!／COST／自訂標籤。主底板固定 80% 透明；標籤、外框、左側識別條與文字維持正式實色。</div>
 <div class="grid">
 <div class="panel"><div class="section-title">01｜內容輸入</div>
-<div id="note" class="note"><b>HERE</b> 用於位置、場景或畫面主題；主標固定橘色，副標固定白色。</div>
+<div id="note" class="note"><b>HERE</b> 用於位置、場景或畫面主題；主標固定橘色，副標預設白色，可選取文字套用正式色票。</div>
 <label>卡片形式</label><select id="mode"><option value="HERE">HERE｜位置／場景</option><option value="GET">GET!｜商品／道具解鎖</option><option value="COST">COST｜花費／成本</option><option value="CUSTOM">自訂｜標籤文字與色票</option></select>
 <div id="customControls" class="custom-controls" hidden>
 <label>自訂標籤文字</label><input id="customLabel" maxlength="12" value="CUSTOM" autocomplete="off">
 <label>標籤顏色｜O-Ne 色票</label><div class="color-row"><select id="labelColor"><option value="#FDF3E7">亮色和框線｜#FDF3E7</option><option value="#3F8FB7">移動卡藍｜#3F8FB7</option><option value="#29A6A7" selected>一般卡青綠｜#29A6A7</option><option value="#FD4537">挑戰紅｜#FD4537</option><option value="#FFBE37">高亮黃｜#FFBE37</option><option value="#433A35">暗色｜#433A35</option><option value="#1F1713">文字深色框線｜#1F1713</option></select><span id="colorChip" class="color-chip" aria-hidden="true"></span></div>
 </div>
 <label id="titleLabel">主標｜橘色</label><input id="title" value="A2 三重站">
-<label id="subtitleLabel">副標｜白色</label><input id="subtitle" value="下一站｜桃園機場第二航廈">
+<label id="subtitleLabel">副標｜預設白色，可局部改色</label><input id="subtitle" value="下一站｜桃園機場第二航廈">
+<div class="subtitle-format" role="group" aria-label="副標局部文字顏色">
+<label for="subtitleColor">選取副標中的文字，再套用顏色</label>
+<select id="subtitleColor"><option value="#FFBE37">高亮黃</option><option value="#FDF3E7">預設白色</option><option value="#29A6A7">青綠</option><option value="#3F8FB7">藍色</option><option value="#FD4537">紅色</option></select>
+<div class="buttons"><button id="applySubtitleColor" type="button">套用到選取文字</button><button id="clearSubtitleColors" type="button" class="secondary">全部還原白色</button></div>
+<div id="subtitleColorStatus" class="status" role="status" aria-live="polite">例如：選取 NT$1,280，只將價格改成高亮黃。</div>
+</div>
 <div id="status" class="status">READY｜可輸出透明 PNG</div>
 <div class="buttons"><button id="download">輸出透明 PNG</button><button id="jsonBtn" class="secondary">輸出欄位 JSON</button><button id="reset" class="secondary">回復示例</button></div>
 <div id="rules" class="mini"><b class="lock">🔒 固定：</b>653×127、#1F1713 主底板 80%、白色外框、HERE、左側青綠條、正式色彩。<br><b>可改：</b>主標、副標。</div>
@@ -44,12 +51,13 @@ const canvas=document.getElementById('c'),ctx=canvas.getContext('2d'),$=id=>docu
 const C={panel:'rgba(31,23,19,.80)',cream:'#FDF3E7',white:'#FFFFFF',orange:'#FFBE37',teal:'#29A6A7',blue:'#3F8FB7',red:'#FD4537',dark:'#433A35',deep:'#1F1713',darkText:'#3B170C'};
 const PALETTE=[C.cream,C.blue,C.teal,C.red,C.orange,C.dark,C.deep];
 const config={
-  HERE:{label:'HERE',accent:C.teal,labelText:C.white,titleLabel:'主標｜橘色',subtitleLabel:'副標｜白色',note:'<b>HERE</b> 用於位置、場景或畫面主題；主標固定橘色，副標固定白色。',rules:'<b class="lock">🔒 固定：</b>653×127、#1F1713 主底板 80%、白色外框、HERE、左側青綠條、正式色彩。<br><b>可改：</b>主標、副標。',componentId:'HERE-01',variant:'HERE',file:'O-Ne_HERE_一般卡',defaults:{title:'A2 三重站',subtitle:'下一站｜桃園機場第二航廈'}},
-  GET:{label:'GET!',accent:C.orange,labelText:C.darkText,titleLabel:'品項名稱｜橘色',subtitleLabel:'資訊列｜白色',note:'<b>GET!</b> 用於商品、道具或圖鑑解鎖；資訊列建議依序放「價格 | 數量 | 解鎖進度」。',rules:'<b class="lock">🔒 固定：</b>653×127、#1F1713 主底板 80%、白色外框、GET!、左側高亮黃條、正式色彩。<br><b>可改：</b>品項名稱、價格／數量／解鎖資訊。',componentId:'COL-02',variant:'GET',file:'O-Ne_GET_解鎖卡',defaults:{title:'中祥 O’ day 雪花餅',subtitle:'NT$70 | 9 小包 | 解鎖 6/7'}},
-  COST:{label:'COST',accent:C.red,labelText:C.white,titleLabel:'花費項目｜橘色',subtitleLabel:'金額／成本資訊｜白色',note:'<b>COST</b> 用於任務花費、購買成本或預算結果；標籤與左側識別條固定使用挑戰紅。',rules:'<b class="lock">🔒 固定：</b>653×127、#1F1713 主底板 80%、白色外框、COST、挑戰紅 #FD4537。<br><b>可改：</b>花費項目、金額／成本資訊。',componentId:'RWD-01',variant:'transaction_receipt',file:'O-Ne_COST_花費卡',defaults:{title:'本次任務花費',subtitle:'總花費｜NT$1,280'}},
-  CUSTOM:{label:'CUSTOM',accent:C.teal,labelText:C.white,titleLabel:'主標｜橘色',subtitleLabel:'副標｜白色',note:'<b>自訂標籤</b> 可輸入標籤文字，並從 O-Ne 正式主色票選色；卡體、外框與文字層級保持不變。',rules:'<b class="lock">🔒 固定：</b>653×127、#1F1713 主底板 80%、白色外框與既有資訊層級。<br><b>可改：</b>標籤文字、標籤色票、主標、副標。',componentId:null,variant:'CUSTOM_LABEL',file:'O-Ne_自訂標籤_一般卡',defaults:{title:'自訂主標',subtitle:'補充資訊',label:'CUSTOM',color:C.teal}}
+  HERE:{label:'HERE',accent:C.teal,labelText:C.white,titleLabel:'主標｜橘色',subtitleLabel:'副標｜預設白色，可局部改色',note:'<b>HERE</b> 用於位置、場景或畫面主題；主標固定橘色，副標預設白色，可選取文字套用正式色票。',rules:'<b class="lock">🔒 固定：</b>653×127、#1F1713 主底板 80%、白色外框、HERE、左側青綠條、正式色彩。<br><b>可改：</b>主標、副標。',componentId:'HERE-01',variant:'HERE',file:'O-Ne_HERE_一般卡',defaults:{title:'A2 三重站',subtitle:'下一站｜桃園機場第二航廈'}},
+  GET:{label:'GET!',accent:C.orange,labelText:C.darkText,titleLabel:'品項名稱｜橘色',subtitleLabel:'資訊列｜預設白色，可局部改色',note:'<b>GET!</b> 用於商品、道具或圖鑑解鎖；資訊列建議依序放「價格 | 數量 | 解鎖進度」。',rules:'<b class="lock">🔒 固定：</b>653×127、#1F1713 主底板 80%、白色外框、GET!、左側高亮黃條、正式色彩。<br><b>可改：</b>品項名稱、價格／數量／解鎖資訊。',componentId:'COL-02',variant:'GET',file:'O-Ne_GET_解鎖卡',defaults:{title:'中祥 O’ day 雪花餅',subtitle:'NT$70 | 9 小包 | 解鎖 6/7'}},
+  COST:{label:'COST',accent:C.red,labelText:C.white,titleLabel:'花費項目｜橘色',subtitleLabel:'金額／成本資訊｜預設白色，可局部改色',note:'<b>COST</b> 用於任務花費、購買成本或預算結果；標籤與左側識別條固定使用挑戰紅。',rules:'<b class="lock">🔒 固定：</b>653×127、#1F1713 主底板 80%、白色外框、COST、挑戰紅 #FD4537。<br><b>可改：</b>花費項目、金額／成本資訊。',componentId:'RWD-01',variant:'transaction_receipt',file:'O-Ne_COST_花費卡',defaults:{title:'本次任務花費',subtitle:'總花費｜NT$1,280'}},
+  CUSTOM:{label:'CUSTOM',accent:C.teal,labelText:C.white,titleLabel:'主標｜橘色',subtitleLabel:'副標｜預設白色，可局部改色',note:'<b>自訂標籤</b> 可輸入標籤文字，並從 O-Ne 正式主色票選色；卡體、外框與文字層級保持不變。',rules:'<b class="lock">🔒 固定：</b>653×127、#1F1713 主底板 80%、白色外框與既有資訊層級。<br><b>可改：</b>標籤文字、標籤色票、主標、副標。',componentId:null,variant:'CUSTOM_LABEL',file:'O-Ne_自訂標籤_一般卡',defaults:{title:'自訂主標',subtitle:'補充資訊',label:'CUSTOM',color:C.teal}}
 };
 let currentMode='HERE';
+const subtitleColors=ONEGeneralSubtitleColors;
 const drafts=Object.fromEntries(Object.entries(config).map(([key,value])=>[key,{...value.defaults}]));
 function font(weight,px){return `${weight} ${px}px "Noto Sans TC","Noto Sans CJK TC","Microsoft JhengHei",sans-serif`}
 function fitText(text,maxWidth,startSize,minSize,weight){let s=startSize;while(s>=minSize){ctx.font=font(weight,s);const w=ctx.measureText(text).width;if(w<=maxWidth)return{size:s,width:w,ok:true};s--}ctx.font=font(weight,minSize);return{size:minSize,width:ctx.measureText(text).width,ok:false}}
@@ -59,25 +67,38 @@ function activeLabel(){if(currentMode!=='CUSTOM')return config[currentMode].labe
 function activeAccent(){return currentMode==='CUSTOM'?$('labelColor').value:config[currentMode].accent}
 function drawHereBase(){ctx.save();ctx.beginPath();ctx.moveTo(20,2);ctx.lineTo(632,2);ctx.lineTo(651,21);ctx.lineTo(651,106);ctx.lineTo(632,125);ctx.lineTo(20,125);ctx.lineTo(2,107);ctx.lineTo(2,20);ctx.closePath();ctx.fillStyle=C.panel;ctx.fill();ctx.strokeStyle=C.white;ctx.lineWidth=3;ctx.stroke();ctx.fillStyle=C.teal;ctx.fillRect(3,21,9,85);roundedRect(30,19,141,33,7);ctx.fillStyle=C.teal;ctx.fill();ctx.fillStyle=C.white;ctx.font=font(800,22);ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('HERE',100.5,35.5);ctx.restore();return true}
 function drawTagBase(label,accent,labelText){ctx.save();ctx.fillStyle=C.panel;ctx.strokeStyle=C.white;ctx.lineWidth=4;ctx.lineJoin='miter';ctx.beginPath();ctx.moveTo(21,4);ctx.lineTo(632,4);ctx.lineTo(650,21);ctx.lineTo(650,106);ctx.lineTo(632,123);ctx.lineTo(21,123);ctx.lineTo(4,106);ctx.lineTo(4,21);ctx.closePath();ctx.fill();ctx.stroke();ctx.fillStyle=accent;ctx.fillRect(4,20,9,87);roundedRect(30,20,141,33,10);ctx.fillStyle=accent;ctx.fill();const lf=fitText(label,116,20,12,800);ctx.fillStyle=labelText;ctx.font=font(800,lf.size);ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(label,100.5,37.5);ctx.restore();return lf.ok}
-function saveDraft(){const d=drafts[currentMode];d.title=$('title').value;d.subtitle=$('subtitle').value;if(currentMode==='CUSTOM'){d.label=$('customLabel').value;d.color=$('labelColor').value}}
+function syncSubtitle(){const d=drafts[currentMode],next=$('subtitle').value;d.subtitleColors=subtitleColors.remap(d.subtitle,next,d.subtitleColors);d.subtitle=next}
+function applySubtitleColor(){
+  const input=$('subtitle'),start=input.selectionStart,end=input.selectionEnd;
+  if(start===end){$('subtitleColorStatus').textContent='請先在上方副標欄位選取要改色的文字。';input.focus();return}
+  syncSubtitle();
+  drafts[currentMode].subtitleColors=subtitleColors.apply(input.value,drafts[currentMode].subtitleColors,start,end,$('subtitleColor').value);
+  $('subtitleColorStatus').textContent=`已將「${input.value.slice(start,end)}」套用${$('subtitleColor').selectedOptions[0].textContent}。`;
+  render();input.focus();input.setSelectionRange(start,end);
+}
+$('applySubtitleColor').onclick=applySubtitleColor;
+$('clearSubtitleColors').onclick=()=>{drafts[currentMode].subtitleColors=[];$('subtitleColorStatus').textContent='副標已全部還原為預設白色。';render()};
+function saveDraft(){const d=drafts[currentMode];d.title=$('title').value;syncSubtitle();if(currentMode==='CUSTOM'){d.label=$('customLabel').value;d.color=$('labelColor').value}}
 function syncCustomControls(){const custom=currentMode==='CUSTOM';$('customControls').hidden=!custom;if(custom){const d=drafts.CUSTOM;$('customLabel').value=d.label;$('labelColor').value=d.color;$('colorChip').style.background=d.color}}
 function loadMode(mode){const c=config[mode],d=drafts[mode];$('title').value=d.title;$('subtitle').value=d.subtitle;$('titleLabel').textContent=c.titleLabel;$('subtitleLabel').textContent=c.subtitleLabel;$('note').innerHTML=c.note;$('rules').innerHTML=c.rules;syncCustomControls()}
-function render(){const mode=$('mode').value,c=config[mode];ctx.clearRect(0,0,653,127);let blocked=false;const label=activeLabel(),accent=activeAccent(),labelText=mode==='CUSTOM'?contrastText(accent):c.labelText;if(mode==='HERE')drawHereBase();else blocked||=!drawTagBase(label,accent,labelText);if(mode==='CUSTOM'){const validLabel=label.length>0&&PALETTE.includes(accent);$('customLabel').classList.toggle('bad',!validLabel);blocked||=!validLabel;$('colorChip').style.background=accent}const t=$('title').value,tf=fitText(t,430,34,18,800);$('title').classList.toggle('bad',!tf.ok);ctx.font=font(800,tf.size);ctx.fillStyle=C.orange;ctx.textAlign='left';ctx.textBaseline='alphabetic';ctx.fillText(t,mode==='HERE'?186:183,49);blocked||=!tf.ok;const s=$('subtitle').value,sf=fitText(s,585,22,14,700);$('subtitle').classList.toggle('bad',!sf.ok);ctx.font=font(700,sf.size);ctx.fillStyle=C.cream;ctx.fillText(s,mode==='HERE'?36:34,mode==='HERE'?91:92);blocked||=!sf.ok;$('download').disabled=blocked;$('status').className=blocked?'status error':'status';$('status').textContent=blocked?'BLOCKED｜內容超出安全範圍或標籤未填寫':`READY｜${label} 可輸出透明 PNG`;return blocked}
+function render(){const mode=$('mode').value,c=config[mode];ctx.clearRect(0,0,653,127);let blocked=false;const label=activeLabel(),accent=activeAccent(),labelText=mode==='CUSTOM'?contrastText(accent):c.labelText;if(mode==='HERE')drawHereBase();else blocked||=!drawTagBase(label,accent,labelText);if(mode==='CUSTOM'){const validLabel=label.length>0&&PALETTE.includes(accent);$('customLabel').classList.toggle('bad',!validLabel);blocked||=!validLabel;$('colorChip').style.background=accent}const t=$('title').value,tf=fitText(t,430,34,18,800);$('title').classList.toggle('bad',!tf.ok);ctx.font=font(800,tf.size);ctx.fillStyle=C.orange;ctx.textAlign='left';ctx.textBaseline='alphabetic';ctx.fillText(t,mode==='HERE'?186:183,49);blocked||=!tf.ok;const s=$('subtitle').value,sf=fitText(s,585,22,14,700);$('subtitle').classList.toggle('bad',!sf.ok);ctx.font=font(700,sf.size);subtitleColors.draw(ctx,s,drafts[currentMode].subtitleColors,mode==='HERE'?36:34,mode==='HERE'?91:92);blocked||=!sf.ok;$('download').disabled=blocked;$('status').className=blocked?'status error':'status';$('status').textContent=blocked?'BLOCKED｜內容超出安全範圍或標籤未填寫':`READY｜${label} 可輸出透明 PNG`;return blocked}
 $('mode').onchange=()=>{saveDraft();currentMode=$('mode').value;loadMode(currentMode);render()};
-$('title').oninput=()=>{drafts[currentMode].title=$('title').value;render()};$('subtitle').oninput=()=>{drafts[currentMode].subtitle=$('subtitle').value;render()};
+$('title').oninput=()=>{drafts[currentMode].title=$('title').value;render()};$('subtitle').oninput=()=>{syncSubtitle();render()};
 $('customLabel').oninput=()=>{drafts.CUSTOM.label=$('customLabel').value;render()};$('labelColor').onchange=()=>{drafts.CUSTOM.color=$('labelColor').value;render()};
 $('download').onclick=()=>{if(render())return;const c=config[$('mode').value];canvas.toBlob(b=>{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=c.file+'.png';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)},'image/png')};
-$('jsonBtn').onclick=()=>{if(render())return;const mode=$('mode').value,c=config[mode],label=activeLabel(),accent=activeAccent(),p={component_id:c.componentId,mapping_status:mode==='CUSTOM'?'CUSTOM_DERIVATIVE_UNMAPPED':'MAPPED',generator_version:'V1.2.1_20260826',panel_fill_opacity:.8,mode,variant:c.variant,label:{text:label,color:accent,text_color:mode==='CUSTOM'?contrastText(accent):c.labelText,custom:mode==='CUSTOM'},title:$('title').value,subtitle:$('subtitle').value};const u=URL.createObjectURL(new Blob([JSON.stringify(p,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=u;a.download=`O-Ne_一般卡_${mode}_data_v121.json`;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000)};
+$('jsonBtn').onclick=()=>{if(render())return;const mode=$('mode').value,c=config[mode],label=activeLabel(),accent=activeAccent(),p={component_id:c.componentId,mapping_status:mode==='CUSTOM'?'CUSTOM_DERIVATIVE_UNMAPPED':'MAPPED',generator_version:'V1.2.1_20260826',panel_fill_opacity:.8,mode,variant:c.variant,label:{text:label,color:accent,text_color:mode==='CUSTOM'?contrastText(accent):c.labelText,custom:mode==='CUSTOM'},title:$('title').value,subtitle:$('subtitle').value,subtitle_colors:subtitleColors.normalize($('subtitle').value,drafts[currentMode].subtitleColors)};const u=URL.createObjectURL(new Blob([JSON.stringify(p,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=u;a.download=`O-Ne_一般卡_${mode}_data_v121.json`;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000)};
 $('reset').onclick=()=>{drafts[currentMode]={...config[currentMode].defaults};loadMode(currentMode);render()};
 loadMode(currentMode);render();
 ONEEditBackup.mount({
   id:'general-card',
   generatorVersion:'V1.2.1_20260826',
-  anchor:document.querySelector('.buttons'),
+  anchor:$('download').parentElement,
   capture:()=>{saveDraft();return{currentMode,drafts:JSON.parse(JSON.stringify(drafts))}},
   apply:snapshot=>{
     if(!snapshot||!config[snapshot.currentMode]||!snapshot.drafts)throw new Error('一般卡備份內容不完整。');
-    Object.keys(config).forEach(mode=>{if(snapshot.drafts[mode])drafts[mode]={...config[mode].defaults,...snapshot.drafts[mode]}});
+    const restored={};
+    Object.keys(config).forEach(mode=>{const d={...config[mode].defaults,...(snapshot.drafts[mode]||{})};d.subtitle=String(d.subtitle);d.subtitleColors=subtitleColors.normalize(d.subtitle,d.subtitleColors);restored[mode]=d});
+    Object.assign(drafts,restored);
     currentMode=snapshot.currentMode;$('mode').value=currentMode;loadMode(currentMode);render();
   },
   fromJSON:payload=>{
@@ -88,7 +109,8 @@ ONEEditBackup.mount({
     snapshot.drafts[payload.mode]={
       ...snapshot.drafts[payload.mode],
       title:String(payload.title??''),
-      subtitle:String(payload.subtitle??'')
+      subtitle:String(payload.subtitle??''),
+      subtitleColors:subtitleColors.normalize(String(payload.subtitle??''),payload.subtitle_colors)
     };
     if(payload.mode==='CUSTOM'){
       snapshot.drafts.CUSTOM.label=String(payload.label?.text??'CUSTOM');
