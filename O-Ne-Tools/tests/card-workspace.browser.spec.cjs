@@ -1208,7 +1208,7 @@ test('rating crop cancel is non-mutating while apply requires manual save', asyn
   await openCard(page,cards.find(c=>c.id==='rating'));
   await expandEditor(page);
   const feedback=page.locator('.one-workspace-save-feedback');
-  const opener=page.locator('#cropLeftProduct');
+  const opener=page.locator('#cropRightProduct');
   await opener.click();
   const dialog=page.getByRole('dialog',{name:/編輯裁切/});
   await expect(dialog).toBeVisible();
