@@ -35,6 +35,8 @@ jobs:
           node-version: '24'
           cache: npm
       - run: npm ci --ignore-scripts
+      - name: Lock all 13 maker capabilities and native renderer hashes
+        run: node O-Ne-Tools/tests/card-capability-contract-regression.cjs
       - name: Run Canonical schema and AI guide regressions
         run: |
           node O-Ne-Tools/tests/card-canonical-regression.cjs
