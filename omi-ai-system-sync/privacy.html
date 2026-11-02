@@ -1,0 +1,43 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Omi AI System Sync 隱私權政策</title><style>body{font-family:system-ui,"Noto Sans TC",sans-serif;max-width:720px;margin:2rem auto;padding:0 1rem;line-height:1.7;color:#222}
+code{background:#f2f2f2;padding:0 .3em}h1{font-size:1.6rem}h2{font-size:1.15rem;margin-top:1.6rem}</style></head><body>
+<h1>Omi AI System Sync 隱私權政策</h1>
+<p>最後更新：2026-11-02</p>
+<h2>1. 適用對象</h2>
+<p>本工具為 Omi 個人自用，唯一授權使用者為 Omi 本人。本政策說明本工具如何存取、使用、儲存與分享 Google 使用者資料。</p>
+<h2>2. 處理的資料</h2>
+<ul>
+<li><strong>指定文件</strong>：Omi 私人 GitHub repo 中事先指定的文件（規劃為 59 份）及 1 份清單檔，包含檔名與文件內容。</li>
+<li><strong>Google Drive 檔案內容與中繼資料</strong>：同步所需的既有檔案內容、檔案 ID、所在資料夾、類型、修訂、垃圾桶／捷徑狀態與權限資料（可能含電子郵件地址及角色），用於核對目標、權限與內容。</li>
+<li><strong>OAuth 憑證</strong>：Google 核發給本工具的授權資訊，用於代表 Omi 存取其 Drive。</li>
+</ul>
+<p>上述資料只用於同步與必要核對，不用於分析追蹤或廣告。</p>
+<h2>3. Google 授權範圍</h2>
+<p>本工具申請完整 Drive 權限（<code>https://www.googleapis.com/auth/drive</code>）。Google 授權本身允許存取授權帳號下所有 Drive 檔案；本工具的程式另以固定檔案 ID 白名單，只對指定的同步目標檔案進行操作。此白名單是程式層面的自我限制，並非 Google 授權範圍的限制。</p>
+<h2>4. 資料流</h2>
+<p>GitHub 私人 repo（指定文件）→ 同步程式（規劃於 GitHub Actions 的 GitHub 代管執行環境 GitHub-hosted runner 執行）→ Omi 本人 Google Drive「AI_System」資料夾。</p>
+<p>每次執行時，指定文件內容、清單檔、Google Drive 檔案內容與中繼資料，以及執行時從 GitHub Secrets 載入的 OAuth 憑證，會進入該 GitHub Actions 執行環境。</p>
+<p>同步方向為 GitHub → Google Drive。資料僅用於完成此同步功能。</p>
+<h2>5. 憑證存放</h2>
+<p>OAuth 憑證規劃存放於 GitHub Secrets（目前尚未完成設定），於 GitHub Actions 執行時載入使用。憑證不會寫入程式碼或公開於任何頁面。</p>
+<h2>6. 分享與轉移</h2>
+<p>本工具不出售、不出租 Google 使用者資料，也不提供給廣告商或資料仲介。資料處理僅經由 Google（Google Drive、Google OAuth）與 GitHub（repo、GitHub Secrets、GitHub Actions）這兩個服務進行，並受其各自條款規範。</p>
+<p>Omi AI System Sync 對於從 Google API 取得之資訊的使用及轉移，將遵守 <a href="https://developers.google.com/terms/api-services-user-data-policy">Google API Services User Data Policy</a>，包括其中的 Limited Use（有限使用）要求。</p>
+<h2>7. 安全</h2>
+<p>會採取合理措施保護憑證與資料，例如以 GitHub Secrets 存放憑證、限制 repo 存取權限。程式的設計原則是不在執行紀錄（log）中輸出憑證或文件內容；此外，GitHub 會嘗試在執行紀錄中遮蔽已登記的 Secrets，但 GitHub 官方說明自動遮蔽無法保證（<a href="https://docs.github.com/en/actions/reference/security/secure-use">GitHub 說明</a>）。任何網路服務都無法保證絕對安全。</p>
+<h2>8. 撤銷授權與刪除</h2>
+<ul>
+<li>撤銷 Google 授權：前往 Google 帳戶「第三方應用程式和服務」頁面 <a href="https://myaccount.google.com/connections">https://myaccount.google.com/connections</a> ，移除 Omi AI System Sync 的存取權。</li>
+<li>刪除憑證：刪除 GitHub repo 中存放的相關 Secrets。</li>
+<li>撤銷授權可阻止後續存取；亦應停用同步工作。撤銷不會自動刪除既有文件、版本或執行紀錄，須由 Omi 另行管理。</li>
+</ul>
+<h2>9. 資料保留</h2>
+<ul>
+<li>同步後的文件存放在 Omi 本人的 Google Drive 與 GitHub repo，由 Omi 自行管理與刪除。</li>
+<li>目前設計不另設資料庫保存文件內容；正式啟用前會核對實作與本政策一致。</li>
+<li>GitHub Actions 的執行紀錄（workflow run logs）與產出檔（artifacts）由 GitHub 依 repo 的保留設定保存：GitHub 預設保留 90 天後自動刪除；私人 repo 可調整為 1 至 400 天（<a href="https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository">GitHub 說明</a>）。本工具實際採用的保留天數：尚未確定，確定後更新本政策。</li>
+</ul>
+<h2>10. 政策變更</h2>
+<p>如本工具處理資料的方式變更，將先更新本政策。</p>
+<h2>11. 聯絡</h2>
+<p>chian0501@gmail.com</p>
+</body></html>
