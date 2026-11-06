@@ -32,8 +32,8 @@ for (const [name, url] of tools) {
     const uploadProject = page.locator('[data-one-project-quick="upload"]');
     await expect(downloadProject).toBeVisible();
     await expect(uploadProject).toBeVisible();
-    await expect(downloadProject).toHaveText('下載專案');
-    await expect(uploadProject).toHaveText('載入專案');
+    await expect(downloadProject).toHaveText(name === '說明卡' ? '下載專案' : '存專案 ZIP');
+    await expect(uploadProject).toHaveText(name === '說明卡' ? '載入專案' : '開專案 ZIP');
     const sameRow = downloadProject.locator('..');
     await expect(sameRow.locator('[data-one-project-quick="upload"]')).toHaveCount(1);
     expect(await sameRow.locator(outputSelector).count()).toBeGreaterThan(0);

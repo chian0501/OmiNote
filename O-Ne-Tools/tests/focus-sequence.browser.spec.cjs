@@ -26,7 +26,7 @@ async function screenshot(page, info, name) {
   await info.attach(name, { path: target, contentType: 'image/png' });
 }
 async function fileMenu(page) {
-  await page.locator('.one-workspace-header-actions').getByRole('button', { name: '專案檔案', exact: true }).click();
+  await page.locator('.one-workspace-header-actions').getByRole('button', { name: '檔案', exact: true }).click();
   await expect(page.locator('#one-workspace-files')).toBeVisible();
 }
 async function closeFiles(page) { await page.locator('.one-workspace-dialog-head').getByRole('button', { name: '關閉', exact: true }).click(); }
@@ -98,7 +98,7 @@ test('focus cumulative text and all PNG frames keep dimensions, order and curren
   }
   expect(new Set(outputs).size).toBe(4);
   await frame(page,2); const current = await artwork(page);
-  const zip = await download(page,page.getByRole('button',{name:'輸出全部幕 PNG ZIP',exact:true}),info,'all-frames.zip');
+  const zip = await download(page,page.getByRole('button',{name:/^輸出全部 PNG（\d+ 張）$/}),info,'all-frames.zip');
   const entries = entriesOf(zip.bytes), names = Object.keys(entries);
   expect(names).toHaveLength(4); expect(names.map(n => n.match(/-(\d\d)\.png$/)[1])).toEqual(['01','02','03','04']);
   for (let i=0;i<4;i++) {
@@ -201,7 +201,7 @@ test('focus bad ZIPs, missing originals and malformed settings never partially r
 
 test('focus lightweight JSON carries sequence metadata, while legacy JSON opens with cumulative mode off', async ({page},info) => {
   const errors=await open(page,3,'list'); await frame(page,2); await fileMenu(page);
-  const json=await download(page,page.getByRole('button',{name:'輸出設定 JSON',exact:true}),info,'settings.json');
+  const json=await download(page,page.getByRole('button',{name:'匯出 JSON',exact:true}),info,'settings.json');
   const data=JSON.parse(json.bytes);expect(data.schema).toBe('o-ne.focus-card.ready.v0.6.0');expect(data.content.sequence.step).toBe(2);
   expect(JSON.stringify(data)).not.toContain('data:image/');
   await page.locator('#one-workspace-tab-history').click();

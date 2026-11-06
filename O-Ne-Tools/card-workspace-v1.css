@@ -33,6 +33,21 @@ body[data-one-workspace-ready] {
 .one-workspace-button:disabled {opacity:.45;cursor:not-allowed;}
 .one-workspace-header .one-workspace-save {background:#143b3f;border-color:var(--one-teal);color:#99ede5;}
 .one-workspace-help-button {min-width:36px;padding:6px;}
+.one-workspace-switch label {display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--one-muted);white-space:nowrap;}
+.one-workspace-switch[hidden],.one-workspace-guide[hidden] {display:none;}
+.one-workspace-switch select {min-height:34px;max-width:150px;padding:4px 6px;border:1px solid #2d4553;border-radius:8px;background:#101b24;color:#e6eff2;font:inherit;}
+.one-workspace-guide {display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin:0 0 8px;font-size:13px;color:var(--one-muted);}
+.one-workspace-guide strong {color:#99ede5;font-size:12px;}
+.one-workspace-guide a {color:#8fd4c8;}
+body[data-one-card-workspace=focus] .one-workspace-guide {margin:0 18px 8px;}
+.one-workspace-ai-paste {display:grid;gap:8px;margin-bottom:14px;justify-items:start;}
+.one-workspace-ai-paste label {display:grid;gap:8px;width:100%;font-size:13px;font-weight:700;}
+.one-workspace-ai-feedback {margin:0;font-size:13px;color:#8fe0d7;}
+.one-workspace-ai-feedback:empty {display:none;}
+.one-workspace-ai-feedback.is-error {color:#ff8780;}
+.one-workspace-export-actions .one-workspace-export-button[data-one-project-quick] {flex:0 0 130px;}
+.one-workspace-ai-paste textarea {box-sizing:border-box;width:100%;padding:8px;border:1px solid #2d4553;border-radius:8px;background:#0c151c;color:#e6eff2;font:13px/1.45 ui-monospace,Consolas,monospace;resize:vertical;}
+.one-workspace-react-app .export-actions .export-button.primary {order:-1;}
 .one-workspace-modebar {
   display:flex;align-items:center;flex-wrap:wrap;gap:10px;min-height:52px;
   margin-bottom:10px;padding:7px 10px;border:1px solid var(--one-line);
@@ -563,7 +578,7 @@ body[data-one-workspace-ready] {
   .one-workspace-header h1 {font-size:18px;}
   .one-workspace-header-actions {width:100%;margin-left:0;justify-content:flex-start;flex-wrap:wrap;}
   .one-workspace-header-actions .one-workspace-button {min-height:42px;}
-  .one-workspace-save-feedback {max-width:100%;font-size:11px;}
+  .one-workspace-save-feedback {flex-basis:100%;max-width:100%;font-size:11px;}
   .one-workspace-modebar {padding:10px;gap:8px;}
   .one-workspace-steps {order:3;width:100%;margin:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));}
   .one-workspace-steps button {min-width:0;padding:8px 2px;font-size:11px;white-space:normal;}
