@@ -1,5 +1,5 @@
 {
-  "version": "V2.38_20261106",
+  "version": "V2.39_20261106",
   "ui_shell_version": "V1.3.3",
   "public_boundary": "semantic_references_only",
   "principle": "one_function_one_entry",
@@ -32,6 +32,56 @@
       "Unknown facts must not be invented."
     ]
   },
+  "card_guide": {
+    "version": "V1.0_20261106",
+    "exchange_schema": "o-ne.card.canonical.v1",
+    "purpose": "人與 AI 判斷該用哪張字卡的唯一正本，搭配各工具的 guide 使用",
+    "decision_order": [
+      "先問這段希望觀眾注意什麼；答不出來就不放字卡",
+      "依各工具 guide 的 use_when 與 tie_breaks 選卡；都不合就回報 UNMAPPED，不硬套、不自建",
+      "文字與數字都要有來源；沒有就留空或不放",
+      "輸出 o-ne.card.canonical.v1；tool_id 與 mode 取自 guide",
+      "meta.status 固定 DRAFT；有圖的卡交 project.zip"
+    ],
+    "tie_breaks": [
+      {
+        "case": "價格",
+        "rule": "單獨講價錢用一般卡 COST；品鑑時放評分卡金額欄",
+        "status": "approved"
+      },
+      {
+        "case": "整支片總花費",
+        "rule": "片尾講用片尾結算；片中講用一般卡 COST",
+        "status": "approved"
+      },
+      {
+        "case": "DONE／FAIL",
+        "rule": "突發事件用觸發卡；任務本身的完成或失敗用常駐卡",
+        "status": "approved"
+      },
+      {
+        "case": "感受 vs 事件",
+        "rule": "表達感受用效果卡；有具體事件用觸發卡",
+        "status": "approved"
+      },
+      {
+        "case": "一步步 vs 一次看完",
+        "rule": "要累積、左圖同步換用說明卡；一次看完用焦點內容卡",
+        "status": "approved"
+      },
+      {
+        "case": "結論",
+        "rule": "片尾用片尾結算；片中用焦點內容卡",
+        "status": "approved"
+      },
+      {
+        "case": "多選項",
+        "rule": "短選項用選項卡；要配圖或長說明暫用焦點內容卡",
+        "status": "interim",
+        "note": "兩張卡功能重複，規劃整合中"
+      }
+    ]
+  },
   "tools": [
     {
       "id": "general",
@@ -57,7 +107,96 @@
         "ai_json_schema_guide"
       ],
       "formal_ref": "HERE-01",
-      "generator_version": "V1.2.1_20260826"
+      "generator_version": "V1.2.1_20260826",
+      "tool_id": "general-card",
+      "guide": {
+        "summary": "交代現況的短卡：位置、花費、拿到東西",
+        "aliases": [
+          "位置",
+          "地點",
+          "場景",
+          "現在在哪",
+          "這裡是哪",
+          "抵達",
+          "價格",
+          "花費",
+          "花多少",
+          "門票",
+          "COST",
+          "GET",
+          "獲得",
+          "拿到",
+          "解鎖"
+        ],
+        "use_when": [
+          "告訴觀眾現在在哪、這段的場景",
+          "單一項目的價格或花費",
+          "拿到商品、道具或解鎖東西"
+        ],
+        "avoid_when": [
+          "品鑑時的金額放評分卡的金額欄",
+          "片尾講整支片總花費用片尾結算",
+          "沒查證的數字不放"
+        ],
+        "modes": [
+          {
+            "mode": "HERE",
+            "component_id": "HERE-01",
+            "use_when": "目前位置、場景"
+          },
+          {
+            "mode": "GET",
+            "component_id": "COL-02",
+            "use_when": "拿到商品、道具或解鎖東西"
+          },
+          {
+            "mode": "COST",
+            "component_id": "RWD-01",
+            "use_when": "單一項目的價格或花費；title 放花費項目，subtitle 放金額",
+            "reference": {
+              "label": "3COINS 11 件",
+              "url": "https://youtu.be/MJ8X5-t5hSg"
+            }
+          },
+          {
+            "mode": "CUSTOM",
+            "component_id": null,
+            "use_when": "上面都不合、又只需要短標籤時；另填 label"
+          }
+        ],
+        "fields": {
+          "required": [
+            "card.mode",
+            "content.title"
+          ],
+          "optional": [
+            "content.subtitle"
+          ]
+        },
+        "limits": [
+          "component_id 由工具依 mode 自動帶入"
+        ],
+        "output": {
+          "kind": "component",
+          "size": "653x127"
+        },
+        "needs_image": false,
+        "example": "臨空城華盛頓飯店／計畫外多住的一晚",
+        "references": [
+          {
+            "label": "大阪 D1D2",
+            "url": "https://youtu.be/Z4ad3eAkaLU"
+          },
+          {
+            "label": "淡江大橋",
+            "url": "https://youtu.be/TWlWkjWvrHs"
+          },
+          {
+            "label": "3COINS 11 件",
+            "url": "https://youtu.be/MJ8X5-t5hSg"
+          }
+        ]
+      }
     },
     {
       "id": "trigger",
@@ -88,7 +227,73 @@
         "ai_json_schema_guide"
       ],
       "formal_ref": "TRIGGER-CARD",
-      "generator_version": "V1.0.2_20260826"
+      "generator_version": "V1.0.2_20260826",
+      "tool_id": "trigger-card",
+      "guide": {
+        "summary": "突發事件：計畫外發生的事與結果",
+        "aliases": [
+          "突發",
+          "意外",
+          "事件",
+          "發生",
+          "驚喜",
+          "成功",
+          "失敗",
+          "EVENT",
+          "DONE",
+          "FAIL"
+        ],
+        "use_when": [
+          "突發事件、意外發生的事",
+          "計畫外事件的成功或失敗"
+        ],
+        "avoid_when": [
+          "已掛著的任務完成或失敗用常駐卡",
+          "只表達感受、沒有具體事件用效果卡"
+        ],
+        "modes": [
+          {
+            "mode": "EVENT",
+            "field": "card.state",
+            "use_when": "事件發生"
+          },
+          {
+            "mode": "DONE",
+            "field": "card.state",
+            "use_when": "事件成功"
+          },
+          {
+            "mode": "FAIL",
+            "field": "card.state",
+            "use_when": "事件失敗"
+          }
+        ],
+        "fields": {
+          "required": [
+            "card.state",
+            "content.title"
+          ],
+          "optional": [
+            "content.subtitle",
+            "content.progress"
+          ]
+        },
+        "limits": [
+          "progress 寫成 0/1、1/1"
+        ],
+        "output": {
+          "kind": "component",
+          "size": "653x127"
+        },
+        "needs_image": false,
+        "example": "機場居然看得到煙火？！",
+        "references": [
+          {
+            "label": "淡江大橋",
+            "url": "https://youtu.be/TWlWkjWvrHs"
+          }
+        ]
+      }
     },
     {
       "id": "persistent",
@@ -121,7 +326,68 @@
       ],
       "formal_ref": "PERSISTENT-MISSION",
       "generator_version": "V1.1.2_20260827",
-      "mapping": "./persistent-card-mapping.json"
+      "mapping": "./persistent-card-mapping.json",
+      "tool_id": "persistent-card",
+      "guide": {
+        "summary": "任務：這段要完成什麼、進度如何",
+        "aliases": [
+          "任務",
+          "主線",
+          "目標",
+          "進度",
+          "MISSION",
+          "完成任務",
+          "任務失敗"
+        ],
+        "use_when": [
+          "交代任務與進度",
+          "任務本身的完成或失敗"
+        ],
+        "avoid_when": [
+          "計畫外的突發事件用觸發卡",
+          "不要全程黏著，只在任務開始與結果出現"
+        ],
+        "modes": [
+          {
+            "mode": "MISSION",
+            "field": "card.state",
+            "use_when": "任務進行中"
+          },
+          {
+            "mode": "DONE",
+            "field": "card.state",
+            "use_when": "任務完成"
+          },
+          {
+            "mode": "FAIL",
+            "field": "card.state",
+            "use_when": "任務失敗"
+          }
+        ],
+        "fields": {
+          "required": [
+            "card.state",
+            "content.title",
+            "content.progress"
+          ],
+          "optional": []
+        },
+        "limits": [
+          "文字超出安全寬度會擋輸出"
+        ],
+        "output": {
+          "kind": "component",
+          "size": "634x62"
+        },
+        "needs_image": false,
+        "example": "準備返台 0/1",
+        "references": [
+          {
+            "label": "淡江大橋",
+            "url": "https://youtu.be/TWlWkjWvrHs"
+          }
+        ]
+      }
     },
     {
       "id": "effect",
@@ -149,7 +415,63 @@
         "ai_json_schema_guide"
       ],
       "generator_version": "V0.3.1_20260826",
-      "panel_fill_opacity": 0.8
+      "panel_fill_opacity": 0.8,
+      "tool_id": "effect-card",
+      "guide": {
+        "summary": "感受與氛圍：不是事件，是狀態",
+        "aliases": [
+          "心情",
+          "感受",
+          "狀態",
+          "氛圍",
+          "好吃",
+          "可愛",
+          "踩雷",
+          "難吃",
+          "開心",
+          "BUFF",
+          "DEBUFF"
+        ],
+        "use_when": [
+          "表達感受、狀態或氛圍"
+        ],
+        "avoid_when": [
+          "有具體事件發生用觸發卡",
+          "要給分數或評價用評分卡"
+        ],
+        "modes": [
+          {
+            "mode": "BUFF",
+            "field": "card.state",
+            "use_when": "正面狀態"
+          },
+          {
+            "mode": "DEBUFF",
+            "field": "card.state",
+            "use_when": "負面狀態"
+          }
+        ],
+        "fields": {
+          "required": [
+            "card.state",
+            "content.title"
+          ],
+          "optional": [
+            "content.subtitle",
+            "appearance.tool.preset"
+          ]
+        },
+        "limits": [
+          "8 組預設、6 款滿版氛圍"
+        ],
+        "output": {
+          "kind": "fullcanvas",
+          "size": "1920x1080"
+        },
+        "needs_image": false,
+        "example": "好吃到爆！幸福感 +999",
+        "references": []
+      }
     },
     {
       "id": "move",
@@ -174,7 +496,69 @@
         "same_tool_batch_render",
         "ai_json_schema_guide"
       ],
-      "generator_version": "V1.0.7_20260826"
+      "generator_version": "V1.0.7_20260826",
+      "tool_id": "move-card",
+      "guide": {
+        "summary": "路線：從 A 到 B 怎麼走",
+        "aliases": [
+          "移動",
+          "路線",
+          "交通",
+          "怎麼去",
+          "轉車",
+          "搭車",
+          "開車",
+          "步行",
+          "MOVE"
+        ],
+        "use_when": [
+          "交代路線與移動方式"
+        ],
+        "avoid_when": [
+          "公里、分鐘等沒查證的數字不放"
+        ],
+        "modes": [
+          {
+            "mode": "white",
+            "field": "card.state",
+            "use_when": "白色版"
+          },
+          {
+            "mode": "orange",
+            "field": "card.state",
+            "use_when": "橘色版"
+          }
+        ],
+        "fields": {
+          "required": [
+            "content.title",
+            "content.route.stations",
+            "content.route.segments"
+          ],
+          "optional": []
+        },
+        "limits": [
+          "2–8 站",
+          "路段數＝站數－1",
+          "實線是區域內，虛線是跨國"
+        ],
+        "output": {
+          "kind": "component",
+          "size": "721x126"
+        },
+        "needs_image": false,
+        "example": "一蘭 → 關西機場",
+        "references": [
+          {
+            "label": "大阪 D1D2",
+            "url": "https://youtu.be/Z4ad3eAkaLU"
+          },
+          {
+            "label": "淡江大橋",
+            "url": "https://youtu.be/TWlWkjWvrHs"
+          }
+        ]
+      }
     },
     {
       "id": "choice",
@@ -204,7 +588,51 @@
       ],
       "formal_ref": "SELECT-CARD",
       "panel_fill_opacity": 0.8,
-      "generator_version": "V1.0.1_20260826"
+      "generator_version": "V1.0.1_20260826",
+      "tool_id": "choice-card",
+      "guide": {
+        "summary": "做選擇：短選項，可標亮暗",
+        "aliases": [
+          "選擇",
+          "選項",
+          "選哪個",
+          "哪一個",
+          "備案",
+          "SELECT"
+        ],
+        "use_when": [
+          "從幾個短選項裡選一個，要顯示亮暗狀態"
+        ],
+        "avoid_when": [
+          "只有接受或放棄用挑戰卡",
+          "選項要配圖或需要長說明，暫時用焦點內容卡"
+        ],
+        "modes": [],
+        "fields": {
+          "required": [
+            "content.title",
+            "content.question",
+            "content.items"
+          ],
+          "optional": []
+        },
+        "limits": [
+          "每項 state：BRIGHT／DIM，可多項同亮",
+          "標準 2～4 項"
+        ],
+        "output": {
+          "kind": "component",
+          "size": "882x678"
+        },
+        "needs_image": false,
+        "example": "選擇的交通工具？",
+        "references": [
+          {
+            "label": "大阪 D1D2",
+            "url": "https://youtu.be/Z4ad3eAkaLU"
+          }
+        ]
+      }
     },
     {
       "id": "challenge",
@@ -241,6 +669,53 @@
       "default_labels": {
         "yes": "YES",
         "no": "NO"
+      },
+      "tool_id": "challenge-card",
+      "guide": {
+        "summary": "接受或放棄：只有 YES／NO",
+        "aliases": [
+          "挑戰",
+          "接受",
+          "放棄",
+          "要不要",
+          "YES",
+          "NO"
+        ],
+        "use_when": [
+          "要不要接受或放棄一件事"
+        ],
+        "avoid_when": [
+          "三個以上選項用選項卡"
+        ],
+        "modes": [
+          {
+            "mode": "accept",
+            "field": "card.mode",
+            "use_when": "接受"
+          },
+          {
+            "mode": "abandon",
+            "field": "card.mode",
+            "use_when": "放棄"
+          }
+        ],
+        "fields": {
+          "required": [
+            "card.mode",
+            "content.confirmation"
+          ],
+          "optional": []
+        },
+        "limits": [
+          "文字超出安全寬度會擋輸出"
+        ],
+        "output": {
+          "kind": "component",
+          "size": "692x326"
+        },
+        "needs_image": false,
+        "example": "確認接受挑戰任務？",
+        "references": []
       }
     },
     {
@@ -304,6 +779,45 @@
         "single_npc_case": "pass",
         "dual_character_case": "pass",
         "headless_browser_dom": "pass"
+      },
+      "tool_id": "dialogue-card",
+      "guide": {
+        "summary": "角色講話",
+        "aliases": [
+          "對話",
+          "講話",
+          "吐槽",
+          "吵架",
+          "角色",
+          "台詞"
+        ],
+        "use_when": [
+          "角色對話、吐槽"
+        ],
+        "avoid_when": [
+          "長篇說明用焦點內容卡或說明卡"
+        ],
+        "modes": [],
+        "fields": {
+          "required": [
+            "content.dialogue.left",
+            "content.dialogue.right",
+            "content.dialogue.text"
+          ],
+          "optional": []
+        },
+        "limits": [
+          "角色：NONE／Omi／NieTe／Kuma／Nomi／NPC",
+          "表情：一般／大笑／驚訝／生氣／委屈哭／疑惑／無奈",
+          "NPC 無頭像"
+        ],
+        "output": {
+          "kind": "component",
+          "size": "617x120"
+        },
+        "needs_image": false,
+        "example": "你不是說走這條比較快嗎？",
+        "references": []
       }
     },
     {
@@ -351,7 +865,61 @@
         "results",
         "rating4"
       ],
-      "mapping": "./rating-card-mapping.json"
+      "mapping": "./rating-card-mapping.json",
+      "tool_id": "rating-card",
+      "guide": {
+        "summary": "品鑑：幫食物、商品打分",
+        "aliases": [
+          "評分",
+          "品鑑",
+          "食物",
+          "美食",
+          "好吃",
+          "商品",
+          "開箱",
+          "推不推薦",
+          "值不值得",
+          "CP 值"
+        ],
+        "use_when": [
+          "評價食物、商品或店家"
+        ],
+        "avoid_when": [
+          "只想表達好吃的感受用效果卡",
+          "單獨講價錢用一般卡 COST"
+        ],
+        "modes": [],
+        "fields": {
+          "required": [
+            "content.title",
+            "content.items"
+          ],
+          "optional": [
+            "content.label",
+            "content.subtitle",
+            "content.price",
+            "content.review",
+            "assets"
+          ]
+        },
+        "limits": [
+          "1–8 項；score 填分數，text 填 result",
+          "標籤預設「補給品鑑定」，金額欄預設「金額」",
+          "要圖時交 project.zip"
+        ],
+        "output": {
+          "kind": "fullcanvas",
+          "size": "1920x1080"
+        },
+        "needs_image": true,
+        "example": "燒肉力丸 道頓堀店",
+        "references": [
+          {
+            "label": "九份伴手禮",
+            "url": "https://youtu.be/7jxl8AZd5J0"
+          }
+        ]
+      }
     },
     {
       "id": "focus",
@@ -412,6 +980,67 @@
         "browser_main_and_portable": "pass_candidate_component_preview",
         "console_errors": 0,
         "focus_layout_regression": "pass"
+      },
+      "tool_id": "focus-card",
+      "guide": {
+        "summary": "大段內容：提問、結論、比較，一次看完",
+        "aliases": [
+          "提問",
+          "問觀眾",
+          "結論",
+          "比較",
+          "清單",
+          "重點",
+          "大段內容"
+        ],
+        "use_when": [
+          "觀眾提問、片中結論、較大說明，一次看完",
+          "選項要配圖或需要長說明"
+        ],
+        "avoid_when": [
+          "要一句句累積、左圖同步換用說明卡",
+          "片尾總結用片尾結算"
+        ],
+        "modes": [
+          {
+            "mode": "body",
+            "field": "card.mode",
+            "use_when": "一般內文"
+          },
+          {
+            "mode": "list",
+            "field": "card.mode",
+            "use_when": "項目清單"
+          },
+          {
+            "mode": "steps",
+            "field": "card.mode",
+            "use_when": "步驟"
+          }
+        ],
+        "fields": {
+          "required": [
+            "card.mode",
+            "content.title",
+            "content.body 或 content.items"
+          ],
+          "optional": [
+            "content.label",
+            "assets",
+            "sequence"
+          ]
+        },
+        "limits": [
+          "最多 8 列",
+          "不自動縮字"
+        ],
+        "output": {
+          "kind": "fullcanvas",
+          "size": "1920x1080"
+        },
+        "needs_image": false,
+        "example": "道頓堀觀光船",
+        "references": []
       }
     },
     {
@@ -522,6 +1151,70 @@
         "public_pages_run": "pass_run_311",
         "release_gate": "omi_approved_direct_main_v049_project_zip_hotfix",
         "app_console_errors": 0
+      },
+      "tool_id": "explanation-card",
+      "guide": {
+        "summary": "逐步說明：一句句累積，左圖跟著換",
+        "aliases": [
+          "說明",
+          "解釋",
+          "步驟",
+          "流程",
+          "歷史",
+          "傳說",
+          "由來",
+          "制度",
+          "規則",
+          "知識"
+        ],
+        "use_when": [
+          "逐步圖文說明、資訊敘事"
+        ],
+        "avoid_when": [
+          "一次看完的內容用焦點內容卡",
+          "傳說不要寫成史實"
+        ],
+        "modes": [
+          {
+            "mode": "content",
+            "field": "card.mode",
+            "use_when": "圖文說明"
+          },
+          {
+            "mode": "gallery",
+            "field": "card.mode",
+            "use_when": "純圖片"
+          }
+        ],
+        "fields": {
+          "required": [
+            "card.mode",
+            "content.title",
+            "content.body",
+            "sequence",
+            "assets"
+          ],
+          "optional": [
+            "content.label",
+            "content.subtitle"
+          ]
+        },
+        "limits": [
+          "一句一行，不折行、不縮字",
+          "要圖時交 project.zip"
+        ],
+        "output": {
+          "kind": "component",
+          "size": "1552x724"
+        },
+        "needs_image": true,
+        "example": "退稅流程三步驟",
+        "references": [
+          {
+            "label": "淡江大橋",
+            "url": "https://youtu.be/TWlWkjWvrHs"
+          }
+        ]
       }
     },
     {
@@ -549,7 +1242,42 @@
         "same_tool_batch_render",
         "ai_json_schema_guide"
       ],
-      "generator_version": "V1.2.6_20260826"
+      "generator_version": "V1.2.6_20260826",
+      "tool_id": "thumbnail-frame",
+      "guide": {
+        "summary": "影片縮圖的品牌框",
+        "aliases": [
+          "縮圖",
+          "封面",
+          "品牌框",
+          "首頁框"
+        ],
+        "use_when": [
+          "做影片縮圖時套品牌框"
+        ],
+        "avoid_when": [
+          "縮圖設計方法看 one-thumbnail-design"
+        ],
+        "modes": [],
+        "fields": {
+          "required": [
+            "assets"
+          ],
+          "optional": [
+            "appearance.tool.corner"
+          ]
+        },
+        "limits": [
+          "要圖時交 project.zip"
+        ],
+        "output": {
+          "kind": "fullcanvas",
+          "size": "1920x1080"
+        },
+        "needs_image": true,
+        "example": "",
+        "references": []
+      }
     },
     {
       "id": "settlement",
@@ -593,7 +1321,61 @@
       "mapping": "./settlement-card-mapping.json",
       "visual_status": "READY",
       "ready_approved_by": "Omi",
-      "ready_approved_on": "2026-08-20"
+      "ready_approved_on": "2026-08-20",
+      "tool_id": "settlement-card",
+      "guide": {
+        "summary": "片尾總結",
+        "aliases": [
+          "片尾",
+          "結算",
+          "總結",
+          "結果",
+          "總花費",
+          "下一集",
+          "End Screen"
+        ],
+        "use_when": [
+          "片尾總結，含整支片的總花費"
+        ],
+        "avoid_when": [
+          "片中講總花費用一般卡 COST",
+          "片中結論用焦點內容卡"
+        ],
+        "modes": [],
+        "fields": {
+          "required": [
+            "content.title",
+            "content.items"
+          ],
+          "optional": [
+            "content.subtitle",
+            "content.summary",
+            "content.question",
+            "content.next_text",
+            "assets"
+          ]
+        },
+        "limits": [
+          "1–8 列",
+          "icon 有固定清單"
+        ],
+        "output": {
+          "kind": "fullcanvas",
+          "size": "1920x1080"
+        },
+        "needs_image": false,
+        "example": "大阪任務結算",
+        "references": [
+          {
+            "label": "3COINS 11 件",
+            "url": "https://youtu.be/MJ8X5-t5hSg"
+          },
+          {
+            "label": "京都",
+            "url": "https://youtu.be/cBh0Yobs2Eo"
+          }
+        ]
+      }
     },
     {
       "id": "player1",
