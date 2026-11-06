@@ -10,11 +10,11 @@ O-Ne 字卡工具入口與編輯器集合。
 - 移動卡 V1.0.7
 - 選項卡 V1.0.1
 - 挑戰卡 V0.1.1 READY：沿用固定卡正式「接受／放棄」PSD 外觀；同一工具可切換接受／放棄與 YES／NO 選取，主句三段文字與左右按鈕可修改。
-- 對話卡 V1.3.7
+- 對話卡 V1.3.8
 - 評分卡 V1.3.1
-- 焦點內容卡 V0.5.15：混合中英標題與各列都用 Canvas 實際量字，高度與元件預覽會依換行向下增加；圖片仍可完整顯示、固定 16:9 或自由拉框裁切。
+- 焦點內容卡 V0.6.0：混合中英標題與各列都用 Canvas 實際量字，高度與元件預覽會依換行向下增加；圖片仍可完整顯示、固定 16:9 或自由拉框裁切。
 - 縮圖品牌框 V1.2.6
-- 說明卡單一編輯 V3：一般說明與純圖片卡在同一編輯器切換，主標／副標／內文預設為 7／3／4 級。
+- 說明卡單一編輯 V3.5（工具版本 V0.4.9）：一般說明與純圖片卡在同一編輯器切換，主標／副標／內文預設為 7／3／4 級。
 - 片尾結算卡 V0.1.3 READY：QST-03／FORMAL V1.1＋Omi 核准擴充，支援 1–8 列自由增減、Icon 替換、欄位名稱預設／自訂、左側觀眾互動問題／下一影片模式。
 
 ## 使用方式
@@ -45,7 +45,7 @@ O-Ne 字卡工具入口與編輯器集合。
 畫面驗收：根目錄執行 `npm ci`、`npm run dev`，開啟開發伺服器會進入 `tests/workspace-preview.html`。可切換 12 個工具，使用 1920 × 1080、1366 × 900、390 × 844 的 iframe 視窗檢查排版及操作。Vite 與驗收頁僅供開發，正式 GitHub Pages 仍直接使用既有靜態 HTML。
 
 入口頁只讀 `one-tools-registry-v1.json`；`registry.json` 僅保留相容指標，不再複製一份舊工具清單。
-Command Center V0.9.4 也會讀取同一份 canonical registry，並顯示全部 13 個可用工具，避免入口數量與導覽內容不同步。依 Omi 明確核准的例外，專案頁直接提供 8 個專案共 47 個母專案、企劃卡與 01～04 Drive／Docs 入口，不再要求每台瀏覽器匯入；Google 權限仍是內容存取的唯一判定。USJ 尚無已核對的唯一企劃卡入口，因此目前提供 5 個，其餘每案 6 個。正式白名單優先於舊 localStorage；本機資料只能補尚未提供的欄位與備份相容，不能覆蓋已核對網址。
+O-Ne 工作台 V1.3（Command Center）也會讀取同一份 canonical registry，並顯示全部 13 個可用工具，避免入口數量與導覽內容不同步。頁面目前顯示 10 個影片專案、68 個專案快捷。依 Omi 明確核准的例外，專案頁直接提供母專案、企劃卡與 01～04 Drive／Docs 入口，不再要求每台瀏覽器匯入；Google 權限仍是內容存取的唯一判定。USJ 尚無已核對的唯一企劃卡入口，因此目前提供 5 個，其餘每案 6 個。正式白名單優先於舊 localStorage；本機資料只能補尚未提供的欄位與備份相容，不能覆蓋已核對網址。
 
 ## 最近 5 次編輯與載入 JSON
 
@@ -58,7 +58,7 @@ Command Center V0.9.4 也會讀取同一份 canonical registry，並顯示全部
 - 載入檔限制 1 MB，且必須是同一工具的 JSON。格式錯誤、工具不符或欄位無效時會拒絕載入，畫面目前內容不會被覆蓋。
 - 評分卡、焦點卡、說明卡、縮圖品牌框與片尾結算卡的單獨 JSON 只保存文字與圖片調整設定，不直接嵌入圖片位元；若要連圖片一起搬移，優先使用「專案檔案」的 ZIP 專案包。說明卡仍保留 `.onecard` 載入／下載，供既有專案相容使用。
 
-共用行為由 `edit-backup-v1.js` V1.3.1 與 `one-tools-ui-v1.js` V1.3.1 提供；各工具仍保留自己的正式 Native JSON schema 與驗證規則。Canonical 只作 AI exchange contract，不取代 renderer contract。常駐卡沿用既有本機暫存鍵值，其餘工具也不更換原鍵值，因此升級前的最近紀錄不會被清除。
+共用行為由 `edit-backup-v1.js` V1.3.1 與 `one-tools-ui-v1.js` V1.3.3 提供；各工具仍保留自己的正式 Native JSON schema 與驗證規則。Canonical 只作 AI exchange contract，不取代 renderer contract。常駐卡沿用既有本機暫存鍵值，其餘工具也不更換原鍵值，因此升級前的最近紀錄不會被清除。
 
 ## 智慧檔名與完整 ZIP 專案包
 
@@ -87,10 +87,11 @@ Command Center V0.9.4 也會讀取同一份 canonical registry，並顯示全部
 
 ## 給 AI 的 JSON 格式提示
 
-- 共用 `ai-json-guide-v1.js` V1.4.0 的工具，可從「專案檔案 → AI 格式」開啟「給 AI 的 JSON 格式」；13 種卡型都使用唯一 AI exchange schema：`o-ne.card.canonical.v1`，JSON 範例預設折疊。
+- 共用 `ai-json-guide-v1.js` V1.4.1 的工具，可從「專案檔案 → AI 格式」開啟「給 AI 的 JSON 格式」；13 種卡型都使用唯一 AI exchange schema：`o-ne.card.canonical.v1`，JSON 範例預設折疊。
 - AI 不再記 13 套 Native 頂層格式。Canonical JSON 會依 `tool_id` 經 adapter 轉成對應工具既有 Native settings，再交給原生 importer／renderer；既有 Native JSON 仍可直接載入，兩層不得混為同一 schema。
 - AI 新產出的 `meta.status` 固定 `DRAFT`，不得自行寫 `FORMAL`／`APPROVED`；建議檔名使用 `*.card.json`。
 - 每張卡提供「複製完整 AI 指令」「複製 JSON 範例」「下載 JSON 範例」；完整 AI 指令會要求 AI 回傳 UTF-8 `.json` 檔，若介面不能建立附件則只回 raw JSON，不加 Markdown 程式碼框或解說。
+- 一般卡的 `card.component_id` 由工具依 `card.mode` 自動帶入（HERE-01／COL-02／RWD-01，CUSTOM 無對應），AI 改 mode 時不必改它。
 - 說明區會列出固定 component、重要 enum、陣列數量與相依規則；移動卡會檢查站點／路段，累積卡以 `sequence` 綁定，格式錯誤或卡種不符會拒絕套用，不覆蓋目前畫面。
 - 評分卡、焦點卡、說明卡、縮圖品牌框與片尾結算卡的 Canonical JSON 不包含圖片位元；需要連圖片與可編輯設定一起交付時使用 `project.zip`。`.onecard` 僅保留 Legacy 相容。
 - `tests/card-canonical-import.browser.spec.cjs` 已透過 13 個真實工具的 JSON 載入入口驗證 Canonical → Native → 原生 importer，Gate 為 PASS 13/13。
@@ -122,7 +123,7 @@ GitHub Actions 的 `Card workspace browser QA` 使用鎖定版本 Chromium／Pla
 ## 維護規則
 - 後續新工具或版本更新，直接更新 `O-Ne-Tools/` 內對應檔案。
 - 新增工具時只更新 canonical `one-tools-registry-v1.json`；入口頁會自動讀取。
-- 公開 HTML／JS／JSON 原則上只能使用 HERE-01、COL-02、QST-03 等語意代號，不得寫入 Drive／Docs URL 或檔案 ID。唯一例外為 Omi 已核准的 `command-center-project-links-direct-v1.js` 專案快捷白名單；它只可包含已核對的母專案、唯一企劃卡與 01～04 入口，不得包含正文、權限資料、憑證或自動化設定。`tests/public-boundary-regression.cjs` 會鎖定這個窄例外並阻擋其他檔案洩漏。
+- 公開 HTML／JS／JSON 原則上只能使用 HERE-01、COL-02、QST-03 等語意代號，不得寫入 Drive／Docs URL 或檔案 ID。例外只有 Omi 已核准的 O-Ne 工作台兩支檔案：`command-center-project-links-direct-v1.js` 與 `command-center-v1-data.js`；它們只可放工作台要用的 Drive／Docs 入口，不得包含正文、權限資料、憑證或自動化設定。新增連結前要確認對方資料夾沒有開放公開編輯。`tests/public-boundary-regression.cjs` 會鎖定這兩支例外，並阻擋其他檔案出現 Drive／Docs 連結；這支測試已排進 CI。
 - 不另建平行工具包。
 - `assets/NotoSansTC-O-Ne.woff` 依 SIL Open Font License 1.1 使用；授權文字見 `assets/OFL-NotoSansTC.txt`。
 

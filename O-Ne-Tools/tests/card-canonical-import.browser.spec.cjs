@@ -66,3 +66,37 @@ for (const [toolId, file] of tools) {
     expect(errors).toEqual([]);
   });
 }
+
+test('general-card COST loads when an AI changes only card.mode from the guide example', async ({ page }) => {
+  await page.goto('/O-Ne-Tools/general-card.html');
+  await expect.poll(() => page.evaluate(() => Boolean(window.ONEAIJsonGuide && window.ONE_CARD_CANONICAL))).toBe(true);
+  const payload = await page.evaluate(() => window.ONEAIJsonGuide.example('general-card'));
+  expect(payload.card.component_id).toBe('HERE-01');
+  payload.card.mode = 'COST';
+  payload.card.variant = 'COST';
+  payload.content.title = '門票';
+  payload.content.subtitle = 'NT$ 100';
+  await page.getByRole('button', { name: '專案檔案', exact: true }).click();
+  const load = page.locator('#one-workspace-files .one-workspace-native-files [data-action="load"],#one-workspace-files .one-workspace-native-files #loadJson').first();
+  const chooser = page.waitForEvent('filechooser');
+  await load.click();
+  await (await chooser).setFiles({ name: 'general-cost.card.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(payload), 'utf8') });
+  await expect(page.locator('#mode')).toHaveValue('COST');
+  await expect(page.locator('#title')).toHaveValue('門票');
+});
+
+test('AI assistant applies the general-card mode and refuses an unknown one', async ({ page }) => {
+  await page.goto('/O-Ne-Tools/ai-card.html?tool=general');
+  const editor = page.frameLocator('#toolFrame');
+  await expect(editor.locator('#mode')).toHaveValue('HERE');
+  await page.locator('#jsonInput').fill(JSON.stringify({ tool: 'general-card', mode: 'COST', title: '門票', subtitle: 'NT$ 100' }));
+  await page.locator('#applyJson').click();
+  await expect(page.locator('#applyStatus')).toContainText('已套用');
+  await expect(editor.locator('#mode')).toHaveValue('COST');
+  await expect(editor.locator('#title')).toHaveValue('門票');
+  await page.locator('#jsonInput').fill(JSON.stringify({ tool: 'general-card', mode: 'PRICE', title: '錯誤' }));
+  await page.locator('#applyJson').click();
+  await expect(page.locator('#applyStatus')).toContainText('無法套用');
+  await expect(editor.locator('#mode')).toHaveValue('COST');
+  await expect(editor.locator('#title')).toHaveValue('門票');
+});

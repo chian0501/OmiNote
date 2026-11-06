@@ -1,4 +1,4 @@
-/* O-Ne Card Canonical Schema adapter — V1.0.0 */
+/* O-Ne Card Canonical Schema adapter — V1.0.1 */
 (function(root,factory){
   var api=factory();
   if(typeof module==='object'&&module.exports) module.exports=api;
@@ -8,6 +8,7 @@
 var SCHEMA='o-ne.card.canonical.v1', VERSION='1.0';
 var TOOL_IDS=['general-card','trigger-card','persistent-card','effect-card','move-card','choice-card','challenge-card','dialogue-card','rating-card','focus-card','explanation-card','thumbnail-frame','settlement-card'];
 var COMPONENTS={'trigger-card':'TRIGGER-CARD','persistent-card':'PERSISTENT-MISSION','effect-card':'STA-02','move-card':'NAV-01','choice-card':'SELECT-CARD','challenge-card':'CHALLENGE-CARD','dialogue-card':'DIALOGUE-CARD','rating-card':'COL-02','focus-card':'FOCUS-CARD','explanation-card':'EXPLANATION-CARD','thumbnail-frame':'THUMBNAIL-FRAME','settlement-card':'QST-03'};
+var GENERAL_COMPONENTS={HERE:'HERE-01',GET:'COL-02',COST:'RWD-01',CUSTOM:null};
 function clone(v){return v==null?v:JSON.parse(JSON.stringify(v));}
 function obj(v){return v&&typeof v==='object'&&!Array.isArray(v);}
 function arr(v){return Array.isArray(v)?v:[];}
@@ -56,7 +57,7 @@ function fromNative(toolId,n){
 function toNative(c){
  var errors=validate(c);if(errors.length)throw new Error('INVALID_CANONICAL:'+errors.join('|'));var t=c.tool_id,n=clone(c.native&&c.native.passthrough||{}),tool=obj(c.appearance&&c.appearance.tool)?c.appearance.tool:{};
  if(c.native&&c.native.target_schema)n.schema=c.native.target_schema;if(c.native&&c.native.target_version)n.version=c.native.target_version;if(c.native&&c.native.generator_version)n.generator_version=c.native.generator_version;if(c.meta&&c.meta.status)n.status=c.meta.status;if(COMPONENTS[t])n.component_id=COMPONENTS[t];
- if(t==='general-card'){if(c.card.component_id!=null)n.component_id=c.card.component_id;n.mode=c.card.mode;n.variant=c.card.variant;n.label=clone(c.content.label);n.title=c.content.title;n.subtitle=c.content.subtitle;if(c.appearance.panel_opacity!=null)n.panel_fill_opacity=c.appearance.panel_opacity;
+ if(t==='general-card'){if(Object.prototype.hasOwnProperty.call(GENERAL_COMPONENTS,c.card.mode)){delete n.component_id;if(GENERAL_COMPONENTS[c.card.mode])n.component_id=GENERAL_COMPONENTS[c.card.mode];}else if(c.card.component_id!=null)n.component_id=c.card.component_id;n.mode=c.card.mode;n.variant=c.card.variant;n.label=clone(c.content.label);n.title=c.content.title;n.subtitle=c.content.subtitle;if(c.appearance.panel_opacity!=null)n.panel_fill_opacity=c.appearance.panel_opacity;
  }else if(t==='trigger-card'){n.formal_ref='TRIGGER-CARD';n.state=c.card.state;n.title=c.content.title;n.subtitle=c.content.subtitle;n.progress=c.content.progress;if(c.appearance.panel_opacity!=null)n.panel_fill_opacity=c.appearance.panel_opacity;
  }else if(t==='persistent-card'){n.formal_ref='PERSISTENT-MISSION';n.tool=tool.tool||'persistent-card';n.state=c.card.state;n.task_text=c.content.title;n.progress=c.content.progress;if(c.appearance.panel_opacity!=null)n.panel_fill_opacity=c.appearance.panel_opacity;['task_font_size','progress_font_size','font_size_mode'].forEach(function(k){if(tool[k]!=null)n[k]=tool[k];});
  }else if(t==='effect-card'){n.state=c.card.state;n.title=c.content.title;n.subtitle=c.content.subtitle;if(c.appearance.accent_color!=null)n.accent=c.appearance.accent_color;if(c.appearance.title_size!=null)n.title_font_size=c.appearance.title_size;if(c.appearance.content_size!=null)n.content_font_size=c.appearance.content_size;['preset','text_style','decoration','decoration_density','decoration_visible','atmosphere','content_visible'].forEach(function(k){if(tool[k]!=null)n[k]=clone(tool[k]);});

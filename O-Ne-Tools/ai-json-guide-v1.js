@@ -1,13 +1,13 @@
-/* O-Ne shared AI JSON format guide + Canonical import — V1.4.0 */
+/* O-Ne shared AI JSON format guide + Canonical import — V1.4.1 */
 (function (global) {
   'use strict';
 
-  var VERSION = '1.4.0';
+  var VERSION = '1.4.1';
   var CANONICAL_SCHEMA = 'o-ne.card.canonical.v1';
   var mounted = Object.create(null);
 
   var META = {
-    'general-card': { name:'一般卡', code:'GENERAL-CARD', version:'V1.2.1', file:'一般卡-臨空城華盛頓飯店-HERE.card.json', native:{ generator_version:'V1.2.1_20260826' }, values:['mode：HERE／GET／COST／CUSTOM','HERE=地點定位；GET=獲得；COST=花費；CUSTOM=自訂標籤'] },
+    'general-card': { name:'一般卡', code:'GENERAL-CARD', version:'V1.2.1', file:'一般卡-臨空城華盛頓飯店-HERE.card.json', native:{ generator_version:'V1.2.1_20260826' }, values:['card.mode：HERE／GET／COST／CUSTOM；card.component_id 由工具依 mode 自動帶入，改 mode 時不必改它','HERE=目前位置、場景；GET=拿到商品或道具；COST=單一項目的價格或花費（title 放花費項目，subtitle 放金額）；CUSTOM=自訂標籤','金額要有來源；品鑑時的金額用評分卡，不用一般卡'] },
     'trigger-card': { name:'觸發卡', code:'TRIGGER-CARD', version:'V1.0.2', file:'觸發卡-機場煙火-EVENT.card.json', native:{ generator_version:'V1.0.2_20260826' }, values:['state：EVENT／DONE／FAIL','progress 例如 0/1、1/1'] },
     'persistent-card': { name:'常駐卡', code:'PERSISTENT-MISSION', version:'V1.1.2', file:'常駐卡-準備返台-MISSION.card.json', native:{ target_version:'1.2', generator_version:'V1.1.2_20260827' }, values:['state：MISSION／DONE／FAIL','字級由 appearance.tool.task_font_size／progress_font_size 控制'] },
     'effect-card': { name:'效果卡', code:'STA-02', version:'V0.3.1', file:'效果卡-好吃到爆-BUFF.card.json', native:{ target_schema:'o-ne.effect-card.formal.v0.3.1', target_version:'0.3.1', generator_version:'V0.3.1_20260826', renderer_status:'FORMAL' }, values:['state 建議 BUFF／DEBUFF','preset／text_style／decoration／atmosphere 放 appearance.tool'] },
@@ -69,12 +69,12 @@
     var existing=document.getElementById&&document.getElementById('one-card-canonical-v1');
     if(existing){ if(callback) existing.addEventListener&&existing.addEventListener('load',callback,{once:true}); return; }
     if(document.readyState==='loading' && typeof document.write==='function'){
-      document.write('<script id="one-card-canonical-v1" src="./card-canonical-v1.js?v=100"></'+'script>');
+      document.write('<script id="one-card-canonical-v1" src="./card-canonical-v1.js?v=101"></'+'script>');
       if(callback) callback();
       return;
     }
     if(document.createElement && document.head){
-      var s=document.createElement('script'); s.id='one-card-canonical-v1'; s.src='./card-canonical-v1.js?v=100'; s.onload=function(){ if(callback) callback(); }; document.head.appendChild(s);
+      var s=document.createElement('script'); s.id='one-card-canonical-v1'; s.src='./card-canonical-v1.js?v=101'; s.onload=function(){ if(callback) callback(); }; document.head.appendChild(s);
     }
   }
 

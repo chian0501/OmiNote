@@ -121,7 +121,7 @@ const tools = [
   ['challenge-card.html', 'challenge-card', 'V0.1.1'],
   ['dialogue-card-v135.html', 'dialogue-card', 'V1.3.8'],
   ['rating-card.html', 'rating-card', 'V1.3.1'],
-  ['focus-card.html', 'focus-card', 'V0.5.15'],
+  ['focus-card.html', 'focus-card', 'V0.6.0'],
   ['explanation-card.html', 'explanation-card', 'V0.4.9'],
   ['thumbnail-frame.html', 'thumbnail-frame', 'V1.2.6'],
   ['settlement-card.html', 'settlement-card', 'V0.1.3']
@@ -174,7 +174,7 @@ for (const file of ['edit-backup-v1.js', 'settlement-card-v011.js']) {
 assert.deepStrictEqual(syntaxFailures, []);
 
 const registry = JSON.parse(fs.readFileSync(path.join(root, 'one-tools-registry-v1.json'), 'utf8'));
-assert.strictEqual(registry.version, 'V2.37_20260903');
+assert.strictEqual(registry.version, 'V2.38_20261106');
 assert.strictEqual(registry.total, 18);
 assert.strictEqual(registry.ready, 13);
 assert.strictEqual(registry.candidate, 0);
@@ -186,7 +186,7 @@ for (const id of registryIds) {
     assert(entry.features.includes(feature), id + ' missing ' + feature);
   }
 }
-assert.strictEqual(registry.shared_ai_json_guide.version, 'V1.3.1_20260901');
+assert.strictEqual(registry.shared_ai_json_guide.version, 'V1.4.1_20261106');
 assert.strictEqual(registry.shared_ai_json_guide.tool_count, 13);
 assert.strictEqual(registry.shared_ai_json_guide.raw_json_only_instruction, true);
 assert.strictEqual(registry.shared_ai_json_guide.placement, 'collapsed_completion_dock_below_editor');
@@ -194,7 +194,7 @@ assert.strictEqual(registry.shared_ai_json_guide.left_controls_untouched, true);
 assert.strictEqual(registry.shared_batch_render.version, 'V1.3.1_20260901');
 assert.strictEqual(registry.shared_batch_render.max_files, 20);
 assert.strictEqual(registry.shared_batch_render.image_tool_json_policy, 'zip_project_package_required');
-assert.strictEqual(registry.shared_project_package.version, 'V1.3.2_20260903');
+assert.strictEqual(registry.shared_project_package.version, 'V1.3.4');
 assert.strictEqual(registry.shared_project_package.filename_pattern, '{card_category}-{title}-{state}.{ext}');
 assert.strictEqual(registry.shared_project_package.brand_prefix_in_filename, false);
 assert.strictEqual(registry.shared_project_package.same_title_variant_safe, true);
@@ -203,7 +203,7 @@ assert.strictEqual(registry.shared_edit_backup.max_json_bytes, 1048576);
 assert.strictEqual(registry.shared_edit_backup.version, 'V1.3.1_20260901');
 assert.strictEqual(registry.shared_edit_backup.default_save_mode, 'manual');
 assert.strictEqual(registry.shared_edit_backup.manual_save_supported, true);
-assert.strictEqual(registry.shared_ui_shell.version, 'V1.3.1_20260901');
+assert.strictEqual(registry.shared_ui_shell.version, 'V1.3.3');
 assert.strictEqual(registry.shared_ui_shell.single_completion_dock_per_page, true);
 assert.deepStrictEqual(registry.shared_edit_backup.manual_save_tools, [
   'general-card', 'trigger-card', 'persistent-card', 'effect-card', 'move-card', 'choice-card',
