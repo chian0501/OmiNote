@@ -31,4 +31,10 @@ for(const [id,native] of Object.entries(fixtures)){
 }
 assert.throws(()=>C.toNative(C.canonical('move-card',{content:{route:{stations:['A'],segments:[]}}})),/BAD_STATIONS/);
 assert.throws(()=>C.toNative(C.canonical('trigger-card',{card:{state:'WHAT'}})),/BAD_STATE/);
+// General card: component_id follows mode, so an AI that only changes card.mode is not rejected.
+for (const [mode, expected] of [['HERE','HERE-01'],['GET','COL-02'],['COST','RWD-01']]) {
+  const stale = C.canonical('general-card',{card:{component_id:'HERE-01',mode,variant:mode},content:{title:'門票',subtitle:'NT$ 100'}});
+  assert.strictEqual(C.toNative(stale).component_id, expected, mode+' must carry its own component_id');
+}
+assert.strictEqual(C.toNative(C.canonical('general-card',{card:{component_id:'HERE-01',mode:'CUSTOM'},content:{title:'A'}})).component_id, undefined, 'CUSTOM has no formal component_id');
 console.log('PASS card-canonical-v1: 13/13 adapters + validator + canonical round-trip');

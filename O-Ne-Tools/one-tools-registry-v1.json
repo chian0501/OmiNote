@@ -1,13 +1,13 @@
 {
-  "version": "V2.37_20260903",
-  "ui_shell_version": "V1.3.1_20260901",
+  "version": "V2.38_20261106",
+  "ui_shell_version": "V1.3.3",
   "public_boundary": "semantic_references_only",
   "principle": "one_function_one_entry",
   "total": 18,
   "ready": 13,
   "candidate": 0,
   "ai_bridge": {
-    "version": "V1.2_20260807",
+    "version": "V1.3.1_20261106",
     "mode": "chatgpt_pro_manual_json_bridge",
     "api_required": false,
     "optional": true,
@@ -38,7 +38,7 @@
       "name": "一般卡",
       "family": "一般卡",
       "group": "任務／事件",
-      "desc": "HERE｜目前位置、場景定位、畫面主題",
+      "desc": "HERE 目前位置、地點、場景｜GET! 拿到商品、道具｜COST 價格、花費｜也可自訂標籤",
       "status": "ready",
       "href": "./general-card.html?v=121&build=manual-history-v2&ui=131",
       "ai_href": "./ai-card.html?tool=general&v=12",
@@ -311,7 +311,8 @@
       "name": "說明字卡",
       "family": "說明／評分",
       "group": "資訊／閱讀",
-      "status": "planned",
+      "status": "replaced",
+      "replaced_by": "explanation",
       "href": ""
     },
     {
@@ -401,7 +402,7 @@
         "same_tool_batch_render",
         "ai_json_schema_guide"
       ],
-      "generator_version": "V0.5.15_20260829",
+      "generator_version": "V0.6.0_20260907",
       "visual_status": "READY",
       "formal_replacement": false,
       "panel_fill_opacity": 0.8,
@@ -672,7 +673,7 @@
     "image_restore_policy": "text_and_settings_restore; uploaded_image_files_must_be_selected_again"
   },
   "shared_project_package": {
-    "version": "V1.3.2_20260903",
+    "version": "V1.3.4",
     "tool_count": 13,
     "filename_pattern": "{card_category}-{title}-{state}.{ext}",
     "brand_prefix_in_filename": false,
@@ -700,7 +701,7 @@
     "stop_supported": true
   },
   "shared_ai_json_guide": {
-    "version": "V1.3.1_20260901",
+    "version": "V1.4.1_20261106",
     "tool_count": 13,
     "placement": "collapsed_completion_dock_below_editor",
     "copy_full_ai_prompt": true,
@@ -713,7 +714,7 @@
     "left_controls_untouched": true
   },
   "shared_ui_shell": {
-    "version": "V1.3.1_20260901",
+    "version": "V1.3.3",
     "minimum_helper_text_px": 13,
     "minimum_control_height_px": 42,
     "after_edit_tools_collapsed": true,

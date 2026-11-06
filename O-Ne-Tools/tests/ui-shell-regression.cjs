@@ -13,7 +13,7 @@ const batch = fs.readFileSync(path.join(root, 'batch-render-v1.js'), 'utf8');
 const guide = fs.readFileSync(path.join(root, 'ai-json-guide-v1.js'), 'utf8');
 const commandSync = fs.readFileSync(path.join(root, 'command-center-registry-sync-v1.js'), 'utf8');
 
-assert(shell.includes("var VERSION = '1.3.1'"));
+assert(shell.includes("var VERSION = '1.3.3'"));
 assert(shell.includes('mergeDuplicateDocks'));
 assert(shell.includes('完成後：儲存與輸出'));
 assert(shell.includes('enhanceLabels'));
