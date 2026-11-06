@@ -6,7 +6,7 @@ const registry=require('../one-tools-registry-v1.json');
 const ready=registry.tools.filter(t=>t.status==='ready'&&t.href);
 
 async function openHub(page){
-  await page.goto('/O-Ne-Tools/index.html');
+  await page.goto('/O-Ne-Tools/index-v2.html');
   await expect(page.locator('#statNum')).toHaveText(ready.length+' 個');
   await expect(page.locator('#grid .card')).toHaveCount(ready.length);
 }

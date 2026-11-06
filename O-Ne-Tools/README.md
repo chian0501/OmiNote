@@ -19,7 +19,7 @@ O-Ne 字卡工具入口與編輯器集合。
 
 ## 使用方式
 1. 開啟 `index.html`。
-2. 在入口頁選擇要製作的字卡。
+2. 在入口頁選想表達的情境或搜尋，開到要製作的字卡。
 3. 編輯內容並確認右側預覽；各工具可直接輸出 PNG。
 4. 在頂部按「暫存」保留目前內容；從「專案檔案」載入／下載專案、使用批次輸出或查看 AI 格式。PNG 輸出放在預覽下方。
 
@@ -85,9 +85,9 @@ O-Ne 工作台 V1.3（Command Center）也會讀取同一份 canonical registry�
 - 完成後只下載一個 `字卡名稱-批次輸出-YYYYMMDD.zip`，裡面是依「卡片分類-標題-狀態」命名的 PNG；同名檔自動加 `-02`、`-03`。
 - 可按「停止」中止後續處理；已完成的 PNG 仍會打包下載。
 
-## 首頁候選版
+## 首頁
 
-`index-next.html` 是依情境選卡的候選首頁，資料都來自 `card_guide.situations` 與各工具的 `guide`；確認後才取代 `index.html`。工具網址可加 `mode=COST` 這類參數直接開到該模式，未知值會被忽略，也不影響已暫存內容。卡片樣圖在 `assets/card-samples/`，由 `tests/generate-card-samples.cjs` 從工具畫布產生，不另外重畫。
+`index.html` 依情境選卡，資料都來自 `card_guide.situations` 與各工具的 `guide`。前一版首頁保留在 `index-v2.html` 可回復，`index-next.html` 轉址到首頁。工具網址可加 `mode=COST` 這類參數直接開到該模式，未知值會被忽略，也不影響已暫存內容。卡片樣圖在 `assets/card-samples/`，由 `tests/generate-card-samples.cjs` 從工具畫布產生，不另外重畫。
 
 ## 卡種判斷
 
