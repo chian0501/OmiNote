@@ -469,6 +469,7 @@
       state.saveFeedback.title = '內容只會在按下暫存後保留在此瀏覽器';
     }
     function markUnsaved(event) {
+      if (state.applyingLink) return;
       var target = event.target;
       if (!target || !target.closest) return;
       if (target.closest('.one-workspace-dialog,.one-workspace-section-jump,.one-workspace-switch,[data-one-backup-ui],[data-one-project-package-ui]')) return;
@@ -758,7 +759,10 @@
     if (!select || select.tagName !== 'SELECT') return;
     if (!Array.prototype.some.call(select.options, function (option) { return option.value === requested; })) return;
     select.value = requested;
+    // Opening a card from a link is not an edit, so it must not show as unsaved.
+    instance.applyingLink = true;
     select.dispatchEvent(new Event('change', { bubbles: true }));
+    instance.applyingLink = false;
   }
   function mount() {
     if (instance || !document.body) return;
@@ -807,7 +811,7 @@
     observer = new MutationObserver(schedule);
     observer.observe(document.body, { childList: true, subtree: true });
   }
-  global.ONECardWorkspace = { version: '1.8.0', refresh: refresh };
+  global.ONECardWorkspace = { version: '1.8.1', refresh: refresh };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
   else init();
 })(window);

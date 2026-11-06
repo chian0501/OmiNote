@@ -141,6 +141,22 @@ test('switching cards asks first when there are unsaved edits', async ({ page })
   await expect(page).toHaveURL(/persistent-card\.html/);
 });
 
+test('opening a card from a mode link is not an unsaved edit', async ({ page }) => {
+  await page.goto('/O-Ne-Tools/general-card.html?mode=COST');
+  await expect(page.locator('.one-workspace-switch select')).toBeVisible();
+  await expect(page.locator('#mode')).toHaveValue('COST');
+  await expect(page.locator('.one-workspace-save-feedback')).not.toContainText('尚未暫存');
+  await page.locator('.one-workspace-switch select').selectOption({ label: '常駐卡' });
+  await expect(page).toHaveURL(/persistent-card.html/);
+});
+
+test('changing the mode by hand after a mode link still counts as an edit', async ({ page }) => {
+  await page.goto('/O-Ne-Tools/general-card.html?mode=COST');
+  await expect(page.locator('#mode')).toHaveValue('COST');
+  await page.locator('#mode').selectOption('GET');
+  await expect(page.locator('.one-workspace-save-feedback')).toContainText('尚未暫存');
+});
+
 test('choosing a card in the switcher does not mark the card as edited', async ({ page }) => {
   await open(page, 'general-card');
   await page.locator('.one-workspace-switch select').evaluate(select => select.dispatchEvent(new Event('input', { bubbles: true })));
