@@ -40,6 +40,17 @@ for (const mode of general) {
   assert.equal(native.component_id === undefined ? null : native.component_id, mode.component_id, mode.mode + ' component_id must match the adapter');
 }
 
+// Situations drive the homepage, so each one must point at a real card and mode.
+for (const group of guide.situations) {
+  assert(group.group && group.items.length, 'situation group');
+  for (const item of group.items) {
+    const tool = ready.find(entry => entry.id === item.tool);
+    assert(tool, item.label + ' must use a ready tool');
+    if (item.mode) assert(tool.guide.modes.some(mode => mode.mode === item.mode), item.label + ' mode');
+  }
+}
+assert.deepEqual([...new Set(guide.situations.flatMap(group => group.items.map(item => item.tool)))].sort(), ready.map(tool => tool.id).sort(), 'every ready tool needs a situation');
+
 // Words people actually use must lead to the right card.
 const expected = {
   COST: 'general', 花費: 'general', 地點: 'general', 現在在哪: 'general', 交通: 'move', 食物: 'rating',

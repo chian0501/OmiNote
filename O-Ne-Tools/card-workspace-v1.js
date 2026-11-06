@@ -624,6 +624,15 @@
     scheduled = true;
     global.setTimeout(function () { scheduled = false; refresh(); }, 0);
   }
+  // ?mode=COST opens a card in that mode. Runs after load so a restored draft is not overwritten.
+  function applyRequestedMode(config) {
+    var requested = new URL(location.href).searchParams.get('mode');
+    var select = requested && config.mode && document.getElementById(config.mode);
+    if (!select || select.tagName !== 'SELECT') return;
+    if (!Array.prototype.some.call(select.options, function (option) { return option.value === requested; })) return;
+    select.value = requested;
+    select.dispatchEvent(new Event('change', { bubbles: true }));
+  }
   function mount() {
     if (instance || !document.body) return;
     var id = document.body.getAttribute('data-one-card-workspace');
@@ -637,6 +646,8 @@
     if (!editor || !preview || editor === preview) return;
     var state = { id: id, config: config, app: app, workspace: workspace, editor: editor, preview: preview, sidebarHidden: false };
     instance = state;
+    if (document.readyState === 'complete') global.setTimeout(function () { applyRequestedMode(config); }, 0);
+    else global.addEventListener('load', function () { global.setTimeout(function () { applyRequestedMode(config); }, 0); });
     app.classList.add('one-workspace-app');
     workspace.classList.add('one-workspace-layout');
     document.body.setAttribute('data-one-workspace-ready', '1');

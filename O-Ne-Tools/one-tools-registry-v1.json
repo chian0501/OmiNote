@@ -1,5 +1,5 @@
 {
-  "version": "V2.39_20261106",
+  "version": "V2.40_20261106",
   "ui_shell_version": "V1.3.3",
   "public_boundary": "semantic_references_only",
   "principle": "one_function_one_entry",
@@ -33,7 +33,7 @@
     ]
   },
   "card_guide": {
-    "version": "V1.0_20261106",
+    "version": "V1.1_20261106",
     "exchange_schema": "o-ne.card.canonical.v1",
     "purpose": "人與 AI 判斷該用哪張字卡的唯一正本，搭配各工具的 guide 使用",
     "decision_order": [
@@ -79,6 +79,96 @@
         "rule": "短選項用選項卡；要配圖或長說明暫用焦點內容卡",
         "status": "interim",
         "note": "兩張卡功能重複，規劃整合中"
+      }
+    ],
+    "situations": [
+      {
+        "group": "交代現況",
+        "items": [
+          {
+            "label": "現在在哪",
+            "tool": "general",
+            "mode": "HERE"
+          },
+          {
+            "label": "花多少錢",
+            "tool": "general",
+            "mode": "COST"
+          },
+          {
+            "label": "拿到東西",
+            "tool": "general",
+            "mode": "GET"
+          },
+          {
+            "label": "從 A 到 B",
+            "tool": "move"
+          }
+        ]
+      },
+      {
+        "group": "事情有變化",
+        "items": [
+          {
+            "label": "突發事件、成功或失敗",
+            "tool": "trigger"
+          },
+          {
+            "label": "任務與進度",
+            "tool": "persistent"
+          },
+          {
+            "label": "心情、狀態",
+            "tool": "effect"
+          },
+          {
+            "label": "角色講話",
+            "tool": "dialogue"
+          }
+        ]
+      },
+      {
+        "group": "要做決定",
+        "items": [
+          {
+            "label": "從幾項選一個",
+            "tool": "choice"
+          },
+          {
+            "label": "接受或放棄",
+            "tool": "challenge"
+          }
+        ]
+      },
+      {
+        "group": "給資訊",
+        "items": [
+          {
+            "label": "評價食物、商品",
+            "tool": "rating"
+          },
+          {
+            "label": "一步步解釋",
+            "tool": "explanation"
+          },
+          {
+            "label": "提問、結論、大段內容",
+            "tool": "focus"
+          }
+        ]
+      },
+      {
+        "group": "收尾與包裝",
+        "items": [
+          {
+            "label": "片尾總結",
+            "tool": "settlement"
+          },
+          {
+            "label": "影片縮圖",
+            "tool": "thumbnail-frame"
+          }
+        ]
       }
     ]
   },
@@ -142,26 +232,47 @@
           {
             "mode": "HERE",
             "component_id": "HERE-01",
-            "use_when": "目前位置、場景"
+            "use_when": "目前位置、場景",
+            "aliases": [
+              "位置",
+              "地點",
+              "場景",
+              "現在在哪",
+              "這裡是哪",
+              "抵達"
+            ]
           },
           {
             "mode": "GET",
             "component_id": "COL-02",
-            "use_when": "拿到商品、道具或解鎖東西"
+            "use_when": "拿到商品、道具或解鎖東西",
+            "aliases": [
+              "GET",
+              "獲得",
+              "拿到",
+              "解鎖"
+            ]
           },
           {
             "mode": "COST",
             "component_id": "RWD-01",
-            "use_when": "單一項目的價格或花費；title 放花費項目，subtitle 放金額",
+            "use_when": "單一項目的價格或花費",
             "reference": {
               "label": "3COINS 11 件",
               "url": "https://youtu.be/MJ8X5-t5hSg"
-            }
+            },
+            "aliases": [
+              "價格",
+              "花費",
+              "花多少",
+              "門票",
+              "COST"
+            ]
           },
           {
             "mode": "CUSTOM",
             "component_id": null,
-            "use_when": "上面都不合、又只需要短標籤時；另填 label"
+            "use_when": "上面都不合、又只需要短標籤時"
           }
         ],
         "fields": {
@@ -174,7 +285,9 @@
           ]
         },
         "limits": [
-          "component_id 由工具依 mode 自動帶入"
+          "component_id 由工具依 mode 自動帶入",
+          "COST：title 放花費項目，subtitle 放金額",
+          "CUSTOM：另填 label"
         ],
         "output": {
           "kind": "component",
@@ -879,7 +992,9 @@
           "開箱",
           "推不推薦",
           "值不值得",
-          "CP 值"
+          "CP 值",
+          "價格",
+          "金額"
         ],
         "use_when": [
           "評價食物、商品或店家"
