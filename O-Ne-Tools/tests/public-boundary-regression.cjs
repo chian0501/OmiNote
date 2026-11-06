@@ -23,16 +23,18 @@ const forbidden = [
   /["']1[A-Za-z0-9_-]{20,}["']/
 ];
 
+// Omi approved these two Command Center files as the only public Drive/Docs shortcut lists.
+const approvedLinkFiles = new Set(['command-center-project-links-direct-v1.js', 'command-center-v1-data.js']);
 const leaks = [];
 for (const file of runtimeFiles) {
   const source = fs.readFileSync(file, 'utf8');
-  const approvedDirectMap = path.basename(file) === 'command-center-project-links-direct-v1.js';
+  const approvedDirectMap = approvedLinkFiles.has(path.basename(file));
   for (const [index, pattern] of forbidden.entries()) {
     if (approvedDirectMap && (index === 0 || index === 3)) continue;
     if (pattern.test(source)) leaks.push(path.relative(root, file) + ' matched ' + pattern);
   }
 }
-assert.deepStrictEqual(leaks, [], 'public runtime must not expose Drive/Docs identifiers outside the Omi-approved direct-link map');
+assert.deepStrictEqual(leaks, [], 'public runtime must not expose Drive/Docs identifiers outside the Omi-approved Command Center link files');
 
 const registry = JSON.parse(fs.readFileSync(path.join(root, 'one-tools-registry-v1.json'), 'utf8'));
 assert.strictEqual(registry.public_boundary, 'semantic_references_only');
@@ -44,4 +46,4 @@ const pointer = JSON.parse(fs.readFileSync(path.join(root, 'registry.json'), 'ut
 assert.strictEqual(pointer.status, 'DEPRECATED');
 assert.strictEqual(pointer.canonical_registry, './one-tools-registry-v1.json');
 
-console.log('PASS: public runtime is semantic-only except the tested Omi-approved Command Center direct-link map.');
+console.log('PASS: public runtime is semantic-only except the tested Omi-approved Command Center link files.');

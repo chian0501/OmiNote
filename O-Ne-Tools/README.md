@@ -123,7 +123,7 @@ GitHub Actions 的 `Card workspace browser QA` 使用鎖定版本 Chromium／Pla
 ## 維護規則
 - 後續新工具或版本更新，直接更新 `O-Ne-Tools/` 內對應檔案。
 - 新增工具時只更新 canonical `one-tools-registry-v1.json`；入口頁會自動讀取。
-- 公開 HTML／JS／JSON 原則上只能使用 HERE-01、COL-02、QST-03 等語意代號，不得寫入 Drive／Docs URL 或檔案 ID。唯一例外為 Omi 已核准的 `command-center-project-links-direct-v1.js` 專案快捷白名單；它只可包含已核對的母專案、唯一企劃卡與 01～04 入口，不得包含正文、權限資料、憑證或自動化設定。`tests/public-boundary-regression.cjs` 會鎖定這個窄例外並阻擋其他檔案洩漏。現況：`command-center-v1-data.js` 另含 Drive／Docs 連結，尚未納入例外，這支測試目前失敗，也還沒排進 CI；處理方式待 Omi 決定。
+- 公開 HTML／JS／JSON 原則上只能使用 HERE-01、COL-02、QST-03 等語意代號，不得寫入 Drive／Docs URL 或檔案 ID。例外只有 Omi 已核准的 O-Ne 工作台兩支檔案：`command-center-project-links-direct-v1.js` 與 `command-center-v1-data.js`；它們只可放工作台要用的 Drive／Docs 入口，不得包含正文、權限資料、憑證或自動化設定。新增連結前要確認對方資料夾沒有開放公開編輯。`tests/public-boundary-regression.cjs` 會鎖定這兩支例外，並阻擋其他檔案出現 Drive／Docs 連結；這支測試已排進 CI。
 - 不另建平行工具包。
 - `assets/NotoSansTC-O-Ne.woff` 依 SIL Open Font License 1.1 使用；授權文字見 `assets/OFL-NotoSansTC.txt`。
 
