@@ -85,6 +85,10 @@ O-Ne 工作台 V1.3（Command Center）也會讀取同一份 canonical registry�
 - 完成後只下載一個 `字卡名稱-批次輸出-YYYYMMDD.zip`，裡面是依「卡片分類-標題-狀態」命名的 PNG；同名檔自動加 `-02`、`-03`。
 - 可按「停止」中止後續處理；已完成的 PNG 仍會打包下載。
 
+## 首頁候選版
+
+`index-next.html` 是依情境選卡的候選首頁，資料都來自 `card_guide.situations` 與各工具的 `guide`；確認後才取代 `index.html`。工具網址可加 `mode=COST` 這類參數直接開到該模式，未知值會被忽略，也不影響已暫存內容。卡片樣圖在 `assets/card-samples/`，由 `tests/generate-card-samples.cjs` 從工具畫布產生，不另外重畫。
+
 ## 卡種判斷
 
 - 該用哪張字卡，以 `one-tools-registry-v1.json` 為唯一正本：`card_guide` 放判斷順序與容易選錯時的規則，各工具的 `guide` 放用途、別名、欄位、限制、範例與過往參考片，`tool_id` 是 Canonical 名稱。
