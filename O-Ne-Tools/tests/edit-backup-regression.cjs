@@ -210,7 +210,7 @@ assert.deepStrictEqual(registry.shared_edit_backup.manual_save_tools, [
   'challenge-card', 'dialogue-card', 'rating-card', 'focus-card', 'explanation-card', 'thumbnail-frame', 'settlement-card'
 ]);
 
-const index = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+const index = fs.readFileSync(path.join(root, 'index-v2.html'), 'utf8');
 assert(index.includes("fetch('./one-tools-registry-v1.json?v=2370'"), 'index must read the canonical registry');
 assert(!index.includes('const tools=['), 'index must not keep a second hardcoded registry');
 assert(index.includes('command-center.html'), 'index must expose the Command Center entry');

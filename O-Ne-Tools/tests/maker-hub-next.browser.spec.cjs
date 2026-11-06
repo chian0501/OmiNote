@@ -2,7 +2,7 @@
 const { test, expect } = require('@playwright/test');
 const registry = require('../one-tools-registry-v1.json');
 
-const page_ = '/O-Ne-Tools/index-next.html';
+const page_ = '/O-Ne-Tools/index.html';
 const ready = registry.tools.filter(tool => tool.status === 'ready');
 
 test('every situation opens a real card, and all 13 cards show their sample', async ({ page }) => {
@@ -74,7 +74,14 @@ test('a phone sees the situations on the first screen without sideways scrolling
   expect(overflow).toBeLessThanOrEqual(0);
 });
 
-test('the current homepage is untouched', async ({ page }) => {
-  await page.goto('/O-Ne-Tools/index.html');
+test('the previous homepage stays available to roll back to', async ({ page }) => {
+  await page.goto('/O-Ne-Tools/index-v2.html');
   await expect(page.locator('h1')).toContainText('今天要做哪張');
+  await expect(page.locator('.card')).toHaveCount(ready.length);
+});
+
+test('the old candidate address leads to the homepage', async ({ page }) => {
+  await page.goto('/O-Ne-Tools/index-next.html');
+  await expect(page).toHaveURL(/index\.html$/);
+  await expect(page.locator('h1')).toContainText('這段你想告訴觀眾');
 });
