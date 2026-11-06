@@ -151,7 +151,7 @@
       ['問題', 92], ['對話', 90], ['內容', 86], ['地點', 84], ['路線', 82], ['名稱', 78], ['文字', 70]
     ];
     nodes.forEach(function (node, index) {
-      if (node.closest && (node.closest('[data-one-backup-ui]') || node.closest('[data-one-project-package-ui]'))) return;
+      if (node.closest && (node.closest('[data-one-backup-ui]') || node.closest('[data-one-project-package-ui]') || node.closest('[data-one-frame-control]'))) return;
       var value = String(node.value || '').replace(/\s+/g, ' ').trim();
       if (!value || /^\d+\s*\/\s*\d+$/.test(value) || value.length > 180) return;
       var label = labelTextFor(node);

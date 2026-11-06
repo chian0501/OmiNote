@@ -16,6 +16,29 @@
     'thumbnail-frame': { name: '縮圖品牌框' },
     settlement: { name: '片尾結算卡' }
   };
+  // 統一用語的唯一位置。工具 HTML 鎖雜湊不改，舊字樣在這裡換成統一名稱。
+  var TERMS = {
+    home: '← 工具入口', files: '檔案', reset: '重設內容',
+    saveProject: '存專案 ZIP', openProject: '開專案 ZIP', exportJson: '匯出 JSON', importJson: '匯入 JSON',
+    tabs: [['project', '專案'], ['history', '暫存紀錄'], ['batch', '批次輸出'], ['ai', 'AI'], ['help', '說明']]
+  };
+  var RELABEL = [
+    ['#download,#downloadPng', /^(?:輸出|下載) ?(?:透明(?:底框)? |1920×1080 )PNG$/, '輸出 PNG'],
+    ['#download', /^僅下載目前畫面 PNG$/, '只輸出目前畫面'],
+    ['#downloadSet', /^輸出整組 PNG（(\d+) 張）$/, '輸出全部 PNG（$1 張）'],
+    ['#downloadBoth', /^下載兩版 PNG ZIP$/, '輸出全部 PNG（2 張）'],
+    ['#downloadWhite', /^輸出白色版 PNG$/, '只輸出白色版'],
+    ['#downloadOrange', /^輸出橘色版 PNG$/, '只輸出橘色版'],
+    ['.one-workspace-react-app .export-button.primary strong', /^輸出含字 PNG$/, '輸出 PNG'],
+    ['.one-workspace-react-app .export-bar > p', /輸出含字 PNG/g, '輸出 PNG'],
+    ['#jsonBtn,#downloadJson', /^(?:輸出欄位|輸出設定|下載設定|下載) JSON$/, TERMS.exportJson],
+    ['[data-action="load"],#loadJson', /^載入 JSON$/, TERMS.importJson],
+    ['#reset', /^重設目前內容$/, TERMS.reset],
+    ['.one-edit-backup__note,.one-edit-backup__status,#historyStatus,.note', /「暫存目前內容」/g, '「暫存」'],
+    ['.one-project-package__title', /^完整專案包$/, '專案 ZIP'],
+    ['[data-one-project-package-ui] [data-action="export-package"]', /^下載專案包 ZIP$/, TERMS.saveProject],
+    ['[data-one-project-package-ui] [data-action="import-package"]', /^載入專案包 ZIP$/, TERMS.openProject]
+  ];
   var instance;
   var scheduled = false;
   var observer;
@@ -37,6 +60,24 @@
     if (heading && heading.querySelector('strong,span')) heading = heading.querySelector('strong,span');
     return (heading ? heading.textContent : '').replace(/^\s*\d+\s*[｜|]\s*/, '').replace(/\s+/g, ' ').trim();
   }
+  function relabel(node, pattern, replacement) {
+    var aria = node.getAttribute('aria-label');
+    if (aria && aria.replace(pattern, replacement) !== aria) node.setAttribute('aria-label', aria.replace(pattern, replacement));
+    var text = node.childNodes.length === 1 && node.firstChild.nodeType === 3 ? node.firstChild : null;
+    if (!text) return;
+    var next = text.nodeValue.trim().replace(pattern, replacement);
+    if (next !== text.nodeValue.trim()) text.nodeValue = next;
+  }
+  // 工具會在輸出中暫時改字再改回來，所以每次刷新都重套；只換認得的舊字樣。
+  function applyTerms() {
+    RELABEL.forEach(function (rule) {
+      document.querySelectorAll(rule[0]).forEach(function (node) { relabel(node, rule[1], rule[2]); });
+    });
+    var frames = document.querySelector('.focus-sequence-navigation select');
+    Array.prototype.forEach.call(document.querySelectorAll('.focus-sequence-toolbar > button'), function (node) {
+      if (frames) relabel(node, /^輸出全部(?:幕 PNG ZIP| PNG（\d+ 張）)$/, '輸出全部 PNG（' + frames.options.length + ' 張）');
+    });
+  }
   function hideEmptyContainers(root) {
     Array.prototype.slice.call(root.querySelectorAll('.buttons,.two,.title-row,.app-header,.export,.export-bar,.export-actions')).reverse().forEach(function (node) {
       var visibleChild = Array.prototype.some.call(node.children, function (child) { return getComputedStyle(child).display !== 'none'; });
@@ -44,12 +85,45 @@
     });
   }
 
+  /* Pasted JSON goes through the tool's own file import, so errors and Canonical conversion stay the same. */
+  function pasteJson(state, text) {
+    var input = document.getElementById('jsonFile') || document.querySelector('[data-one-backup-ui] input[type="file"]');
+    var report = function (message, failed) {
+      state.aiFeedback.textContent = message;
+      state.aiFeedback.classList.toggle('is-error', Boolean(failed));
+    };
+    if (!text.trim()) { report('先貼上 AI 給的 JSON。', true); return; }
+    try { JSON.parse(text); } catch (error) { report('JSON 格式錯誤，請確認貼上的內容完整。', true); return; }
+    if (!input) { report('匯入功能仍在載入，請稍後再試。', true); return; }
+    try {
+      var transfer = new DataTransfer();
+      transfer.items.add(new File([text], 'ai-paste.card.json', { type: 'application/json' }));
+      input.files = transfer.files;
+    } catch (error) { report('這個瀏覽器無法貼上，請改用「專案」分頁的匯入 JSON。', true); return; }
+    report('正在套用…');
+    state.aiPending = true;
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+  }
+  function makeAiPaste(state) {
+    var box = element('section', 'one-workspace-ai-paste');
+    box.setAttribute('data-one-frame-control', '');
+    var label = element('label', '', '貼上 AI 給的 JSON');
+    var area = element('textarea');
+    area.rows = 5;
+    area.spellcheck = false;
+    label.appendChild(area);
+    state.aiFeedback = element('p', 'one-workspace-ai-feedback');
+    state.aiFeedback.setAttribute('role', 'status');
+    box.append(label, button('套用到字卡', 'one-workspace-button', function () { pasteJson(state, area.value); }), state.aiFeedback);
+    state.filePanels.ai.appendChild(box);
+  }
+
   function makeDialog(state) {
     var dialog = element('dialog', 'one-workspace-dialog');
     dialog.id = 'one-workspace-files';
     dialog.setAttribute('aria-labelledby', 'one-workspace-files-title');
     var head = element('header', 'one-workspace-dialog-head');
-    var title = element('strong', '', '專案檔案');
+    var title = element('strong', '', TERMS.files);
     title.id = 'one-workspace-files-title';
     var close = button('關閉', 'one-workspace-button', function () { dialog.close(); });
     head.append(title, close);
@@ -59,10 +133,7 @@
     var panels = element('div', 'one-workspace-file-panels');
     state.fileTabs = {};
     state.filePanels = {};
-    [
-      ['project', '專案檔案'], ['history', '暫存紀錄'],
-      ['batch', '批次輸出'], ['ai', 'AI 格式'], ['help', '使用說明']
-    ].forEach(function (entry) {
+    TERMS.tabs.forEach(function (entry) {
       var key = entry[0];
       var tab = button(entry[1], 'one-workspace-file-tab', function () { selectTab(state, key); });
       tab.id = 'one-workspace-tab-' + key;
@@ -88,13 +159,14 @@
       panels.appendChild(panel);
     });
     state.nativeFiles = element('div', 'one-workspace-native-files');
-    state.filePanels.project.appendChild(element('p', 'one-workspace-hint', '跨裝置接續編輯請下載完整專案 ZIP；只需文字與設定時可使用 JSON。'));
+    state.filePanels.project.appendChild(element('p', 'one-workspace-hint', '跨裝置接續編輯請用「存專案 ZIP」；只需文字與設定時可使用 JSON。'));
     state.filePanels.project.appendChild(state.nativeFiles);
     state.projectFeedback = element('p', 'one-workspace-project-feedback');
     state.projectFeedback.setAttribute('role', 'status');
     state.filePanels.project.appendChild(state.projectFeedback);
     state.filePanels.history.appendChild(element('p', 'one-workspace-hint', '按頂部「暫存」才會保留目前內容；最近 5 次紀錄只存在這台裝置。'));
-    state.filePanels.help.appendChild(element('p', 'one-workspace-hint', '點字卡文字直接修改，預覽下方輸出 PNG。按 Ctrl／⌘＋S 或頂部「暫存」保留目前內容；跨裝置使用完整專案 ZIP，JSON 僅保存文字與設定。'));
+    makeAiPaste(state);
+    state.filePanels.help.appendChild(element('p', 'one-workspace-hint', '點字卡文字直接修改，預覽下方輸出 PNG。按 Ctrl／⌘＋S 或頂部「暫存」保留目前內容；跨裝置使用「存專案 ZIP」，JSON 僅保存文字與設定。'));
     dialog.append(head, tabs, panels);
     document.body.appendChild(dialog);
     state.dialog = dialog;
@@ -167,8 +239,8 @@
       (state.preview.querySelector('.export-actions') || state.app.querySelector('.export-actions')) :
       state.preview.querySelector('.one-workspace-export-actions');
     if (!exports) return false;
-    if (!exports.querySelector('[data-one-project-quick="download"]')) exports.appendChild(makeProjectQuickButton(state, 'export-package', '下載專案'));
-    if (!exports.querySelector('[data-one-project-quick="upload"]')) exports.appendChild(makeProjectQuickButton(state, 'import-package', '載入專案'));
+    if (!exports.querySelector('[data-one-project-quick="download"]')) exports.appendChild(makeProjectQuickButton(state, 'export-package', TERMS.saveProject));
+    if (!exports.querySelector('[data-one-project-quick="upload"]')) exports.appendChild(makeProjectQuickButton(state, 'import-package', TERMS.openProject));
     return true;
   }
 
@@ -176,7 +248,7 @@
     var header = element('header', 'one-workspace-header');
     var home, title;
     if (state.config.react) {
-      home = element('a', 'one-workspace-home', '← 回工具入口');
+      home = element('a', 'one-workspace-home');
       home.href = './';
       var originalTitle = state.app.querySelector('h1');
       title = originalTitle ? originalTitle.cloneNode(true) : element('h1', '', 'O-Ne ' + state.config.name);
@@ -185,28 +257,77 @@
     } else {
       home = state.app.querySelector('.tool-home-link,.home,.back-link');
       title = state.app.querySelector('h1');
-      if (!home) { home = element('a', '', '← 回工具入口'); home.href = './'; }
+      if (!home) { home = element('a'); home.href = './'; }
       home.classList.add('one-workspace-home');
       if (!title) title = element('h1', '', 'O-Ne ' + state.config.name);
       state.app.insertBefore(header, state.app.firstChild);
     }
-    header.append(home, title);
+    home.textContent = TERMS.home;
+    if (title.firstChild && title.firstChild.nodeType === 3) title.firstChild.nodeValue = title.firstChild.nodeValue.replace(/^O-Ne /, '').replace(/生成器|工具/, '');
+    state.switchHost = element('div', 'one-workspace-switch');
+    // Tools save every field with an id as card content; frame controls must stay out of it.
+    state.switchHost.setAttribute('data-one-frame-control', '');
+    state.switchHost.hidden = true;
+    header.append(home, title, state.switchHost);
     var actions = element('div', 'one-workspace-header-actions');
     state.saveHost = element('div', 'one-workspace-save-host');
     state.saveFeedback = element('span', 'one-workspace-save-feedback');
     state.saveFeedback.setAttribute('role', 'status');
     state.saveFeedback.setAttribute('aria-live', 'polite');
-    var files = button('專案檔案', 'one-workspace-button', function () { openFiles(state, 'project', files); });
-    var history = button('暫存紀錄', 'one-workspace-button', function () { openFiles(state, 'history', history); });
+    var files = button(TERMS.files, 'one-workspace-button', function () { openFiles(state, 'project', files); });
     var help = button('？', 'one-workspace-button one-workspace-help-button', function () { openFiles(state, 'help', help); });
-    help.setAttribute('aria-label', '使用說明');
-    [files, history, help].forEach(function (node) {
+    help.setAttribute('aria-label', '說明');
+    [files, help].forEach(function (node) {
       node.setAttribute('aria-haspopup', 'dialog');
       node.setAttribute('aria-controls', state.dialog.id);
     });
-    actions.append(state.saveFeedback, state.saveHost, history, files, help);
+    actions.append(state.saveFeedback, state.saveHost, files, help);
     header.appendChild(actions);
     state.header = header;
+  }
+
+  /* The registry supplies the card list and usage line. If it cannot load, the tool works without them. */
+  function makeGuide(state) {
+    state.guide = element('div', 'one-workspace-guide');
+    state.guide.hidden = true;
+    state.modebar.parentNode.insertBefore(state.guide, state.modebar);
+    if (!global.fetch) return;
+    global.fetch('./one-tools-registry-v1.json', { cache: 'no-cache' }).then(function (response) {
+      if (!response.ok) throw new Error('registry');
+      return response.json();
+    }).then(function (registry) {
+      var ready = registry.tools.filter(function (tool) { return tool.status === 'ready' && tool.href; });
+      var current = ready.filter(function (tool) { return tool.id === state.id; })[0];
+      if (!current) return;
+      var label = element('label', '', '換卡種');
+      var select = element('select');
+      label.appendChild(select);
+      ready.forEach(function (tool) {
+        var option = element('option', '', tool.name);
+        option.value = tool.href;
+        option.selected = tool === current;
+        select.appendChild(option);
+      });
+      select.addEventListener('change', function () {
+        if (state.dirty && !global.confirm('換到別張卡？尚未暫存的修改不會保留。')) { select.value = current.href; return; }
+        location.href = new URL(select.value, location.href).href;
+      });
+      state.switchHost.appendChild(label);
+      state.switchHost.hidden = false;
+      var guide = current.guide;
+      if (!guide || !guide.summary) return;
+      state.guide.append(element('strong', '', '這張用在'), element('span', '', guide.summary));
+      var reference = guide.references && guide.references[0];
+      if (reference) {
+        var link = element('a', '', '過往範例 ↗');
+        link.href = reference.url;
+        link.target = '_blank';
+        link.rel = 'noopener';
+        state.guide.appendChild(link);
+      }
+      state.guide.hidden = false;
+      fitPreview(state);
+    }).catch(function () {});
   }
 
   function makeModebar(state) {
@@ -350,7 +471,7 @@
     function markUnsaved(event) {
       var target = event.target;
       if (!target || !target.closest) return;
-      if (target.closest('.one-workspace-dialog,.one-workspace-section-jump,[data-one-backup-ui],[data-one-project-package-ui]')) return;
+      if (target.closest('.one-workspace-dialog,.one-workspace-section-jump,.one-workspace-switch,[data-one-backup-ui],[data-one-project-package-ui]')) return;
       state.dirty = true;
       state.saveFeedback.textContent = '● 有尚未暫存的修改';
       state.saveFeedback.dataset.oneUnsaved = 'true';
@@ -502,7 +623,7 @@
     var status = document.getElementById('status') || state.editor.querySelector('.status');
     if (status) footer.appendChild(status);
     var exports = element('div', 'one-workspace-export-actions');
-    ['downloadSet', 'download', 'downloadPng', 'downloadWhite', 'downloadOrange', 'downloadBoth'].forEach(function (id) {
+    ['downloadSet', 'downloadBoth', 'download', 'downloadPng', 'downloadWhite', 'downloadOrange'].forEach(function (id) {
       var node = document.getElementById(id);
       if (node && /^(BUTTON|A)$/.test(node.tagName)) {
         node.classList.add('one-workspace-export-button');
@@ -527,7 +648,7 @@
 
   function moveNativeFiles(state) {
     if (state.config.react) {
-      var proxy = button('輸出設定 JSON', 'one-workspace-button', function () {
+      var proxy = button(TERMS.exportJson, 'one-workspace-button', function () {
         var original = state.app.querySelector('.export-actions .export-button.secondary');
         if (original) original.click();
       });
@@ -538,7 +659,7 @@
       var node = document.getElementById(id);
       if (node) { node.classList.add('one-workspace-button'); state.nativeFiles.appendChild(node); }
       if (node && id === 'reset') {
-        node.textContent = '重設目前內容';
+        node.textContent = TERMS.reset;
         node.addEventListener('click', function (event) {
           if (!global.confirm('重設目前內容？尚未暫存的文字與圖片會被取代。')) {
             event.preventDefault(); event.stopImmediatePropagation();
@@ -600,6 +721,11 @@
         var message = status.textContent;
         state.projectFeedback.textContent = message;
         state.projectFeedback.classList.toggle('is-error', /失敗|不可用|無法|不支援/.test(message));
+        if (state.aiPending && message) {
+          state.aiPending = false;
+          state.aiFeedback.textContent = message;
+          state.aiFeedback.classList.toggle('is-error', /失敗|不可用|無法|不支援|錯誤/.test(message));
+        }
         state.saveFeedback.textContent = message;
         state.saveFeedback.title = message;
         state.saveFeedback.classList.toggle('is-error', /失敗|不可用|無法|不支援/.test(message));
@@ -616,6 +742,7 @@
     if (!instance) { mount(); return; }
     routeUtilities(instance);
     ensureProjectQuickActions(instance);
+    applyTerms();
     if (instance.updateMode) instance.updateMode();
     if (instance.syncFolds) instance.syncFolds();
   }
@@ -654,12 +781,14 @@
     makeDialog(state);
     makeHeader(state);
     makeModebar(state);
+    makeGuide(state);
     prepareEditor(state);
     preparePreview(state);
     moveNativeFiles(state);
     routeUtilities(state);
     ensureProjectQuickActions(state);
     trackUnsaved(state);
+    applyTerms();
     if (!config.react) hideEmptyContainers(app);
     document.addEventListener('change', function () { if (state.updateMode) state.updateMode(); });
     document.addEventListener('keydown', function (event) {
@@ -678,7 +807,7 @@
     observer = new MutationObserver(schedule);
     observer.observe(document.body, { childList: true, subtree: true });
   }
-  global.ONECardWorkspace = { version: '1.7.0', refresh: refresh };
+  global.ONECardWorkspace = { version: '1.8.0', refresh: refresh };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
   else init();
 })(window);

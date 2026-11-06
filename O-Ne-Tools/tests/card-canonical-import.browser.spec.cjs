@@ -38,7 +38,7 @@ for (const [toolId, file] of tools) {
       };
     });
 
-    await page.getByRole('button', { name: '專案檔案', exact: true }).click();
+    await page.getByRole('button', { name: toolId === 'explanation-card' ? '專案檔案' : '檔案', exact: true }).click();
 
     let load;
     if (toolId === 'explanation-card') {
@@ -76,7 +76,7 @@ test('general-card COST loads when an AI changes only card.mode from the guide e
   payload.card.variant = 'COST';
   payload.content.title = '門票';
   payload.content.subtitle = 'NT$ 100';
-  await page.getByRole('button', { name: '專案檔案', exact: true }).click();
+  await page.getByRole('button', { name: '檔案', exact: true }).click();
   const load = page.locator('#one-workspace-files .one-workspace-native-files [data-action="load"],#one-workspace-files .one-workspace-native-files #loadJson').first();
   const chooser = page.waitForEvent('filechooser');
   await load.click();

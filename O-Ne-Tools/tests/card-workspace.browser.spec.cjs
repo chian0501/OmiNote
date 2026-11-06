@@ -50,7 +50,8 @@ async function screenshot(page, info, name) {
   await info.attach(name, { path: target, contentType: 'image/png' });
 }
 async function files(page, tab = 'project') {
-  await page.locator('.one-workspace-header-actions').getByRole('button', { name: '專案檔案', exact: true }).click();
+  // The /main comparison page still has the previous name.
+  await page.locator('.one-workspace-header-actions').getByRole('button', { name: /^(專案)?檔案$/ }).click();
   if (tab !== 'project') await page.locator('#one-workspace-tab-' + tab).click();
   await expect(page.locator('#one-workspace-files')).toBeVisible();
 }
@@ -268,7 +269,7 @@ test('focus inline formatting, COST alignment, composition and project restore',
   }
   const saved = await artwork(page);
   await files(page);
-  const json = await download(page, page.locator('.one-workspace-native-files').getByRole('button', { name: '輸出設定 JSON', exact: true }), info, 'focus-inline-settings', 'json');
+  const json = await download(page, page.locator('.one-workspace-native-files').getByRole('button', { name: '匯出 JSON', exact: true }), info, 'focus-inline-settings', 'json');
   const payload = JSON.parse(json.bytes); expect(payload.label.text).toBe('COST'); expect(payload.style.titleSize).toBe(64); expect(payload.style.contentSize).toBe(38);
   await closeFiles(page); await title.click(); await input.fill('載入前變更');
   await page.locator('.one-direct-editor').getByRole('button', { name: '完成', exact: true }).click();
@@ -618,7 +619,7 @@ for (const card of cards) {
       }
       await page.keyboard.press('Escape');
       await expect(page.locator('dialog')).toBeHidden();
-      await expect(page.locator('.one-workspace-header-actions').getByRole('button', { name: '專案檔案', exact: true })).toBeFocused();
+      await expect(page.locator('.one-workspace-header-actions').getByRole('button', { name: '檔案', exact: true })).toBeFocused();
       expect(errors, 'uncaught runtime errors').toEqual([]);
     });
   }
@@ -630,7 +631,7 @@ for (const card of cards) {
     await openCard(page, card);
     const initial = await artwork(page);
     await files(page);
-    const jsonButton = card.id === 'focus' ? page.getByRole('button', { name: '輸出設定 JSON', exact: true }) :
+    const jsonButton = card.id === 'focus' ? page.getByRole('button', { name: '匯出 JSON', exact: true }) :
       page.locator('.one-workspace-native-files #jsonBtn,.one-workspace-native-files #downloadJson');
     const json = await download(page, jsonButton, info, 'native-settings', 'json');
     expect(JSON.parse(json.bytes.toString())).toBeTruthy();
@@ -657,7 +658,7 @@ for (const card of cards) {
       await expect.poll(() => artwork(page)).not.toBe(initial);
     }
     const saved = await artwork(page);
-    const png = await download(page, page.locator('.one-workspace-export-button:not(#downloadSet),.export-actions .export-button.primary').first(), info, 'exported-card', 'png');
+    const png = await download(page, page.locator('.one-workspace-export-button:not(#downloadSet):not(#downloadBoth),.export-actions .export-button.primary').first(), info, 'exported-card', 'png');
     assertPNG(png.bytes);
     await files(page);
     const project = await download(page, page.locator('[data-action="export-package"]'), info, 'native-project', 'zip');
@@ -1157,7 +1158,7 @@ test('focus GET capsule matches explanation size and exports without title overl
   const t=await title.boundingBox(),l=await tag.boundingBox();expect(l.y+l.height).toBeLessThan(t.y);
   await page.locator('.label-color-block').getByRole('button',{name:/高亮黃/}).click();
   await screenshot(page,info,'focus-GET-larger-capsule');
-  const png=await download(page,page.locator('.export-button').filter({hasText:'輸出含字 PNG'}),info,'focus-GET-capsule','png');assertPNG(png.bytes);
+  const png=await download(page,page.locator('.export-button.primary'),info,'focus-GET-capsule','png');assertPNG(png.bytes);
   const comparison=await canvas.evaluate(async(c,data)=>{
     const image=new Image();image.src='data:image/png;base64,'+data;await image.decode();
     const exported=document.createElement('canvas');exported.width=image.width;exported.height=image.height;

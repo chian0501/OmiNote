@@ -36,7 +36,7 @@
 
   function fieldElements(root) {
     return Array.prototype.slice.call((root || document).querySelectorAll('input[id],select[id],textarea[id]'))
-      .filter(function (element) { return element.type !== 'file' && !element.closest('[data-one-backup-ui]'); });
+      .filter(function (element) { return element.type !== 'file' && !element.closest('[data-one-backup-ui],[data-one-frame-control]'); });
   }
   function collectFields(root) {
     var fields = {};
