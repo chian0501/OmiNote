@@ -48,6 +48,14 @@ body[data-one-card-workspace=focus] .one-workspace-guide {margin:0 18px 8px;}
 .one-workspace-export-actions .one-workspace-export-button[data-one-project-quick] {flex:0 0 130px;}
 .one-workspace-ai-paste textarea {box-sizing:border-box;width:100%;padding:8px;border:1px solid #2d4553;border-radius:8px;background:#0c151c;color:#e6eff2;font:13px/1.45 ui-monospace,Consolas,monospace;resize:vertical;}
 .one-workspace-react-app .export-actions .export-button.primary {order:-1;}
+.one-persistent-sequence__body {display:grid;gap:8px;padding:10px;}
+.one-persistent-sequence__hint {margin:0;font-size:12px;color:var(--one-muted);}
+.one-persistent-sequence__body label {display:grid;gap:4px;font-size:13px;}
+.one-persistent-sequence__rows {display:grid;gap:6px;}
+.one-persistent-sequence__row {display:grid;grid-template-columns:minmax(0,1fr) 72px auto;gap:6px;align-items:center;}
+.one-persistent-sequence__status {margin:0;font-size:12px;color:#8fe0d7;}
+.one-persistent-sequence__status:empty {display:none;}
+.one-persistent-sequence__status.is-error {color:#ff8780;}
 .one-workspace-modebar {
   display:flex;align-items:center;flex-wrap:wrap;gap:10px;min-height:52px;
   margin-bottom:10px;padding:7px 10px;border:1px solid var(--one-line);
