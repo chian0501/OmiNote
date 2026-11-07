@@ -19,6 +19,8 @@
     ['[data-action="save"]', /^暫存目前內容$/, '暫存'],
     ['#exportJson', /^僅設定 JSON$/, T.exportJson],
     ['#resetAll', /^重設目前內容$/, T.reset],
+    ['.one-overlay-list > button', /^＋新增一項$/, '＋ 新增項目'],
+    ['#oneAddNote', /^＋小提醒$/, '＋ 新增小提醒'],
     ['.one-edit-backup__note,.one-edit-backup__status', /「暫存目前內容」/g, '「暫存」'],
     ['.export-bar p', /專案檔案請由頂部載入或保存/, '專案用下方按鈕存取']
   ];

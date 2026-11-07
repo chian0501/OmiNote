@@ -31,6 +31,10 @@
     ['#downloadOrange', /^輸出橘色版 PNG$/, '只輸出橘色版'],
     ['.one-workspace-react-app .export-button.primary strong', /^輸出含字 PNG$/, '輸出 PNG'],
     ['.one-workspace-react-app .export-bar > p', /輸出含字 PNG/g, '輸出 PNG'],
+    // 一列內容用「刪除」，圖片用「移除」。
+    ['#addStation', /^＋ 增加站點$/, '＋ 新增站點'],
+    ['.remove-rating', /^移除$/, '刪除'],
+    ['.row-remove', /^×$/, '刪除'],
     ['#jsonBtn,#downloadJson', /^(?:輸出欄位|輸出設定|下載設定|下載) JSON$/, TERMS.exportJson],
     ['[data-action="load"],#loadJson', /^載入 JSON$/, TERMS.importJson],
     ['#reset', /^重設目前內容$/, TERMS.reset],
@@ -343,6 +347,28 @@
     });
   }
 
+  // Three choices or fewer read better as buttons. The select stays underneath: tools and saved data use it.
+  function makeSegments(control) {
+    if (control.tagName !== 'SELECT' || control.options.length > 3) return null;
+    var group = element('div', 'one-workspace-segments');
+    group.setAttribute('role', 'group');
+    group.setAttribute('aria-label', control.getAttribute('aria-label') || '版型與狀態');
+    Array.prototype.forEach.call(control.options, function (option) {
+      var node = button(option.textContent.split('｜')[0].trim(), '', function () {
+        if (control.value === option.value) return;
+        control.value = option.value;
+        control.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+      node.value = option.value;
+      node.title = option.textContent.trim();
+      group.appendChild(node);
+    });
+    control.classList.add('one-workspace-segment-source');
+    control.tabIndex = -1;
+    control.setAttribute('aria-hidden', 'true');
+    return group;
+  }
+
   function makeModebar(state) {
     var bar = element('div', 'one-workspace-modebar');
     var toggle = button('內容設定', 'one-workspace-button', function () {
@@ -377,6 +403,8 @@
         if (label && label.tagName === 'LABEL') body.appendChild(label);
         if (!control.getAttribute('aria-label')) control.setAttribute('aria-label', '版型與狀態');
         body.appendChild(control);
+        var segments = makeSegments(control);
+        if (segments) body.appendChild(segments);
         if (state.id === 'general') {
           var custom = document.getElementById('customControls');
           if (custom) body.appendChild(custom);
@@ -387,6 +415,9 @@
           var selected = control.options[control.selectedIndex];
           var text = selected ? selected.textContent : '';
           if (value.textContent !== text) value.textContent = text;
+          if (segments) Array.prototype.forEach.call(segments.children, function (node) {
+            node.setAttribute('aria-pressed', String(node.value === control.value));
+          });
         };
         control.addEventListener('change', update);
         state.updateMode = update;

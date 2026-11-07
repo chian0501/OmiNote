@@ -203,7 +203,7 @@ test('the explanation card uses the shared names and tabs', async ({ page }) => 
 test('the explanation card keeps its sequence output names when steps are on', async ({ page }) => {
   await page.goto('/O-Ne-Tools/explanation-card.html');
   await expect(page.locator('.one-workspace-switch select')).toBeVisible();
-  await page.getByRole('button', { name: '＋新增一項', exact: true }).click();
+  await page.getByRole('button', { name: '＋ 新增項目', exact: true }).click();
   await page.locator('#oneOverlayDone').click();
   await page.locator('#sequenceEnabled').check();
   await expect(page.locator('#exportPng')).toHaveText('只輸出目前畫面');
@@ -213,7 +213,7 @@ test('the explanation card keeps its sequence output names when steps are on', a
 test('editing the explanation card makes the switcher ask first', async ({ page }) => {
   await page.goto('/O-Ne-Tools/explanation-card.html');
   await expect(page.locator('.one-workspace-switch select')).toBeVisible();
-  await page.getByRole('button', { name: '＋新增一項', exact: true }).click();
+  await page.getByRole('button', { name: '＋ 新增項目', exact: true }).click();
   await page.locator('#oneOverlayDone').click();
   await page.locator('#sequenceEnabled').check();
   page.once('dialog', dialog => dialog.dismiss());
@@ -248,6 +248,57 @@ test('every homepage card links to its AI tab', async ({ page }) => {
   await page.goto('/O-Ne-Tools/index.html');
   await expect(page.locator('a:has-text("AI 助手")')).toHaveCount(ready.length);
   await expect(page.locator('a[href*="ai-card"]')).toHaveCount(0);
+});
+
+for (const [file, select, values] of [
+  ['trigger-card', 'state', ['EVENT', 'DONE', 'FAIL']],
+  ['persistent-card', 'state', ['MISSION', 'DONE', 'FAIL']],
+  ['effect-card', 'stateText', ['BUFF', 'DEBUFF']],
+  ['move-card', 'previewState', ['white', 'orange']]
+]) {
+  test(`${file} picks its state with buttons`, async ({ page }) => {
+    await open(page, file);
+    const buttons = page.locator('.one-workspace-segments button');
+    await expect(buttons).toHaveCount(values.length);
+    const artwork = () => page.locator('.one-workspace-canvas').first().evaluate(c => c.toDataURL());
+    const before = await artwork();
+    await buttons.nth(1).click();
+    await expect(page.locator('#' + select)).toHaveValue(values[1]);
+    await expect(buttons.nth(1)).toHaveAttribute('aria-pressed', 'true');
+    await expect(buttons.nth(0)).toHaveAttribute('aria-pressed', 'false');
+    await expect.poll(artwork).not.toBe(before);
+    await expect(page.locator('.one-workspace-save-feedback')).toContainText('尚未暫存');
+  });
+}
+
+test('a saved state shows on the buttons after a reload', async ({ page }) => {
+  await open(page, 'persistent-card');
+  await page.locator('.one-workspace-segments button').nth(2).click();
+  await page.locator('.one-workspace-save').click();
+  await expect(page.locator('.one-workspace-save-feedback')).toContainText('已暫存');
+  await page.reload();
+  await expect(page.locator('#state')).toHaveValue('FAIL');
+  await expect(page.locator('.one-workspace-segments button').nth(2)).toHaveAttribute('aria-pressed', 'true');
+});
+
+test('a card with four or more modes keeps its dropdown', async ({ page }) => {
+  await open(page, 'general-card');
+  await expect(page.locator('.one-workspace-segments')).toHaveCount(0);
+  await expect(page.locator('#mode')).toBeVisible();
+  await expect(page.locator('#mode')).not.toHaveClass(/one-workspace-segment-source/);
+});
+
+test('rows use the same add and delete names', async ({ page }) => {
+  await open(page, 'move-card');
+  await expect(page.locator('#addStation')).toHaveText('＋ 新增站點');
+  await open(page, 'rating-card');
+  await expect(page.locator('.remove-rating').first()).toHaveText('刪除');
+  await page.locator('#addRating').dispatchEvent('click');
+  await expect(page.locator('.remove-rating').last()).toHaveText('刪除');
+  await open(page, 'settlement-card');
+  await expect(page.locator('.row-remove').first()).toHaveText('刪除');
+  await page.locator('#addRow').dispatchEvent('click');
+  await expect(page.locator('.row-remove').last()).toHaveText('刪除');
 });
 
 test('the tool still works when the card list cannot load', async ({ page }) => {

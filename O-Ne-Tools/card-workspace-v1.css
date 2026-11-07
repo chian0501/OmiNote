@@ -618,3 +618,8 @@ body[data-one-card-workspace=focus][data-one-workspace-ready] .one-workspace-hea
     margin:8px 10px 12px;
   }
 }
+.one-workspace-segments {display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:6px;}
+.one-workspace-segments button {min-height:42px;padding:6px 8px;border:1px solid #385465;border-radius:8px;background:#101b24;color:#c7d3d6;cursor:pointer;font:inherit;font-size:13px;font-weight:800;}
+.one-workspace-segments button[aria-pressed=true] {border-color:var(--one-teal);background:#143b3f;color:#99ede5;}
+.one-workspace-segments button:focus-visible {outline:2px solid var(--one-teal);outline-offset:2px;}
+.one-workspace-mode-content .one-workspace-segment-source {position:absolute;width:1px!important;height:1px!important;min-height:0!important;padding:0;border:0;opacity:0;pointer-events:none;}

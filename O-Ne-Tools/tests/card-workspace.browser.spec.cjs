@@ -994,7 +994,7 @@ test('explanation direct edit, keyboard save, order limits and project round tri
   await expect(page.locator('#oneSaveStatus')).toContainText(/暫存/);
   await expect(page.locator('#wordPage')).not.toHaveClass(/one-overlay-page/);
   await page.reload();await expect(page.locator('#oneOverlayOutline')).toContainText('全工具驗收');
-  await page.getByRole('button',{name:'＋新增一項',exact:true}).click();
+  await page.getByRole('button',{name:'＋ 新增項目',exact:true}).click();
   await page.locator('#oneOverlayDone').click();
   await expect(page.locator('[data-order-action="up"]').first()).toBeDisabled();
   await expect(page.locator('[data-order-action="down"]').last()).toBeDisabled();
@@ -1048,7 +1048,7 @@ async function fillFareOutline(page, baseline=false) {
   await page.evaluate(()=>document.fonts.ready);
   for(let i=0;i<fareCopy.length;i++) {
     const [kind,text]=fareCopy[i];
-    if(i>=3) await page.getByRole('button',{name:'＋新增一項',exact:true}).click();
+    if(i>=3) await page.getByRole('button',{name:baseline?'＋新增一項':'＋ 新增項目',exact:true}).click();
     else await page.locator('#oneOverlayOutline [data-overlay-block]').nth(i).click();
     await page.locator('#wordPage .rich[data-kind="'+kind+'"]').filter({visible:true}).last().fill(text);
     await page.locator('#oneOverlayDone').click();
