@@ -58,7 +58,7 @@ jobs:
       - name: Run 13-tool Canonical import Gate
         run: npx playwright test O-Ne-Tools/tests/card-canonical-import.browser.spec.cjs --config O-Ne-Tools/tests/playwright.workspace.config.cjs
       - name: Check the shared tool frame
-        run: npx playwright test O-Ne-Tools/tests/tool-frame.browser.spec.cjs --config O-Ne-Tools/tests/playwright.workspace.config.cjs
+        run: npx playwright test O-Ne-Tools/tests/tool-frame.browser.spec.cjs O-Ne-Tools/tests/persistent-sequence.browser.spec.cjs --config O-Ne-Tools/tests/playwright.workspace.config.cjs
       - name: Check the candidate homepage
         run: npx playwright test O-Ne-Tools/tests/maker-hub-next.browser.spec.cjs --config O-Ne-Tools/tests/playwright.workspace.config.cjs
       - name: Compare all 13 native Canvas renders to exact main commit

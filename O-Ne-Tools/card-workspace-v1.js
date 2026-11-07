@@ -485,7 +485,7 @@
       if (state.applyingLink) return;
       var target = event.target;
       if (!target || !target.closest) return;
-      if (target.closest('.one-workspace-dialog,.one-workspace-section-jump,.one-workspace-switch,[data-one-backup-ui],[data-one-project-package-ui]')) return;
+      if (target.closest('.one-workspace-dialog,.one-workspace-section-jump,[data-one-frame-control],[data-one-backup-ui],[data-one-project-package-ui]')) return;
       state.dirty = true;
       state.saveFeedback.textContent = '● 有尚未暫存的修改';
       state.saveFeedback.dataset.oneUnsaved = 'true';
@@ -500,7 +500,7 @@
     state.app.addEventListener('click', function (event) {
       var control = event.target && event.target.closest && event.target.closest('button');
       if (!control || !state.editor.contains(control) || control.disabled) return;
-      if (control.closest('.one-workspace-editor-heading,.one-workspace-section-jump')) return;
+      if (control.closest('.one-workspace-editor-heading,.one-workspace-section-jump,[data-one-frame-control]')) return;
       if (control.matches('.one-workspace-text-button,[aria-haspopup="dialog"],.image-crop-button,[id^="crop"]')) return;
       if (control.id === 'transparentView' || control.id === 'darkView') return;
       markUnsaved(event);
@@ -808,6 +808,11 @@
     ensureProjectQuickActions(state);
     trackUnsaved(state);
     applyTerms();
+    if (id === 'persistent') {
+      var sequence = document.createElement('script');
+      sequence.src = './persistent-sequence-v1.js?v=100';
+      document.body.appendChild(sequence);
+    }
     if (!config.react) hideEmptyContainers(app);
     document.addEventListener('change', function () { if (state.updateMode) state.updateMode(); });
     document.addEventListener('keydown', function (event) {
@@ -827,7 +832,7 @@
     observer.observe(document.body, { childList: true, subtree: true });
   }
   global.ONECardWorkspace = {
-    version: '1.9.0', refresh: refresh, TERMS: TERMS, applyTerms: applyTerms,
+    version: '1.10.0', refresh: refresh, TERMS: TERMS, applyTerms: applyTerms,
     fillGuide: fillGuide, makeAiPaste: makeAiPaste, aiResult: aiResult
   };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
