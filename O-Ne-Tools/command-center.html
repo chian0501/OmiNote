@@ -15,7 +15,7 @@
     <div>
       <div class="eyebrow">O-NE COMMAND CENTER</div>
       <h1>O-Ne 工作台</h1>
-      <p>找專案、找素材、開製作工具、查看目前可用的 ChatGPT Skills。Google Drive 仍是正式主資料，這一頁只做導航與工作入口。</p>
+      <p>找專案、找素材、開製作工具、查看常用技能。Google Drive 仍是正式主資料，這一頁只做導航與工作入口。</p>
     </div>
     <div class="hero-badges"><span class="pill candidate">V1.3 CANDIDATE</span><span class="pill">PROJECT_GROUPS_V1</span><span class="pill">FILE_ORGANIZER_NESTED_V1</span><span class="pill">唯讀</span></div>
   </header>
@@ -23,7 +23,7 @@
   <nav class="tabs" aria-label="Command Center 主功能">
     <button class="tab active" data-tab="find">📁 專案與素材</button>
     <button class="tab" data-tab="tools">🛠 製作工具</button>
-    <button class="tab" data-tab="skills">🧩 ChatGPT Skills</button>
+    <button class="tab" data-tab="skills">🧩 常用技能</button>
     <button class="tab" data-tab="ai">✨ AI 常用工作</button>
   </nav>
 
@@ -61,14 +61,14 @@
     <section class="screen" id="screen-skills">
       <div class="section-head">
         <div>
-          <h2>ChatGPT Skills</h2>
-          <p>只列目前帳號已安裝的 O-Ne Skills。這些是你可以直接叫的能力入口，不是 31 個內部角色技能。</p>
+          <h2>常用技能</h2>
+          <p>常用工作的說法與對應技能，不是全部技能。</p>
         </div>
-        <span class="pill skill-installed-count" id="skillInstalledCount">9 / 9 已安裝</span>
+        <span class="pill skill-installed-count" id="skillInstalledCount">9 個常用入口</span>
       </div>
 
       <div class="notice skill-note">
-        <strong>最簡單的用法：</strong>直接在 ChatGPT 說你要做什麼即可。你不需要先選 ROLE 或記 R1-S03 之類的編號，系統會自己路由。
+        <strong>最簡單的用法：</strong>直接跟 AI 說你要做什麼即可，不用記技能名稱。
       </div>
 
       <div class="skill-toolbar">
@@ -82,19 +82,10 @@
 
       <div id="skillGroups"></div>
 
-      <details class="skill-other card">
-        <summary>其他 Skill 狀態｜不是目前 9/9</summary>
-        <div id="skillOther"></div>
-      </details>
-
-      <details class="skill-other card">
-        <summary>內部 31 個角色技能｜不用手動選</summary>
-        <div id="internalRoleSummary"></div>
-      </details>
     </section>
 
     <section class="screen" id="screen-ai">
-      <div class="section-head"><div><h2>AI 常用工作</h2><p>這裡是工作捷徑，會幫你組好可複製指令；它不是 ChatGPT Skills 清單。</p></div><span class="pill" id="aiCount">18 / 18</span></div>
+      <div class="section-head"><div><h2>AI 常用工作</h2><p>這裡是工作捷徑，會幫你組好可複製指令；它不是技能清單。</p></div><span class="pill" id="aiCount">18 / 18</span></div>
       <div class="notice"><strong id="aiContext">影片型 AI 工作需要先選一個專案。</strong><br>產生的是可複製指令，不會直接呼叫 API，也不會自動修改正式資料。</div>
       <div class="ai-toolbar"><select class="field" id="aiProject" style="max-width:360px"></select><input class="search" id="aiSearch" type="search" placeholder="搜尋：剪輯、縮圖、字卡、字幕、查證…" style="max-width:430px"><button class="filter active" data-audience="all">全部 18</button><button class="filter" data-audience="niete">涅特常用</button><button class="filter" data-audience="omi">Omi 常用</button></div>
       <div class="ai-grid" id="aiGrid"></div>
