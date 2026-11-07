@@ -47,7 +47,7 @@ assert(index.includes('one-tools-ui-v1.css?v=1310'));
 assert(index.includes('one-tools-ui-v1.js?v=1310'));
 assert(index.includes("fetch('./one-tools-registry-v1.json?v=2370'"));
 
-const bridge = fs.readFileSync(path.join(root, 'ai-card.html'), 'utf8');
+const bridge = fs.readFileSync(path.join(root, 'ai-card-v1.html'), 'utf8');
 assert(bridge.includes("+'&embed=1'"));
 assert(bridge.includes('O-Ne AI 字卡助手 V1.3'));
 
@@ -70,7 +70,7 @@ function assertClassicScriptsParse(file) {
     assert.doesNotThrow(() => new Function(match[2]), file + ' inline script must parse');
   }
 }
-['index-v2.html', 'ai-card.html', 'persistent-card.html', 'thumbnail-frame.html'].forEach(assertClassicScriptsParse);
+['index-v2.html', 'ai-card-v1.html', 'persistent-card.html', 'thumbnail-frame.html'].forEach(assertClassicScriptsParse);
 ['one-tools-ui-v1.js', 'edit-backup-v1.js', 'project-package-v1.js', 'batch-render-v1.js', 'ai-json-guide-v1.js', 'command-center-registry-sync-v1.js'].forEach(file => {
   assert.doesNotThrow(() => new Function(fs.readFileSync(path.join(root, file), 'utf8')), file + ' must parse');
 });

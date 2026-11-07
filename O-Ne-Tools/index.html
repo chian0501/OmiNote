@@ -136,7 +136,7 @@ a:focus-visible,summary:focus-visible{outline:2px solid var(--focus);outline-off
       var actions=el('div','actions'),open=link('open',tool);open.textContent='開啟'+tool.name;actions.appendChild(open);
       var ref=(g.references||[])[0];
       if(ref){var video=el('a','sub','範例影片 ↗');video.href=ref.url;video.target='_blank';video.rel='noopener';actions.appendChild(video)}
-      if(tool.ai_href){var ai=el('a','sub','AI 助手');ai.href=tool.ai_href;actions.appendChild(ai)}
+      var ai=el('a','sub','AI 助手');ai.href=tool.href+'&open=ai';actions.appendChild(ai);
       card.append(thumb,el('h3','',tool.name),el('p','',g.summary||''),actions);
       grid.appendChild(card);
     });

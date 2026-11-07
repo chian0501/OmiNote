@@ -215,7 +215,7 @@ assert(index.includes("fetch('./one-tools-registry-v1.json?v=2370'"), 'index mus
 assert(!index.includes('const tools=['), 'index must not keep a second hardcoded registry');
 assert(index.includes('command-center.html'), 'index must expose the Command Center entry');
 
-const aiBridge = fs.readFileSync(path.join(root, 'ai-card.html'), 'utf8');
+const aiBridge = fs.readFileSync(path.join(root, 'ai-card-v1.html'), 'utf8');
 for (const href of [
   'general-card.html?v=121&build=ui-shell-v131',
   'trigger-card.html?v=102&build=ui-shell-v131',

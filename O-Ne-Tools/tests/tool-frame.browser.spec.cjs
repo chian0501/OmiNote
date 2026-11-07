@@ -163,6 +163,93 @@ test('choosing a card in the switcher does not mark the card as edited', async (
   await expect(page.locator('.one-workspace-save-feedback')).not.toContainText('尚未暫存');
 });
 
+test('the explanation card uses the shared names and tabs', async ({ page }) => {
+  const errors = [];
+  page.on('pageerror', error => errors.push(error.message));
+  const entry = registry.tools.find(tool => tool.id === 'explanation');
+  await page.goto('/O-Ne-Tools/explanation-card.html');
+  await expect(page.locator('.one-workspace-switch select')).toBeVisible();
+  await expect(page.locator('.back-link')).toHaveText('← 工具入口');
+  await expect(page.locator('.one-project-actions button')).toHaveText(['暫存', '檔案', '內容清單', '？']);
+  await expect(page.locator('.one-workspace-switch select option:checked')).toHaveText(entry.name);
+  await expect(page.locator('.one-workspace-guide span')).toHaveText(entry.guide.summary);
+  await expect(page.locator('#exportPng')).toHaveText('輸出 PNG');
+  await expect(page.locator('[data-one-project-quick="download"]')).toHaveText('存專案 ZIP');
+  await expect(page.locator('[data-one-project-quick="upload"]')).toHaveText('開專案 ZIP');
+  await page.getByRole('button', { name: '檔案', exact: true }).click();
+  const dialog = page.locator('#oneProjectDialog');
+  await expect(dialog.getByRole('tab')).toHaveText(['專案', '暫存紀錄', '批次輸出', 'AI', '說明']);
+  await expect(dialog.locator('[data-one-project-package-ui]')).toBeVisible();
+  await expect(dialog.locator('[data-one-backup-ui]')).toBeHidden();
+  await dialog.getByRole('tab', { name: '暫存紀錄', exact: true }).click();
+  await expect(dialog.locator('[data-one-backup-ui]')).toBeVisible();
+  await expect(dialog.locator('[data-one-backup-ui] [data-action="load"]')).toHaveText('匯入 JSON');
+  await dialog.getByRole('tab', { name: '批次輸出', exact: true }).click();
+  await expect(dialog.locator('[data-one-batch-render-ui]')).toBeVisible();
+  await dialog.getByRole('tab', { name: 'AI', exact: true }).click();
+  await expect(dialog.locator('[data-one-ai-json-guide]')).toBeVisible();
+  const payload = await page.evaluate(() => window.ONEAIJsonGuide.example('explanation-card'));
+  await dialog.locator('.one-workspace-ai-paste textarea').fill(JSON.stringify(payload));
+  await dialog.getByRole('button', { name: '套用到字卡' }).click();
+  await expect(dialog.locator('.one-workspace-ai-feedback')).toContainText('成功');
+  await dialog.getByRole('tab', { name: '說明', exact: true }).click();
+  await expect(dialog.locator('.one-frame-help')).toBeVisible();
+  await dialog.getByRole('button', { name: '關閉', exact: true }).click();
+  await page.getByRole('button', { name: '使用說明' }).or(page.locator('.one-project-actions button').last()).first().click();
+  await expect(dialog.locator('.one-frame-help')).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
+test('the explanation card keeps its sequence output names when steps are on', async ({ page }) => {
+  await page.goto('/O-Ne-Tools/explanation-card.html');
+  await expect(page.locator('.one-workspace-switch select')).toBeVisible();
+  await page.getByRole('button', { name: '＋新增一項', exact: true }).click();
+  await page.locator('#oneOverlayDone').click();
+  await page.locator('#sequenceEnabled').check();
+  await expect(page.locator('#exportPng')).toHaveText('只輸出目前畫面');
+  await expect(page.locator('#exportSequenceAll')).toHaveText(/^輸出全部 PNG（\d+ 張）$/);
+});
+
+test('editing the explanation card makes the switcher ask first', async ({ page }) => {
+  await page.goto('/O-Ne-Tools/explanation-card.html');
+  await expect(page.locator('.one-workspace-switch select')).toBeVisible();
+  await page.getByRole('button', { name: '＋新增一項', exact: true }).click();
+  await page.locator('#oneOverlayDone').click();
+  await page.locator('#sequenceEnabled').check();
+  page.once('dialog', dialog => dialog.dismiss());
+  await page.locator('.one-workspace-switch select').selectOption({ label: '一般卡' });
+  await expect(page).toHaveURL(/explanation-card\.html/);
+});
+
+for (const [link, file] of [['general-card.html?open=ai', 'general'], ['dialogue-card.html?v=141&open=ai', 'dialogue'], ['focus-card.html?open=ai', 'focus']]) {
+  test(`${file} opens on the AI tab from a link`, async ({ page }) => {
+    await page.goto('/O-Ne-Tools/' + link);
+    await expect(page.locator('#one-workspace-files')).toBeVisible();
+    await expect(page.locator('#one-workspace-tab-ai')).toHaveAttribute('aria-selected', 'true');
+    await expect(page.locator('.one-workspace-ai-paste textarea')).toBeVisible();
+  });
+}
+
+test('the explanation card opens on the AI tab from a link', async ({ page }) => {
+  await page.goto('/O-Ne-Tools/explanation-card.html?open=ai');
+  await expect(page.locator('#oneProjectDialog')).toBeVisible();
+  await expect(page.locator('#oneProjectDialog .one-workspace-ai-paste textarea')).toBeVisible();
+});
+
+test('the old AI assistant address reaches the AI tab', async ({ page }) => {
+  await page.goto('/O-Ne-Tools/ai-card.html?tool=general&v=12');
+  await expect(page).toHaveURL(/general-card\.html\?open=ai/);
+  await expect(page.locator('.one-workspace-ai-paste textarea')).toBeVisible();
+  await page.goto('/O-Ne-Tools/ai-card.html');
+  await expect(page.locator('h1')).toContainText('這段你想告訴觀眾');
+});
+
+test('every homepage card links to its AI tab', async ({ page }) => {
+  await page.goto('/O-Ne-Tools/index.html');
+  await expect(page.locator('a:has-text("AI 助手")')).toHaveCount(ready.length);
+  await expect(page.locator('a[href*="ai-card"]')).toHaveCount(0);
+});
+
 test('the tool still works when the card list cannot load', async ({ page }) => {
   await page.route('**/one-tools-registry-v1.json*', route => route.abort());
   await page.goto('/O-Ne-Tools/general-card.html');

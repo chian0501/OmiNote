@@ -69,8 +69,8 @@
     if (next !== text.nodeValue.trim()) text.nodeValue = next;
   }
   // 工具會在輸出中暫時改字再改回來，所以每次刷新都重套；只換認得的舊字樣。
-  function applyTerms() {
-    RELABEL.forEach(function (rule) {
+  function applyTerms(rules) {
+    (rules || RELABEL).forEach(function (rule) {
       document.querySelectorAll(rule[0]).forEach(function (node) { relabel(node, rule[1], rule[2]); });
     });
     var frames = document.querySelector('.focus-sequence-navigation select');
@@ -104,6 +104,12 @@
     state.aiPending = true;
     input.dispatchEvent(new Event('change', { bubbles: true }));
   }
+  function aiResult(state, message) {
+    if (!state.aiPending || !message) return;
+    state.aiPending = false;
+    state.aiFeedback.textContent = message;
+    state.aiFeedback.classList.toggle('is-error', /失敗|不可用|無法|不支援|錯誤/.test(message));
+  }
   function makeAiPaste(state) {
     var box = element('section', 'one-workspace-ai-paste');
     box.setAttribute('data-one-frame-control', '');
@@ -115,7 +121,7 @@
     state.aiFeedback = element('p', 'one-workspace-ai-feedback');
     state.aiFeedback.setAttribute('role', 'status');
     box.append(label, button('套用到字卡', 'one-workspace-button', function () { pasteJson(state, area.value); }), state.aiFeedback);
-    state.filePanels.ai.appendChild(box);
+    return box;
   }
 
   function makeDialog(state) {
@@ -165,7 +171,7 @@
     state.projectFeedback.setAttribute('role', 'status');
     state.filePanels.project.appendChild(state.projectFeedback);
     state.filePanels.history.appendChild(element('p', 'one-workspace-hint', '按頂部「暫存」才會保留目前內容；最近 5 次紀錄只存在這台裝置。'));
-    makeAiPaste(state);
+    state.filePanels.ai.appendChild(makeAiPaste(state));
     state.filePanels.help.appendChild(element('p', 'one-workspace-hint', '點字卡文字直接修改，預覽下方輸出 PNG。按 Ctrl／⌘＋S 或頂部「暫存」保留目前內容；跨裝置使用「存專案 ZIP」，JSON 僅保存文字與設定。'));
     dialog.append(head, tabs, panels);
     document.body.appendChild(dialog);
@@ -287,17 +293,14 @@
   }
 
   /* The registry supplies the card list and usage line. If it cannot load, the tool works without them. */
-  function makeGuide(state) {
-    state.guide = element('div', 'one-workspace-guide');
-    state.guide.hidden = true;
-    state.modebar.parentNode.insertBefore(state.guide, state.modebar);
+  function fillGuide(options) {
     if (!global.fetch) return;
     global.fetch('./one-tools-registry-v1.json', { cache: 'no-cache' }).then(function (response) {
       if (!response.ok) throw new Error('registry');
       return response.json();
     }).then(function (registry) {
       var ready = registry.tools.filter(function (tool) { return tool.status === 'ready' && tool.href; });
-      var current = ready.filter(function (tool) { return tool.id === state.id; })[0];
+      var current = ready.filter(function (tool) { return tool.id === options.id; })[0];
       if (!current) return;
       var label = element('label', '', '換卡種');
       var select = element('select');
@@ -309,25 +312,35 @@
         select.appendChild(option);
       });
       select.addEventListener('change', function () {
-        if (state.dirty && !global.confirm('換到別張卡？尚未暫存的修改不會保留。')) { select.value = current.href; return; }
+        if (options.isDirty() && !global.confirm('換到別張卡？尚未暫存的修改不會保留。')) { select.value = current.href; return; }
         location.href = new URL(select.value, location.href).href;
       });
-      state.switchHost.appendChild(label);
-      state.switchHost.hidden = false;
+      options.switchHost.appendChild(label);
+      options.switchHost.hidden = false;
       var guide = current.guide;
       if (!guide || !guide.summary) return;
-      state.guide.append(element('strong', '', '這張用在'), element('span', '', guide.summary));
+      options.guideHost.append(element('strong', '', '這張用在'), element('span', '', guide.summary));
       var reference = guide.references && guide.references[0];
       if (reference) {
         var link = element('a', '', '過往範例 ↗');
         link.href = reference.url;
         link.target = '_blank';
         link.rel = 'noopener';
-        state.guide.appendChild(link);
+        options.guideHost.appendChild(link);
       }
-      state.guide.hidden = false;
-      fitPreview(state);
+      options.guideHost.hidden = false;
+      if (options.onReady) options.onReady();
     }).catch(function () {});
+  }
+  function makeGuide(state) {
+    state.guide = element('div', 'one-workspace-guide');
+    state.guide.hidden = true;
+    state.modebar.parentNode.insertBefore(state.guide, state.modebar);
+    fillGuide({
+      id: state.id, switchHost: state.switchHost, guideHost: state.guide,
+      isDirty: function () { return state.dirty; },
+      onReady: function () { fitPreview(state); }
+    });
   }
 
   function makeModebar(state) {
@@ -722,11 +735,7 @@
         var message = status.textContent;
         state.projectFeedback.textContent = message;
         state.projectFeedback.classList.toggle('is-error', /失敗|不可用|無法|不支援/.test(message));
-        if (state.aiPending && message) {
-          state.aiPending = false;
-          state.aiFeedback.textContent = message;
-          state.aiFeedback.classList.toggle('is-error', /失敗|不可用|無法|不支援|錯誤/.test(message));
-        }
+        aiResult(state, message);
         state.saveFeedback.textContent = message;
         state.saveFeedback.title = message;
         state.saveFeedback.classList.toggle('is-error', /失敗|不可用|無法|不支援/.test(message));
@@ -764,6 +773,11 @@
     select.dispatchEvent(new Event('change', { bubbles: true }));
     instance.applyingLink = false;
   }
+  // ?open=ai opens the file window on that tab; old AI assistant links land here.
+  function applyRequestedTab(state) {
+    var key = new URL(location.href).searchParams.get('open');
+    if (key && state.filePanels[key]) openFiles(state, key, state.header.querySelector('.one-workspace-header-actions button:not(.one-workspace-save):not(.one-workspace-help-button)'));
+  }
   function mount() {
     if (instance || !document.body) return;
     var id = document.body.getAttribute('data-one-card-workspace');
@@ -777,8 +791,9 @@
     if (!editor || !preview || editor === preview) return;
     var state = { id: id, config: config, app: app, workspace: workspace, editor: editor, preview: preview, sidebarHidden: false };
     instance = state;
-    if (document.readyState === 'complete') global.setTimeout(function () { applyRequestedMode(config); }, 0);
-    else global.addEventListener('load', function () { global.setTimeout(function () { applyRequestedMode(config); }, 0); });
+    var applyLinks = function () { global.setTimeout(function () { applyRequestedMode(config); applyRequestedTab(state); }, 0); };
+    if (document.readyState === 'complete') applyLinks();
+    else global.addEventListener('load', applyLinks);
     app.classList.add('one-workspace-app');
     workspace.classList.add('one-workspace-layout');
     document.body.setAttribute('data-one-workspace-ready', '1');
@@ -811,7 +826,10 @@
     observer = new MutationObserver(schedule);
     observer.observe(document.body, { childList: true, subtree: true });
   }
-  global.ONECardWorkspace = { version: '1.8.1', refresh: refresh };
+  global.ONECardWorkspace = {
+    version: '1.9.0', refresh: refresh, TERMS: TERMS, applyTerms: applyTerms,
+    fillGuide: fillGuide, makeAiPaste: makeAiPaste, aiResult: aiResult
+  };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
   else init();
 })(window);
