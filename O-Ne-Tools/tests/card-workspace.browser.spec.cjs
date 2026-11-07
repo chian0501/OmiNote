@@ -1000,7 +1000,7 @@ test('explanation direct edit, keyboard save, order limits and project round tri
   await expect(page.locator('[data-order-action="down"]').last()).toBeDisabled();
   await expect(page.locator('[data-order-action="up"]').last()).toBeEnabled();
   await page.locator('#sequenceEnabled').check();
-  await expect(page.locator('#exportSequenceAll')).toHaveAttribute('aria-label','輸出全部 2 幕 PNG ZIP');
+  await expect(page.locator('#exportSequenceAll')).toHaveAttribute('aria-label','輸出全部 PNG（2 張）');
   for (const [index, colors] of [['1',['#ff00ff','#00ff00']],['2',['#0000ff','#ffff00']]]) {
     await page.locator('#sequenceVisibleCount').selectOption(index);
     await page.locator('#openImageDrawer').click();
@@ -1011,8 +1011,8 @@ test('explanation direct edit, keyboard save, order limits and project round tri
   const canvas=page.locator('#previewCanvas');
   const pixels=()=>canvas.evaluate(c=>c.toDataURL());
   const before=await pixels();
-  await page.getByRole('button',{name:'專案檔案',exact:true}).click();
-  const dialog=page.getByRole('dialog',{name:'專案檔案與本機暫存'});
+  await page.getByRole('button',{name:'檔案',exact:true}).click();
+  const dialog=page.locator('#oneProjectDialog');
   await expect(dialog).toBeVisible();
   const zip=await download(page,dialog.locator('[data-action="export-package"]'),info,'explanation-editable-project','zip');
   expect(Object.keys(zipEntries(zip.bytes)).some(n=>n.endsWith('.json'))).toBe(true);
@@ -1020,7 +1020,7 @@ test('explanation direct edit, keyboard save, order limits and project round tri
   await upload(page,dialog.locator('[data-action="import-package"]'),zip.target);
   await dialog.getByRole('button',{name:'關閉',exact:true}).click();
   await expect.poll(pixels).toBe(before);
-  await expect(page.locator('#exportSequenceAll')).toHaveAttribute('aria-label','輸出全部 2 幕 PNG ZIP');
+  await expect(page.locator('#exportSequenceAll')).toHaveAttribute('aria-label','輸出全部 PNG（2 張）');
   const png=await download(page,page.locator('#exportPng'),info,'explanation-restored-frame','png');assertPNG(png.bytes);
   const sequence=await download(page,page.locator('#exportSequenceAll'),info,'explanation-restored-sequence','zip');
   const frames=Object.values(zipEntries(sequence.bytes));expect(frames).toHaveLength(2);
@@ -1171,7 +1171,7 @@ test('focus GET capsule matches explanation size and exports without title overl
   await page.locator('.label-text-controls input').fill('MISSION DONE');
   await page.getByRole('button',{name:'標題前方',exact:true}).click();
   await page.locator('input[placeholder="輸入卡片標題"]').fill('梅田到 HARUKA｜跟著 5 步走');
-  await expect.poll(async()=>{const a=await title.boundingBox(),b=await tag.boundingBox();return a.x>=b.x+b.width;}).toBe(true);
+  await expect.poll(async()=>{const a=await title.boundingBox(),b=await tag.boundingBox();return Boolean(a&&b)&&a.x>=b.x+b.width;}).toBe(true);
   await screenshot(page,info,'focus-long-label-before-title');
 });
 

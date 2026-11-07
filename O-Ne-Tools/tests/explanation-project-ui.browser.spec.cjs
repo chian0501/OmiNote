@@ -70,13 +70,13 @@ test('ten gallery images retain crops, order, divider sizes and PNG through proj
   const snap=await galleryState(page);
   const pixels=()=>page.locator('#previewCanvas').evaluate(c=>c.toDataURL());
   const before=await pixels();
-  await page.getByRole('button',{name:'專案檔案',exact:true}).click();
-  const dialog=page.getByRole('dialog',{name:'專案檔案與本機暫存'});
+  await page.getByRole('button',{name:'檔案',exact:true}).click();
+  const dialog=page.locator('#oneProjectDialog');
   const downloading=page.waitForEvent('download');await dialog.locator('[data-action="export-package"]').click();
   const download=await downloading,zipPath=info.outputPath('gallery-ten.project.zip');await download.saveAs(zipPath);
   await dialog.getByRole('button',{name:'關閉',exact:true}).click();
   await page.locator('.gallery-slot.is-selected [data-gallery-remove]').click();
-  await page.getByRole('button',{name:'專案檔案',exact:true}).click();
+  await page.getByRole('button',{name:'檔案',exact:true}).click();
   await dialog.locator('[data-one-project-package-ui] input[accept=".zip,application/zip"]').setInputFiles(zipPath);
   await expect(dialog.locator('.one-project-package__status')).toContainText('載入成功');
   await dialog.getByRole('button',{name:'關閉',exact:true}).click();
@@ -94,7 +94,7 @@ test('ten gallery images retain crops, order, divider sizes and PNG through proj
     const blob=await api.makeZip(Object.entries(entries).filter(([n])=>n!==missing).map(([name,data])=>({name,data})));
     return Array.from(new Uint8Array(await blob.arrayBuffer()));
   },zipBytes);
-  await page.getByRole('button',{name:'專案檔案',exact:true}).click();
+  await page.getByRole('button',{name:'檔案',exact:true}).click();
   await dialog.locator('[data-one-project-package-ui] input[accept=".zip,application/zip"]').setInputFiles({name:'missing-image.zip',mimeType:'application/zip',buffer:Buffer.from(broken)});
   await expect(dialog.locator('.one-project-package__status')).toContainText('載入失敗');
   await dialog.getByRole('button',{name:'關閉',exact:true}).click();
@@ -131,9 +131,9 @@ test('explanation project dialog keeps project.zip primary and .onecard legacy a
 
   await page.goto('/O-Ne-Tools/explanation-card.html?v=0491&build=per-step-project-package-ready-v1&ui=131');
   await expect(page.locator('body')).toHaveClass(/one-workspace-v2/);
-  await page.getByRole('button', { name: '專案檔案', exact: true }).click();
+  await page.getByRole('button', { name: '檔案', exact: true }).click();
 
-  const dialog = page.getByRole('dialog', { name: '專案檔案與本機暫存' });
+  const dialog = page.locator('#oneProjectDialog');
   const pkg = dialog.locator('[data-one-project-package-ui]');
   const legacy = pkg.locator('[data-one-explanation-file-group="legacy"]');
   const advanced = pkg.locator('[data-one-explanation-file-group="advanced"]');
@@ -142,8 +142,8 @@ test('explanation project dialog keeps project.zip primary and .onecard legacy a
   await expect(dialog).toBeVisible();
   await expect(pkg.locator('.one-project-package__title')).toHaveText('完整 project.zip｜推薦');
   await expect(pkg.locator('.one-project-package__note')).toContainText('1 組只需保存 1 個 project.zip');
-  await expect(pkg.locator('[data-action="export-package"]')).toHaveText('下載完整 project.zip');
-  await expect(pkg.locator('[data-action="import-package"]')).toHaveText('載入完整 project.zip');
+  await expect(pkg.locator('[data-action="export-package"]')).toHaveText('存專案 ZIP');
+  await expect(pkg.locator('[data-action="import-package"]')).toHaveText('開專案 ZIP');
 
   await expect(legacy.locator('.one-explanation-file-group__title')).toHaveText('舊版相容');
   await expect(legacy.locator('.one-explanation-file-group__note')).toContainText('新專案請改用上方 project.zip');
@@ -151,8 +151,8 @@ test('explanation project dialog keeps project.zip primary and .onecard legacy a
   await expect(legacy.locator('#importProjectBtn')).toHaveText('載入舊版 .onecard');
 
   await expect(advanced.locator('.one-explanation-file-group__title')).toHaveText('進階／備份');
-  await expect(advanced.locator('#exportJson')).toHaveText('僅設定 JSON');
-  await expect(advanced.locator('#resetAll')).toHaveText('重設目前內容');
+  await expect(advanced.locator('#exportJson')).toHaveText('匯出 JSON');
+  await expect(advanced.locator('#resetAll')).toHaveText('重設內容');
 
   await expect(aiGuide.locator('.one-ai-json-guide__file')).toContainText('完整專案 ZIP（推薦；舊 .onecard 僅相容）');
   await expect(aiGuide.locator('.one-ai-json-guide__rules')).toContainText('1 組內容 = 1 個 project.zip');
@@ -163,8 +163,8 @@ test('explanation project dialog keeps project.zip primary and .onecard legacy a
   // Recheck after it, covering the exact regression reported from the live page.
   await page.waitForTimeout(700);
   await expect(pkg.locator('.one-project-package__title')).toHaveText('完整 project.zip｜推薦');
-  await expect(pkg.locator('[data-action="export-package"]')).toHaveText('下載完整 project.zip');
-  await expect(pkg.locator('[data-action="import-package"]')).toHaveText('載入完整 project.zip');
+  await expect(pkg.locator('[data-action="export-package"]')).toHaveText('存專案 ZIP');
+  await expect(pkg.locator('[data-action="import-package"]')).toHaveText('開專案 ZIP');
   await expect(legacy.locator('#exportProject')).toHaveText('下載舊版 .onecard（相容）');
   await expect(legacy.locator('#importProjectBtn')).toHaveText('載入舊版 .onecard');
 

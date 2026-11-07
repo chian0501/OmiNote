@@ -38,12 +38,13 @@ for (const [toolId, file] of tools) {
       };
     });
 
-    await page.getByRole('button', { name: toolId === 'explanation-card' ? '專案檔案' : '檔案', exact: true }).click();
+    await page.getByRole('button', { name: '檔案', exact: true }).click();
 
     let load;
     if (toolId === 'explanation-card') {
-      const dialog = page.getByRole('dialog', { name: '專案檔案與本機暫存' });
+      const dialog = page.locator('#oneProjectDialog');
       await expect(dialog).toBeVisible();
+      await dialog.getByRole('tab', { name: '暫存紀錄', exact: true }).click();
       load = dialog.locator('[data-one-backup-ui] [data-action="load"]').first();
     } else {
       const files = page.locator('#one-workspace-files');
@@ -86,7 +87,7 @@ test('general-card COST loads when an AI changes only card.mode from the guide e
 });
 
 test('AI assistant applies the general-card mode and refuses an unknown one', async ({ page }) => {
-  await page.goto('/O-Ne-Tools/ai-card.html?tool=general');
+  await page.goto('/O-Ne-Tools/ai-card-v1.html?tool=general');
   const editor = page.frameLocator('#toolFrame');
   await expect(editor.locator('#mode')).toHaveValue('HERE');
   await page.locator('#jsonInput').fill(JSON.stringify({ tool: 'general-card', mode: 'COST', title: '門票', subtitle: 'NT$ 100' }));
