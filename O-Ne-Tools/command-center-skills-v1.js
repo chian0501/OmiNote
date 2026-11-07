@@ -17,7 +17,6 @@
   function card(skill){
     return `<article class="skill-card">
       <div class="skill-card-top">
-        <span class="skill-status">已安裝</span>
         <span class="skill-audience">${esc(skill.audience)}</span>
       </div>
       <h4>${esc(skill.title)}</h4>
@@ -26,7 +25,7 @@
       <div class="skill-say"><b>直接說：</b><span>${esc(skill.say)}</span></div>
       <div class="skill-actions">
         <button class="button secondary" data-copy-skill="${esc(skill.id)}">複製用法</button>
-        <details class="skill-route"><summary>看內部承接</summary><small>${esc(skill.route)}</small></details>
+        <details class="skill-route"><summary>看對應技能</summary><small>${esc(skill.route)}</small></details>
       </div>
     </article>`;
   }
@@ -34,7 +33,7 @@
   function render(){
     const q=norm($('#skillSearch')?.value);
     const shown=D.userSkills.filter(s=>(active==='all'||s.category===active)&&matches(s,q));
-    $('#skillInstalledCount').textContent=`${D.installedCount} / ${D.installedCount} 已安裝`;
+    $('#skillInstalledCount').textContent=`${D.userSkills.length} 個常用入口`;
 
     const groups=D.categories.map(cat=>{
       const list=shown.filter(s=>s.category===cat.id);
@@ -63,16 +62,6 @@
     });
   }
 
-  function renderOther(){
-    $('#skillOther').innerHTML=D.otherSkills.map(s=>`<div class="other-skill-row">
-      <div><b>${esc(s.title)}</b><p>${esc(s.desc)}</p></div><span>${esc(s.status)}</span>
-    </div>`).join('');
-
-    const total=D.internalRoles.reduce((n,r)=>n+r.count,0);
-    $('#internalRoleSummary').innerHTML=`<p class="internal-intro">這 ${total} 個是系統後台用來分工的技能，不需要 Omi 或涅特自己挑。</p>
-      <div class="role-summary">${D.internalRoles.map(r=>`<div><b>${esc(r.id)}</b><span>${esc(r.label)}</span><strong>${r.count}</strong></div>`).join('')}</div>`;
-  }
-
   function init(){
     if(!$('#screen-skills'))return;
     $('#skillSearch').addEventListener('input',render);
@@ -82,7 +71,6 @@
       render();
     }));
     render();
-    renderOther();
   }
 
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);
