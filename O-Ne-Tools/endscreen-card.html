@@ -77,9 +77,9 @@ body{margin:0;background:#0e1117;color:#f5efe7;font-family:"O-Ne Noto Sans TC","
  <div class="box sub" id="b_sub" style="left:1430px;top:80px;width:340px;height:340px"><img src="./assets/endscreen-avatar-v001.png" alt=""></div>
  <div class="tag" id="t_sub" style="left:1540px;top:40px">訂閱元素</div>
  <div id="b_plat">
-  <div class="box plat" style="left:1330px;top:450px;width:540px;height:84px"><i>IG</i>Instagram</div>
-  <div class="box plat" style="left:1330px;top:550px;width:540px;height:84px"><i>Th</i>Threads</div>
-  <div class="box plat" style="left:1330px;top:650px;width:540px;height:84px"><i>FB</i>Facebook</div></div>
+  <div class="box plat" style="left:1330px;top:440px;width:540px;height:70px"><i>IG</i>Instagram</div>
+  <div class="box plat" style="left:1330px;top:520px;width:540px;height:70px"><i>Th</i>Threads</div>
+  <div class="box plat" style="left:1330px;top:600px;width:540px;height:70px"><i>FB</i>Facebook</div></div>
  <div class="box join" id="b_join" style="left:1330px;top:450px;width:540px"><b>加入歐涅任務工會</b><div class="js">影片下方按「加入」，一起出任務</div>
   <div class="can" id="b_can"><img src="./assets/endscreen-badge-n-v001.png" alt=""><div><div class="ct">感謝每月罐罐贊助</div><div class="cp" id="o_price">NT$25／月（勿用蘋果裝置加入）</div></div></div></div>
  <div class="cats" id="cats">
@@ -103,12 +103,12 @@ function render(){
  document.querySelectorAll('.vid').forEach(e=>{e.style.borderColor=on('guide')?'#2d6cdf':'transparent'});
  document.querySelectorAll('.gl').forEach(e=>e.classList.toggle('hide',!on('guide')));
  $('b_plat').classList.toggle('hide',!on('plat'));
- $('b_join').classList.toggle('hide',!on('join'));$('b_can').classList.toggle('hide',!on('can'));
- $('b_join').style.top=on('plat')?'750px':'450px';
+ $('b_join').classList.toggle('hide',!on('join'));$('b_can').classList.toggle('hide',!on('can')||on('plat'));
+ $('b_join').style.top=on('plat')?'690px':'450px';
  ['nomi','kuma','sanmei'].forEach(c=>$('c_'+c).classList.toggle('hide',!on(c)));
- const nc=['nomi','kuma','sanmei'].filter(on).length;$('cats').style.transform=nc>=3?'scale(0.78)':'none';
+ const nc=['nomi','kuma','sanmei'].filter(on).length;$('cats').style.transform=on('plat')?(nc>=3?'scale(0.5)':'scale(0.62)'):(nc>=3?'scale(0.78)':'none');
  $('o_tag').textContent=$('t_tag').value;$('o_title').textContent=$('t_title').value;$('o_price').textContent=$('t_price').value;
- const names=$('names').value.split('\n').map(s=>s.trim()).filter(Boolean).slice(0,20);
+ const all=$('names').value.split('\n').map(s=>s.trim()).filter(Boolean);const names=all.slice(0,20);
  const rw=$('rows');
  let h=names.map(n=>`<div class="r">${esc(n)}</div>`).join('');
  if(on('wait'))h+=`<div class="r wait">${names.length?'下一位工會成員招募中…':'工會成員招募中'}</div>`;
@@ -117,6 +117,7 @@ function render(){
  const wide=()=>[...rw.children].some(e=>e.scrollWidth>e.clientWidth+1);
  while((rw.scrollHeight>rw.clientHeight+1||wide())&&f>12){f--;rw.style.setProperty('--fs',f+'px')}
  $('fsv').textContent=f+(f<+$('fs').value?'（自動縮）':'');
+ $('status').textContent=(all.length>20?`⚠ 名單 ${all.length} 位，只放前 20 位；超過 20 位請改捲動名單。`:'')+(on('plat')&&on('can')?' 開平台區時罐罐贊助列會自動收起。':'');
 }
 [...keys,'fs','names','t_tag','t_title','t_price'].forEach(k=>$(k).addEventListener('input',render));
 keys.forEach(k=>$(k).addEventListener('change',render));
