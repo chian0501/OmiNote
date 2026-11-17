@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>O-Ne 片尾結束畫面產生器 V0.1.0</title>
+<style id="cardStyle">
+@font-face{font-family:"O-Ne Noto Sans TC";src:url("./assets/NotoSansTC-O-Ne.woff?v=010") format("woff");font-style:normal;font-weight:100 900}
+.card{position:relative;width:1920px;height:1080px;background:url(./assets/settlement-background-v010.jpg) center/cover;overflow:hidden;color:#3b2a1a;font-family:"O-Ne Noto Sans TC","Noto Sans TC","Microsoft JhengHei",sans-serif;box-sizing:border-box}
+.card *{box-sizing:border-box}
+.card .box{position:absolute;border-radius:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-weight:700}
+.card .vid{border:4px dashed #2d6cdf;background:rgba(255,255,255,.4);color:#1d4aa8;font-size:30px}
+.card .vid small{font-size:24px}
+.card .mem{border:4px solid #f2b632;background:#2a1f17;color:#fff6e3;justify-content:flex-start;align-items:stretch;text-align:left;padding:24px 30px 20px}
+.card .mem .t{background:#f2b632;color:#2a1f17;align-self:flex-start;padding:4px 18px;border-radius:8px;font-size:26px;margin-bottom:12px}
+.card .mem .h{font-size:42px;margin-bottom:18px}
+.card #rows{overflow:hidden;flex:1 1 auto;min-height:0;display:grid;grid-auto-rows:max-content;align-content:start;column-gap:12px}
+.card .r{background:rgba(255,255,255,.07);border-radius:8px;padding:.25em .7em;margin:0 0 .3em;font-size:var(--fs,28px);font-weight:500;color:#f0e3c8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.card .r.wait{grid-column:1/-1;background:none;border:2px dashed #8a7350;color:#c9a96a}
+.card .sub{border:4px dashed #e0453a;border-radius:50%;overflow:hidden;padding:0}
+.card .sub img{width:100%;height:100%;object-fit:cover}
+.card .tag{position:absolute;font-size:22px;font-weight:700;padding:2px 10px;border-radius:6px;color:#fff;background:#e0453a}
+.card .plat{border:4px solid #7a3fb5;background:#2a1f17;color:#fff6e3;font-size:30px;flex-direction:row;justify-content:flex-start;padding:0 22px;gap:16px}
+.card .plat i{font-style:normal;width:56px;height:56px;border-radius:50%;background:#7a3fb5;display:flex;align-items:center;justify-content:center;font-size:22px;color:#fff}
+.card .join{border:4px solid #f2b632;background:#2a1f17;color:#fff6e3;padding:20px 26px;align-items:flex-start;text-align:left;justify-content:flex-start}
+.card .join b{color:#f2b632;font-size:34px}
+.card .join .js{font-size:26px;font-weight:500;margin-top:8px;color:#f0e3c8}
+.card .can{display:flex;align-items:center;gap:16px;margin-top:16px;padding-top:14px;border-top:2px solid #5a4630;width:100%}
+.card .can img{width:78px;height:78px}
+.card .can .ct{font-size:28px;color:#f2b632}
+.card .can .cp{font-size:22px;font-weight:500;color:#e8d6b0;margin-top:4px}
+.card .cats{position:absolute;right:110px;bottom:40px;display:flex;align-items:flex-end;transform-origin:right bottom}
+.card .cats img{display:block}
+.card .hide{display:none!important}
+</style>
+<style>
+body{margin:0;background:#0e1117;color:#f5efe7;font-family:"O-Ne Noto Sans TC","Noto Sans TC","Microsoft JhengHei",sans-serif;display:flex;gap:16px;padding:16px;flex-wrap:wrap}
+#panel{width:320px;background:#151a23;border:1px solid #2a3240;border-radius:12px;padding:14px;font-size:15px;line-height:1.9}
+#panel h1{font-size:18px;margin:0 0 4px}#panel h3{margin:10px 0 2px;font-size:15px;color:#ffbe37}
+#panel input[type=text],#panel textarea{width:100%;box-sizing:border-box;background:#101620;color:#f5efe7;border:1px solid #394355;border-radius:6px;font:inherit;padding:4px 6px}
+#panel textarea{height:140px}
+#panel button{background:#29a6a7;color:#fff;border:0;border-radius:8px;padding:8px 14px;font:inherit;font-weight:700;cursor:pointer;margin:4px 4px 0 0}
+#panel .hint{font-size:12px;color:#9ea7b3;line-height:1.5}
+#panel a{color:#53ced0}
+#status{font-size:13px;color:#9ea7b3}
+</style></head><body>
+<div id="panel">
+<h1>片尾結束畫面 V0.1.0</h1>
+<div class="hint">CANDIDATE｜1920×1080｜<a href="./">回 O-Ne Tools</a>。前段結算用「片尾結算」，最後 15～20 秒用這張。</div>
+<h3>要出現的東西</h3>
+<label><input type="checkbox" id="vid1" checked> 影片框 1</label>
+<label><input type="checkbox" id="vid2" checked> 影片框 2</label><br>
+<label><input type="checkbox" id="mem" checked> 工會成員名單</label>
+<label><input type="checkbox" id="wait" checked> 招募中格</label><br>
+<label><input type="checkbox" id="sub" checked> 訂閱頭像</label>
+<label><input type="checkbox" id="plat"> IG／Threads／FB</label><br>
+<label><input type="checkbox" id="join" checked> 加入工會</label>
+<label><input type="checkbox" id="can" checked> 罐罐贊助</label><br>
+<label><input type="checkbox" id="guide"> 標示框（對位用，上片關掉）</label>
+<h3>貓</h3>
+<label><input type="checkbox" id="nomi" checked> Nomi</label>
+<label><input type="checkbox" id="kuma" checked> Kuma</label>
+<label><input type="checkbox" id="sanmei"> 三妹</label>
+<h3>工會成員（一行一位，最多 20）</h3>
+<textarea id="names"></textarea>
+<label>名單字級 <input type="range" id="fs" min="16" max="36" value="28"> <span id="fsv">28</span>px</label>
+<h3>文字</h3>
+標籤<input type="text" id="t_tag" value="歐涅任務工會">
+標題<input type="text" id="t_title" value="感謝加入的工會成員">
+罐罐價格<input type="text" id="t_price" value="NT$25／月（勿用蘋果裝置加入）">
+<h3>輸出</h3>
+<button id="dl">下載 PNG</button><div id="status"></div>
+<div class="hint">名單超過 9 位自動兩欄、放不下自動縮字；超過 20 位請改捲動名單。網址參數：?names=a|b&amp;sanmei=1&amp;guide=1&amp;export=1</div>
+</div>
+<div id="wrap"><div class="card" id="card">
+ <div class="box vid" id="b_vid1" style="left:60px;top:100px;width:680px;height:383px"><span class="gl">YouTube 影片元素 1</span><small class="gl">系列下一支／最新片</small></div>
+ <div class="box vid" id="b_vid2" style="left:60px;top:520px;width:680px;height:383px"><span class="gl">YouTube 影片元素 2</span><small class="gl">播放清單／熱門片</small></div>
+ <div class="box mem" id="b_mem" style="left:785px;top:100px;width:520px;height:803px">
+   <span class="t" id="o_tag">歐涅任務工會</span><div class="h" id="o_title">感謝加入的工會成員</div><div id="rows"></div></div>
+ <div class="box sub" id="b_sub" style="left:1430px;top:80px;width:340px;height:340px"><img src="./assets/endscreen-avatar-v001.png" alt=""></div>
+ <div class="tag" id="t_sub" style="left:1540px;top:40px">訂閱元素</div>
+ <div id="b_plat">
+  <div class="box plat" style="left:1330px;top:440px;width:540px;height:70px"><i>IG</i>Instagram</div>
+  <div class="box plat" style="left:1330px;top:520px;width:540px;height:70px"><i>Th</i>Threads</div>
+  <div class="box plat" style="left:1330px;top:600px;width:540px;height:70px"><i>FB</i>Facebook</div></div>
+ <div class="box join" id="b_join" style="left:1330px;top:450px;width:540px"><b>加入歐涅任務工會</b><div class="js">影片下方按「加入」，一起出任務</div>
+  <div class="can" id="b_can"><img src="./assets/endscreen-badge-n-v001.png" alt=""><div><div class="ct">感謝每月罐罐贊助</div><div class="cp" id="o_price">NT$25／月（勿用蘋果裝置加入）</div></div></div></div>
+ <div class="cats" id="cats">
+  <img id="c_nomi" src="./assets/endscreen-cat-nomi-v001.png" style="height:290px;margin-right:-30px" alt="">
+  <img id="c_kuma" src="./assets/endscreen-cat-kuma-v001.png" style="height:252px" alt="">
+  <img id="c_sanmei" src="./assets/endscreen-cat-sanmei-v001.png" style="height:256px;margin-left:-10px" alt=""></div>
+</div></div>
+<script>
+const q=new URLSearchParams(location.search),$=id=>document.getElementById(id);
+const keys=['vid1','vid2','mem','wait','sub','plat','join','can','guide','nomi','kuma','sanmei'];
+keys.forEach(k=>{if(q.has(k))$(k).checked=q.get(k)==='1'});
+if(q.has('fs'))$('fs').value=q.get('fs');
+$('names').value=(q.get('names')||'工會成員 01\n工會成員 02').split('|').join('\n');
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function render(){
+ const on=k=>$(k).checked;
+ $('b_vid1').classList.toggle('hide',!on('vid1'));$('b_vid2').classList.toggle('hide',!on('vid2'));
+ $('b_mem').classList.toggle('hide',!on('mem'));$('b_sub').classList.toggle('hide',!on('sub'));
+ $('t_sub').classList.toggle('hide',!on('sub')||!on('guide'));
+ $('b_sub').style.borderColor=on('guide')?'#e0453a':'transparent';
+ document.querySelectorAll('.vid').forEach(e=>{e.style.borderColor=on('guide')?'#2d6cdf':'transparent'});
+ document.querySelectorAll('.gl').forEach(e=>e.classList.toggle('hide',!on('guide')));
+ $('b_plat').classList.toggle('hide',!on('plat'));
+ $('b_join').classList.toggle('hide',!on('join'));$('b_can').classList.toggle('hide',!on('can')||on('plat'));
+ $('b_join').style.top=on('plat')?'690px':'450px';
+ ['nomi','kuma','sanmei'].forEach(c=>$('c_'+c).classList.toggle('hide',!on(c)));
+ const nc=['nomi','kuma','sanmei'].filter(on).length;$('cats').style.transform=on('plat')?(nc>=3?'scale(0.5)':'scale(0.62)'):(nc>=3?'scale(0.78)':'none');
+ $('o_tag').textContent=$('t_tag').value;$('o_title').textContent=$('t_title').value;$('o_price').textContent=$('t_price').value;
+ const all=$('names').value.split('\n').map(s=>s.trim()).filter(Boolean);const names=all.slice(0,20);
+ const rw=$('rows');
+ let h=names.map(n=>`<div class="r">${esc(n)}</div>`).join('');
+ if(on('wait'))h+=`<div class="r wait">${names.length?'下一位工會成員招募中…':'工會成員招募中'}</div>`;
+ rw.innerHTML=h;rw.style.gridTemplateColumns=names.length>9?'1fr 1fr':'1fr';
+ let f=+$('fs').value;rw.style.setProperty('--fs',f+'px');
+ const wide=()=>[...rw.children].some(e=>e.scrollWidth>e.clientWidth+1);
+ while((rw.scrollHeight>rw.clientHeight+1||wide())&&f>12){f--;rw.style.setProperty('--fs',f+'px')}
+ $('fsv').textContent=f+(f<+$('fs').value?'（自動縮）':'');
+ $('status').textContent=(all.length>20?`⚠ 名單 ${all.length} 位，只放前 20 位；超過 20 位請改捲動名單。`:'')+(on('plat')&&on('can')?' 開平台區時罐罐贊助列會自動收起。':'');
+}
+[...keys,'fs','names','t_tag','t_title','t_price'].forEach(k=>$(k).addEventListener('input',render));
+keys.forEach(k=>$(k).addEventListener('change',render));
+document.fonts.load('700 30px "O-Ne Noto Sans TC"').then(render);render();
+const toData=u=>fetch(u).then(r=>r.blob()).then(b=>new Promise(res=>{const fr=new FileReader();fr.onload=()=>res(fr.result);fr.readAsDataURL(b)}));
+async function exportPNG(){
+ $('status').textContent='輸出中…';
+ try{
+  const font=await toData('./assets/NotoSansTC-O-Ne.woff?v=010');
+  const bg=await toData('./assets/settlement-background-v010.jpg');
+  const c=$('card').cloneNode(true);c.style.transform='none';c.removeAttribute('id');
+  for(const im of c.querySelectorAll('img')){if(im.closest('.hide'))continue;im.setAttribute('src',await toData(im.getAttribute('src')))}
+  c.querySelectorAll('.hide').forEach(e=>e.remove());
+  let css=$('cardStyle').textContent.replace(/url\("\.\/assets\/NotoSansTC-O-Ne\.woff\?v=010"\)/,`url("${font}")`).replace('url(./assets/settlement-background-v010.jpg)',`url(${bg})`);
+  c.querySelectorAll('[id]').forEach(e=>{if(e.id!=='rows')e.removeAttribute('id')});
+  const xml=new XMLSerializer().serializeToString(c);
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080"><foreignObject width="1920" height="1080"><div xmlns="http://www.w3.org/1999/xhtml"><style>${css}</style>${xml}</div></foreignObject></svg>`;
+  const img=new Image();img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);await img.decode();
+  const cv=document.createElement('canvas');cv.width=1920;cv.height=1080;cv.getContext('2d').drawImage(img,0,0);
+  cv.toBlob(b=>{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`O-Ne_片尾結束畫面_${$('guide').checked?'標示版':'乾淨版'}.png`;a.click();$('status').textContent='已下載 1920×1080 PNG'},'image/png');
+ }catch(e){$('status').textContent='輸出失敗：'+e.message}
+}
+$('dl').addEventListener('click',exportPNG);
+if(q.get('export')==='1'){$('panel').remove();document.body.style.padding=0;document.body.style.overflow='hidden'}
+else{const fit=()=>{const s=Math.min(1,(innerWidth-372)/1920);$('card').style.transform=`scale(${s})`;$('card').style.transformOrigin='0 0';$('wrap').style.width=1920*s+'px';$('wrap').style.height=1080*s+'px'};addEventListener('resize',fit);fit()}
+</script></body></html>
