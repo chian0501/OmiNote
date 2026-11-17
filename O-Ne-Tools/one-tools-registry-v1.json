@@ -3,9 +3,9 @@
   "ui_shell_version": "V1.3.3",
   "public_boundary": "semantic_references_only",
   "principle": "one_function_one_entry",
-  "total": 18,
+  "total": 19,
   "ready": 13,
-  "candidate": 0,
+  "candidate": 1,
   "ai_bridge": {
     "version": "V1.3.1_20261106",
     "mode": "chatgpt_pro_manual_json_bridge",
@@ -1492,6 +1492,71 @@
             "url": "https://youtu.be/cBh0Yobs2Eo"
           }
         ]
+      }
+    },
+    {
+      "id": "endscreen",
+      "name": "片尾結束畫面",
+      "family": "QST-04｜CANDIDATE",
+      "group": "結算／結果",
+      "desc": "最後 15～20 秒的 YouTube 結束畫面：兩格影片元素位、工會成員名單（自動兩欄縮字）、訂閱頭像、加入工會＋罐罐贊助、Nomi／Kuma／三妹各自開關、平台區可選",
+      "status": "candidate",
+      "href": "./endscreen-card.html?v=010",
+      "features": [
+        "formal_1920x1080_canvas",
+        "youtube_endscreen_video_slots_2",
+        "subscribe_avatar_slot",
+        "guild_member_list_auto_fit_1_to_20",
+        "recruit_row_toggle",
+        "join_guild_and_monthly_sponsor_box",
+        "per_cat_toggle_nomi_kuma_sanmei",
+        "platform_links_optional",
+        "guide_overlay_for_alignment",
+        "png_export"
+      ],
+      "generator_version": "V0.1.0_20261117",
+      "visual_status": "CANDIDATE",
+      "tool_id": "endscreen-card",
+      "guide": {
+        "summary": "片尾結束畫面（接在片尾結算之後）",
+        "aliases": [
+          "結束畫面",
+          "End Screen",
+          "工會成員",
+          "會員名單",
+          "感謝會員"
+        ],
+        "use_when": [
+          "影片最後 15～20 秒放 YouTube 結束畫面元素",
+          "感謝工會成員、宣傳加入工會"
+        ],
+        "avoid_when": [
+          "本集總結與總花費用片尾結算",
+          "超過 20 位成員要改捲動名單"
+        ],
+        "modes": [],
+        "fields": {
+          "required": [
+            "names"
+          ],
+          "optional": [
+            "toggles",
+            "tag",
+            "title",
+            "price"
+          ]
+        },
+        "limits": [
+          "名單最多 20 位",
+          "上片用乾淨版（標示框關掉）"
+        ],
+        "output": {
+          "kind": "fullcanvas",
+          "size": "1920x1080"
+        },
+        "needs_image": false,
+        "example": "26TW-08-1 行政中心片尾",
+        "references": []
       }
     },
     {
