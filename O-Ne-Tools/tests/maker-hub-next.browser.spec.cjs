@@ -77,7 +77,9 @@ test('a phone sees the situations on the first screen without sideways scrolling
 test('the previous homepage stays available to roll back to', async ({ page }) => {
   await page.goto('/O-Ne-Tools/index-v2.html');
   await expect(page.locator('h1')).toContainText('今天要做哪張');
-  await expect(page.locator('.card')).toHaveCount(ready.length);
+  // index-v2 lists ready and candidate tools (see its registry filter)
+  const v2Tools = registry.tools.filter(tool => (tool.status === 'ready' || tool.status === 'candidate') && tool.href);
+  await expect(page.locator('.card')).toHaveCount(v2Tools.length);
 });
 
 test('the old candidate address leads to the homepage', async ({ page }) => {
