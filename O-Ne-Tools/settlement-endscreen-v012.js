@@ -21,6 +21,11 @@
   var esCanvas = null;
   var esCtx = null;
   var panelObserver = null;
+  var statusObserver = null;
+  var myStatus = { text: '', error: false };
+  var settingStatus = false;
+  var DEFAULTS = { esNames: '工會成員 01\n工會成員 02', esFs: '28', esTag: '歐涅任務工會', esTitle: '感謝加入的工會成員',
+    esPrice: 'NT$25／月（勿用蘋果裝置加入）', esP1: 'Instagram', esP2: 'Threads', esP3: 'Facebook' };
 
   function $(id) { return document.getElementById(id); }
   function font(size, weight) {
@@ -95,6 +100,16 @@
   }
 
   function on(id) { return $(id) && $(id).checked; }
+
+  function setStatus(text, error) {
+    myStatus = { text: text, error: !!error };
+    var st = $('status');
+    if (!st) return;
+    settingStatus = true;
+    st.classList.toggle('error', !!error);
+    st.textContent = text;
+    settingStatus = false;
+  }
 
   /* 預覽大小跟舊結算卡畫布走（適合畫面／100% 原尺寸由 card-workspace 設在 #canvas 上） */
   function syncSize() {
@@ -302,11 +317,9 @@
     if (on('esJoin')) drawJoin(ctx);
     drawCats(ctx);
 
-    var st = $('status');
-    st.classList.toggle('error', issues.length > 0);
-    st.textContent = issues.length
+    setStatus(issues.length
       ? '請修正後再輸出：' + issues.join('、')
-      : '結束畫面｜1920×1080｜版位檢查通過｜' + (guide ? '標示版（對位用）' : '乾淨版（可上片）');
+      : '結束畫面｜1920×1080｜版位檢查通過｜' + (guide ? '標示版（對位用）' : '乾淨版（可上片）'), issues.length > 0);
     return issues.length === 0;
   }
 
@@ -329,6 +342,17 @@
       panelObserver = new MutationObserver(applyPanelVisibility);
       panelObserver.observe($('esModeSection').parentElement, { childList: true });
     }
+    if (!statusObserver && window.MutationObserver && $('status')) {
+      // 核心結算卡的 render 會改狀態列；結束畫面模式下把我們的訊息蓋回去，免得名單溢位警告被蓋掉
+      statusObserver = new MutationObserver(function () {
+        if (!active || settingStatus || !myStatus.text) return;
+        if ($('status').textContent !== myStatus.text) setStatus(myStatus.text, myStatus.error);
+      });
+      statusObserver.observe($('status'), { childList: true, characterData: true, subtree: true });
+    }
+    var vt = $('transparentView') && $('transparentView').parentElement;
+    var sg = $('showGuides') && $('showGuides').closest('label');
+    [vt, sg].forEach(function (el) { if (el) el.style.display = isEnd ? 'none' : ''; });
     $('canvas').style.display = isEnd ? 'none' : '';
     esCanvas.style.display = isEnd ? '' : 'none';
     syncSize();
@@ -358,6 +382,17 @@
   function bindExport() {
     document.addEventListener('click', function (e) {
       if (!active) return;
+      var blocked = e.target && e.target.closest ? e.target.closest('button,[data-action]') : null;
+      if (blocked && !blocked.closest('#esSection') && blocked.id !== 'downloadPng' && blocked.id !== 'downloadJson') {
+        var txt = blocked.innerText || '';
+        var act = blocked.getAttribute('data-action') || '';
+        if (/存專案 ZIP|開專案 ZIP|匯入 JSON/.test(txt) || /^(save|load|export-package|import-package)$/.test(act)) {
+          e.stopImmediatePropagation();
+          e.preventDefault();
+          setStatus('結束畫面模式不支援暫存、專案 ZIP、匯入 JSON（會存成舊結算卡內容）。請用「輸出 PNG」和「匯出 JSON」；要存專案請先切回「片尾結算卡」。', true);
+          return;
+        }
+      }
       var t = e.target && e.target.closest ? e.target.closest('#downloadPng,#downloadJson,#reset') : null;
       if (!t) return;
       e.stopImmediatePropagation();
@@ -369,8 +404,7 @@
       } else if (t.id === 'downloadJson') {
         download(new Blob([JSON.stringify(settings(), null, 2)], { type: 'application/json' }), 'O-Ne_片尾結束畫面_設定.json');
       } else {
-        $('esNames').value = '工會成員 01\n工會成員 02';
-        $('esFs').value = '28';
+        Object.keys(DEFAULTS).forEach(function (id) { $(id).value = DEFAULTS[id]; });
         CHECKS.forEach(function (c) { $(c[0]).checked = c[3]; });
         render();
       }
