@@ -66,8 +66,8 @@
       cfg: { mem: ['slideL', 0.3, 0.7], rows: ['slideR', 1.0, 0.5], sub: ['slideR', 0.8, 0.7], join: ['slideU', 1.4, 0.6], plat: ['slideR', 1.8, 0.5], nomi: ['slideU', 2.0, 0.6], kuma: ['slideU', 2.3, 0.6], sanmei: ['slideU', 2.6, 0.6] } },
     type: { label: '逐行打字', rowStep: 0.55, amp: 1,
       cfg: { mem: ['fade', 0.3, 0.5], rows: ['type', 1.0, 0.7], sub: ['fade', 0.8, 0.5], join: ['slideU', 2.4, 0.5], plat: ['fade', 2.8, 0.4], nomi: ['peek', 3.2, 0.6], kuma: ['peek', 3.5, 0.6], sanmei: ['peek', 3.8, 0.6] } },
-    breathe: { label: '輕微呼吸晃動', rowStep: 0.2, amp: 1.8,
-      cfg: { mem: ['fade', 0.2, 0.6], rows: ['fade', 0.8, 0.5], sub: ['fade', 0.5, 0.6], join: ['fade', 1.1, 0.6], plat: ['fade', 1.4, 0.5], nomi: ['fade', 1.6, 0.6], kuma: ['fade', 1.8, 0.6], sanmei: ['fade', 2.0, 0.6] } }
+    breathe: { label: '輕微呼吸晃動', rowStep: 0.2, amp: 1,
+      cfg: { mem: ['fade', 0.2, 0.7], rows: ['fade', 0.9, 0.5], sub: ['pop', 0.6, 0.9], join: ['slideU', 1.3, 0.8], plat: ['slideU', 1.6, 0.7], nomi: ['slideU', 1.8, 0.9], kuma: ['slideU', 2.1, 0.9], sanmei: ['slideU', 2.4, 0.9] } }
   };
   var anim = { t: null, playing: false, raf: 0, t0: 0, cfg: null, rowStep: 0.3, idleOn: true, amp: 1, total: 15 };
 
@@ -214,7 +214,7 @@
     h += '</select>';
     h += '<div class="two"><div><label for="esTotal">全片長度（秒）</label><input id="esTotal" type="number" min="3" max="30" step="0.5" value="15"></div>' +
       '<div><label for="esRowStep">名單逐行間隔（秒）</label><input id="esRowStep" type="number" min="0.05" max="2" step="0.05" value="0.3"></div></div>';
-    h += '<div class="switch-row"><div class="switch-copy"><strong>待機小動作</strong><small>出現後貓輕輕呼吸晃動、頭像微脈動、背景雲慢飄，不會 3 秒後就停住</small></div><input id="esIdle" type="checkbox" checked></div>';
+    h += '<div class="switch-row"><div class="switch-copy"><strong>待機小動作</strong><small>出現後貓整隻輕輕呼吸晃動、頭像微脈動、背景緩慢漂移，不會 3 秒後就停住（貓眨眼、搖尾需要分層素材，目前沒有）</small></div><input id="esIdle" type="checkbox" checked></div>';
     h += '<label for="esAmp">待機幅度</label><select id="esAmp"><option value="0.6">輕</option><option value="1" selected>中</option><option value="1.8">強</option></select>';
     h += '<div style="margin-top:12px;display:grid;grid-template-columns:1fr 1.25fr .6fr .6fr;gap:6px;align-items:center;font-size:11px;color:#9ea7b3"><b>元素</b><b>動法</b><b>幾秒出現</b><b>長度(秒)</b></div>';
     ELEMENTS.forEach(function (e) {
@@ -244,7 +244,7 @@
       '<button id="esWebm" class="action secondary" type="button" style="min-height:40px;padding:0 16px">輸出動畫 WebM</button>' +
       '<button id="esZip" class="action secondary" type="button" style="min-height:40px;padding:0 16px">輸出圖片序列 ZIP</button>' +
       '<select id="esFps" style="min-height:40px;max-width:130px"><option value="10">10 fps</option><option value="15" selected>15 fps</option><option value="24">24 fps</option><option value="30">30 fps</option></select>' +
-      '<span style="font-size:11px;color:#76818f;align-self:center">WebM 為即時錄製，錄製時請保持此分頁在前景；圖片序列 1920×1080，張數多、檔案大。</span></div>';
+      '<div style="flex-basis:100%;font-size:11px;line-height:1.6;color:#76818f">WebM 為即時錄製，錄製時請保持此分頁在前景；Chrome 錄出的 WebM 可能沒有長度資訊，匯入 ChatCut／剪映不吃就改用圖片序列 ZIP。動畫最後一格會帶待機小動作，跟靜態「輸出 PNG」略有不同。<br><span id="esZipHint"></span></div></div>';
     if (st && st.parentElement) st.parentElement.insertBefore(bar, st);
 
     var stage = $('stage');
@@ -634,6 +634,20 @@
     return new Blob(parts.concat(central, [end.buffer]), { type: 'application/zip' });
   }
 
+  function zipEstimate() {
+    readAnimUI();
+    var fps = Number($('esFps').value) || 15;
+    var n = Math.round(anim.total * fps) + 1;
+    return { fps: fps, n: n, mb: Math.round(n * 0.5) };
+  }
+  function updateZipHint() {
+    var h = $('esZipHint');
+    if (!h) return;
+    var e = zipEstimate();
+    h.textContent = '圖片序列約 ' + e.n + ' 張、預估 ' + e.mb + ' MB（全部先存在記憶體，過大會讓分頁當掉；建議 15 fps）。';
+    h.style.color = e.n > 600 ? '#ffb86b' : '#76818f';
+  }
+
   function guard() {
     if (busy) return false;
     if (!render(null)) { setStatus('請先修正版面問題再輸出動畫。', true); return false; }
@@ -688,6 +702,7 @@
     var fps = Number($('esFps').value) || 15;
     var T = anim.total;
     var N = Math.round(T * fps) + 1;
+    if (N > 600 && !window.confirm('這會輸出約 ' + N + ' 張 1920×1080 圖片（預估 ' + Math.round(N * 0.5) + ' MB），可能讓分頁記憶體不足。要繼續嗎？建議改 15 fps 或縮短秒數。')) return;
     busy = true;
     try {
       var files = [];
@@ -695,7 +710,7 @@
         render(Math.min(i / fps, T));
         var blob = await new Promise(function (r) { esCanvas.toBlob(r, 'image/png'); });
         var buf = new Uint8Array(await blob.arrayBuffer());
-        files.push({ name: 'frame_' + String(i + 1).padStart(4, '0') + '.png', data: buf });
+        files.push({ name: 'O-Ne_endscreen_frames/frame_' + String(i + 1).padStart(4, '0') + '.png', data: buf });
         if (i % 3 === 0) {
           setStatus('輸出圖片序列中 ' + (i + 1) + ' / ' + N + ' 張（' + fps + ' fps）', false);
           await new Promise(function (r) { setTimeout(r, 0); });
@@ -745,6 +760,7 @@
       if (!t) return;
       e.stopImmediatePropagation();
       e.preventDefault();
+      if (busy) return;
       if (t.id === 'downloadPng') {
         if (busy || !render(null)) return;
         var name = 'O-Ne_片尾結束畫面_' + (on('esGuide') ? '標示版' : '乾淨版') + '_1920x1080.png';
@@ -818,19 +834,27 @@
   function init() {
     if (!buildUI()) return;
     readAnimUI();
-    $('esMode').addEventListener('change', function () { setMode(this.value === 'end'); });
+    $('esMode').addEventListener('change', function () {
+      if (busy) { this.value = 'end'; return; }
+      setMode(this.value === 'end');
+    });
     $('esSection').addEventListener('input', function (e) {
+      if (busy) return;
       if (e.target && e.target.id === 'esPreset') return;
       render();
-      if (e.target && e.target.id === 'esTotal') updateBar();
+      if (e.target && e.target.id === 'esTotal') { updateBar(); }
+      updateZipHint();
     });
     $('esSection').addEventListener('change', function (e) {
+      if (busy) return;
       if (e.target && e.target.id === 'esPreset') {
         var p = PRESETS[e.target.value];
         if (p) { writeAnimUI(p); updateBar(); }
       }
       render();
     });
+    $('esFps').addEventListener('change', updateZipHint);
+    updateZipHint();
     $('esPlay').addEventListener('click', play);
     $('esStopBtn').addEventListener('click', stopAnim);
     $('esSeek').addEventListener('input', function () { pause(); readAnimUI(); anim.t = Number(this.value) / 100; render(); updateBar(); });
