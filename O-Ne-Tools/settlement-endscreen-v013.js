@@ -6,7 +6,7 @@
 (function () {
   'use strict';
 
-  var VERSION = '0.2.1-endscreen-anim';
+  var VERSION = '0.3.0-endscreen-anim';
   var A = './assets/';
   var SRC = {
     bg: A + 'settlement-background-v011.jpg?v=012',
@@ -14,9 +14,21 @@
     badge: A + 'endscreen-badge-n-v001.png',
     nomi: A + 'endscreen-cat-nomi-v001.png',
     kuma: A + 'endscreen-cat-kuma-v001.png',
-    sanmei: A + 'endscreen-cat-sanmei-v001.png'
+    sanmei: A + 'endscreen-cat-sanmei-v001.png',
+    nomiBlink: A + 'endscreen-cat-nomi-blink-v001.png',
+    kumaBlink: A + 'endscreen-cat-kuma-blink-v001.png',
+    sanmeiBlink: A + 'endscreen-cat-sanmei-blink-v001.png',
+    nomiBody: A + 'endscreen-cat-nomi-body-v001.png',
+    nomiTail: A + 'endscreen-cat-nomi-tail-v001.png'
+  };
+  // 貓的小動作素材：眨眼＝閉眼補丁疊上去；搖尾＝尾巴獨立圖層繞根部轉（只有 Nomi；Kuma 趴著看不到尾巴、三妹尾巴切不乾淨）
+  var CAT_EXTRA = {
+    nomi: { blink: 'nomiBlink', body: 'nomiBody', tail: 'nomiTail', pivot: [800, 1190], period: 4.6, phase: 0.4 },
+    kuma: { blink: 'kumaBlink', period: 5.3, phase: 2.1 },
+    sanmei: { blink: 'sanmeiBlink', period: 4.9, phase: 3.3 }
   };
   var imgs = {};
+  var OPTIONAL = { nomiBlink: 1, kumaBlink: 1, sanmeiBlink: 1, nomiBody: 1, nomiTail: 1 };
   var ready = false;
   var active = false;
   var esCanvas = null;
@@ -213,7 +225,7 @@
     h += '</select>';
     h += '<div class="two"><div><label for="esTotal">全片長度（秒）</label><input id="esTotal" type="number" min="3" max="30" step="0.5" value="15"></div>' +
       '<div><label for="esRowStep">名單逐行間隔（秒）</label><input id="esRowStep" type="number" min="0.05" max="2" step="0.05" value="0.3"></div></div>';
-    h += '<div class="switch-row"><div class="switch-copy"><strong>待機小動作</strong><small>出現後貓整隻輕輕呼吸晃動、頭像微脈動、背景緩慢漂移，不會 3 秒後就停住（貓眨眼、搖尾需要分層素材，目前沒有）</small></div><input id="esIdle" type="checkbox" checked></div>';
+    h += '<div class="switch-row"><div class="switch-copy"><strong>待機小動作</strong><small>出現後貓輕輕呼吸晃動並定時眨眼、Nomi 會搖尾巴、頭像微脈動、背景緩慢漂移，不會 3 秒後就停住（Kuma 趴著看不到尾巴、三妹只有眨眼）</small></div><input id="esIdle" type="checkbox" checked></div>';
     h += '<label for="esAmp">待機幅度</label><select id="esAmp"><option value="0.6">輕</option><option value="1" selected>中</option><option value="1.8">強</option></select>';
     h += '<div style="margin-top:12px;display:grid;grid-template-columns:1fr 1.25fr .6fr .6fr;gap:6px;align-items:center;font-size:11px;color:#9ea7b3"><b>元素</b><b>動法</b><b>幾秒出現</b><b>長度(秒)</b></div>';
     ELEMENTS.forEach(function (e) {
@@ -240,10 +252,10 @@
       '<output id="esTime" style="min-width:110px;font-size:12px;color:#8fd4c8">完成畫面</output>' +
       '<label style="display:flex;align-items:center;gap:5px;margin:0;font-size:11px"><input id="esLoop" type="checkbox"> 循環</label></div>' +
       '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px">' +
-      '<button id="esWebm" class="action secondary" type="button" style="min-height:40px;padding:0 16px">輸出動畫 WebM</button>' +
+      '<button id="esWebm" class="action secondary" type="button" style="min-height:40px;padding:0 16px">輸出動畫 MP4</button>' +
       '<button id="esZip" class="action secondary" type="button" style="min-height:40px;padding:0 16px">輸出圖片序列 ZIP</button>' +
       '<select id="esFps" style="min-height:40px;max-width:130px"><option value="10">10 fps</option><option value="15" selected>15 fps</option><option value="24">24 fps</option><option value="30">30 fps</option></select>' +
-      '<div style="flex-basis:100%;font-size:11px;line-height:1.6;color:#76818f">WebM 為即時錄製，錄製時請保持此分頁在前景；Chrome 錄出的 WebM 可能沒有長度資訊，匯入 ChatCut／剪映不吃就改用圖片序列 ZIP。動畫最後一格會帶待機小動作，跟靜態「輸出 PNG」略有不同。<br><span id="esZipHint"></span></div></div>';
+      '<div style="flex-basis:100%;font-size:11px;line-height:1.6;color:#76818f">動畫是直接錄畫布（不是錄螢幕），固定 1920×1080；Chrome 會存成 MP4，不支援才存 WebM。錄製是即時的，請保持此分頁在前景、電腦別同時跑重的東西；要一格不漏、可後製，改用圖片序列 ZIP。動畫最後一格會帶待機小動作，跟靜態「輸出 PNG」略有不同。<br><span id="esZipHint"></span></div></div>';
     if (st && st.parentElement) st.parentElement.insertBefore(bar, st);
 
     var stage = $('stage');
@@ -504,10 +516,38 @@
     closeEl(ctx);
   }
 
+  function drawCat(ctx, c, X, Y, t) {
+    var ex = CAT_EXTRA[c.k] || {};
+    var live = t !== null && anim.idleOn;
+    var ramp = 0;
+    if (live) { var cf = anim.cfg[c.k]; ramp = clamp((t - (cf.start + cf.dur)) / 0.8, 0, 1); }
+    if (ramp > 0 && ex.tail && imgs[ex.tail] && imgs[ex.body]) {
+      var sc = c.h / c.img.naturalHeight, px = X + ex.pivot[0] * sc, py = Y + ex.pivot[1] * sc;
+      ctx.save();
+      ctx.translate(px, py);
+      ctx.rotate(0.06 * anim.amp * ramp * Math.sin(Math.PI * 2 * (t / 1.15 + ex.phase)));
+      ctx.translate(-px, -py);
+      ctx.drawImage(imgs[ex.tail], X, Y, c.w, c.h);
+      ctx.restore();
+      ctx.drawImage(imgs[ex.body], X, Y, c.w, c.h);
+    } else {
+      ctx.drawImage(c.img, X, Y, c.w, c.h);
+    }
+    if (ramp > 0 && ex.blink && imgs[ex.blink]) {
+      var ph = (t + ex.phase) % ex.period, d = 0.2;
+      if (ph < d) {
+        ctx.save();
+        ctx.globalAlpha *= Math.sin(Math.PI * ph / d);
+        ctx.drawImage(imgs[ex.blink], X, Y, c.w, c.h);
+        ctx.restore();
+      }
+    }
+  }
+
   function drawCats(ctx, t) {
     var plat = on('esPlat');
     var set = [];
-    if (on('esNomi')) set.push({ k: 'nomi', img: imgs.nomi, h: 290, ml: 0, mr: -30 });
+    if (on('esNomi')) set.push({ k: 'nomi', img: imgs.nomi, h: 290, ml: 0, mr: 6 });
     if (on('esKuma')) set.push({ k: 'kuma', img: imgs.kuma, h: 252, ml: 0, mr: 0 });
     if (on('esSanmei')) set.push({ k: 'sanmei', img: imgs.sanmei, h: 256, ml: -10, mr: 0 });
     if (!set.length) return;
@@ -527,7 +567,7 @@
     set.forEach(function (c) {
       x += c.ml;
       if (openEl(ctx, c.k, t, x + c.w / 2, BY, c.h)) {
-        ctx.drawImage(c.img, x, BY - c.h, c.w, c.h);
+        drawCat(ctx, c, x, BY - c.h, t);
         closeEl(ctx);
       }
       x += c.w + c.mr;
@@ -695,24 +735,28 @@
     return true;
   }
 
-  async function exportWebm() {
+  async function exportVideo() {
     if (!guard()) return;
-    if (!window.MediaRecorder || !esCanvas.captureStream) { setStatus('這個瀏覽器不支援 WebM 錄製，請改用圖片序列 ZIP。', true); return; }
+    if (!window.MediaRecorder || !esCanvas.captureStream) { setStatus('這個瀏覽器不支援影片錄製，請改用圖片序列 ZIP。', true); return; }
     pause();
     readAnimUI();
-    var types = ['video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm'];
+    var types = ['video/mp4;codecs=avc1.640028', 'video/mp4;codecs=avc1', 'video/mp4', 'video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm'];
     var mt = types.filter(function (m) { return MediaRecorder.isTypeSupported(m); })[0];
-    if (!mt) { setStatus('這個瀏覽器不支援 WebM 錄製，請改用圖片序列 ZIP。', true); return; }
+    if (!mt) { setStatus('這個瀏覽器不支援影片錄製，請改用圖片序列 ZIP。', true); return; }
+    var isMp4 = mt.indexOf('mp4') >= 0;
     busy = true;
     try {
       var chunks = [];
-      var rec = new MediaRecorder(esCanvas.captureStream(30), { mimeType: mt, videoBitsPerSecond: 12000000 });
+      var rec = new MediaRecorder(esCanvas.captureStream(30), { mimeType: mt, videoBitsPerSecond: 16000000 });
+      var failed = null;
       rec.ondataavailable = function (e) { if (e.data && e.data.size) chunks.push(e.data); };
+      rec.onerror = function (e) { failed = (e && e.error && e.error.message) || '錄影器回報錯誤'; };
       var stopped = new Promise(function (res) { rec.onstop = res; });
       rec.start();
       var t0 = performance.now(), T = anim.total;
       await new Promise(function (res) {
         (function step() {
+          if (failed || (performance.now() - t0) / 1000 > T + 20) { res(); return; } // 逾時或錄影器出錯就收工
           var t = Math.min((performance.now() - t0) / 1000, T);
           render(t);
           setStatus('錄製動畫中 ' + t.toFixed(1) + ' / ' + T.toFixed(1) + ' 秒（請保持此分頁在前景）', false);
@@ -720,19 +764,21 @@
         })();
       });
       await new Promise(function (r) { setTimeout(r, 250); });
-      rec.stop();
-      await stopped;
-      download(new Blob(chunks, { type: 'video/webm' }), 'O-Ne_片尾結束畫面_動畫_1920x1080.webm');
+      if (failed) { try { rec.stop(); } catch (e0) { /* 已停止 */ } throw new Error(failed); }
+      if (rec.state !== 'inactive') rec.stop();
+      await Promise.race([stopped, new Promise(function (r) { setTimeout(r, 5000); })]);
+      if (!chunks.length) throw new Error('沒有錄到畫面（分頁在背景時瀏覽器會暫停畫面）');
+      download(new Blob(chunks, { type: isMp4 ? 'video/mp4' : 'video/webm' }), 'O-Ne_片尾結束畫面_動畫_1920x1080.' + (isMp4 ? 'mp4' : 'webm'));
       busy = false;
       anim.t = null;
       render();
       updateBar();
-      setStatus('已輸出動畫 WebM（' + T.toFixed(1) + ' 秒，1920×1080）。進 ChatCut／剪映前請先播放確認。', false);
+      setStatus('已輸出動畫 ' + (isMp4 ? 'MP4' : 'WebM') + '（' + T.toFixed(1) + ' 秒，1920×1080）。進 ChatCut／剪映前請先播放確認。', false);
     } catch (err) {
       busy = false;
       anim.t = null;
       render();
-      setStatus('輸出 WebM 失敗：' + err.message, true);
+      setStatus('輸出動畫失敗：' + err.message, true);
     }
   }
 
@@ -867,7 +913,10 @@
     return new Promise(function (resolve, reject) {
       var im = new Image();
       im.onload = function () { imgs[key] = im; resolve(); };
-      im.onerror = function () { reject(new Error('無法載入 ' + SRC[key])); };
+      im.onerror = function () {
+        if (OPTIONAL[key]) { resolve(); return; } // 選用素材：缺了只是沒有眨眼／搖尾
+        reject(new Error('無法載入 ' + SRC[key]));
+      };
       im.src = SRC[key];
     });
   }
@@ -899,7 +948,7 @@
     $('esPlay').addEventListener('click', play);
     $('esStopBtn').addEventListener('click', stopAnim);
     $('esSeek').addEventListener('input', function () { pause(); readAnimUI(); anim.t = Number(this.value) / 100; render(); updateBar(); });
-    $('esWebm').addEventListener('click', exportWebm);
+    $('esWebm').addEventListener('click', exportVideo);
     $('esZip').addEventListener('click', exportZip);
     bindExport();
     $('esMode').value = 'end';
