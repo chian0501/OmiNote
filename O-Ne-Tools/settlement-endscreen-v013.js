@@ -6,7 +6,7 @@
 (function () {
   'use strict';
 
-  var VERSION = '0.2.0-endscreen-anim';
+  var VERSION = '0.2.1-endscreen-anim';
   var A = './assets/';
   var SRC = {
     bg: A + 'settlement-background-v011.jpg?v=012',
@@ -36,8 +36,6 @@
   function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
 
   var CHECKS = [
-    ['esVid1', '影片框 1', '上：系列下一支／最新片', true],
-    ['esVid2', '影片框 2', '下：播放清單／熱門片', true],
     ['esMem', '工會成員名單', '中間欄', true],
     ['esWait', '「招募中」補格', '名單只有幾位時補空位', true],
     ['esSub', '訂閱頭像圈', '右上，對 YouTube 訂閱元素', true],
@@ -47,7 +45,7 @@
     ['esNomi', 'Nomi', '貓', true],
     ['esKuma', 'Kuma', '貓', true],
     ['esSanmei', '三妹', '三妹影片上架後再開', false],
-    ['esGuide', '標示框（對位用）', '輸出標示版給剪輯對位；上片請關掉', false]
+    ['esGuide', '標示框（對位用）', '輸出標示版給剪輯對位（會畫出兩個影片框位置）；上片請關掉', false]
   ];
 
   /* ───────── 動畫設定 ───────── */
@@ -183,6 +181,7 @@
     mode.innerHTML =
       '<div class="section-title"><span>00｜輸出模式</span><small>結算卡＝前段；結束畫面＝最後 15～20 秒</small></div>' +
       '<select id="esMode"><option value="card">片尾結算卡（前段）</option><option value="end">結束畫面（最後 15～20 秒）</option></select>';
+    mode.style.display = 'none';
     panel.insertBefore(mode, panel.firstChild);
 
     var sec = document.createElement('div');
@@ -195,8 +194,8 @@
       h += '<div class="switch-row"><div class="switch-copy"><strong>' + c[1] + '</strong><small>' + c[2] +
         '</small></div><input id="' + c[0] + '" type="checkbox"' + (c[3] ? ' checked' : '') + '></div>';
     });
-    h += '<label for="esNames">工會成員（一行一位，最多 20 位）</label>' +
-      '<textarea id="esNames" maxlength="800">工會成員 01\n工會成員 02</textarea>' +
+    h += '<label for="esNames">工會成員（一行一位；人多會自動分欄、縮字，放不下就改成捲動）</label>' +
+      '<textarea id="esNames" maxlength="6000">工會成員 01\n工會成員 02</textarea>' +
       '<label for="esFs">名單字級 <output id="esFsOut">28</output> px（放不下會自動縮）</label>' +
       '<input id="esFs" type="range" min="16" max="36" step="1" value="28" style="width:100%;accent-color:var(--teal)">' +
       '<div class="two"><div><label for="esTag">名單標籤</label><input id="esTag" type="text" maxlength="12" value="歐涅任務工會"></div>' +
@@ -328,40 +327,55 @@
     return $('esNames').value.split('\n').map(function (s) { return s.trim(); }).filter(Boolean);
   }
 
-  function drawMembers(ctx, issues, t) {
+  function drawMembers(ctx, issues, t, notes) {
     var X = 785, Y = 100, W = 520, H = 803;
-    // 先排版（不畫），算出字級與行高；溢位檢查不管動畫時間
     var left = X + 4 + 30, right = X + W - 4 - 30;
     var top = Y + 4 + 24;
     var titleBase = top + 44 + 12 + 42;
     var listTop = titleBase + 18;
     var listBottom = Y + H - 4 - 20;
+    var visH = listBottom - listTop;
     var all = names();
-    var list = all.slice(0, 20);
-    if (all.length > 20) issues.push('名單 ' + all.length + ' 位，只放前 20 位');
-    var cols = list.length > 9 ? 2 : 1;
+    var items = all.slice(0, 200);
+    if (all.length > 200) issues.push('名單 ' + all.length + ' 位，最多放 200 位');
     var gap = 12;
-    var colW = (right - left - gap * (cols - 1)) / cols;
     var waitOn = on('esWait');
-    var f = Number($('esFs').value);
-    var min = 12;
-    function layout(size) {
-      var rh = Math.round(size * 1.75), rg = Math.round(size * 0.3);
-      var n = list.length;
-      var rowsUsed = Math.ceil(n / cols);
-      var hh = rowsUsed * (rh + rg) + (waitOn ? rh + rg : 0);
-      var ok = hh <= listBottom - listTop + rg;
+    var f0 = Number($('esFs').value);
+    var waitLabel = items.length ? '下一位工會成員招募中…' : '工會成員招募中';
+
+    function wideOk(cols, size) {
+      var colW = (right - left - gap * (cols - 1)) / cols;
       ctx.font = font(size, 500);
-      for (var i = 0; i < n; i++) {
-        if (ctx.measureText(list[i]).width > colW - size * 1.4) ok = false;
-      }
-      return { rh: rh, rg: rg, ok: ok };
+      for (var i = 0; i < items.length; i++) if (ctx.measureText(items[i]).width > colW - size * 1.4) return false;
+      return true;
     }
-    var L = layout(f);
-    while (!L.ok && f > min) { f--; L = layout(f); }
-    if (!L.ok) issues.push('名單放不下');
-    var shown = f;
-    $('esFsOut').value = String(shown) + (shown < Number($('esFs').value) ? '（自動縮）' : '');
+    function lay(cols, size) {
+      var colW = (right - left - gap * (cols - 1)) / cols;
+      var rh = Math.round(size * 1.75), rg = Math.round(size * 0.3);
+      var rowsUsed = Math.ceil(items.length / cols);
+      var hh = rowsUsed * (rh + rg) + (waitOn ? rh + rg : 0);
+      return { cols: cols, size: size, colW: colW, rh: rh, rg: rg, hh: hh, ok: wideOk(cols, size) && hh <= visH + rg };
+    }
+    // 先試 1 欄、2 欄、3 欄（字級往下縮到各欄下限）；都放不下就改成捲動名單
+    var MINS = { 1: 22, 2: 18, 3: 16 };
+    var L = null, c, sz, cols;
+    for (cols = 1; cols <= 3 && !L; cols++) {
+      for (sz = f0; sz >= MINS[cols]; sz--) {
+        c = lay(cols, sz);
+        if (c.ok) { L = c; break; }
+      }
+    }
+    var scroll = false;
+    if (!L) {
+      scroll = true;
+      var sc = 2;
+      sz = Math.min(f0, 24);
+      while (sz > 14 && !wideOk(sc, sz)) sz--;
+      L = lay(sc, sz);
+      notes.push('名單 ' + items.length + ' 位放不下，改成捲動名單（只在動畫輸出會捲，靜態 PNG 只看得到前面）');
+    }
+    var shown = L.size;
+    $('esFsOut').value = String(shown) + (shown < f0 ? '（自動縮）' : '') + (L.cols > 1 ? '・' + L.cols + ' 欄' : '') + (scroll ? '・捲動' : '');
 
     if (!openEl(ctx, 'mem', t, X + W / 2, Y + H / 2, 0)) return;
     box(ctx, X, Y, W, H, '#2a1f17', '#f2b632', 4, null, 18);
@@ -373,6 +387,15 @@
     text(ctx, $('esTitle').value || '', left, titleBase, 42, 700, '#fff6e3', 'left', right - left);
 
     var rowStyle = anim.cfg.rows.style;
+    function plainRow(label, rx, ry, rw, isWait) {
+      if (isWait) {
+        box(ctx, rx, ry, rw, L.rh, null, '#8a7350', 2, [8, 6], 8);
+        text(ctx, label, rx + shown * 0.7, ry + L.rh * 0.68, shown, 500, '#c9a96a', 'left', rw - shown * 1.4);
+      } else {
+        box(ctx, rx, ry, rw, L.rh, 'rgba(255,255,255,.07)', null, 0, null, 8);
+        text(ctx, label, rx + shown * 0.7, ry + L.rh * 0.68, shown, 500, '#f0e3c8', 'left', rw - shown * 1.4);
+      }
+    }
     function drawRow(idx, label, rx, ry, rw, isWait) {
       var p = prog('rows', t, idx, anim.rowStep);
       if (p <= 0) return;
@@ -385,22 +408,40 @@
         f2 = fxOf(rowStyle, p, 0);
       }
       pushFx(ctx, f2, cx, cy);
-      if (isWait) {
-        box(ctx, rx, ry, rw, L.rh, null, '#8a7350', 2, [8, 6], 8);
-        text(ctx, chars === null ? label : label.slice(0, chars), rx + shown * 0.7, ry + L.rh * 0.68, shown, 500, '#c9a96a', 'left', rw - shown * 1.4);
-      } else {
-        box(ctx, rx, ry, rw, L.rh, 'rgba(255,255,255,.07)', null, 0, null, 8);
-        text(ctx, chars === null ? label : label.slice(0, chars), rx + shown * 0.7, ry + L.rh * 0.68, shown, 500, '#f0e3c8', 'left', rw - shown * 1.4);
-      }
+      plainRow(chars === null ? label : label.slice(0, chars), rx, ry, rw, isWait);
       ctx.restore();
     }
-    for (var i = 0; i < list.length; i++) {
-      var c = i % cols, r = Math.floor(i / cols);
-      drawRow(i, list[i], left + c * (colW + gap), listTop + r * (L.rh + L.rg), colW, false);
-    }
-    if (waitOn) {
-      var wr = Math.ceil(list.length / cols);
-      drawRow(list.length, list.length ? '下一位工會成員招募中…' : '工會成員招募中', left, listTop + wr * (L.rh + L.rg), right - left, true);
+
+    if (!scroll) {
+      for (var i = 0; i < items.length; i++) {
+        var cc = i % L.cols, rr0 = Math.floor(i / L.cols);
+        drawRow(i, items[i], left + cc * (L.colW + gap), listTop + rr0 * (L.rh + L.rg), L.colW, false);
+      }
+      if (waitOn) {
+        var wr = Math.ceil(items.length / L.cols);
+        drawRow(items.length, waitLabel, left, listTop + wr * (L.rh + L.rg), right - left, true);
+      }
+    } else {
+      // 捲動名單：整份名單當一組出現，之後像片尾字幕一樣往上捲、循環
+      var p0 = prog('rows', t, 0, 0);
+      if (p0 > 0) {
+        pushFx(ctx, fxOf(rowStyle === 'type' ? 'fade' : rowStyle, p0, 0), left + (right - left) / 2, listTop + visH / 2);
+        ctx.beginPath();
+        ctx.rect(left - 6, listTop - 4, right - left + 12, visH + 8);
+        ctx.clip();
+        var period = L.hh + 40;
+        var off = (t === null) ? 0 : (Math.max(0, t - anim.cfg.rows.start - 1.2) * 46) % period;
+        var copies = (t === null || off === 0) ? [0] : [0, period];
+        copies.forEach(function (add) {
+          var base = listTop - off + add;
+          for (var j = 0; j < items.length; j++) {
+            var c3 = j % L.cols, r3 = Math.floor(j / L.cols);
+            plainRow(items[j], left + c3 * (L.colW + gap), base + r3 * (L.rh + L.rg), L.colW, false);
+          }
+          if (waitOn) plainRow(waitLabel, left, base + Math.ceil(items.length / L.cols) * (L.rh + L.rg), right - left, true);
+        });
+        ctx.restore();
+      }
     }
     closeEl(ctx);
   }
@@ -500,7 +541,7 @@
     readAnimUI();
     var t = (tOverride === undefined) ? anim.t : tOverride;
     var ctx = esCtx;
-    var issues = [];
+    var issues = [], notes = [];
     ctx.clearRect(0, 0, 1920, 1080);
     if (t !== null && anim.idleOn) {
       var tau = Math.PI * 2;
@@ -516,13 +557,13 @@
     var guide = on('esGuide');
 
     [['esVid1', 100, '影片元素 1', '系列下一支／最新片'], ['esVid2', 520, '影片元素 2', '播放清單／熱門片']].forEach(function (v) {
-      if (!on(v[0]) || !guide) return;
+      if (!guide) return;
       box(ctx, 60, v[1], 680, 383, 'rgba(255,255,255,.4)', '#2d6cdf', 4, [14, 10], 18);
       text(ctx, 'YouTube ' + v[2], 400, v[1] + 183, 30, 700, '#1d4aa8', 'center');
       text(ctx, v[3], 400, v[1] + 223, 24, 700, '#1d4aa8', 'center');
     });
 
-    if (on('esMem')) drawMembers(ctx, issues, t);
+    if (on('esMem')) drawMembers(ctx, issues, t, notes);
     if (on('esSub')) drawSub(ctx, t, guide);
     if (on('esPlat')) drawPlatforms(ctx, t);
     if (on('esJoin')) drawJoin(ctx, t);
@@ -531,7 +572,7 @@
     if (!busy) {
       setStatus(issues.length
         ? '請修正後再輸出：' + issues.join('、')
-        : '結束畫面｜1920×1080｜版位檢查通過｜' + (guide ? '標示版（對位用）' : '乾淨版（可上片）') + (t === null ? '' : '｜動畫 ' + t.toFixed(1) + ' 秒'), issues.length > 0);
+        : '結束畫面｜1920×1080｜版位檢查通過｜' + (guide ? '標示版（對位用）' : '乾淨版（可上片）') + (t === null ? '' : '｜動畫 ' + t.toFixed(1) + ' 秒') + (notes.length ? '｜' + notes.join('；') : ''), issues.length > 0);
     }
     return issues.length === 0;
   }
@@ -861,6 +902,8 @@
     $('esWebm').addEventListener('click', exportWebm);
     $('esZip').addEventListener('click', exportZip);
     bindExport();
+    $('esMode').value = 'end';
+    setMode(true);
     Promise.all(Object.keys(SRC).map(load).concat([
       document.fonts.load('700 36px "O-Ne Noto Sans TC"'),
       document.fonts.load('500 28px "O-Ne Noto Sans TC"')
@@ -868,7 +911,6 @@
       ready = true;
       if (active) render();
       var q = new URLSearchParams(location.search);
-      if (q.get('mode') === 'end') { $('esMode').value = 'end'; setMode(true); }
     }).catch(function (err) {
       var st = $('status');
       if (st) { st.classList.add('error'); st.textContent = '結束畫面素材載入失敗：' + err.message; }
