@@ -28,6 +28,7 @@
     sanmei: { blink: 'sanmeiBlink', period: 4.9, phase: 3.3 }
   };
   var imgs = {};
+  var OPTIONAL = { nomiBlink: 1, kumaBlink: 1, sanmeiBlink: 1, nomiBody: 1, nomiTail: 1 };
   var ready = false;
   var active = false;
   var esCanvas = null;
@@ -734,7 +735,7 @@
     return true;
   }
 
-  async function exportWebm() {
+  async function exportVideo() {
     if (!guard()) return;
     if (!window.MediaRecorder || !esCanvas.captureStream) { setStatus('這個瀏覽器不支援影片錄製，請改用圖片序列 ZIP。', true); return; }
     pause();
@@ -747,12 +748,15 @@
     try {
       var chunks = [];
       var rec = new MediaRecorder(esCanvas.captureStream(30), { mimeType: mt, videoBitsPerSecond: 16000000 });
+      var failed = null;
       rec.ondataavailable = function (e) { if (e.data && e.data.size) chunks.push(e.data); };
+      rec.onerror = function (e) { failed = (e && e.error && e.error.message) || '錄影器回報錯誤'; };
       var stopped = new Promise(function (res) { rec.onstop = res; });
       rec.start();
       var t0 = performance.now(), T = anim.total;
       await new Promise(function (res) {
         (function step() {
+          if (failed || (performance.now() - t0) / 1000 > T + 20) { res(); return; } // 逾時或錄影器出錯就收工
           var t = Math.min((performance.now() - t0) / 1000, T);
           render(t);
           setStatus('錄製動畫中 ' + t.toFixed(1) + ' / ' + T.toFixed(1) + ' 秒（請保持此分頁在前景）', false);
@@ -760,8 +764,10 @@
         })();
       });
       await new Promise(function (r) { setTimeout(r, 250); });
-      rec.stop();
-      await stopped;
+      if (failed) { try { rec.stop(); } catch (e0) { /* 已停止 */ } throw new Error(failed); }
+      if (rec.state !== 'inactive') rec.stop();
+      await Promise.race([stopped, new Promise(function (r) { setTimeout(r, 5000); })]);
+      if (!chunks.length) throw new Error('沒有錄到畫面（分頁在背景時瀏覽器會暫停畫面）');
       download(new Blob(chunks, { type: isMp4 ? 'video/mp4' : 'video/webm' }), 'O-Ne_片尾結束畫面_動畫_1920x1080.' + (isMp4 ? 'mp4' : 'webm'));
       busy = false;
       anim.t = null;
@@ -907,7 +913,10 @@
     return new Promise(function (resolve, reject) {
       var im = new Image();
       im.onload = function () { imgs[key] = im; resolve(); };
-      im.onerror = function () { reject(new Error('無法載入 ' + SRC[key])); };
+      im.onerror = function () {
+        if (OPTIONAL[key]) { resolve(); return; } // 選用素材：缺了只是沒有眨眼／搖尾
+        reject(new Error('無法載入 ' + SRC[key]));
+      };
       im.src = SRC[key];
     });
   }
@@ -939,7 +948,7 @@
     $('esPlay').addEventListener('click', play);
     $('esStopBtn').addEventListener('click', stopAnim);
     $('esSeek').addEventListener('input', function () { pause(); readAnimUI(); anim.t = Number(this.value) / 100; render(); updateBar(); });
-    $('esWebm').addEventListener('click', exportWebm);
+    $('esWebm').addEventListener('click', exportVideo);
     $('esZip').addEventListener('click', exportZip);
     bindExport();
     $('esMode').value = 'end';
