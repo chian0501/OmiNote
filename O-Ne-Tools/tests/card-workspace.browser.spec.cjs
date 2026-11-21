@@ -6,7 +6,10 @@ const fs = require('node:fs/promises');
 const path = require('node:path');
 const crypto = require('node:crypto');
 const registry = require('../one-tools-registry-v1.json');
-const cards = registry.tools.filter(tool => tool.href && tool.id !== 'explanation');
+// The settlement page has been endscreen-only since PR #107: the old settlement
+// renderer stays in the file but is hidden, so it is checked by its own test below.
+const cards = registry.tools.filter(tool => tool.href && tool.id !== 'explanation' && tool.id !== 'settlement');
+const settlementCard = registry.tools.find(tool => tool.id === 'settlement');
 const PNG = Buffer.from('89504e470d0a1a0a', 'hex');
 const mainCanvas = '.preview-wrap canvas,.stage canvas,.preview-canvas';
 
@@ -823,7 +826,7 @@ test('dialogue general expressions survive swap, history, JSON, project and batc
   await screenshot(page, info, 'dialogue-general-restored');
 });
 
-for (const id of ['rating', 'settlement']) {
+for (const id of ['rating']) {
   test(`${id} transparent default, reset, PNG and saved background compatibility`, async ({ page, context }, info) => {
     page.on('dialog', dialog => dialog.accept());
     const card = cards.find(c => c.id === id);
@@ -1238,4 +1241,39 @@ test('rating crop cancel is non-mutating while apply requires manual save', asyn
   await expect(dialog).toBeVisible();
   await dialog.getByRole('button',{name:'套用裁切',exact:true}).click();
   await expect(feedback).toHaveAttribute('data-one-unsaved','true');
+});
+
+test('settlement page opens as the endscreen and exports PNG and JSON', async ({ page }, info) => {
+  const errors = [];
+  page.on('pageerror', error => errors.push(error.message));
+  page.on('dialog', dialog => dialog.accept());
+  await page.goto(cardURL(settlementCard));
+  await expect(page.locator('body')).toHaveAttribute('data-one-workspace-ready', '1');
+  const endscreen = page.locator('#esCanvas');
+  await expect(endscreen).toBeVisible();
+  await expect(page.locator('#canvas')).toBeHidden();
+  await expect(page.locator('#esBar')).toBeVisible();
+  await expect(page.locator('#esSection')).toBeVisible();
+  await expect(page.locator('#esModeSection')).toBeHidden();
+  await page.evaluate(() => document.fonts.ready);
+  const art = () => endscreen.evaluate(c => c.toDataURL('image/png'));
+  let previous;
+  await expect.poll(async () => { const current = await art(); const stable = current === previous; previous = current; return stable; },
+    { intervals: [300, 400, 600], timeout: 20000 }).toBe(true);
+  const initial = await art();
+  await screenshot(page, info, 'settlement-endscreen-default');
+  await page.locator('#esNames').fill('測試成員 A\n測試成員 B\n測試成員 C');
+  await expect.poll(art).not.toBe(initial);
+  const png = await download(page, page.locator('#downloadPng'), info, 'settlement-endscreen', 'png');
+  assertPNG(png.bytes);
+  expect(png.bytes.readUInt32BE(16)).toBe(1920);
+  expect(png.bytes.readUInt32BE(20)).toBe(1080);
+  await files(page);
+  const json = await download(page, page.locator('.one-workspace-native-files #downloadJson'), info, 'settlement-endscreen-settings', 'json');
+  await closeFiles(page);
+  const settings = JSON.parse(json.bytes.toString());
+  expect(settings.schema).toBe('o-ne.settlement-card.endscreen.v0.2.0');
+  expect(settings.fields.esNames).toContain('測試成員 C');
+  await screenshot(page, info, 'settlement-endscreen-edited');
+  expect(errors, 'uncaught runtime errors').toEqual([]);
 });

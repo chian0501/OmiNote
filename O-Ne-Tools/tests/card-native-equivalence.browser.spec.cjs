@@ -15,8 +15,9 @@ const cards = [
   ['評分卡','rating-card.html'],
   ['焦點內容卡','focus-card.html'],
   ['說明卡','explanation-card.html'],
-  ['縮圖品牌框','thumbnail-frame.html'],
-  ['片尾結算卡','settlement-card.html']
+  ['縮圖品牌框','thumbnail-frame.html']
+  // 片尾結算卡 is endscreen-only since PR #107 and intentionally renders a
+  // different canvas; card-workspace.browser.spec.cjs checks it instead.
 ];
 const selector='.preview-wrap canvas,.stage canvas,.preview-canvas';
 
