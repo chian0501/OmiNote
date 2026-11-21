@@ -13,8 +13,9 @@ const tools = [
   ['rating-card','rating-card.html'],
   ['focus-card','focus-card.html'],
   ['explanation-card','explanation-card.html'],
-  ['thumbnail-frame','thumbnail-frame.html'],
-  ['settlement-card','settlement-card.html']
+  ['thumbnail-frame','thumbnail-frame.html']
+  // settlement-card: endscreen-only since PR #107; its JSON import is
+  // intentionally blocked there, so it has no Canonical import gate.
 ];
 
 for (const [toolId, file] of tools) {

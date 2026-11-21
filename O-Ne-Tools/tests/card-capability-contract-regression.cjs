@@ -23,7 +23,8 @@ const nativeHtmlSha = {
   'rating-card.html': '17395bbbb1972a69bce48618fa42a8e26c739a42',
   'focus-card.html': '67991457ceb1bed32a14dfe6a8339b1f78599c2e',
   'thumbnail-frame.html': '0c1eade7b977968df5034894349df0ed0f430d7a',
-  'settlement-card.html': '50c32332debb41e2e934926302f2cb265ee3c27f'
+  // Re-locked after PR #105-#108 (endscreen merged in, endscreen-only since #107).
+  'settlement-card.html': 'd50eab1c96964554c222be2084ccdd8a34bc16e1'
 };
 const required = [
   ['一般卡','general-card.html',['id="mode"','id="subtitleColor"','applySubtitleColor','clearSubtitleColors','id="customLabel"']],
@@ -39,7 +40,7 @@ const required = [
   ['焦點序列','focus-card-sequence-v1.js',["const KEYS = ['left', 'right', 'third', 'fourth']",'exportFrames','exportPackage','stack-left','grid-right']],
   ['說明卡','explanation-card-portable-v049.html',['id="contentMode"','id="galleryMode"','MAX_GALLERY_IMAGES=10','const GALLERY_LAYOUTS=','id="galleryAddImage"','id="galleryBatch"','id="contentTemplatePicker"','.onecard']],
   ['縮圖品牌框','thumbnail-frame.html',['id="coverMode"','id="containMode"','id="cornerText"','id="cornerImageInput"','id="zoom"','id="positionX"','id="download"']],
-  ['片尾結算卡','settlement-card.html',['id="leftMode"','id="addRow"','id="catsVisible"','id="subscribeVisible"','id="showGuides"','id="nextUpload"','id="downloadPng"']]
+  ['片尾結算卡','settlement-card.html',['id="leftMode"','id="addRow"','id="catsVisible"','id="subscribeVisible"','id="showGuides"','id="nextUpload"','id="downloadPng"','settlement-endscreen-v013.js']]
 ];
 
 function read(file) { return fs.readFileSync(path.join(root,file),'utf8'); }
