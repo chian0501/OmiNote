@@ -186,6 +186,8 @@
     .segmented button+button{border-left:1px solid var(--line-strong)}
     .segmented button.is-active{color:#fff;background:var(--teal)}
     .segmented.four{grid-template-columns:repeat(4,1fr)}
+    .segmented.five{grid-template-columns:repeat(5,1fr)}
+    .segmented.five button{padding:0 4px}
     .segmented.four button{padding:0 7px}
     .corner-grid{
       display:grid;
@@ -423,12 +425,15 @@
           <div class="note">可保留 O-Ne Logo、改成文字、換成自己的透明圖片，或完全不顯示角標。角標內容會維持原比例並保留呼吸空間。</div>
 
           <label>角標內容</label>
-          <div class="segmented four" role="group" aria-label="角標內容">
+          <div class="segmented five" role="group" aria-label="角標內容">
             <button class="is-active" type="button" data-corner-content="logo">O-Ne Logo</button>
             <button type="button" data-corner-content="text">文字</button>
             <button type="button" data-corner-content="image">自訂圖片</button>
+            <button type="button" data-corner-content="member">會員專屬</button>
             <button type="button" data-corner-content="none">不顯示</button>
           </div>
+
+          <div class="note" id="memberNote" hidden>「會員專屬」會把左上角整塊換成金牌嵌板（固定位置），右上維持 O-Ne Logo。</div>
 
           <div id="cornerPositionControls">
             <label>角標位置</label>
@@ -504,6 +509,9 @@
       var REGULAR_TOP_RIGHT_SOURCE="./assets/thumbnail-regular-top-right-v124.png";
       var CORNER_PANEL_SOURCE="./assets/thumbnail-corner-panel-v124.png";
       var CORNER_LOGO_SOURCE="./assets/thumbnail-corner-logo-patch-v124.png";
+      var MEMBER_PATCH_SOURCE="./assets/thumbnail-member-badge-B-v001.png";
+      var MEMBER_PATCH_WIDTH=760;
+      var MEMBER_PATCH_HEIGHT=300;
       var canvas=document.getElementById("canvas");
       var ctx=canvas.getContext("2d");
       var frameCanvas=document.createElement("canvas");
@@ -514,6 +522,7 @@
       var regularTopRightImage=new Image();
       var cornerPanelImage=new Image();
       var cornerLogoImage=new Image();
+      var memberPatchImage=new Image();
       var sourceImage=null;
       var sourceObjectUrl="";
       var cornerCustomImage=null;
@@ -521,7 +530,7 @@
       var mode="cover";
       var cornerContent="logo";
       var cornerPosition="top-right";
-      var assetState={formal:false,regular:false,panel:false,logo:false,error:false};
+      var assetState={formal:false,regular:false,panel:false,logo:false,member:false,error:false,memberError:false};
 
       function $(id){return document.getElementById(id)}
       function setStatus(message,isError){
@@ -541,7 +550,7 @@
         $("cornerTextColorValue").textContent=$("cornerTextColor").value.toUpperCase();
       }
       function frameAssetsReady(){
-        return assetState.formal&&assetState.regular&&assetState.panel&&assetState.logo&&!assetState.error;
+        return assetState.formal&&assetState.regular&&assetState.panel&&assetState.logo&&!assetState.error&&(cornerContent!=="member"||assetState.member);
       }
       function syncDownloadState(){
         $("download").disabled=!frameAssetsReady();
@@ -624,12 +633,29 @@
           drawHeight
         );
       }
+      function drawMemberCorner(){
+        if(assetState.panel&&assetState.logo){
+          var savedPosition=cornerPosition;
+          cornerPosition="top-right";
+          drawCornerPanel();
+          var logoBox=getCornerContentBox();
+          frameCtx.drawImage(cornerLogoImage,logoBox.x,logoBox.y,logoBox.width,logoBox.height);
+          cornerPosition=savedPosition;
+        }
+        if(!assetState.member)return;
+        frameCtx.clearRect(0,0,MEMBER_PATCH_WIDTH,MEMBER_PATCH_HEIGHT);
+        frameCtx.drawImage(memberPatchImage,0,0,MEMBER_PATCH_WIDTH,MEMBER_PATCH_HEIGHT);
+      }
       function drawFrameLayer(){
         frameCtx.clearRect(0,0,WIDTH,HEIGHT);
         if(!assetState.formal)return;
         frameCtx.drawImage(formalFrameImage,0,0,WIDTH,HEIGHT);
         if(cornerContent==="none"){
           restoreTopRightRegularCorner();
+          return;
+        }
+        if(cornerContent==="member"){
+          drawMemberCorner();
           return;
         }
         if(!assetState.panel)return;
@@ -682,7 +708,8 @@
         resetAdjustments();
       }
       function updateCornerControls(){
-        $("cornerPositionControls").hidden=cornerContent==="none";
+        $("cornerPositionControls").hidden=cornerContent==="none"||cornerContent==="member";
+        $("memberNote").hidden=cornerContent!=="member";
         $("cornerTextControls").hidden=cornerContent!=="text";
         $("cornerImageControls").hidden=cornerContent!=="image";
       }
@@ -692,6 +719,7 @@
           button.classList.toggle("is-active",button.dataset.cornerContent===cornerContent);
         });
         updateCornerControls();
+        syncDownloadState();
         draw();
       }
       function activateCornerPosition(nextPosition){
@@ -802,7 +830,7 @@
         };
       }
       function validateThumbnailSnapshot(snapshot){
-        if(!snapshot||!["cover","contain"].includes(snapshot.mode)||!["logo","text","image","none"].includes(snapshot.cornerContent)||!["top-left","top-right","bottom-left","bottom-right"].includes(snapshot.cornerPosition)||!snapshot.fields)throw new Error("縮圖品牌框 JSON 結構不完整。");
+        if(!snapshot||!["cover","contain"].includes(snapshot.mode)||!["logo","text","image","member","none"].includes(snapshot.cornerContent)||!["top-left","top-right","bottom-left","bottom-right"].includes(snapshot.cornerPosition)||!snapshot.fields)throw new Error("縮圖品牌框 JSON 結構不完整。");
         if(!/^#[0-9A-Fa-f]{6}$/.test(String(snapshot.fields.backgroundColor))||!/^#[0-9A-Fa-f]{6}$/.test(String(snapshot.fields.cornerTextColor)))throw new Error("顏色必須是 6 碼色票。");
         var zoom=Number(snapshot.fields.zoom),x=Number(snapshot.fields.positionX),y=Number(snapshot.fields.positionY);
         if(!Number.isFinite(zoom)||zoom<20||zoom>220||!Number.isFinite(x)||x<-100||x>100||!Number.isFinite(y)||y<-100||y>100)throw new Error("縮放或位置超出允許範圍。");
@@ -816,7 +844,7 @@
         document.querySelectorAll("[data-corner-content]").forEach(function(button){button.classList.toggle("is-active",button.dataset.cornerContent===cornerContent)});
         document.querySelectorAll("[data-corner-position]").forEach(function(button){button.classList.toggle("is-active",button.dataset.cornerPosition===cornerPosition)});
         $("cornerTextPreset").value=[].slice.call($("cornerTextPreset").options).some(function(option){return option.value===$("cornerText").value})?$("cornerText").value:"";
-        updateLabels();updateCornerControls();draw();
+        updateLabels();updateCornerControls();syncDownloadState();draw();
       }
       function importThumbnail(payload){
         if(!payload||payload.component_id!=="THUMBNAIL-FRAME"||typeof payload.schema!=="string"||payload.schema.indexOf("o-ne.thumbnail-frame.ready.")!==0)throw new Error("這不是縮圖品牌框設定 JSON。");
@@ -874,6 +902,9 @@
       bindAsset(regularTopRightImage,"regular",REGULAR_TOP_RIGHT_SOURCE);
       bindAsset(cornerPanelImage,"panel",CORNER_PANEL_SOURCE);
       bindAsset(cornerLogoImage,"logo",CORNER_LOGO_SOURCE);
+      memberPatchImage.onload=function(){assetState.member=true;assetState.memberError=false;draw();syncDownloadState()};
+      memberPatchImage.onerror=function(){assetState.memberError=true;if(cornerContent==="member")setStatus("會員專屬補片載入失敗，請重新整理頁面。",true)};
+      memberPatchImage.src=MEMBER_PATCH_SOURCE;
 
       $("fileInput").addEventListener("change",function(event){loadFile(event.target.files[0])});
       $("cornerImageInput").addEventListener("change",function(event){loadCornerImage(event.target.files[0])});

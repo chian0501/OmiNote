@@ -22,7 +22,7 @@ const nativeHtmlSha = {
   'dialogue-card-v135.html': 'e807d1d108d0f8f411c524481ebf86ae4c1e91f2',
   'rating-card.html': '17395bbbb1972a69bce48618fa42a8e26c739a42',
   'focus-card.html': '67991457ceb1bed32a14dfe6a8339b1f78599c2e',
-  'thumbnail-frame.html': '0c1eade7b977968df5034894349df0ed0f430d7a',
+  'thumbnail-frame.html': 'b193e36e33729dcd7b6530f440e20398fc2a57c0',
   // Re-locked after PR #105-#108 (endscreen merged in, endscreen-only since #107).
   'settlement-card.html': 'd50eab1c96964554c222be2084ccdd8a34bc16e1'
 };
