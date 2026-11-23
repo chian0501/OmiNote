@@ -24,7 +24,7 @@ const nativeHtmlSha = {
   'focus-card.html': '67991457ceb1bed32a14dfe6a8339b1f78599c2e',
   'thumbnail-frame.html': 'b193e36e33729dcd7b6530f440e20398fc2a57c0',
   // Re-locked after PR #105-#108 (endscreen merged in, endscreen-only since #107).
-  'settlement-card.html': 'd50eab1c96964554c222be2084ccdd8a34bc16e1'
+  'settlement-card.html': '356c301698d769e7b95e989ce154fad7cb05eee3'
 };
 const required = [
   ['一般卡','general-card.html',['id="mode"','id="subtitleColor"','applySubtitleColor','clearSubtitleColors','id="customLabel"']],

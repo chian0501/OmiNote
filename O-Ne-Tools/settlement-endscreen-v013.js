@@ -6,11 +6,10 @@
 (function () {
   'use strict';
 
-  var VERSION = '0.3.0-endscreen-anim';
+  var VERSION = '0.3.1-endscreen-subframe';
   var A = './assets/';
   var SRC = {
     bg: A + 'settlement-background-v011.jpg?v=012',
-    avatar: A + 'endscreen-avatar-v001.png',
     badge: A + 'endscreen-badge-n-v001.png',
     nomi: A + 'endscreen-cat-nomi-v001.png',
     kuma: A + 'endscreen-cat-kuma-v001.png',
@@ -50,19 +49,19 @@
   var CHECKS = [
     ['esMem', '工會成員名單', '中間欄', true],
     ['esWait', '「招募中」補格', '名單只有幾位時補空位', true],
-    ['esSub', '訂閱頭像圈', '右上，對 YouTube 訂閱元素', true],
+    ['esSub', '訂閱元素定位框', '右上圓框，只在標示版畫出；頭像由 YouTube 訂閱元素自己帶', true],
     ['esPlat', 'IG／Threads／FB 平台牌', '有經營再開；開啟時罐罐贊助列自動收起', false],
     ['esJoin', '加入工會', '加入說明牌', true],
     ['esCan', '罐罐贊助', '加入牌內的價格列', true],
     ['esNomi', 'Nomi', '貓', true],
     ['esKuma', 'Kuma', '貓', true],
     ['esSanmei', '三妹', '三妹影片上架後再開', false],
-    ['esGuide', '標示框（對位用）', '輸出標示版給剪輯對位（會畫出兩個影片框位置）；上片請關掉', false]
+    ['esGuide', '標示框（對位用）', '輸出標示版給剪輯對位（會畫出兩個影片框與訂閱框位置）；上片請關掉', false]
   ];
 
   /* ───────── 動畫設定 ───────── */
   var ELEMENTS = [
-    ['mem', '工會成員面板'], ['rows', '名單逐行'], ['sub', '訂閱頭像圈'], ['join', '加入工會小卡'],
+    ['mem', '工會成員面板'], ['rows', '名單逐行'], ['join', '加入工會小卡'],
     ['plat', '平台牌（三顆依序）'], ['nomi', 'Nomi'], ['kuma', 'Kuma'], ['sanmei', '三妹']
   ];
   var STYLES = [
@@ -71,13 +70,13 @@
   ];
   var PRESETS = {
     pop: { label: '彈跳探頭', rowStep: 0.3, amp: 1,
-      cfg: { mem: ['slideL', 0.4, 0.6], rows: ['slideR', 1.1, 0.45], sub: ['pop', 0.9, 0.6], join: ['pop', 1.6, 0.6], plat: ['pop', 2.0, 0.5], nomi: ['peek', 2.2, 0.7], kuma: ['peek', 2.6, 0.7], sanmei: ['peek', 3.0, 0.7] } },
+      cfg: { mem: ['slideL', 0.4, 0.6], rows: ['slideR', 1.1, 0.45], join: ['pop', 1.6, 0.6], plat: ['pop', 2.0, 0.5], nomi: ['peek', 2.2, 0.7], kuma: ['peek', 2.6, 0.7], sanmei: ['peek', 3.0, 0.7] } },
     slide: { label: '滑入', rowStep: 0.25, amp: 1,
-      cfg: { mem: ['slideL', 0.3, 0.7], rows: ['slideR', 1.0, 0.5], sub: ['slideR', 0.8, 0.7], join: ['slideU', 1.4, 0.6], plat: ['slideR', 1.8, 0.5], nomi: ['slideU', 2.0, 0.6], kuma: ['slideU', 2.3, 0.6], sanmei: ['slideU', 2.6, 0.6] } },
+      cfg: { mem: ['slideL', 0.3, 0.7], rows: ['slideR', 1.0, 0.5], join: ['slideU', 1.4, 0.6], plat: ['slideR', 1.8, 0.5], nomi: ['slideU', 2.0, 0.6], kuma: ['slideU', 2.3, 0.6], sanmei: ['slideU', 2.6, 0.6] } },
     type: { label: '逐行打字', rowStep: 0.55, amp: 1,
-      cfg: { mem: ['fade', 0.3, 0.5], rows: ['type', 1.0, 0.7], sub: ['fade', 0.8, 0.5], join: ['slideU', 2.4, 0.5], plat: ['fade', 2.8, 0.4], nomi: ['peek', 3.2, 0.6], kuma: ['peek', 3.5, 0.6], sanmei: ['peek', 3.8, 0.6] } },
+      cfg: { mem: ['fade', 0.3, 0.5], rows: ['type', 1.0, 0.7], join: ['slideU', 2.4, 0.5], plat: ['fade', 2.8, 0.4], nomi: ['peek', 3.2, 0.6], kuma: ['peek', 3.5, 0.6], sanmei: ['peek', 3.8, 0.6] } },
     breathe: { label: '輕微呼吸晃動', rowStep: 0.2, amp: 1,
-      cfg: { mem: ['fade', 0.2, 0.7], rows: ['fade', 0.9, 0.5], sub: ['pop', 0.6, 0.9], join: ['slideU', 1.3, 0.8], plat: ['slideU', 1.6, 0.7], nomi: ['slideU', 1.8, 0.9], kuma: ['slideU', 2.1, 0.9], sanmei: ['slideU', 2.4, 0.9] } }
+      cfg: { mem: ['fade', 0.2, 0.7], rows: ['fade', 0.9, 0.5], join: ['slideU', 1.3, 0.8], plat: ['slideU', 1.6, 0.7], nomi: ['slideU', 1.8, 0.9], kuma: ['slideU', 2.1, 0.9], sanmei: ['slideU', 2.4, 0.9] } }
   };
   var anim = { t: null, playing: false, raf: 0, t0: 0, cfg: null, rowStep: 0.3, idleOn: true, amp: 1, total: 15 };
 
@@ -137,7 +136,7 @@
     return o;
   }
 
-  var PHASE = { nomi: 0, kuma: 1.7, sanmei: 3.1, sub: 0.5, mem: 0, join: 2 };
+  var PHASE = { nomi: 0, kuma: 1.7, sanmei: 3.1, mem: 0, join: 2 };
   function idleOf(k, t) {
     var o = { dx: 0, dy: 0, sx: 1, sy: 1, rot: 0 };
     if (t === null || !anim.idleOn) return o;
@@ -151,9 +150,6 @@
       o.sy = 1 + 0.014 * s * w;
       o.sx = 1 - 0.007 * s * w;
       o.rot = 0.022 * s * Math.sin(tau * t / 3.4 + ph);
-    } else if (k === 'sub') {
-      var q = 1 + 0.018 * s * Math.sin(tau * t / 2.6 + ph);
-      o.sx = q; o.sy = q;
     } else if (k === 'mem' || k === 'join') {
       o.dy = 3 * s * Math.sin(tau * t / 4 + ph);
     }
@@ -225,7 +221,7 @@
     h += '</select>';
     h += '<div class="two"><div><label for="esTotal">全片長度（秒）</label><input id="esTotal" type="number" min="3" max="30" step="0.5" value="15"></div>' +
       '<div><label for="esRowStep">名單逐行間隔（秒）</label><input id="esRowStep" type="number" min="0.05" max="2" step="0.05" value="0.3"></div></div>';
-    h += '<div class="switch-row"><div class="switch-copy"><strong>待機小動作</strong><small>出現後貓輕輕呼吸晃動並定時眨眼、Nomi 會搖尾巴、頭像微脈動、背景緩慢漂移，不會 3 秒後就停住（Kuma 趴著看不到尾巴、三妹只有眨眼）</small></div><input id="esIdle" type="checkbox" checked></div>';
+    h += '<div class="switch-row"><div class="switch-copy"><strong>待機小動作</strong><small>出現後貓輕輕呼吸晃動並定時眨眼、Nomi 會搖尾巴、背景緩慢漂移，不會 3 秒後就停住（Kuma 趴著看不到尾巴、三妹只有眨眼）</small></div><input id="esIdle" type="checkbox" checked></div>';
     h += '<label for="esAmp">待機幅度</label><select id="esAmp"><option value="0.6">輕</option><option value="1" selected>中</option><option value="1.8">強</option></select>';
     h += '<div style="margin-top:12px;display:grid;grid-template-columns:1fr 1.25fr .6fr .6fr;gap:6px;align-items:center;font-size:11px;color:#9ea7b3"><b>元素</b><b>動法</b><b>幾秒出現</b><b>長度(秒)</b></div>';
     ELEMENTS.forEach(function (e) {
@@ -494,26 +490,19 @@
     closeEl(ctx);
   }
 
-  function drawSub(ctx, t, guide) {
-    if (!openEl(ctx, 'sub', t, 1600, 250, 0)) return;
-    ctx.save();
+  /* 訂閱元素：只留定位框（和影片框一樣只在標示版畫），頭像交給 YouTube 訂閱元素本身 */
+  function drawSub(ctx, guide) {
+    if (!guide) return;
     ctx.beginPath();
-    ctx.arc(1600, 250, 170, 0, Math.PI * 2);
-    ctx.clip();
-    cover(ctx, imgs.avatar, 1430, 80, 340, 340);
-    ctx.restore();
-    if (guide) {
-      ctx.beginPath();
-      ctx.arc(1600, 250, 168, 0, Math.PI * 2);
-      ctx.setLineDash([14, 10]);
-      ctx.lineWidth = 4;
-      ctx.strokeStyle = '#e0453a';
-      ctx.stroke();
-      ctx.setLineDash([]);
-      box(ctx, 1540, 40, 120, 38, '#e0453a', null, 0, null, 6);
-      text(ctx, '訂閱元素', 1600, 68, 22, 700, '#ffffff', 'center');
-    }
-    closeEl(ctx);
+    ctx.arc(1600, 250, 168, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255,255,255,.4)';
+    ctx.fill();
+    ctx.setLineDash([14, 10]);
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = '#e0453a';
+    ctx.stroke();
+    ctx.setLineDash([]);
+    text(ctx, 'YouTube 訂閱元素', 1600, 260, 28, 700, '#b8322a', 'center');
   }
 
   function drawCat(ctx, c, X, Y, t) {
@@ -604,7 +593,7 @@
     });
 
     if (on('esMem')) drawMembers(ctx, issues, t, notes);
-    if (on('esSub')) drawSub(ctx, t, guide);
+    if (on('esSub')) drawSub(ctx, guide);
     if (on('esPlat')) drawPlatforms(ctx, t);
     if (on('esJoin')) drawJoin(ctx, t);
     drawCats(ctx, t);
