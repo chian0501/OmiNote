@@ -502,8 +502,6 @@
     ctx.strokeStyle = '#e0453a';
     ctx.stroke();
     ctx.setLineDash([]);
-    box(ctx, 1540, 40, 120, 38, '#e0453a', null, 0, null, 6);
-    text(ctx, '訂閱元素', 1600, 68, 22, 700, '#ffffff', 'center');
     text(ctx, 'YouTube 訂閱元素', 1600, 260, 28, 700, '#b8322a', 'center');
   }
 
